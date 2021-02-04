@@ -7,7 +7,9 @@ class Config:
 
     PROGRAM_PATH = sys.executable.replace("\\", "/")
 
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
+
+    DB_COMPATIBLE_VERSIONS = ["1.0.0"]
 
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
     SYSTEM_DRIVE = os.getenv("SYSTEMDRIVE").replace("\\", "/")

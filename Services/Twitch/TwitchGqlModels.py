@@ -42,25 +42,17 @@ class Utils:
     @staticmethod
     def defaultIfNone(data, model):
         if data == None:
-            return model(model.default)
+            return model({})
         else:
             return model(data)
 
 class User:
-    default = {
-        "id": None,
-        "login": "Unknown",
-        "displayName": "Unknown",
-        "profileImageURL": None,
-        "createdAt": "0001-01-01T00:00:00Z"
-    }
-
     def __init__(self, data):
-        self.id = data.get("id")
-        self.login = data.get("login")
-        self.displayName = data.get("displayName")
-        self.profileImageURL = data.get("profileImageURL")
-        self.createdAt = TwitchConfig.Datetime(data.get("createdAt"))
+        self.id = data.get("id", None)
+        self.login = data.get("login", "")
+        self.displayName = data.get("displayName", self.login)
+        self.profileImageURL = data.get("profileImageURL", None)
+        self.createdAt = TwitchConfig.Datetime(data.get("createdAt", "0001-01-01T00:00:00Z"))
 
     def formattedName(self):
         if self.id == None:
@@ -76,77 +68,70 @@ class User:
 class Channel(User):
     def __init__(self, data):
         super().__init__(data)
-        self.description = data.get("description")
-        self.primaryColorHex = data.get("primaryColorHex")
-        self.offlineImageURL = data.get("offlineImageURL")
-        self.isPartner = data.get("roles").get("isPartner")
-        self.isAffiliate = data.get("roles").get("isAffiliate")
-        self.followers = data.get("followers").get("totalCount")
-        self.stream = Utils.noneIfNone(data.get("stream"), Stream)
+        self.description = data.get("description", "")
+        self.primaryColorHex = data.get("primaryColorHex", "")
+        self.offlineImageURL = data.get("offlineImageURL", None)
+        self.isPartner = data.get("roles", {}).get("isPartner", False)
+        self.isAffiliate = data.get("roles", {}).get("isAffiliate", False)
+        self.followers = data.get("followers", {}).get("totalCount", 0)
+        self.stream = Utils.noneIfNone(data.get("stream", None), Stream)
 
     def __str__(self):
         return "Channel Object " + str(self.__dict__)
 
 class Stream:
     def __init__(self, data):
-        self.id = data.get("id")
-        self.title = data.get("title")
-        self.game = Utils.defaultIfNone(data.get("game"), Game)
-        self.type = data.get("type")
-        self.previewImageURL = data.get("previewImageURL")
-        self.broadcaster = User(data.get("broadcaster"))
-        self.createdAt = TwitchConfig.Datetime(data.get("createdAt"))
-        self.viewersCount = data.get("viewersCount")
+        self.id = data.get("id", None)
+        self.title = data.get("title", "")
+        self.game = Utils.defaultIfNone(data.get("game", None), Game)
+        self.type = data.get("type", "")
+        self.previewImageURL = data.get("previewImageURL", None)
+        self.broadcaster = Utils.defaultIfNone(data.get("broadcaster", None), User)
+        self.createdAt = TwitchConfig.Datetime(data.get("createdAt", "0001-01-01T00:00:00Z"))
+        self.viewersCount = data.get("viewersCount", 0)
 
     def __str__(self):
         return "Stream Object " + str(self.__dict__)
 
 class Video:
     def __init__(self, data):
-        self.id = data.get("id")
-        self.title = data.get("title")
-        self.game = Utils.defaultIfNone(data.get("game"), Game)
-        self.previewThumbnailURL = data.get("previewThumbnailURL")
-        self.owner = Utils.defaultIfNone(data.get("owner"), User)
-        self.creator = Utils.defaultIfNone(data.get("creator"), User)
-        self.lengthSeconds = TwitchConfig.Duration(data.get("lengthSeconds"))
-        self.createdAt = TwitchConfig.Datetime(data.get("createdAt"))
-        self.publishedAt = TwitchConfig.Datetime(data.get("publishedAt"))
-        self.viewCount = data.get("viewCount")
+        self.id = data.get("id", None)
+        self.title = data.get("title", "")
+        self.game = Utils.defaultIfNone(data.get("game", None), Game)
+        self.previewThumbnailURL = data.get("previewThumbnailURL", None)
+        self.owner = Utils.defaultIfNone(data.get("owner", None), User)
+        self.creator = Utils.defaultIfNone(data.get("creator", None), User)
+        self.lengthSeconds = TwitchConfig.Duration(data.get("lengthSeconds", 0))
+        self.createdAt = TwitchConfig.Datetime(data.get("createdAt", "0001-01-01T00:00:00Z"))
+        self.publishedAt = TwitchConfig.Datetime(data.get("publishedAt", "0001-01-01T00:00:00Z"))
+        self.viewCount = data.get("viewCount", 0)
 
     def __str__(self):
         return "Video Object " + str(self.__dict__)
 
 class Clip:
     def __init__(self, data):
-        self.id = data.get("id")
-        self.title = data.get("title")
-        self.game = Utils.defaultIfNone(data.get("game"), Game)
-        self.thumbnailURL = data.get("thumbnailURL")
-        self.slug = data.get("slug")
-        self.url = data.get("url")
-        self.broadcaster = Utils.defaultIfNone(data.get("broadcaster"), User)
-        self.curator = Utils.defaultIfNone(data.get("curator"), User)
-        self.durationSeconds = TwitchConfig.Duration(data.get("durationSeconds"))
-        self.createdAt = TwitchConfig.Datetime(data.get("createdAt"))
-        self.viewCount = data.get("viewCount")
+        self.id = data.get("id", None)
+        self.title = data.get("title", "")
+        self.game = Utils.defaultIfNone(data.get("game", None), Game)
+        self.thumbnailURL = data.get("thumbnailURL", None)
+        self.slug = data.get("slug", "")
+        self.url = data.get("url", "")
+        self.broadcaster = Utils.defaultIfNone(data.get("broadcaster", None), User)
+        self.curator = Utils.defaultIfNone(data.get("curator", None), User)
+        self.durationSeconds = TwitchConfig.Duration(data.get("durationSeconds", 0))
+        self.createdAt = TwitchConfig.Datetime(data.get("createdAt", "0001-01-01T00:00:00Z"))
+        self.viewCount = data.get("viewCount", 0)
 
     def __str__(self):
         return "Clip Object " + str(self.__dict__)
 
 class Game:
-    default = {
-        "id": None,
-        "name": "Unknown",
-        "boxArtURL": "https://static-cdn.jtvnw.net/ttv-static/404_boxart-{width}x{height}.jpg",
-        "displayName": "Unknown"
-    }
-
     def __init__(self, data):
-        self.id = data.get("id")
-        self.name = data.get("name")
-        self.boxArtURL = data.get("boxArtURL")
-        self.displayName = data.get("displayName")
+        self.id = data.get("id", None)
+        self.name = data.get("name", "Unknown")
+        self.boxArtURL = data.get("boxArtURL", "https://static-cdn.jtvnw.net/ttv-static/404_boxart-{width}x{height}.jpg")
+        self.displayName = data.get("displayName", "Unknown")
 
     def __str__(self):
         return "Game Object " + str(self.__dict__)

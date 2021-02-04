@@ -508,7 +508,7 @@
           <widget class="QLabel" name="cropInfoLabel">
            <property name="font">
             <font>
-             <family>맑은 고딕</family>
+             <family>Arial Rounded MT Bold</family>
              <pointsize>9</pointsize>
              <weight>75</weight>
              <bold>true</bold>

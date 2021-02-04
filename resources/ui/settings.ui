@@ -562,6 +562,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QLabel" name="restrictedLabel">
      <property name="font">
       <font>
+       <family>Arial Rounded MT Bold</family>
        <weight>75</weight>
        <bold>true</bold>
       </font>

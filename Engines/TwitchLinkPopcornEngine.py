@@ -53,14 +53,17 @@ class TwitchDownloader:
         fileLength = list(map(float, re.findall(self.FILE_READER, data.text)))
         self.totalFiles = len(fileLength)
         self.totalSeconds = int(sum(fileLength))
+        self.reloadTotalTime()
+        self.downloadList = re.findall(".*\.ts", playlist)
+
+    def reloadTotalTime(self):
         h = str(self.totalSeconds // 3600)
-        h = (2-len(h))*"0" + h
+        h = (2 - len(h)) * "0" + h
         m = str(self.totalSeconds % 3600 // 60)
         m = (2 - len(m)) * "0" + m
-        s = str(self.totalSeconds % 3060 % 60)
+        s = str(self.totalSeconds % 3600 % 60)
         s = (2 - len(s)) * "0" + s
         self.totalTime = h + ":" + m + ":" + s
-        self.downloadList = re.findall(".*\.ts", playlist)
 
     def download(self):
         downloader = threading.Thread(target=self.downloader)

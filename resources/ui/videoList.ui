@@ -191,7 +191,7 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>70</width>
+                 <width>80</width>
                  <height>20</height>
                 </size>
                </property>
@@ -203,7 +203,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>맑은 고딕</family>
+                 <family>Arial Rounded MT Bold</family>
                  <pointsize>10</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
@@ -521,7 +521,7 @@ border-radius: 10px;</string>
                   </property>
                   <property name="font">
                    <font>
-                    <family>맑은 고딕</family>
+                    <family>Arial Rounded MT Bold</family>
                     <pointsize>10</pointsize>
                     <weight>75</weight>
                     <bold>true</bold>

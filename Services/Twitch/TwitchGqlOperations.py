@@ -92,9 +92,9 @@ class getChannelVideos:
 
     variableList = [
         "login",
-        "type", #ARCHIVE, HIGHLIGHT, UPLOAD, PAST_PREMIERE, null
-        "sort", #TIME, VIEWS
-        "limit", #From 1 to 100
+        "type",
+        "sort",
+        "limit",
         "cursor"
     ]
 
@@ -146,8 +146,8 @@ class getChannelClips:
 
     variableList = [
         "login",
-        "filter", #LAST_DAY, LAST_WEEK, LAST_MONTH, ALL_TIME
-        "limit", #From 1 to 100
+        "filter",
+        "limit",
         "cursor"
     ]
 

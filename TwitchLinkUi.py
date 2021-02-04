@@ -30,10 +30,10 @@ class Ui:
         return self.setup(Loading(self.db), forceAllLabelFonts=True)
 
     def Settings(self):
-        return self.setup(Settings(self.db))
+        return self.setup(Settings(self.db), forceAllLabelFonts=True)
 
     def Login(self):
-        return self.setup(Login(self.db))
+        return self.setup(Login(self.db), forceAllLabelFonts=True)
 
     def About(self):
         return self.setup(About(self.db))
@@ -54,13 +54,13 @@ class Ui:
         return self.setup(VideoBox(self.db, window, video))
 
     def VideoList(self, mode, data):
-        return self.setup(VideoList(self.db, mode, data), forceSize=False)
+        return self.setup(VideoList(self.db, mode, data), forceSize=False, forceAllLabelFonts=True)
 
     def DownloadMenu(self, video, vod):
-        return self.setup(DownloadMenu(self.db, video, vod))
+        return self.setup(DownloadMenu(self.db, video, vod), forceAllLabelFonts=True)
 
     def Download(self):
-        return self.setup(Download(self.db))
+        return self.setup(Download(self.db), forceAllLabelFonts=True)
 
     def setup(self, ui, forceSize=True, forceAllLabelFonts=False):
         if isinstance(ui, QDialog):
@@ -149,6 +149,7 @@ class Settings(QDialog, UiFiles.settings):
             self.timezoneArea.setEnabled(False)
             self.popcornSettingsArea.setEnabled(False)
             self.popcornDownloadModeArea.setEnabled(False)
+            self.buttonBox.button(QDialogButtonBox.Reset).setEnabled(False)
         else:
             self.restrictedLabel.hide()
         self.buttonBox.accepted.connect(self.saveSettings)
@@ -1057,7 +1058,19 @@ class Download(QWidget, UiFiles.download):
             self.thumbnail_image.setPixmap(Utils.Image(self.accessToken.previewThumbnailURL, Config.THUMBNAIL_IMAGE))
             self.user_name.setText(T("#Channel : {channel}", channel=self.accessToken.owner.displayName))
             self.date.setText(T("#Date : {date}", date=self.accessToken.publishedAt.toUTC(self.db.localization.timezone)))
-            self.duration.setText(T("#Duration : {duration}", duration=self.accessToken.lengthSeconds))
+            start, end = self.db.fileDownload["range"]
+            if start == None and end == None:
+                self.duration.setText(T("#Duration : {duration}", duration=self.accessToken.lengthSeconds))
+            else:
+                if start == None:
+                    start = T("#From start")
+                else:
+                    start = self.getTimeString(start)
+                if end == None:
+                    end = T("#To end")
+                else:
+                    end = self.getTimeString(end)
+                self.duration.setText(T("#Duration : {duration} / Crop : {start} ~ {end}", duration=self.accessToken.lengthSeconds, start=start, end=end))
             self.view_count.setText(T("#View Count : {view}", view=self.accessToken.viewCount))
         self.resolution.setText(T("#Resolution : {resolution}", resolution=self.db.fileDownload["resolution"]))
         self.file.setText(T("#File : {file}", file=self.db.fileDownload["saveDirectory"] + "/" + self.db.fileDownload["fileName"]))
@@ -1080,6 +1093,15 @@ class Download(QWidget, UiFiles.download):
         self.downloader.errorOccurred.connect(self.errorOccurred)
         self.db.setDownloadingState(True)
         self.downloader.start()
+
+    def getTimeString(self, totalSeconds):
+        h = str(totalSeconds // 3600)
+        h = (2 - len(h)) * "0" + h
+        m = str(totalSeconds % 3600 // 60)
+        m = (2 - len(m)) * "0" + m
+        s = str(totalSeconds % 3600 % 60)
+        s = (2 - len(s)) * "0" + s
+        return h + ":" + m + ":" + s
 
     def streamProgress(self, complete, duration):
         if complete:

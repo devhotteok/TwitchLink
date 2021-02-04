@@ -78,13 +78,18 @@ class TwitchLink(QMainWindow, UiFiles.mainWindow):
             if self.db.serverNotice != None:
                 Utils.info("notice", self.db.serverNotice)
             return True
-        elif status == "Update Found":
-            if Utils.ask("update-notice", "#A new version of {name} has been released!\nOptional updates.", "update", "ok", True, name=T("#PROGRAM_NAME")):
-                QDesktopServices.openUrl(QUrl(self.db.updateUrl))
-            return True
-        elif status == "Update Required":
-            if Utils.ask("update-notice", "#A new version of {name} has been released!\nEssential updates.", "update", "cancel", True, name=T("#PROGRAM_NAME")):
-                QDesktopServices.openUrl(QUrl(self.db.updateUrl))
+        else:
+            if self.db.updateNote == None:
+                updateInfoString = "#A new version of {name} has been released!\n\n* {updateType}"
+            else:
+                updateInfoString = "#A new version of {name} has been released!\n{updateNote}\n\n* {updateType}"
+            if status == "Update Found":
+                if Utils.ask("update-notice", updateInfoString, "update", "ok", True, name=T("#PROGRAM_NAME"), updateNote=self.db.updateNote, updateType=T("#Optional update")):
+                    QDesktopServices.openUrl(QUrl(self.db.updateUrl))
+                return True
+            elif status == "Update Required":
+                if Utils.ask("update-notice", updateInfoString, "update", "cancel", True, name=T("#PROGRAM_NAME"), updateNote=self.db.updateNote, updateType=T("#Update required")):
+                    QDesktopServices.openUrl(QUrl(self.db.updateUrl))
         return False
 
     def closeEvent(self, event):

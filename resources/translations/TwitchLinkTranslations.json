@@ -11,13 +11,21 @@
     "en": "{name} is currently unavailable.\n{message}",
     "ko": "현재 {name} 서비스를 이용할 수 없습니다.\n{message}"
   },
-  "#A new version of {name} has been released!\nOptional updates.": {
-    "en": "A new version of {name} has been released!\nOptional updates.",
-    "ko": "{name}의 새로운 버전이 출시되었습니다!\n선택적 업데이트입니다."
+  "#A new version of {name} has been released!\n\n* {updateType}": {
+    "en": "A new version of {name} has been released!\n\n* {updateType}",
+    "ko": "{name}의 새로운 버전이 출시되었습니다!\n\n* {updateType}"
   },
-  "#A new version of {name} has been released!\nEssential updates.": {
-    "en": "A new version of {name} has been released!\nEssential updates.",
-    "ko": "{name}의 새로운 버전이 출시되었습니다!\n필수적 업데이트입니다."
+  "#A new version of {name} has been released!\n{updateNote}\n\n* {updateType}": {
+    "en": "A new version of {name} has been released!\n{updateNote}\n\n* {updateType}",
+    "ko": "{name}의 새로운 버전이 출시되었습니다!\n{updateNote}\n\n* {updateType}"
+  },
+  "#Optional update": {
+    "en": "Optional update",
+    "ko": "선택적 업데이트"
+  },
+  "#Update required": {
+    "en": "Update required",
+    "ko": "필수 업데이트"
   },
   "#There is a download in progress.\nDo you want to cancel and exit?": {
     "en": "There is a download in progress.\nDo you want to cancel and exit?",
@@ -334,6 +342,18 @@
   "#Viewer Count : {viewer}": {
     "en": "Viewer Count : {viewer}",
     "ko": "시청자 : {viewer}명"
+  },
+  "#Duration : {duration} / Crop : {start} ~ {end}": {
+    "en": "Duration : {duration} / Crop : {start} ~ {end}",
+    "ko": "길이 : {duration} / 자르기 : {start} ~ {end}"
+  },
+  "#From start": {
+    "en": "From start",
+    "ko": "처음부터"
+  },
+  "#To end": {
+    "en": "To end",
+    "ko": "끝까지"
   },
   "#View Count : {view}": {
     "en": "View Count : {view}",

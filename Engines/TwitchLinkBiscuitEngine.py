@@ -40,19 +40,31 @@ class TwitchDownloader:
         except:
             raise TwitchDownloaderNetworkError
         fileLength = list(map(float, re.findall(self.FILE_READER, data.text)))
-        self.totalFiles = len(fileLength)
-        self.totalSeconds = int(sum(fileLength))
-        h = str(self.totalSeconds // 3600)
-        h = (2-len(h))*"0" + h
-        m = str(self.totalSeconds % 3600 // 60)
-        m = (2 - len(m)) * "0" + m
-        s = str(self.totalSeconds % 3060 % 60)
-        s = (2 - len(s)) * "0" + s
-        self.totalTime = h + ":" + m + ":" + s
+        self.realTotalFiles = len(fileLength)
+        self.realTotalSeconds = int(sum(fileLength))
+        self.totalFiles = self.realTotalFiles
+        self.totalSeconds = self.realTotalSeconds
+        self.reloadTotalTime()
 
     def setRange(self, start, end):
         if self.download_type == "video":
             self.range = {"start": start, "end": end}
+            if start == None:
+                start = 0
+            if end == None:
+                end = self.realTotalSeconds
+            self.totalSeconds = end - start
+            self.totalFiles = int((self.totalSeconds / self.realTotalSeconds) * self.realTotalFiles)
+            self.reloadTotalTime()
+
+    def reloadTotalTime(self):
+        h = str(self.totalSeconds // 3600)
+        h = (2 - len(h)) * "0" + h
+        m = str(self.totalSeconds % 3600 // 60)
+        m = (2 - len(m)) * "0" + m
+        s = str(self.totalSeconds % 3600 % 60)
+        s = (2 - len(s)) * "0" + s
+        self.totalTime = h + ":" + m + ":" + s
 
     def download(self):
         downloader = threading.Thread(target=self.downloader)
@@ -74,6 +86,8 @@ class TwitchDownloader:
                 fileCheck = re.search(self.FILE_PROGRESS, line)
                 if fileCheck != None:
                     self.fileProgress += 1
+                if self.fileProgress > self.totalFiles:
+                    self.totalFiles = self.fileProgress
                 timeCheck = re.search(self.TIME_PROGRESS, line)
                 if timeCheck != None:
                     self.timeProgress = timeCheck.group(1).strip().split(".")[0]

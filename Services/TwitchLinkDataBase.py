@@ -118,6 +118,7 @@ class DataBase:
             return
         if response.status_code == 200:
             data = response.json()
+            self.programStatus = ""
             try:
                 status = data["status"]
                 self.statusMessage = status["message"].get(translator.getLanguage())
@@ -126,19 +127,23 @@ class DataBase:
                     self.programStatus = "Unavailable"
                     return
                 version = data["version"]
+                self.updateNote = version["updateNote"].get(translator.getLanguage())
                 self.updateUrl = version["updateUrl"]
                 if version["versionNo"] != Config.VERSION:
                     if version["updateRequired"]:
                         self.programStatus = "Update Required"
+                        return
                     else:
                         self.programStatus = "Update Found"
-                else:
-                    if self.getConfigData():
+                if self.getConfigData():
+                    if self.programStatus != "Update Found":
                         self.programStatus = "Available"
-                    else:
-                        self.programStatus = "Server Error"
+                else:
+                    self.programStatus = "Server Error"
             except:
                 self.programStatus = "Update Required"
+                self.updateNote = None
+                self.updateUrl = Config.HOMEPAGE_URL
         else:
             self.programStatus = "Server Error"
 
@@ -209,7 +214,11 @@ class DataBase:
             self.temp = db["temp"]
             self.engines = db["engines"]
             if self.setup.version != Config.VERSION:
-                self.resetDB()
+                if self.setup.version in Config.DB_COMPATIBLE_VERSIONS:
+                    self.setup.version = Config.VERSION
+                    self.saveDB()
+                else:
+                    self.resetDB()
         except:
             self.resetDB()
         self.localization.reloadTranslator()

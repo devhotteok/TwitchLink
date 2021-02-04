@@ -100,7 +100,7 @@
          </property>
          <property name="font">
           <font>
-           <family>맑은 고딕</family>
+           <family>Arial Rounded MT Bold</family>
            <weight>75</weight>
            <bold>true</bold>
           </font>
