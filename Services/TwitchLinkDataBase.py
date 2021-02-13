@@ -140,6 +140,8 @@ class DataBase:
                         self.programStatus = "Available"
                 else:
                     self.programStatus = "Server Error"
+                if not self.getRestrictions():
+                    self.programStatus = "Server Error"
             except:
                 self.programStatus = "Update Required"
                 self.updateNote = None
@@ -156,6 +158,18 @@ class DataBase:
             data = response.json()
             Config.AD_SERVER = data["ads"][self.localization.language]["AD_SERVER"]
             Config.SHOW_ADS = data["ads"][self.localization.language]["SHOW_ADS"]
+            return True
+        else:
+            return False
+
+    def getRestrictions(self):
+        try:
+            response = requests.get(Config.SERVER_URL + "/restrictions.json")
+        except:
+            return False
+        if response.status_code == 200:
+            data = response.json()
+            self.restrictions = data
             return True
         else:
             return False
@@ -279,6 +293,25 @@ class DataBase:
     def setBiscuitEngineSettings(self):
         self.engines.biscuit.set()
         self.saveDB()
+
+    def checkRestrictions(self, type, channel_id, content_id):
+        if channel_id in self.restrictions["channel"]:
+            if type in self.restrictions["channel"][channel_id]:
+                return 1
+        if content_id in self.restrictions[type]:
+            return 2
+        return 0
+
+    def isRestricted(self, contentType, channel, content_id):
+        restricted = self.checkRestrictions(contentType, channel.id, content_id)
+        if restricted == 0:
+            return False
+        elif restricted == 1:
+            reason = "#'{channel}' has restricted downloading {content}s from their channel."
+        else:
+            reason = "#'{channel}' has restricted downloading this {content}."
+        Utils.info("content-restricted", "#{reason}\n\nTo protect the streamer's rights, TwitchLink blocks content downloads when restrictions requests are received.", reason=T(reason, channel=channel.displayName, content=T(contentType)))
+        return True
 
     def setDownloadingState(self, state):
         self.downloading = state

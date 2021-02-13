@@ -7,9 +7,9 @@ class Config:
 
     PROGRAM_PATH = sys.executable.replace("\\", "/")
 
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
 
-    DB_COMPATIBLE_VERSIONS = ["1.0.0"]
+    DB_COMPATIBLE_VERSIONS = ["1.0.0", "1.0.1"]
 
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
     SYSTEM_DRIVE = os.getenv("SYSTEMDRIVE").replace("\\", "/")
@@ -45,4 +45,4 @@ class Config:
     DATA_LOAD_LIMIT = 30
 
     AD_SERVER = None
-    SHOW_ADS = True
+    SHOW_ADS = False

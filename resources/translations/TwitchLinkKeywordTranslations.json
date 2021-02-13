@@ -95,6 +95,10 @@
     "en": "Unable to download",
     "ko": "다운로드 불가"
   },
+  "change-account": {
+    "en": "Change account",
+    "ko": "계정 변경"
+  },
   "offline": {
     "en": "OFFLINE",
     "ko": "오프라인"
@@ -138,6 +142,10 @@
   "restart": {
     "en": "Restart",
     "ko": "재시작"
+  },
+  "content-restricted": {
+    "en": "Content Restricted",
+    "ko": "제한된 콘텐츠"
   },
   "stream": {
     "en": "Stream",

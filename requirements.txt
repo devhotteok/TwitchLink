@@ -1,0 +1,6 @@
+PyQt5==5.15.2
+PyQtWebEngine==5.15.2
+pytz==2021.1
+requests==2.25.1
+selenium==3.141.0
+webdriver-manager==3.3.0

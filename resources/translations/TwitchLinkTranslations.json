@@ -299,8 +299,8 @@
     "en": "Cropping is only supported in [Biscuit Engine].",
     "ko": "자르기 기능은 [토니 엔진]에서만 지원합니다."
   },
-  "#The crop is based on the nearest point in the crop range that can be processed.": {
-    "en": "The crop is based on the nearest point in the crop range that can be processed.",
+  "#Crop is based on the nearest point in the crop range that can be processed.": {
+    "en": "Crop is based on the nearest point in the crop range that can be processed.",
     "ko": "자르기 범위 중 처리할 수 있는 가장 가까운 지점을 기준으로 자릅니다."
   },
   "#mp4 file (*.mp4)": {
@@ -418,6 +418,18 @@
   "#Restart due to time zone change.": {
     "en": "Restart due to time zone change.",
     "ko": "시간대 변경으로 인해 재시작합니다."
+  },
+  "#'{channel}' has restricted downloading {content}s from their channel.": {
+    "en": "'{channel}' has restricted downloading {content}s from their channel.",
+    "ko": "'{channel}'님이 자신의 채널에서 {content} 다운로드를 제한하였습니다."
+  },
+  "#'{channel}' has restricted downloading this {content}.": {
+    "en": "'{channel}' has restricted downloading this {content}.",
+    "ko": "'{channel}'님이 해당 {content}의 다운로드를 제한하였습니다."
+  },
+  "#{reason}\n\nTo protect the streamer's rights, TwitchLink blocks content downloads when restrictions requests are received.": {
+    "en": "{reason}\n\nTo protect the streamer's rights, TwitchLink blocks content downloads when restrictions requests are received.",
+    "ko": "{reason}\n\nTwitchLink는 스트리머의 권리를 존중합니다.\nTwitchLink는 스트리머의 권리를 보호하기 위해 콘텐츠 제한 요청이 접수되면 해당 콘텐츠의 다운로드를 제한합니다."
   },
   "#{name} - Select Folder": {
     "en": "{name} - Select Folder",

@@ -66,8 +66,7 @@ class TwitchGqlAPI:
 
     def getChannel(self, channel):
         variables = {
-            "login": channel,
-            "channelLogin": channel,
+            "login": channel
         }
         response = self.gql.api(getChannel, variables)
         channel = response["data"]["user"]
@@ -129,5 +128,3 @@ class TwitchGqlAPI:
         response = self.gql.api(getClip, variables)
         clip = response["data"]["clip"]
         return self.errorIfNone(clip, Clip)
-
-api = TwitchGqlAPI()

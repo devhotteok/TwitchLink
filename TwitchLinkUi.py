@@ -279,7 +279,7 @@ class Login(QDialog, UiFiles.login):
         self.loginButton.setText(T("login"))
         if result == "Succeed":
             Utils.info("login", "#Login complete.")
-            self.close()
+            self.restart()
         elif result == "BrowserNotFound":
             Utils.info("error", "#Chrome browser or Edge browser is required to proceed.")
         elif result == "BrowserNotLoadable":
@@ -292,11 +292,14 @@ class Login(QDialog, UiFiles.login):
             self.db.account.user.logout()
             self.db.saveDB()
             Utils.info("logout", "#Logout complete.")
-            self.close()
+            self.restart()
 
     def closeEvent(self, event):
         if not self.isEnabled():
             event.ignore()
+
+    def restart(self):
+        self.done(1)
 
 class LoginThread(QThread):
     loginResult = pyqtSignal(str)
@@ -522,6 +525,8 @@ class VideoBox(QWidget, UiFiles.videoBox):
             self.downloadButton.clicked.connect(self.downloadClip)
 
     def checkVideo(self):
+        if self.db.isRestricted("video", self.data.owner, self.data.id):
+            return False
         try:
             video = TwitchVod(self.data.id, self.db.account.user)
         except TokenError:
@@ -540,13 +545,18 @@ class VideoBox(QWidget, UiFiles.videoBox):
         elif video.found == VodRestricted:
             if self.db.account.user.connected:
                 advice = T("#Unable to find subscription in your account.\nSubscribe to this streamer or log in with another account.")
+                okText = "change-account"
             else:
                 advice = T("#You need to log in to download subscriber-only videos.")
-            Utils.info("unable-to-download", "#This video is for subscribers only.\n{advice}", advice=advice)
+                okText = "login"
+            if Utils.ask("unable-to-download", "#This video is for subscribers only.\n{advice}", okText=okText, cancelText="ok", advice=advice):
+                self.db.mainWindow.openLogin()
             return False
         return video
 
     def checkClip(self):
+        if self.db.isRestricted("clip", self.data.broadcaster, self.data.id):
+            return False
         try:
             clip = TwitchClip(self.data.slug, self.db.account.user)
         except TokenError:
@@ -837,6 +847,8 @@ class VideoList(QDialog, UiFiles.videoList):
             layout.itemAt(0).widget().setParent(None)
 
     def checkStream(self):
+        if self.db.isRestricted("stream", self.channel, self.channel.stream.id):
+            return False
         try:
             stream = TwitchStream(self.channel.login, self.db.account.user)
         except TokenError:
@@ -978,7 +990,7 @@ class DownloadMenu(QDialog, UiFiles.downloadMenu):
             self.cropInfoLabel.setText(T("#Cropping is only supported in [Biscuit Engine]."))
         else:
             self.cropArea.setEnabled(True)
-            self.cropInfoLabel.setText(T("#The crop is based on the nearest point in the crop range that can be processed."))
+            self.cropInfoLabel.setText(T("#Crop is based on the nearest point in the crop range that can be processed."))
 
     def askSaveDirectory(self):
         directory = self.db.fileDownload["saveDirectory"] + "/" + self.db.fileDownload["fileName"]

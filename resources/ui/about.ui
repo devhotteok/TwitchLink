@@ -235,7 +235,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Help me out with a cup of coffee if you like the program :)</string>
+         <string>If you like the program, consider contributing to TwitchLink!</string>
         </property>
        </widget>
       </item>

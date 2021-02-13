@@ -135,7 +135,10 @@ class TwitchDownloader:
                 self.startCancel()
                 return
             totalSeconds = self.totalSeconds
-            self.checkPlaylist()
+            try:
+                self.checkPlaylist()
+            except:
+                break
             if totalSeconds == self.totalSeconds:
                 break
         if self.cancel:
@@ -188,7 +191,6 @@ class TwitchDownloader:
             self.error = True
             self.cancel = True
             self.canceled = True
-            print("error")
         self.removeTemporaryFiles()
         self.done = True
 

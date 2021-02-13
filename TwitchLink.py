@@ -141,10 +141,12 @@ class TwitchLink(QMainWindow, UiFiles.mainWindow):
             self.db.resetSettings()
 
     def openLogin(self):
-        self.Login = self.ui.Login()
-        self.Login.exec()
-        del self.Login
-        gc.collect()
+        restart = 1
+        while restart == 1:
+            self.Login = self.ui.Login()
+            restart = self.Login.exec()
+            del self.Login
+            gc.collect()
 
     def openAbout(self):
         self.About = self.ui.About()
