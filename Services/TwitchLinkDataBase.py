@@ -122,7 +122,9 @@ class DataBase:
             try:
                 status = data["status"]
                 self.statusMessage = status["message"].get(translator.getLanguage())
-                self.serverNotice = data["notice"].get(translator.getLanguage())
+                notice = data["notice"].get(translator.getLanguage())
+                self.serverNotice = notice["message"]
+                self.serverNoticeUrl = notice["url"]
                 if not status["running"]:
                     self.programStatus = "Unavailable"
                     return
@@ -310,7 +312,7 @@ class DataBase:
             reason = "#'{channel}' has restricted downloading {content}s from their channel."
         else:
             reason = "#'{channel}' has restricted downloading this {content}."
-        Utils.info("content-restricted", "#{reason}\n\nTo protect the streamer's rights, TwitchLink blocks content downloads when restrictions requests are received.", reason=T(reason, channel=channel.displayName, content=T(contentType)))
+        Utils.info("content-restricted", "#{reason}\n\nTo protect the streamer's rights, {name} blocks content downloads when restrictions requests are received.", reason=T(reason, channel=channel.displayName, content=T(contentType)), name=T("#PROGRAM_NAME"))
         return True
 
     def setDownloadingState(self, state):
@@ -334,7 +336,7 @@ class DataBase:
                 "date": stream.createdAt.date(self.localization.timezone),
                 "time": stream.createdAt.time(self.localization.timezone)
             }
-            logs = "[Stream] [{channel}] [{started_at}] {title}".format(**kwargs)
+            logs = "[Stream]\nChannel : {channel}\nStarted at : {started_at}\nTitle : {title}\nStream ID : {id}".format(**kwargs)
             fileName = Utils.safeFormat(self.templates.streamFilename, **kwargs)
             fileName = self.getSafeFileName(fileName) + ".ts"
             self.fileDownload = {"downloadType": "stream", "stream": stream, "streamData": streamData, "resolution": streamData.getResolutions()[0], "fileName": fileName, "saveDirectory": self.temp.fileSaveDirectory}
@@ -353,7 +355,7 @@ class DataBase:
                 "time": video.publishedAt.time(self.localization.timezone),
                 "views": video.viewCount
             }
-            logs = "[Video] [{channel}] [{published_at}] {title}".format(**kwargs)
+            logs = "[Video]\nChannel : {channel}\nPublished at : {published_at}\nTitle : {title}\nVideo ID : {id}".format(**kwargs)
             fileName = Utils.safeFormat(self.templates.videoFilename, **kwargs)
             fileName = self.getSafeFileName(fileName) + ".ts"
             self.fileDownload = {"downloadType": "video", "video": video, "videoData": videoData, "resolution": videoData.getResolutions()[0], "range": [None, None], "fileName": fileName, "saveDirectory": self.temp.fileSaveDirectory}
@@ -374,7 +376,7 @@ class DataBase:
                 "time": clip.createdAt.time(self.localization.timezone),
                 "views": clip.viewCount
             }
-            logs = "[Clip] [{channel}] [{created_at}] {title}".format(**kwargs)
+            logs = "[Clip]\nChannel : {channel}\nCreated at : {created_at}\nTitle : {title}\nClip ID : {id}".format(**kwargs)
             fileName = Utils.safeFormat(self.templates.clipFilename, **kwargs)
             fileName = self.getSafeFileName(fileName) + ".mp4"
             self.fileDownload = {"downloadType": "clip", "clip": clip, "clipData": clipData, "resolution": clipData.getResolutions()[0], "fileName": fileName, "saveDirectory": self.temp.fileSaveDirectory}

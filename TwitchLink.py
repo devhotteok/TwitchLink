@@ -76,13 +76,17 @@ class TwitchLink(QMainWindow, UiFiles.mainWindow):
                 Utils.info("warning", "#{name} is currently unavailable.\n{message}", name=T("#PROGRAM_NAME"), message=self.db.statusMessage)
         elif status == "Available":
             if self.db.serverNotice != None:
-                Utils.info("notice", self.db.serverNotice)
+                if self.db.serverNoticeUrl == None:
+                    Utils.info("notice", self.db.serverNotice)
+                else:
+                    if Utils.ask("notice", self.db.serverNotice, "open", "ok", True):
+                        QDesktopServices.openUrl(QUrl(self.db.serverNoticeUrl))
             return True
         else:
             if self.db.updateNote == None:
                 updateInfoString = "#A new version of {name} has been released!\n\n* {updateType}"
             else:
-                updateInfoString = "#A new version of {name} has been released!\n{updateNote}\n\n* {updateType}"
+                updateInfoString = "#A new version of {name} has been released!\n\n{updateNote}\n\n* {updateType}"
             if status == "Update Found":
                 if Utils.ask("update-notice", updateInfoString, "update", "ok", True, name=T("#PROGRAM_NAME"), updateNote=self.db.updateNote, updateType=T("#Optional update")):
                     QDesktopServices.openUrl(QUrl(self.db.updateUrl))

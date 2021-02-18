@@ -15,9 +15,9 @@
     "en": "A new version of {name} has been released!\n\n* {updateType}",
     "ko": "{name}의 새로운 버전이 출시되었습니다!\n\n* {updateType}"
   },
-  "#A new version of {name} has been released!\n{updateNote}\n\n* {updateType}": {
-    "en": "A new version of {name} has been released!\n{updateNote}\n\n* {updateType}",
-    "ko": "{name}의 새로운 버전이 출시되었습니다!\n{updateNote}\n\n* {updateType}"
+  "#A new version of {name} has been released!\n\n{updateNote}\n\n* {updateType}": {
+    "en": "A new version of {name} has been released!\n\n{updateNote}\n\n* {updateType}",
+    "ko": "{name}의 새로운 버전이 출시되었습니다!\n\n{updateNote}\n\n* {updateType}"
   },
   "#Optional update": {
     "en": "Optional update",
@@ -427,9 +427,9 @@
     "en": "'{channel}' has restricted downloading this {content}.",
     "ko": "'{channel}'님이 해당 {content}의 다운로드를 제한하였습니다."
   },
-  "#{reason}\n\nTo protect the streamer's rights, TwitchLink blocks content downloads when restrictions requests are received.": {
-    "en": "{reason}\n\nTo protect the streamer's rights, TwitchLink blocks content downloads when restrictions requests are received.",
-    "ko": "{reason}\n\nTwitchLink는 스트리머의 권리를 존중합니다.\nTwitchLink는 스트리머의 권리를 보호하기 위해 콘텐츠 제한 요청이 접수되면 해당 콘텐츠의 다운로드를 제한합니다."
+  "#{reason}\n\nTo protect the streamer's rights, {name} blocks content downloads when restrictions requests are received.": {
+    "en": "{reason}\n\nTo protect the streamer's rights, {name} blocks content downloads when restrictions requests are received.",
+    "ko": "{reason}\n\n{name}는 스트리머의 권리를 존중합니다.\n{name}는 스트리머의 권리를 보호하기 위해 콘텐츠 제한 요청이 접수되면 해당 콘텐츠의 다운로드를 제한합니다."
   },
   "#{name} - Select Folder": {
     "en": "{name} - Select Folder",

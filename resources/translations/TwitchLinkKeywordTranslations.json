@@ -51,6 +51,10 @@
     "en": "Update Notice",
     "ko": "업데이트 알림"
   },
+  "open": {
+    "en": "Open",
+    "ko": "열기"
+  },
   "update": {
     "en": "Update",
     "ko": "업데이트"

@@ -55,6 +55,8 @@ class TwitchDownloader:
                 end = self.realTotalSeconds
             self.totalSeconds = end - start
             self.totalFiles = int((self.totalSeconds / self.realTotalSeconds) * self.realTotalFiles)
+            if self.totalFiles == 0:
+                self.totalFiles = 1
             self.reloadTotalTime()
 
     def reloadTotalTime(self):
