@@ -2,6 +2,8 @@ import requests
 import re
 import json
 
+from urllib.parse import quote
+
 
 class TwitchApiError(Exception):
     def __init__(self, response):
@@ -335,7 +337,7 @@ class TwitchClip:
         self.resolutions = {}
         for quality in qualities:
             name = "{quality}p{frameRate}".format(quality=quality["quality"], frameRate=quality["frameRate"])
-            self.resolutions[name] = ClipUrl(self.SLUG, name, "{url}?sig={sig}&token={token}".format(url=quality["sourceURL"], sig=sig, token=token))
+            self.resolutions[name] = ClipUrl(self.SLUG, name, "{url}?sig={sig}&token={token}".format(url=quality["sourceURL"], sig=sig, token=quote(token)))
 
     def resolution(self, resolution):
         if self.found == False:

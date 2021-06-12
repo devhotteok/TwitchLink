@@ -380,7 +380,7 @@ class DataBase:
             fileName = Utils.safeFormat(self.templates.clipFilename, **kwargs)
             fileName = self.getSafeFileName(fileName) + ".mp4"
             self.fileDownload = {"downloadType": "clip", "clip": clip, "clipData": clipData, "resolution": clipData.getResolutions()[0], "fileName": fileName, "saveDirectory": self.temp.fileSaveDirectory}
-        self.saveLogs(logs + "\n" + accessToken.resolution(self.fileDownload["resolution"]).url.split("?")[0])
+        self.saveLogs(logs + "\n" + accessToken.resolution(self.fileDownload["resolution"]).url)
 
     def getSafeFileName(self, name):
         characters = {

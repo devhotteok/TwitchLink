@@ -24,10 +24,10 @@ You can download sub-only videos, and unmute muted videos.
 ## Features
 
 - **Super Fast Download**
-- **Download Stream, Video, Clip**
-- **Download sub-only videos**
-- **Unmute muted videos**
-- **Time selection for video downloads**
+- **Download Streams, Videos, Clips**
+- **Download Sub-Only Videos**
+- **Unmute Muted Videos**
+- **Time Selection For Video Downloads**
 - **Channel Bookmarks**
 - **Filename Templates**
 - **Language/Time Localization**
@@ -52,7 +52,9 @@ I'm not a native speaker, so some translations would be awkward.
 Let me know if some of my expressions should be changed.
 
 - Email : devhotteok@gmail.com
-- **Personal emails are ignored.**
+- Discord : DevHotteok#6437
+- Discord Channel : [TwitchLink Discord Channel](https://discord.gg/4p8ytb2rkt)
+- Donate : [Contribute to TwitchLink](https://twitchlink.github.io/donate)
 
 ***
 
