@@ -6,26 +6,51 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>320</height>
+    <width>700</width>
+    <height>600</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="windowTitle">
-   <string>MainWindow</string>
-  </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="centralWidgetLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>450</width>
+     <width>700</width>
      <height>21</height>
     </rect>
    </property>
@@ -33,16 +58,7 @@
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuSearch">
-     <property name="title">
-      <string>Search</string>
-     </property>
-     <addaction name="actionChannel"/>
-     <addaction name="actionVideoClip"/>
-     <addaction name="actionUrl"/>
-    </widget>
     <addaction name="actionNewDownloader"/>
-    <addaction name="menuSearch"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -50,12 +66,13 @@
     </property>
     <addaction name="actionSettings"/>
     <addaction name="separator"/>
-    <addaction name="actionLogin"/>
+    <addaction name="actionAccount"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionGettingStarted"/>
     <addaction name="actionAbout"/>
     <addaction name="actionTermsOfService"/>
    </widget>
@@ -75,29 +92,19 @@
     <string>New Downloader</string>
    </property>
   </action>
-  <action name="actionChannel">
-   <property name="text">
-    <string>Channel</string>
-   </property>
-  </action>
-  <action name="actionVideoClip">
-   <property name="text">
-    <string>Video / Clip</string>
-   </property>
-  </action>
-  <action name="actionUrl">
-   <property name="text">
-    <string>Url</string>
-   </property>
-  </action>
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
    </property>
   </action>
-  <action name="actionLogin">
+  <action name="actionAccount">
    <property name="text">
-    <string>Login</string>
+    <string>Account</string>
+   </property>
+  </action>
+  <action name="actionGettingStarted">
+   <property name="text">
+    <string>Getting Started</string>
    </property>
   </action>
   <action name="actionAbout">

@@ -38,6 +38,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial Rounded MT Bold</family>
        <pointsize>12</pointsize>
       </font>
      </property>
@@ -57,7 +58,7 @@
     <widget class="QWidget" name="infoArea" native="true">
      <layout class="QVBoxLayout" name="infoAreaLayout">
       <item>
-       <widget class="QLabel" name="programNameLabel">
+       <widget class="QLabel" name="appLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -66,16 +67,17 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>TwitchLink</string>
+         <string>App</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="versionLabel">
+       <widget class="QLabel" name="appInfoLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -83,7 +85,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>version</string>
+         <string>App Info</string>
         </property>
        </widget>
       </item>
@@ -95,7 +97,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="developerLabel">
+       <widget class="QLabel" name="copyrightLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -104,16 +106,17 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Developer</string>
+         <string>Copyright</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="copyrightLabel">
+       <widget class="QLabel" name="copyrightInfoLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -121,7 +124,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Copyright ⓒ 2021 by DevHotteok</string>
+         <string>Copyright Info</string>
         </property>
        </widget>
       </item>
@@ -142,6 +145,7 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
@@ -159,7 +163,7 @@
          </size>
         </property>
         <property name="text">
-         <string>TwitchLink Homepage</string>
+         <string>Homepage</string>
         </property>
        </widget>
       </item>
@@ -180,6 +184,7 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
@@ -189,7 +194,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="emailLabel">
+       <widget class="QLabel" name="contactInfoLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -197,7 +202,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Email : devhotteok@gmail.com</string>
+         <string>Contact Info</string>
         </property>
        </widget>
       </item>
@@ -218,6 +223,7 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
@@ -235,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>If you like the program, consider contributing to TwitchLink!</string>
+         <string>Donate Info</string>
         </property>
        </widget>
       </item>

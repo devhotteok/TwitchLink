@@ -1,32 +1,30 @@
 # TwitchLink
 
-**TwitchLink**, A Brand New Twitch Downloader
+[![GitHub issues](https://img.shields.io/github/issues/devhotteok/TwitchLink?style=for-the-badge)](https://github.com/devhotteok/TwitchLink/issues) [![GitHub forks](https://img.shields.io/github/forks/devhotteok/TwitchLink?style=for-the-badge)](https://github.com/devhotteok/TwitchLink/network) [![GitHub stars](https://img.shields.io/github/stars/devhotteok/TwitchLink?style=for-the-badge)](https://github.com/devhotteok/TwitchLink/stargazers) [![GitHub license](https://img.shields.io/github/license/devhotteok/TwitchLink?style=for-the-badge)](https://github.com/devhotteok/TwitchLink/blob/main/LICENSE)
 
-<img src="./resources/img/logo.png" width="200px">
+##### Twitch Stream/Video/Clip Downloader
 
-## Project Homepage
-- [TwitchLink](https://twitchlink.github.io)
+[![TwitchLink Logo](./.github/img/logo.png)](https://twitchlink.github.io)
+
+#
+
+## Homepage
+- [TwitchLink Homepage](https://twitchlink.github.io)
 - For more information, visit this homepage.
 
 
-## Requirements & Download
+## Download
 
-- **Windows OS**
-- Your installer is [here](https://github.com/devhotteok/TwitchLink/releases).
-
-
-## What's the difference with other downloaders?
-
-You can download **EVERYTHING**! (Streams, Videos, Clips)
-You can download sub-only videos, and unmute muted videos.
+- **TwitchLink** for Windows 10 or higher. [[Install]](https://github.com/devhotteok/TwitchLink/releases)
 
 
 ## Features
 
-- **Super Fast Download**
 - **Download Streams, Videos, Clips**
-- **Download Sub-Only Videos**
-- **Unmute Muted Videos**
+- **Download subscribers-only Videos**
+- **Download Thumbnails**
+- **Unmute Videos**
+- **Super Fast Download**
 - **Time Selection For Video Downloads**
 - **Channel Bookmarks**
 - **Filename Templates**
@@ -48,12 +46,8 @@ I'm developing TwitchLink in my free time for no money.
 Which means, my response or patch might be slow.
 Just be patient, it may take a while for me to look at it.
 
-I'm not a native speaker, so some translations would be awkward.
-Let me know if some of my expressions should be changed.
-
 - Email : devhotteok@gmail.com
 - Discord : DevHotteok#6437
-- Discord Channel : [TwitchLink Discord Channel](https://discord.gg/4p8ytb2rkt)
 - Donate : [Contribute to TwitchLink](https://twitchlink.github.io/donate)
 
 ***
@@ -62,13 +56,13 @@ Let me know if some of my expressions should be changed.
 
 - **Take a look at the latest issues [here](https://github.com/devhotteok/TwitchLink/issues).**
 - **Maybe your problem has already been reported or resolved.**
-- Try to use the latest version of **TwitchLink**. (Issues from older versions will not be accepted.)
-- Provide as much information about the download as possible. (Channel, Video/Clip ID, Url, Engine Type, Settings)
-- Try to describe the problem as detailed as possible. I can't read your mind ;)
+- Try to use the latest version of **TwitchLink**.
+- Provide as much information about the problem as possible. (Channel, Stream/Video/Clip ID, Url, Settings)
+- Try to describe the problem as detailed as possible.
 
 
 ## License
 
 [MIT License](https://github.com/devhotteok/TwitchLink/blob/main/LICENSE)
 
-Copyright (c) 2021 Dev Hotteok
+ⓒ 2021 DevHotteok.

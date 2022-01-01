@@ -1,0 +1,3 @@
+class Config:
+    MAX_THREAD_LIMIT = 20
+    RECOMMENDED_THREAD_LIMIT = 10

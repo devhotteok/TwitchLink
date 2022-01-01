@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>686</height>
+    <width>420</width>
+    <height>656</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -41,6 +41,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial Rounded MT Bold</family>
        <pointsize>12</pointsize>
       </font>
      </property>
@@ -57,42 +58,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="videoFrameArea" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+    <widget class="QWidget" name="videoWidgetPlaceholder" native="true">
      <property name="minimumSize">
       <size>
-       <width>404</width>
-       <height>302</height>
+       <width>402</width>
+       <height>300</height>
       </size>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>404</width>
-       <height>302</height>
-      </size>
-     </property>
-     <layout class="QVBoxLayout" name="videoFrameAreaLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetFixedSize</enum>
-      </property>
-      <property name="leftMargin">
-       <number>10</number>
-      </property>
-      <property name="topMargin">
-       <number>10</number>
-      </property>
-      <property name="rightMargin">
-       <number>10</number>
-      </property>
-      <property name="bottomMargin">
-       <number>10</number>
-      </property>
-     </layout>
+     <layout class="QVBoxLayout" name="videoWidgetPlaceholderLayout"/>
     </widget>
    </item>
    <item>
@@ -112,13 +85,13 @@
       </property>
       <item>
        <widget class="QWidget" name="directoryArea" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <layout class="QHBoxLayout" name="directoryAreaLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="directoryLabel">
            <property name="sizePolicy">
@@ -175,13 +148,13 @@
       </item>
       <item>
        <widget class="QWidget" name="resolutionArea" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <layout class="QHBoxLayout" name="resolutionAreaLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="resolutionLabel">
            <property name="sizePolicy">
@@ -219,10 +192,10 @@
         <property name="title">
          <string>Crop</string>
         </property>
-        <layout class="QVBoxLayout" name="cropAreaLayout">
+        <layout class="QHBoxLayout" name="cropAreaLayout">
          <item>
-          <widget class="QWidget" name="cropRangeArea" native="true">
-           <layout class="QFormLayout" name="cropRangeLayout">
+          <widget class="QWidget" name="cropBarArea" native="true">
+           <layout class="QFormLayout" name="cropBarAreaLayout">
             <property name="leftMargin">
              <number>0</number>
             </property>
@@ -259,7 +232,7 @@
                <item>
                 <widget class="QSpinBox" name="startSpinH">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -270,11 +243,8 @@
                    <height>0</height>
                   </size>
                  </property>
-                 <property name="suffix">
-                  <string/>
-                 </property>
-                 <property name="maximum">
-                  <number>0</number>
+                 <property name="minimum">
+                  <number>-1</number>
                  </property>
                 </widget>
                </item>
@@ -282,6 +252,7 @@
                 <widget class="QLabel" name="startColon_1">
                  <property name="font">
                   <font>
+                   <family>Arial Rounded MT Bold</family>
                    <pointsize>12</pointsize>
                   </font>
                  </property>
@@ -293,7 +264,7 @@
                <item>
                 <widget class="QSpinBox" name="startSpinM">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -304,11 +275,8 @@
                    <height>0</height>
                   </size>
                  </property>
-                 <property name="suffix">
-                  <string/>
-                 </property>
-                 <property name="maximum">
-                  <number>0</number>
+                 <property name="minimum">
+                  <number>-1</number>
                  </property>
                 </widget>
                </item>
@@ -316,6 +284,7 @@
                 <widget class="QLabel" name="startColon_2">
                  <property name="font">
                   <font>
+                   <family>Arial Rounded MT Bold</family>
                    <pointsize>12</pointsize>
                   </font>
                  </property>
@@ -327,7 +296,7 @@
                <item>
                 <widget class="QSpinBox" name="startSpinS">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -338,18 +307,28 @@
                    <height>0</height>
                   </size>
                  </property>
-                 <property name="suffix">
-                  <string/>
-                 </property>
-                 <property name="prefix">
-                  <string/>
-                 </property>
-                 <property name="maximum">
-                  <number>0</number>
+                 <property name="minimum">
+                  <number>-1</number>
                  </property>
                 </widget>
                </item>
               </layout>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="endCheckBox">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>To End</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item row="1" column="1">
@@ -376,7 +355,7 @@
                <item>
                 <widget class="QSpinBox" name="endSpinH">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -387,11 +366,8 @@
                    <height>0</height>
                   </size>
                  </property>
-                 <property name="suffix">
-                  <string/>
-                 </property>
-                 <property name="maximum">
-                  <number>0</number>
+                 <property name="minimum">
+                  <number>-1</number>
                  </property>
                 </widget>
                </item>
@@ -399,6 +375,7 @@
                 <widget class="QLabel" name="endColon_1">
                  <property name="font">
                   <font>
+                   <family>Arial Rounded MT Bold</family>
                    <pointsize>12</pointsize>
                   </font>
                  </property>
@@ -410,7 +387,7 @@
                <item>
                 <widget class="QSpinBox" name="endSpinM">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -421,11 +398,8 @@
                    <height>0</height>
                   </size>
                  </property>
-                 <property name="suffix">
-                  <string/>
-                 </property>
-                 <property name="maximum">
-                  <number>0</number>
+                 <property name="minimum">
+                  <number>-1</number>
                  </property>
                 </widget>
                </item>
@@ -433,6 +407,7 @@
                 <widget class="QLabel" name="endColon_2">
                  <property name="font">
                   <font>
+                   <family>Arial Rounded MT Bold</family>
                    <pointsize>12</pointsize>
                   </font>
                  </property>
@@ -444,7 +419,7 @@
                <item>
                 <widget class="QSpinBox" name="endSpinS">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -458,31 +433,12 @@
                  <property name="specialValueText">
                   <string/>
                  </property>
-                 <property name="suffix">
-                  <string/>
-                 </property>
-                 <property name="maximum">
-                  <number>0</number>
+                 <property name="minimum">
+                  <number>-1</number>
                  </property>
                 </widget>
                </item>
               </layout>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QCheckBox" name="endCheckBox">
-              <property name="minimumSize">
-               <size>
-                <width>80</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>To End</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
              </widget>
             </item>
             <item row="0" column="0">
@@ -505,23 +461,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="cropInfoLabel">
-           <property name="font">
-            <font>
-             <family>Arial Rounded MT Bold</family>
-             <pointsize>9</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">color: rgb(255, 0, 0);</string>
-           </property>
+          <widget class="QToolButton" name="cropInfo">
            <property name="text">
-            <string>Notification</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
+            <string>?</string>
            </property>
           </widget>
          </item>
@@ -565,11 +507,11 @@
    </item>
    <item>
     <widget class="QWidget" name="adArea_1" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="minimumSize">
+      <size>
+       <width>320</width>
+       <height>50</height>
+      </size>
      </property>
      <layout class="QHBoxLayout" name="adAreaLayout_1">
       <property name="spacing">
@@ -587,35 +529,6 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QLabel" name="ad_1">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>320</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>15</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>AD</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>130</height>
+    <width>500</width>
+    <height>170</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,6 +38,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial Rounded MT Bold</family>
        <pointsize>12</pointsize>
       </font>
      </property>
@@ -54,9 +55,44 @@
     </widget>
    </item>
    <item>
+    <widget class="QWidget" name="searchHelperArea" native="true">
+     <layout class="QFormLayout" name="searchHelperAreaLayout">
+      <property name="horizontalSpacing">
+       <number>15</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="searchExampleLabel">
+        <property name="text">
+         <string>Example</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="searchExample">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Example</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QStackedWidget" name="queryArea">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="queryPage">
       <layout class="QVBoxLayout" name="queryPageLayout">
@@ -71,6 +107,17 @@
         <widget class="QComboBox" name="queryComboBox">
          <property name="editable">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="searchPage">
+      <layout class="QVBoxLayout" name="searchPageLayout">
+       <item>
+        <widget class="QLabel" name="searchProgress">
+         <property name="text">
+          <string>Search Progress</string>
          </property>
         </widget>
        </item>

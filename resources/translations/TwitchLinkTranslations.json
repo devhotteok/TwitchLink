@@ -1,23 +1,23 @@
 {
+  "#Checking for updates": {
+    "en": "Checking for updates",
+    "ko": "업데이트 확인 중"
+  },
+  "#Loading Data": {
+    "en": "Loading Data",
+    "ko": "데이터 불러오는 중"
+  },
   "#A temporary error occurred while connecting to the server.\nPlease try again later.": {
     "en": "A temporary error occurred while connecting to the server.\nPlease try again later.",
     "ko": "서버와 연결 중 일시적인 오류가 발생하였습니다.\n잠시 후 다시 시도하십시오."
   },
-  "#{name} is currently unavailable.": {
-    "en": "{name} is currently unavailable.",
-    "ko": "현재 {name} 서비스를 이용할 수 없습니다."
+  "#{appName} is currently unavailable.": {
+    "en": "{appName} is currently unavailable.",
+    "ko": "현재 {appName} 서비스를 이용할 수 없습니다."
   },
-  "#{name} is currently unavailable.\n{message}": {
-    "en": "{name} is currently unavailable.\n{message}",
-    "ko": "현재 {name} 서비스를 이용할 수 없습니다.\n{message}"
-  },
-  "#A new version of {name} has been released!\n\n* {updateType}": {
-    "en": "A new version of {name} has been released!\n\n* {updateType}",
-    "ko": "{name}의 새로운 버전이 출시되었습니다!\n\n* {updateType}"
-  },
-  "#A new version of {name} has been released!\n\n{updateNote}\n\n* {updateType}": {
-    "en": "A new version of {name} has been released!\n\n{updateNote}\n\n* {updateType}",
-    "ko": "{name}의 새로운 버전이 출시되었습니다!\n\n{updateNote}\n\n* {updateType}"
+  "#A new version of {appName} has been released!": {
+    "en": "A new version of {appName} has been released!",
+    "ko": "{appName}의 새로운 버전이 출시되었습니다!"
   },
   "#Optional update": {
     "en": "Optional update",
@@ -31,6 +31,10 @@
     "en": "There is a download in progress.\nDo you want to cancel and exit?",
     "ko": "진행 중인 다운로드가 있습니다.\n취소하고 종료하시겠습니까?"
   },
+  "#Shutting down downloader": {
+    "en": "Shutting down downloader",
+    "ko": "다운로더를 종료하는 중"
+  },
   "#Are you sure you want to exit?": {
     "en": "Are you sure you want to exit?",
     "ko": "정말 종료하시겠습니까?"
@@ -39,97 +43,57 @@
     "en": "An error occurred while loading settings.",
     "ko": "설정을 불러오는 중 오류가 발생하였습니다."
   },
-  "#Search By": {
-    "en": "Search By",
-    "ko": "검색 방식을 선택하여 주십시오."
+  "#Checking URL": {
+    "en": "Checking URL",
+    "ko": "URL 정보 확인 중"
   },
-  "#Well.. You forgot to type your keyword!": {
-    "en": "Well.. You forgot to type your keyword!",
-    "ko": "검색할 내용이 없습니다."
+  "#This URL is invalid.": {
+    "en": "This URL is invalid.",
+    "ko": "URL이 유효하지 않습니다."
   },
-  "#Checking link...": {
-    "en": "Checking link...",
-    "ko": "링크 정보 확인 중..."
-  },
-  "#Oops! Wrong link!": {
-    "en": "Oops! Wrong link!",
-    "ko": "링크 형식이 올바르지 않습니다."
-  },
-  "#Checking channel info...": {
-    "en": "Checking channel info...",
-    "ko": "채널 정보 확인 중..."
+  "#Checking channel info": {
+    "en": "Checking channel info",
+    "ko": "채널 정보 확인 중"
   },
   "#Channel not found.": {
     "en": "Channel not found.",
     "ko": "해당 채널을 찾을 수 없습니다."
   },
-  "#Checking video info...": {
-    "en": "Checking video info...",
-    "ko": "비디오 정보 확인 중..."
+  "#Checking video info": {
+    "en": "Checking video info",
+    "ko": "비디오 정보 확인 중"
   },
   "#Video not found.": {
     "en": "Video not found.",
     "ko": "해당 비디오를 찾을 수 없습니다."
   },
-  "#Checking clip info...": {
-    "en": "Checking clip info...",
-    "ko": "클립 정보 확인 중..."
+  "#Checking clip info": {
+    "en": "Checking clip info",
+    "ko": "클립 정보 확인 중"
   },
   "#Clip not found.": {
     "en": "Clip not found.",
     "ko": "해당 클립을 찾을 수 없습니다."
   },
-  "#Loading data...": {
-    "en": "Loading data...",
-    "ko": "데이터 불러오는 중..."
+  "#Filename Template Variables": {
+    "en": "Filename Template Variables",
+    "ko": "파일명 템플릿 변수"
   },
-  "#Select your download engine.\nThese settings apply only to video downloads.\nThe live download is automatically fixed with [Biscuit Engine].\nThe clips are downloaded without an engine.": {
-    "en": "Select your download engine.\nThese settings apply only to video downloads.\nThe live download is automatically fixed with [Biscuit Engine].\nThe clips are downloaded without an engine.",
-    "ko": "다운로드 엔진을 선택합니다.\n해당 설정은 비디오 다운로드에만 적용됩니다.\n생방송 다운로드는 [토니 엔진]으로 자동 고정됩니다.\n클립은 별도의 엔진 없이 다운로드됩니다."
+  "#'displayname' if {nameType} Displayname is English, otherwise 'username(displayname)'": {
+    "en": "'displayname' if {nameType} Displayname is English, otherwise 'username(displayname)'",
+    "ko": "{nameType} 사용자 닉네임이 영어라면 '닉네임', 그렇지 않으면 '아이디(닉네임)'"
   },
-  "#Stream Filename Template Variables": {
-    "en": "Stream Filename Template Variables",
-    "ko": "생방송 파일명 템플릿 변수"
+  "#This will reset all settings.\nProceed?": {
+    "en": "This will reset all settings.\nProceed?",
+    "ko": "모든 데이터가 초기화됩니다.\n진행하시겠습니까?"
   },
-  "#{type} : File Type (Stream)\n{id} : Stream ID (XXXXXXXXXX)\n{title} : Title\n{game} : Category\n{channel} : Channel\n{started_at} : Started At (XXXX-XX-XX XX:XX:XX)\n{date} : Started Date (XXXX-XX-XX)\n{time} : Started Time (XX:XX:XX)": {
-    "en": "{type} : File Type (Stream)\n{id} : Stream ID (XXXXXXXXXX)\n{title} : Title\n{game} : Category\n{channel} : Channel\n{started_at} : Started At (XXXX-XX-XX XX:XX:XX)\n{date} : Started Date (XXXX-XX-XX)\n{time} : Started Time (XX:XX:XX)",
-    "ko": "{type} : 파일 종류 (생방송)\n{id} : 생방송 아이디 (XXXXXXXXXX)\n{title} : 제목\n{game} : 카테고리\n{channel} : 채널명\n{started_at} : 시작날짜/시간 (XXXX-XX-XX XX:XX:XX)\n{date} : 시작날짜 (XXXX-XX-XX)\n{time} : 시작시간 (XX:XX:XX)"
+  "#There are unsaved changes.\nDo you want to discard them?": {
+    "en": "There are unsaved changes.\nDo you want to discard them?",
+    "ko": "저장하지 않은 변경사항이 있습니다.\n나가시겠습니까?"
   },
-  "#Video Filename Template Variables": {
-    "en": "Video Filename Template Variables",
-    "ko": "비디오 파일명 템플릿 변수"
-  },
-  "#{type} : File Type (Video)\n{id} : Video ID (XXXXXXXXXX)\n{title} : Title\n{game} : Category\n{channel} : Channel\n{duration} : Duration\n{published_at} : Published At (XXXX-XX-XX XX:XX:XX)\n{date} : Published Date (XXXX-XX-XX)\n{time} : Published Time (XX:XX:XX)\n{views} : Views": {
-    "en": "{type} : File Type (Video)\n{id} : Video ID (XXXXXXXXXX)\n{title} : Title\n{game} : Category\n{channel} : Channel\n{duration} : Duration\n{published_at} : Published At (XXXX-XX-XX XX:XX:XX)\n{date} : Published Date (XXXX-XX-XX)\n{time} : Published Time (XX:XX:XX)\n{views} : Views",
-    "ko": "{type} : 파일 종류 (비디오)\n{id} : 비디오 아이디 (XXXXXXXXXX)\n{title} : 제목\n{game} : 카테고리\n{channel} : 채널명\n{duration} : 길이\n{published_at} : 게시날짜/시간 (XXXX-XX-XX XX:XX:XX)\n{date} : 게시날짜 (XXXX-XX-XX)\n{time} : 게시시간 (XX:XX:XX)\n{views} : 조회수"
-  },
-  "#Clip Filename Template Variables": {
-    "en": "Clip Filename Template Variables",
-    "ko": "클립 파일명 템플릿 변수"
-  },
-  "#{type} : File Type (Clip)\n{id} : Clip ID (XXXXXXXXXX)\n{title} : Title\n{game} : Category\n{slug} : Slug (HappySlugExampleHelloTwitch)\n{channel} : Channel\n{creator} : Creator\n{duration} : Duration\n{created_at} : Created At (XXXX-XX-XX XX:XX:XX)\n{date} : Created Date (XXXX-XX-XX)\n{time} : Created Time (XX:XX:XX)\n{views} : Views": {
-    "en": "{type} : File Type (Clip)\n{id} : Clip ID (XXXXXXXXXX)\n{title} : Title\n{game} : Category\n{slug} : Slug (HappySlugExampleHelloTwitch)\n{channel} : Channel\n{creator} : Creator\n{duration} : Duration\n{created_at} : Created At (XXXX-XX-XX XX:XX:XX)\n{date} : Created Date (XXXX-XX-XX)\n{time} : Created Time (XX:XX:XX)\n{views} : Views",
-    "ko": "{type} : 파일 종류 (클립)\n{id} : 클립 아이디 (XXXXXXXXXX)\n{title} : 제목\n{game} : 카테고리\n{slug} : 클립 키워드 주소 (HappySlugExampleHelloTwitch)\n{channel} : 채널명\n{creator} : 제작자\n{duration} : 길이\n{created_at} : 생성날짜/시간 (XXXX-XX-XX XX:XX:XX)\n{date} : 생성날짜 (XXXX-XX-XX)\n{time} : 생성시간 (XX:XX:XX)\n{views} : 조회수"
-  },
-  "#Bookmark already exists.": {
-    "en": "Bookmark already exists.",
-    "ko": "북마크가 이미 존재합니다."
-  },
-  "#A place to store various temporary data.\nAllocate it to a disk with a lot of free space.\n\nIt is mainly used for temporary storage of video data in [Popcorn Engine].\n[Popcorn Engine] processes download and encoding separately, which requires additional free space as much as the size of the video to be downloaded.\nWhen the download is complete or canceled, all temporary data will be deleted.\n[Biscuit Engine] does not require this free space.": {
-    "en": "A place to store various temporary data.\nAllocate it to a disk with a lot of free space.\n\nIt is mainly used for temporary storage of video data in [Popcorn Engine].\n[Popcorn Engine] processes download and encoding separately, which requires additional free space as much as the size of the video to be downloaded.\nWhen the download is complete or canceled, all temporary data will be deleted.\n[Biscuit Engine] does not require this free space.",
-    "ko": "임시 데이터를 저장하는 곳입니다.\n여유 공간이 많은 디스크에 할당하십시오.\n\n주로 [마루 엔진]에서 영상 데이터를 임시로 저장하는데 사용합니다.\n[마루 엔진]은 다운로드와 인코딩을 별개로 처리하여 다운로드할 영상의 용량만큼의 여유 공간이 추가로 필요합니다.\n다운로드가 완료되거나 취소되면 임시 데이터는 모두 삭제됩니다.\n[토니 엔진]은 이 여유 공간이 필요하지 않습니다."
-  },
-  "#This will reset all settings, including logs.\nWould you like to continue?": {
-    "en": "This will reset all settings, including logs.\nWould you like to continue?",
-    "ko": "로그 기록을 포함한 모든 데이터가 초기화됩니다.\n진행하시겠습니까?"
-  },
-  "#Logging in...": {
-    "en": "Logging in...",
-    "ko": "로그인 중..."
-  },
-  "#Login complete.": {
-    "en": "Login complete.",
-    "ko": "로그인이 완료되었습니다."
+  "#Logging in": {
+    "en": "Logging in",
+    "ko": "로그인 중"
   },
   "#Chrome browser or Edge browser is required to proceed.": {
     "en": "Chrome browser or Edge browser is required to proceed.",
@@ -147,9 +111,9 @@
     "en": "Are you sure you want to log out?",
     "ko": "정말 로그아웃하시겠습니까?"
   },
-  "#Logout complete.": {
-    "en": "Logout complete.",
-    "ko": "로그아웃이 완료되었습니다."
+  "#If you like the program, consider contributing to {appName}!": {
+    "en": "If you like the program, consider contributing to {appName}!",
+    "ko": "프로그램이 마음에 드신다면 후원을 통해 {appName}의 개발에 기여해 주세요!"
   },
   "#Agreed at {time}": {
     "en": "Agreed at {time}",
@@ -163,37 +127,13 @@
     "en": "Search by Video / Clip ID",
     "ko": "비디오 / 클립 아이디를 입력하십시오."
   },
-  "#Search by Channel / Video / Clip Link": {
-    "en": "Search by Channel / Video / Clip Link",
-    "ko": "채널 / 비디오 / 클립 링크를 입력하십시오."
+  "#Search by Channel / Video / Clip / Playlist URL": {
+    "en": "Search by Channel / Video / Clip / Playlist URL",
+    "ko": "채널 / 비디오 / 클립 / 재생목록 URL을 입력하십시오."
   },
-  "#Stream Information": {
-    "en": "Stream Information",
-    "ko": "생방송 정보"
-  },
-  "#Channel : {channel}\nTitle : {title}\nCategory : {game}\nStarted At : {startedAt}\nViewer Count : {viewer}": {
-    "en": "Channel : {channel}\nTitle : {title}\nCategory : {game}\nStarted At : {startedAt}\nViewer Count : {viewer}",
-    "ko": "채널 : {channel}\n제목 : {title}\n카테고리 : {game}\n시작 시간 : {startedAt}\n시청자 : {viewer}명"
-  },
-  "#Video Information": {
-    "en": "Video Information",
-    "ko": "비디오 정보"
-  },
-  "#Channel : {channel}\nTitle : {title}\nCategory : {game}\nDuration : {duration}\nPublished At : {publishedAt}\nView Count : {view}": {
-    "en": "Channel : {channel}\nTitle : {title}\nCategory : {game}\nDuration : {duration}\nPublished At : {publishedAt}\nView Count : {view}",
-    "ko": "채널 : {channel}\n제목 : {title}\n카테고리 : {game}\n길이 : {duration}\n등록 시간 : {publishedAt}\n시청수 : {view}회"
-  },
-  "#Clip Information": {
-    "en": "Clip Information",
-    "ko": "클립 정보"
-  },
-  "#Channel : {channel}\nTitle : {title}\nCategory : {game}\nCreator : {creator}\nDuration : {duration}\nCreated At : {createdAt}\nView Count : {view}": {
-    "en": "Channel : {channel}\nTitle : {title}\nCategory : {game}\nCreator : {creator}\nDuration : {duration}\nCreated At : {createdAt}\nView Count : {view}",
-    "ko": "채널 : {channel}\n제목 : {title}\n카테고리 : {game}\n제작 : {creator}\n길이 : {duration}\n생성 시간 : {createdAt}\n시청수 : {view}회"
-  },
-  "#An authentication error has occurred.\nIf the error persists, please log in again.": {
-    "en": "An authentication error has occurred.\nIf the error persists, please log in again.",
-    "ko": "사용자 계정 인증 오류가 발생하였습니다.\n해당 오류가 지속된다면 재로그인하시기 바랍니다."
+  "#An authentication error has occurred.\nIf the error persists, try logging in again.": {
+    "en": "An authentication error has occurred.\nIf the error persists, try logging in again.",
+    "ko": "사용자 계정 인증 오류가 발생하였습니다.\n해당 오류가 지속된다면 다시 로그인하시기 바랍니다."
   },
   "#Your login has expired.\nIf you do not log in again, the downloader will operate in a logged out state.": {
     "en": "Your login has expired.\nIf you do not log in again, the downloader will operate in a logged out state.",
@@ -223,14 +163,6 @@
     "en": "Clip not found. Deleted or temporary error.",
     "ko": "클립 정보를 찾을 수 없습니다. 삭제되었거나 일시적인 오류입니다."
   },
-  "#Loading...": {
-    "en": "Loading...",
-    "ko": "불러오는 중..."
-  },
-  "#Downloading...": {
-    "en": "Downloading...",
-    "ko": "다운로드 중..."
-  },
   "#{channel}'s channel": {
     "en": "{channel}'s channel",
     "ko": "{channel}님의 채널"
@@ -255,28 +187,20 @@
     "en": "{followers} followers",
     "ko": "팔로워 : {followers}명"
   },
-  "#Partner Streamer": {
-    "en": "Partner Streamer",
-    "ko": "파트너 스트리머"
+  "#A temporary error has occurred.\nPlease try again later.": {
+    "en": "A temporary error has occurred.\nPlease try again later.",
+    "ko": "일시적인 오류가 발생하였습니다.\n잠시 후 다시 시도하십시오."
   },
-  "#Affiliate Streamer": {
-    "en": "Affiliate Streamer",
-    "ko": "제휴 스트리머"
-  },
-  "#Streamer": {
-    "en": "Streamer",
-    "ko": "일반 스트리머"
-  },
-  "#Temporary Error or Restricted Content": {
-    "en": "Temporary Error or Restricted Content",
-    "ko": "일시적인 오류이거나 제한된 콘텐츠일 수 있습니다."
+  "#There is a download in progress.": {
+    "en": "There is a download in progress.",
+    "ko": "진행 중인 다운로드가 있습니다."
   },
   "#Channel not found. Deleted or temporary error.": {
     "en": "Channel not found. Deleted or temporary error.",
     "ko": "채널 정보를 찾을 수 없습니다. 삭제되었거나 일시적인 오류입니다."
   },
-  "#Stream not found. Terminated or temporary error.": {
-    "en": "Stream not found. Terminated or temporary error.",
+  "#Stream not found. Stream ended or temporary error.": {
+    "en": "Stream not found. Stream ended or temporary error.",
     "ko": "생방송 정보를 찾을 수 없습니다. 생방송이 종료되었거나 일시적인 오류입니다."
   },
   "#Twitch's ads can't be blocked during the stream because your account doesn't have any subscription to this channel.\nProceed?": {
@@ -291,101 +215,77 @@
     "en": "Download {type}",
     "ko": "{type} 다운로드"
   },
-  "#Crop / Total Length : {duration}": {
-    "en": "Crop / Total Length : {duration}",
-    "ko": "자르기 / 총 길이 : {duration}"
+  "#The filename template contains a 'resolution' variable. Do you want to create a new filename based on the changed resolution?": {
+    "en": "The filename template contains a 'resolution' variable. Do you want to create a new filename based on the changed resolution?",
+    "ko": "파일명 템플릿에 '해상도' 변수가 포함되어 있습니다. 변경된 해상도를 바탕으로 파일명을 새롭게 생성하시겠습니까?"
   },
-  "#Cropping is only supported in [Biscuit Engine].": {
-    "en": "Cropping is only supported in [Biscuit Engine].",
-    "ko": "자르기 기능은 [토니 엔진]에서만 지원합니다."
+  "#Total Length : {duration}": {
+    "en": "Total Length : {duration}",
+    "ko": "총 길이 : {duration}"
   },
-  "#Crop is based on the nearest point in the crop range that can be processed.": {
-    "en": "Crop is based on the nearest point in the crop range that can be processed.",
-    "ko": "자르기 범위 중 처리할 수 있는 가장 가까운 지점을 기준으로 자릅니다."
+  "#Update track mode is currently enabled.\nSetting the end of the crop range will not track updates.\nProceed?": {
+    "en": "Update track mode is currently enabled.\nSetting the end of the crop range will not track updates.\nProceed?",
+    "ko": "현재 업데이트 추적 모드가 활성화되어있습니다.\n자르기 범위의 끝부분을 설정하면 업데이트 추적을 하지 않습니다.\n진행하시겠습니까?"
   },
-  "#mp4 file (*.mp4)": {
-    "en": "mp4 file (*.mp4)",
-    "ko": "mp4 파일 (*.mp4)"
+  "#Video crop is based on the closest point in the crop range that can be processed.": {
+    "en": "Video crop is based on the closest point in the crop range that can be processed.",
+    "ko": "비디오 자르기는 자르기 범위에서 처리할 수 있는 가장 가까운 지점을 기준으로 합니다."
   },
-  "#ts file (recommended) (*.ts);;mp4 file (*.mp4)": {
-    "en": "ts file (recommended) (*.ts);;mp4 file (*.mp4)",
-    "ko": "ts 파일(권장) (*.ts);;mp4 파일 (*.mp4)"
-  },
-  "#ts file (*.ts)": {
-    "en": "ts file (*.ts)",
-    "ko": "ts 파일 (*.ts)"
+  "#{fileFormat} file (*.{fileFormat})": {
+    "en": "{fileFormat} file (*.{fileFormat})",
+    "ko": "{fileFormat} 파일 (*.{fileFormat})"
   },
   "#A file with the same name already exists.\nOverwrite?": {
     "en": "A file with the same name already exists.\nOverwrite?",
     "ko": "동일한 이름의 파일이 이미 존재합니다.\n덮어쓰시겠습니까?"
   },
-  "#The end point of the cropping range is equal to or earlier than the start point.": {
-    "en": "The end point of the cropping range is equal to or earlier than the start point.",
-    "ko": "자르기 범위의 끝 지점이 시작 지점보다 이르거나 동일합니다."
+  "#The target directory or filename is unavailable.": {
+    "en": "The target directory or filename is unavailable.",
+    "ko": "대상 디렉토리 또는 파일명을 사용할 수 없습니다."
   },
-  "#Title : {title}": {
-    "en": "Title : {title}",
-    "ko": "제목 : {title}"
+  "#The filename template has been changed. Do you want to create a new filename based on the changed template?": {
+    "en": "The filename template has been changed. Do you want to create a new filename based on the changed template?",
+    "ko": "파일명 템플릿이 변경되었습니다. 변경된 템플릿을 바탕으로 파일명을 새롭게 생성하시겠습니까?"
   },
   "#Channel : {channel}": {
     "en": "Channel : {channel}",
     "ko": "채널 : {channel}"
   },
-  "#Date : {date}": {
-    "en": "Date : {date}",
-    "ko": "날짜 : {date}"
+  "#Viewer Count:": {
+    "en": "Viewer Count:",
+    "ko": "시청자:"
   },
-  "#Duration : {duration}": {
-    "en": "Duration : {duration}",
-    "ko": "길이 : {duration}"
+  "#{duration} - Crop : {totalDuration}({startTime}~{endTime})": {
+    "en": "{duration} - Crop : {totalDuration}({startTime}~{endTime})",
+    "ko": "{duration} - 자르기 : {totalDuration}({startTime}~{endTime})"
   },
-  "#Viewer Count : {viewer}": {
-    "en": "Viewer Count : {viewer}",
-    "ko": "시청자 : {viewer}명"
+  "#View Count:": {
+    "en": "View Count:",
+    "ko": "시청수:"
   },
-  "#Duration : {duration} / Crop : {start} ~ {end}": {
-    "en": "Duration : {duration} / Crop : {start} ~ {end}",
-    "ko": "길이 : {duration} / 자르기 : {start} ~ {end}"
+  "#Copied to clipboard.": {
+    "en": "Copied to clipboard.",
+    "ko": "클립보드에 복사되었습니다."
   },
-  "#From start": {
-    "en": "From start",
-    "ko": "처음부터"
+  "#Save completed.": {
+    "en": "Save completed.",
+    "ko": "저장이 완료되었습니다."
   },
-  "#To end": {
-    "en": "To end",
-    "ko": "끝까지"
+  "#Waiting for download": {
+    "en": "Waiting for download",
+    "ko": "다운로드 대기 중"
   },
-  "#View Count : {view}": {
-    "en": "View Count : {view}",
-    "ko": "시청수 : {view}회"
+  "#Checking for additional files": {
+    "en": "Checking for additional files",
+    "ko": "추가 파일 확인 중"
   },
-  "#Resolution : {resolution}": {
-    "en": "Resolution : {resolution}",
-    "ko": "해상도 : {resolution}"
-  },
-  "#File : {file}": {
-    "en": "File : {file}",
-    "ko": "파일 : {file}"
-  },
-  "#Preparing...": {
-    "en": "Preparing...",
-    "ko": "준비 중..."
-  },
-  "#Downloading Live Stream...": {
-    "en": "Downloading Live Stream...",
-    "ko": "생방송 실시간 다운로드 중..."
-  },
-  "#Waiting for download... / Checking for additional files (5 minutes)": {
-    "en": "Waiting for download... / Checking for additional files (5 minutes)",
-    "ko": "다운로드 대기 중... / 추가파일 확인 (약 5분)"
+  "#Are you sure you want to stop the download?": {
+    "en": "Are you sure you want to stop the download?",
+    "ko": "다운로드를 중지하시겠습니까?"
   },
   "#Are you sure you want to cancel the download?": {
     "en": "Are you sure you want to cancel the download?",
     "ko": "다운로드를 취소하시겠습니까?"
-  },
-  "#Canceling...": {
-    "en": "Canceling...",
-    "ko": "취소 중..."
   },
   "#The download has already been completed.": {
     "en": "The download has already been completed.",
@@ -407,9 +307,9 @@
     "en": "File not found.\nIt has been moved, renamed or deleted.",
     "ko": "대상 파일을 찾을 수 없습니다.\n이름이 변경되었거나 이동 또는 삭제되었습니다."
   },
-  "#A system error has occurred.\n\nPossible Causes\n\n* Invalid file name or path\n* Out of storage capacity\nIf the error persists, try Run as administrator.": {
-    "en": "A system error has occurred.\n\nPossible Causes\n\n* Invalid file name or path\n* Out of storage capacity\nIf the error persists, try Run as administrator.",
-    "ko": "시스템 오류가 발생하였습니다.\n\n가능한 원인\n\n* 유효하지 않은 파일명 또는 경로\n* 저장 용량 부족\n\n오류가 지속된다면 프로그램을 관리자 권한으로 실행하십시오."
+  "#A system error has occurred.\n\nPossible Causes\n\n* Too long or invalid filename or path\n* Out of storage capacity\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.": {
+    "en": "A system error has occurred.\n\nPossible Causes\n\n* Too long or invalid filename or path\n* Out of storage capacity\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.",
+    "ko": "시스템 오류가 발생하였습니다.\n\n가능한 원인\n\n* 너무 길거나 유효하지 않은 파일명 또는 경로\n* 저장 용량 부족\n* 해당 작업을 수행하기 위한 권한 필요\n\n오류가 지속된다면 프로그램을 관리자 권한으로 실행하십시오."
   },
   "#Restart due to language change.": {
     "en": "Restart due to language change.",
@@ -427,20 +327,12 @@
     "en": "'{channel}' has restricted downloading this {content}.",
     "ko": "'{channel}'님이 해당 {content}의 다운로드를 제한하였습니다."
   },
-  "#{reason}\n\nTo protect the streamer's rights, {name} blocks content downloads when restrictions requests are received.": {
-    "en": "{reason}\n\nTo protect the streamer's rights, {name} blocks content downloads when restrictions requests are received.",
-    "ko": "{reason}\n\n{name}는 스트리머의 권리를 존중합니다.\n{name}는 스트리머의 권리를 보호하기 위해 콘텐츠 제한 요청이 접수되면 해당 콘텐츠의 다운로드를 제한합니다."
+  "#{appName} respect the rights of streamers.\nTo protect the rights of streamers, {appName} restrict downloads when a content restriction request is received.": {
+    "en": "{appName} respect the rights of streamers.\nTo protect the rights of streamers, {appName} restrict downloads when a content restriction request is received.",
+    "ko": "{appName}는 스트리머의 권리를 존중합니다.\n{appName}는 스트리머의 권리를 보호하기 위해 콘텐츠 제한 요청이 접수되면 해당 콘텐츠의 다운로드를 제한합니다."
   },
-  "#{name} - Select Folder": {
-    "en": "{name} - Select Folder",
-    "ko": "{name} - 폴더 선택"
-  },
-  "#{name} - Save As": {
-    "en": "{name} - Save As",
-    "ko": "{name} - 다른 이름으로 저장"
-  },
-  "#Failed to load data.": {
-    "en": "Failed to load data.",
-    "ko": "데이터를 불러오는 중 오류가 발생하였습니다."
+  "#{appName} - Save As": {
+    "en": "{appName} - Save As",
+    "ko": "{appName} - 다른 이름으로 저장"
   }
 }
