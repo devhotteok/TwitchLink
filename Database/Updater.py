@@ -21,7 +21,8 @@ class Converters:
             "1.0.2": None,
             "1.0.3": None,
             "1.0.4": None,
-            "1.1.0": None
+            "1.1.0": None,
+            "1.1.1": None
         }
         if versionFrom in VERSIONS:
             return list(VERSIONS.values())[list(VERSIONS.keys()).index(versionFrom) + 1:]

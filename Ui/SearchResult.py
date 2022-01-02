@@ -219,6 +219,9 @@ class SearchResult(QtWidgets.QDialog, UiFile.searchResult):
         self.downloader.progressUpdate.disconnect(self.handleClipProgress)
         self.downloader.finished.disconnect(self.handleDownloadResult)
 
+    def handleClipStatus(self, status):
+        pass
+
     def handleClipProgress(self, progress):
         self.clipProgress(downloadProgress=progress.byteSizeProgress)
 
