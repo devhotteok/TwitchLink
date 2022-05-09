@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>170</height>
+    <width>700</width>
+    <height>250</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,11 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="font">
-   <font>
-    <family>Arial Rounded MT Bold</family>
-   </font>
   </property>
   <property name="windowTitle">
    <string>Search</string>
@@ -38,7 +33,6 @@
      </property>
      <property name="font">
       <font>
-       <family>Arial Rounded MT Bold</family>
        <pointsize>12</pointsize>
       </font>
      </property>

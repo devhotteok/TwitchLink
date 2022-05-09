@@ -1,112 +1,62 @@
 from Core.GlobalExceptions import Exceptions
 from Core.Config import Config
 from Services.Utils.Utils import Utils
+from Services.Image.Presets import *
 from Services.Translator.Translator import Translator, T
 from Services.Ad import AdManager
 from Database.Database import DB
 
-from PyQt5 import QtCore, QtGui, QtWidgets, uic
+from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets, uic
 
 
-class _QDialog(QtWidgets.QDialog):
-    def exec(self):
-        self.returnValue = False
-        super().exec()
-        return self.returnValue
+class WindowGeometryManager:
+    def __init__(self):
+        super(WindowGeometryManager, self).__init__()
+        self.setWindowGeometryKey()
 
-    def accept(self, returnValue=True):
-        self.returnValue = returnValue
-        return super().accept()
-QtWidgets.QDialog = _QDialog
+    def setWindowGeometryKey(self, key=None):
+        self.windowGeometryKey = key or self.__class__.__name__
 
+    def getWindowGeometryKey(self):
+        return self.windowGeometryKey
 
-class _QLabel(QtWidgets.QLabel):
-    _keepImageRatio = False
+    def loadWindowGeometry(self):
+        if DB.temp.hasWindowGeometry(self.windowGeometryKey):
+            self.restoreGeometry(QtCore.QByteArray.fromBase64(DB.temp.getWindowGeometry(self.windowGeometryKey)))
 
-    def setImageSizePolicy(self, minimumSize, maximumSize, keepImageRatio=True):
-        self.setMinimumSize(*minimumSize)
-        self.setMaximumSize(*maximumSize)
-        self.keepImageRatio(keepImageRatio)
-
-    def keepImageRatio(self, keepImageRatio):
-        self._keepImageRatio = keepImageRatio
-
-    def setText(self, text):
-        return super().setText(str(text))
-
-    def paintEvent(self, event):
-        if self.pixmap() == None:
-            if self.hasSelectedText():
-                return super().paintEvent(event)
-            else:
-                painter = QtGui.QPainter(self)
-                metrics = QtGui.QFontMetrics(self.font())
-                elided = map(lambda text: metrics.elidedText(text, QtCore.Qt.ElideRight, self.width()), self.text().split("\n"))
-                text = "\n".join(elided)
-                painter.drawText(self.rect(), self.alignment(), text)
-                self.setToolTip("" if text == self.text() else self.text())
-        else:
-            if self._keepImageRatio:
-                margins = self.getContentsMargins()
-                size = self.size() - QtCore.QSize(margins[0] + margins[2], margins[1] + margins[3])
-                painter = QtGui.QPainter(self)
-                point = QtCore.QPoint(0, 0)
-                scaledPix = self.pixmap().scaled(size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                point.setX((size.width() - scaledPix.width()) / 2 + margins[0])
-                point.setY((size.height() - scaledPix.height()) / 2 + margins[1])
-                painter.drawPixmap(point, scaledPix)
-            else:
-                return super().paintEvent(event)
-QtWidgets.QLabel = _QLabel
+    def saveWindowGeometry(self):
+        DB.temp.setWindowGeometry(self.windowGeometryKey, self.saveGeometry().toBase64().data())
 
 
-class _QSpinBox(QtWidgets.QSpinBox):
-    def setValueSilent(self, value):
-        self.blockSignals(True)
-        self.setValue(value)
-        self.blockSignals(False)
-QtWidgets.QSpinBox = _QSpinBox
-
-
-def loadUi(ui_name):
+def loadUi(name):
     try:
-        UiClass = uic.loadUiType("{}.ui".format(Utils.joinPath(Config.UI_ROOT, ui_name)))[0]
+        uiData, widgetType = uic.loadUiType(f"{Utils.joinPath(Config.UI_ROOT, name)}.ui")
     except:
         raise Exceptions.FileSystemError
-    class UiManager(UiClass):
-        def __init__(self, useWindowGeometry=True):
-            self.useWindowGeometry = useWindowGeometry
+    class UiWidget(uiData):
+        def __init__(self):
+            super(UiWidget, self).__init__()
             self.setupUi(self)
-            self.setupUiLayout()
-            self.ignoreKeys = []
-
-        def setupUiLayout(self):
-            if isinstance(self, QtWidgets.QMainWindow) or isinstance(self, QtWidgets.QDialog):
-                self.setWindowIcon(QtGui.QIcon(Config.ICON_IMAGE))
-                title = self.windowTitle()
-                if title == "":
-                    self.setWindowTitle(Config.APP_NAME)
-                else:
-                    self.setWindowTitle("{} - {}".format(Config.APP_NAME, T(title)))
-                self.setWindowFlag(QtCore.Qt.WindowContextHelpButtonHint, False)
-                if self.useWindowGeometry:
-                    windowGeometry = DB.temp.getWindowGeometry(self.__class__.__name__)
-                    if windowGeometry != None:
-                        self.restoreGeometry(QtCore.QByteArray.fromBase64(windowGeometry))
             self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            if widgetType == QtWidgets.QMainWindow or widgetType == QtWidgets.QDialog:
+                self.setWindowFlag(QtCore.Qt.WindowContextHelpButtonHint, False)
+                self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
+                self.setWindowTitle(self.windowTitle() or Config.APP_NAME)
+            self.ignoreKeys = []
             self.setAds()
-            self.setFont(Translator.getFont())
-            for widget in self.findChildren(QtWidgets.QTextBrowser):
-                widget.setFont(Translator.getDocFont(widget.font()))
-            for widget in self.findChildren(QtWidgets.QLabel):
-                widget.setFont(Translator.getFont(widget.font()))
+
+        def info(self, title, content, titleTranslate=True, contentTranslate=True, buttonText=None):
+            Utils.info(title, content, titleTranslate, contentTranslate, buttonText, parent=self)
+
+        def ask(self, title, content, titleTranslate=True, contentTranslate=True, okText=None, cancelText=None, defaultOk=False):
+            return Utils.ask(title, content, titleTranslate, contentTranslate, okText, cancelText, defaultOk, parent=self)
 
         def setAds(self):
             adArea = self.findChildren(QtWidgets.QWidget, QtCore.QRegExp("^adArea_\d+$"))
             adGroup = self.findChildren(QtWidgets.QWidget, QtCore.QRegExp("^adGroup_\d+$"))
             if AdManager.Config.SHOW:
                 for widget in adArea:
-                    Utils.setPlaceholder(widget, AdManager.Ad(minimumSize=widget.minimumSize(), responsive=True))
+                    Utils.setPlaceholder(widget, AdManager.Ad(minimumSize=widget.minimumSize(), responsive=True, parent=self))
             else:
                 for widget in adArea + adGroup:
                     widget.setParent(None)
@@ -117,28 +67,20 @@ def loadUi(ui_name):
 
         def keyPressEvent(self, event):
             if event.key() in self.ignoreKeys:
-                return event.ignore()
-            else:
-                return self.keyPressEvent(event)
-
-        def done(self, *args, **kwargs):
-            self.saveWindow()
-            return self.done(*args, **kwargs)
-
-        def saveWindow(self):
-            if self.useWindowGeometry:
-                DB.temp.setWindowGeometry(self.__class__.__name__, self.saveGeometry().toBase64().data())
-    return UiManager
+                event.ignore()
+            self.keyPressEvent(event)
+    return UiWidget
 
 
 class UiFile:
     mainWindow = loadUi("mainWindow")
     loading = loadUi("loading")
+    setup = loadUi("setup")
     settings = loadUi("settings")
-    formInfo = loadUi("formInfo")
+    propertyView = loadUi("propertyView")
     account = loadUi("account")
     about = loadUi("about")
-    termsOfService = loadUi("termsOfService")
+    documentView = loadUi("documentView")
     home = loadUi("home")
     search = loadUi("search")
     videoWidget = loadUi("videoWidget")
@@ -153,11 +95,12 @@ class UiFile:
 class Ui:
     MainWindow = None
     Loading = None
+    Setup = None
     Settings = None
-    FormInfo = None
+    PropertyView = None
     Account = None
     About = None
-    TermsOfService = None
+    DocumentView = None
     Home = None
     Search = None
     VideoWidget = None
@@ -169,16 +112,17 @@ class Ui:
     Download = None
 
 
-from Ui import MainWindow, Loading, Settings, FormInfo, Account, About, TermsOfService, Home, Search, VideoWidget, VideoDownloadWidget, SearchResult, DownloadMenu, Downloads, DownloadPreview, Download
+from Ui import MainWindow, Loading, Setup, Settings, PropertyView, Account, About, DocumentView, Home, Search, VideoWidget, VideoDownloadWidget, SearchResult, DownloadMenu, Downloads, DownloadPreview, Download
 
 
 Ui.MainWindow = MainWindow.MainWindow
 Ui.Loading = Loading.Loading
+Ui.Setup = Setup.Setup
 Ui.Settings = Settings.Settings
-Ui.FormInfo = FormInfo.FormInfo
+Ui.PropertyView = PropertyView.PropertyView
 Ui.Account = Account.Account
 Ui.About = About.About
-Ui.TermsOfService = TermsOfService.TermsOfService
+Ui.DocumentView = DocumentView.DocumentView
 Ui.Home = Home.Home
 Ui.Search = Search.Search
 Ui.VideoWidget = VideoWidget.VideoWidget

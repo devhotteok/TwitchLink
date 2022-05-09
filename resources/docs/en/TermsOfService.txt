@@ -1,0 +1,14 @@
+{appName}
+[Twitch Stream / Video / Clip Downloader]
+
+{appName} is built based on Twitch's API.
+{appName} acts by simply proxying user requests to the Twitch API.
+All requests are made solely by the user and the program simply acts as a browser in communication between the Twitch server and the user.
+
+The user is responsible for all advantages and disadvantages that arise or may arise from the use of this program, and the developer of the program is not responsible.
+
+Users must use all content downloaded through this program for personal use only, and permission from the copyright holder is required to use it for any other purpose.
+Unauthorized use, redistribution, or commercial use of content without the permission of the copyright holder is prohibited by law.
+The user, not the developer, assumes all responsibility arising from any violation of this.
+
+* By using this software, you are accepting our terms of service.

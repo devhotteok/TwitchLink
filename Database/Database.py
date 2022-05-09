@@ -1,30 +1,40 @@
-from .EncoderDecoder import JsonDatabase, DatabaseEncoder, DatabaseDecoder
-from .Loader import DatabaseLoader
+from .EncoderDecoder import Encoder, Decoder
+from .Loader import DataLoader
 
+from Core.App import App
 from Core.Config import Config
 from Services.Utils.OSUtils import OSUtils
 from Services.Utils.SystemUtils import SystemUtils
-from Services.Utils.Image.Config import Config as ImageLoaderConfig
+from Services.Image.Loader import ImageLoader
+from Services.Image.Config import Config as ImageConfig
 from Services.Account.Auth import TwitchAccount
 from Services.Twitch.Playback.TwitchPlaybackAccessTokens import TwitchPlaybackAccessTokenTypes
 from Services.Translator.Translator import Translator
-from Download.Downloader.Task.ThreadPool import ThreadPool
-from Download.Downloader.Task.Config import Config as TaskConfig
+from Download import DownloadHistory
+from Download.Downloader.Engine.ThreadPool import ThreadPool as DownloadThreadPool
+from Download.Downloader.Engine.Config import Config as EngineConfig
 
-import os
+import json
 
 from datetime import datetime
 
 
-class TermsOfService:
+class Setup:
     def __init__(self):
-        self._agreedTime = None
+        self._needSetup = True
+        self._termsOfServiceAgreement = None
 
-    def agree(self):
-        self._agreedTime = datetime.now()
+    def setupComplete(self):
+        self._needSetup = False
 
-    def getAgreedTime(self):
-        return self._agreedTime
+    def needSetup(self):
+        return self._needSetup
+
+    def agreeTermsOfService(self):
+        self._termsOfServiceAgreement = datetime.now()
+
+    def getTermsOfServiceAgreement(self):
+        return self._termsOfServiceAgreement
 
 class Account:
     def __init__(self):
@@ -40,7 +50,7 @@ class Account:
         self._user.updateAccount()
 
     def isUserLoggedIn(self):
-        return self._user.connected
+        return self._user.isConnected()
 
     def getAccountData(self):
         return self._user.data
@@ -53,17 +63,24 @@ class Account:
 
 class General:
     def __init__(self):
-        self._autoClose = False
+        self._openProgressWindow = True
+        self._notify = True
         self._bookmarks = []
 
-    def setAutoCloseEnabled(self, autoClose):
-        self._autoClose = autoClose
+    def setOpenProgressWindowEnabled(self, openProgressWindow):
+        self._openProgressWindow = openProgressWindow
+
+    def setNotifyEnabled(self, notify):
+        self._notify = notify
 
     def setBookmarks(self, bookmarks):
         self._bookmarks = bookmarks
 
-    def isAutoCloseEnabled(self):
-        return self._autoClose
+    def isOpenProgressWindowEnabled(self):
+        return self._openProgressWindow
+
+    def isNotifyEnabled(self):
+        return self._notify
 
     def getBookmarks(self):
         return self._bookmarks
@@ -92,27 +109,44 @@ class Templates:
     def getClipFilename(self):
         return self._clipFilename
 
+class Advanced:
+    def __init__(self):
+        self._externalContentUrl = True
+        self.setCachingEnabled(False)
+
+    def setExternalContentUrlEnabled(self, enabled):
+        self._externalContentUrl = enabled
+
+    def setCachingEnabled(self, enabled):
+        self._caching = enabled
+        self.reloadCaching()
+
+    def reloadCaching(self):
+        ImageLoader.setCachingEnabled(self._caching)
+
+    def isExternalContentUrlEnabled(self):
+        return self._externalContentUrl
+
+    def isCachingEnabled(self):
+        return self._caching
+
 class Localization:
     def __init__(self):
         self.setLanguage(Translator.getDefaultLanguage())
-        self.setTimezoneNo(SystemUtils.getTimezoneList().index(SystemUtils.getLocalTimezone(preferredTimezones=[Translator.getLanguageData()[language]["preferredTimezone"] for language in Translator.getLanguageKeyList()])))
+        self._timezone = SystemUtils.getLocalTimezone(preferred=Translator.getLanguageData()[Translator.getDefaultLanguage()]["preferredTimezone"])
 
     def setLanguage(self, language):
         self._language = language
         self.reloadTranslator()
 
-    def setTimezoneNo(self, timezoneNo):
-        self._timezoneNo = timezoneNo
-        self._timezone = SystemUtils.getTimezone(SystemUtils.getTimezoneList()[timezoneNo])
+    def setTimezone(self, timezone):
+        self._timezone = SystemUtils.getTimezone(timezone)
 
     def reloadTranslator(self):
         Translator.setLanguage(self._language)
 
     def getLanguage(self):
         return self._language
-
-    def getTimezoneIndex(self):
-        return self._timezoneNo
 
     def getTimezone(self):
         return self._timezone
@@ -122,86 +156,59 @@ class Localization:
 
 class Temp:
     def __init__(self):
-        self._defaultDirectory = Config.DEFAULT_FILE_DIRECTORY
-        self._defaultFormat = {
-            TwitchPlaybackAccessTokenTypes.TYPES.STREAM: "ts",
-            TwitchPlaybackAccessTokenTypes.TYPES.VIDEO: "ts",
-            TwitchPlaybackAccessTokenTypes.TYPES.CLIP: "mp4",
-            ImageLoaderConfig.IMAGE_DATA_TYPE: "jpg"
+        self._downloadHistory = {
+            TwitchPlaybackAccessTokenTypes.STREAM: DownloadHistory.StreamHistory(),
+            TwitchPlaybackAccessTokenTypes.VIDEO: DownloadHistory.VideoHistory(),
+            TwitchPlaybackAccessTokenTypes.CLIP: DownloadHistory.ClipHistory(),
+            ImageConfig.DATA_TYPE: DownloadHistory.ThumbnailHistory()
         }
         self._windowGeometry = {}
 
-    def setDefaultDirectory(self, defaultDirectory):
-        self._defaultDirectory = defaultDirectory
+    def getDownloadHistory(self, contentType):
+        return self._downloadHistory[contentType]
 
-    def setDefaultFormat(self, contentType, defaultFormat):
-        self._defaultFormat[contentType] = defaultFormat
+    def hasWindowGeometry(self, windowName):
+        return windowName in self._windowGeometry
 
     def setWindowGeometry(self, windowName, windowGeometry):
         self._windowGeometry[windowName] = windowGeometry
 
-    def updateDefaultDirectory(self):
-        for directory in [Config.DEFAULT_FILE_DIRECTORY, Config.APPDATA_PATH]:
-            try:
-                OSUtils.createDirectory(self.getDefaultDirectory())
-                break
-            except:
-                self.setDefaultDirectory(directory)
-
-    def getDefaultDirectory(self):
-        return self._defaultDirectory
-
-    def getDefaultFormat(self, contentType):
-        return self._defaultFormat[contentType]
-
     def getWindowGeometry(self, windowName):
-        return self._windowGeometry.get(windowName)
+        return self._windowGeometry[windowName]
+
 
 class Download:
     def __init__(self):
-        self._downloadSpeed = TaskConfig.RECOMMENDED_THREAD_LIMIT
-        self._unmuteVideo = True
-        self._updateTrack = False
+        self.setDownloadSpeed(EngineConfig.RECOMMENDED_THREAD_LIMIT)
 
     def setDownloadSpeed(self, downloadSpeed):
         self._downloadSpeed = downloadSpeed
         self.reloadDownloadSpeed()
 
-    def setUnmuteVideoEnabled(self, unmuteVideo):
-        self._unmuteVideo = unmuteVideo
-
-    def setUpdateTrackEnabled(self, updateTrack):
-        self._updateTrack = updateTrack
-
     def reloadDownloadSpeed(self):
-        ThreadPool.setMaxThreadCount(self._downloadSpeed)
+        DownloadThreadPool.setMaxThreadCount(self._downloadSpeed)
 
     def getDownloadSpeed(self):
         return self._downloadSpeed
-
-    def isUnmuteVideoEnabled(self):
-        return self._unmuteVideo
-
-    def isUpdateTrackEnabled(self):
-        return self._updateTrack
 
 
 class Database:
     def __init__(self):
         self.version = Config.VERSION
         self.load()
-
-    def open(self):
-        try:
-            with open(Config.DB_FILE, "r", encoding="utf-8") as file:
-                return JsonDatabase.load(file, cls=DatabaseDecoder)
-        except:
-            self.save()
-            return {}
+        App.aboutToQuit.connect(self.save)
 
     def load(self):
-        self.resetData()
-        DatabaseLoader.load(self, self.open())
+        self.reset()
+        try:
+            with open(Config.DB_FILE, "r", encoding="utf-8") as file:
+                DataLoader.load(self, Decoder.decode(json.load(file)))
+        except Exception as e:
+            App.logger.critical("Unable to load data.")
+            App.logger.exception(e)
+            self.reset()
+            App.logger.info("Starting with default settings.")
+        self.advanced.reloadCaching()
         self.localization.reloadTranslator()
         self.download.reloadDownloadSpeed()
 
@@ -209,35 +216,20 @@ class Database:
         try:
             OSUtils.createDirectory(Config.DB_ROOT)
             with open(Config.DB_FILE, "w", encoding="utf-8") as file:
-                JsonDatabase.dump(DatabaseLoader.unpack(self.__dict__), file, cls=DatabaseEncoder)
-        except:
-            return False
-        else:
-            return True
+                json.dump(Encoder.encode(self), file, indent=3)
+        except Exception as e:
+            App.logger.critical("Unable to save data.")
+            App.logger.exception(e)
 
-    def resetData(self):
-        self.termsOfService = TermsOfService()
+    def reset(self):
+        self.setup = Setup()
         self.account = Account()
         self.general = General()
         self.templates = Templates()
+        self.advanced = Advanced()
         self.localization = Localization()
         self.temp = Temp()
         self.download = Download()
 
-    def reset(self):
-        self.resetData()
-        self.save()
-
-    def saveLogs(self, logs):
-        try:
-            if not os.path.exists(Config.DOWNLOAD_LOGS):
-                with open(Config.DOWNLOAD_LOGS, "w", encoding="utf-8") as file:
-                    file.write("{} Download Logs".format(Config.APP_NAME))
-            with open(Config.DOWNLOAD_LOGS, "a", encoding="utf-8") as file:
-                file.write("\n\n{}".format(logs))
-        except:
-            return False
-        else:
-            return True
 
 DB = Database()

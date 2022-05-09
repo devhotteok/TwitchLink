@@ -18,11 +18,12 @@ class Exceptions:
             if self.browser == None:
                 return "Browser Not Found"
             else:
-                return "{} Browser Not Found".format(self.browser)
+                return f"{self.browser} Browser Not Found"
 
     class BrowserNotLoadable(Exception):
         def __str__(self):
             return "Browser Not Loadable"
+
 
 class WebDriverLoader:
     def __init__(self, path):

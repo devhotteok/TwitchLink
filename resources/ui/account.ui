@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>350</height>
+    <height>300</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="font">
-   <font>
-    <family>Arial Rounded MT Bold</family>
-   </font>
   </property>
   <property name="windowTitle">
    <string>Account</string>
@@ -27,7 +16,7 @@
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
-  <layout class="QVBoxLayout" name="DialogLayout">
+  <layout class="QVBoxLayout" name="FormLayout">
    <item>
     <widget class="QLabel" name="window_title">
      <property name="sizePolicy">
@@ -38,7 +27,6 @@
      </property>
      <property name="font">
       <font>
-       <family>Arial Rounded MT Bold</family>
        <pointsize>12</pointsize>
       </font>
      </property>
@@ -64,7 +52,6 @@
      </property>
      <property name="font">
       <font>
-       <family>Arial Rounded MT Bold</family>
        <pointsize>10</pointsize>
       </font>
      </property>
@@ -126,11 +113,6 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="font">
-          <font>
-           <family>Arial Rounded MT Bold</family>
-          </font>
-         </property>
          <property name="styleSheet">
           <string notr="true">color: rgb(255, 0, 0);</string>
          </property>
@@ -143,19 +125,16 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="accountInfo">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
          <property name="text">
           <string>To download live broadcasts without Twitch ads,
-or to download subscriber-only videos,
+or to download subscribers-only videos,
 you need to log in with a subscribed account.</string>
          </property>
          <property name="alignment">
@@ -198,6 +177,23 @@ you need to log in with a subscribed account.</string>
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item alignment="Qt::AlignRight">
+        <widget class="QToolButton" name="refreshAccountButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Refresh</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../icons/update.svg</normaloff>../icons/update.svg</iconset>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QWidget" name="accountArea" native="true">
          <property name="sizePolicy">
@@ -257,7 +253,6 @@ you need to log in with a subscribed account.</string>
            <widget class="QLabel" name="account">
             <property name="font">
              <font>
-              <family>Arial Rounded MT Bold</family>
               <pointsize>13</pointsize>
              </font>
             </property>
@@ -292,51 +287,8 @@ you need to log in with a subscribed account.</string>
      </widget>
     </widget>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

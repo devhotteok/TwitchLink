@@ -1,44 +1,71 @@
-from .Updater import Converters
+from .Updater import Updaters
+from .EncoderDecoder import ObjectData
 
 
-class _DataManager:
-    def unpack(self, data):
-        return self.unpackItems(data.items())
-
-    def unpackItems(self, items):
-        return {key: self.itemsToDict(value) for key, value in items}
-
-    def itemsToDict(self, data):
-        if hasattr(data, "__dict__"):
-            return self.unpackItems(data.__dict__.items())
-        else:
-            return data
-
-    def pack(self, dataObject, data):
-        for key, value in data.items():
-            if hasattr(dataObject, key):
-                if not isinstance(getattr(dataObject, key), dict) and isinstance(value, dict):
-                    self.pack(getattr(dataObject, key), value)
-                else:
-                    setattr(dataObject, key, value)
-        return dataObject
+class Exceptions:
+    class TypeMismatch(Exception):
+        def __str__(self):
+            return "Type Mismatch Error"
 
 
-class _DatabaseLoader(_DataManager):
-    def load(self, database, data):
+class DataLoader:
+    @classmethod
+    def load(cls, database, data):
+        for updater in Updaters.getUpdaters(cls.detectVersion(data)):
+            data = updater(data)
+        cls.unpack(database, data)
+
+    @classmethod
+    def detectVersion(cls, data):
         try:
-            self.database = database
-            self.data = data
-            for converter in Converters.getConverters(self.getOldVersion()):
-                self.data = converter(self.data)
-            return self.pack(self.database, self.data)
-        except:
-            return database
-
-    def getOldVersion(self):
-        try:
-            return self.data["version"]
+            return data.pop("version")
         except:
             return ""
 
-DatabaseLoader = _DatabaseLoader()
+    @classmethod
+    def unpack(cls, dataObject, data):
+        if isinstance(data, ObjectData):
+            if hasattr(dataObject, "__dict__"):
+                return cls._unpackObject(dataObject, data)
+            else:
+                raise Exceptions.TypeMismatch
+        elif isinstance(data, dict):
+            if isinstance(dataObject, dict):
+                return cls._unpackDict(dataObject, data)
+            else:
+                raise Exceptions.TypeMismatch
+        else:
+            return data
+
+    @classmethod
+    def _unpackDict(cls, dataObject, data):
+        newDict = {}
+        for key, value in data.items():
+            if key in dataObject:
+                newDict[key] = cls.unpack(dataObject[key], value)
+            else:
+                try:
+                    cls._checkPureData(value)
+                except:
+                    raise Exceptions.TypeMismatch
+                else:
+                    newDict[key] = value
+        return newDict
+
+    @classmethod
+    def _unpackObject(cls, dataObject, data):
+        for key, value in data.items():
+            if hasattr(dataObject, key):
+                setattr(dataObject, key, cls.unpack(getattr(dataObject, key), value))
+        return dataObject
+
+    @classmethod
+    def _checkPureData(cls, data):
+        if isinstance(data, ObjectData):
+            raise
+        elif isinstance(data, dict):
+            for value in data.values():
+                cls._checkPureData(value)
+        elif isinstance(data, list):
+            for item in data:
+                cls._checkPureData(item)

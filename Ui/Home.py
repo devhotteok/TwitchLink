@@ -1,17 +1,17 @@
-from Core.App import App
 from Core.Ui import *
 from Services.Twitch.Gql import TwitchGqlModels
 from Search.Modes import SearchModes
-from Search import PlaylistAccessToken
+from Search import ExternalPlaylist
 from Download.DownloadInfo import DownloadInfo
 from Download.DownloadManager import DownloadManager
 
 
 class Home(QtWidgets.QWidget, UiFile.home):
-    def __init__(self):
-        super().__init__()
-        self.appLogo.setContentsMargins(10, 10, 10, 10)
-        self.appLogoLoader = Utils.ImageLoader(self.appLogo, Config.LOGO_IMAGE)
+    searchResultWindowRequested = QtCore.pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        super(Home, self).__init__(parent=parent)
+        self.appLogo.setMargin(10)
         self.appName.setText(Config.APP_NAME)
         self.channel_id.clicked.connect(self.searchChannel)
         self.video_id.clicked.connect(self.searchVideo)
@@ -19,39 +19,24 @@ class Home(QtWidgets.QWidget, UiFile.home):
         self.copyright.setText(Config.getCopyrightInfo())
 
     def searchChannel(self):
-        self.startSearch(SearchModes.CHANNEL())
+        self.startSearch(SearchModes(SearchModes.CHANNEL))
 
     def searchVideo(self):
-        self.startSearch(SearchModes.VIDEO())
+        self.startSearch(SearchModes(SearchModes.VIDEO))
 
     def searchUrl(self):
-        self.startSearch(SearchModes.URL())
+        self.startSearch(SearchModes(SearchModes.URL))
 
     def startSearch(self, mode):
-        searchResult = Ui.Search(mode).exec()
+        searchResult = Ui.Search(mode, parent=self).exec()
         if searchResult != False:
-            if type(searchResult) == PlaylistAccessToken.TwitchPlaylist:
+            if type(searchResult) == ExternalPlaylist.ExternalPlaylist:
                 if searchResult.type.isStream():
-                    data = TwitchGqlModels.Stream({"title": "Unknown Stream"})
+                    data = TwitchGqlModels.Stream({"title": "Unknown Stream", "broadcaster": {"login": "Unknown User"}})
                 else:
-                    data = TwitchGqlModels.Video({"title": "Unknown Video", "lengthSeconds": searchResult.totalSeconds})
-                downloadInfo = Ui.DownloadMenu(DownloadInfo(data, searchResult), showMore=False).exec()
+                    data = TwitchGqlModels.Video({"title": "Unknown Video", "owner": {"login": "Unknown User"}, "lengthSeconds": searchResult.totalSeconds})
+                downloadInfo = Ui.DownloadMenu(DownloadInfo(data, searchResult), viewOnly=True, parent=self).exec()
                 if downloadInfo != False:
-                    downloaderId = DownloadManager.start(
-                        downloadInfo,
-                        unmuteVideo=DB.download.isUnmuteVideoEnabled(),
-                        updateTrack=DB.download.isUpdateTrackEnabled()
-                    )
-                    App.coreWindow().showDownload(downloaderId)
+                    DownloadManager.create(downloadInfo)
             else:
-                self.startVideoList(searchResult)
-
-    def startVideoList(self, data):
-        downloadInfo = Ui.SearchResult(data).exec()
-        if downloadInfo != False:
-            downloaderId = DownloadManager.start(
-                downloadInfo,
-                unmuteVideo=DB.download.isUnmuteVideoEnabled(),
-                updateTrack=DB.download.isUpdateTrackEnabled()
-            )
-            App.coreWindow().showDownload(downloaderId)
+                self.searchResultWindowRequested.emit(searchResult)

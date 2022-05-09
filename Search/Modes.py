@@ -1,14 +1,8 @@
 class SearchModes:
-    class MODES:
-        CHANNEL = "channel"
-        VIDEO = "video"
-        CLIP = "clip"
-        URL = "url"
-
-    CHANNEL = lambda: SearchModes(SearchModes.MODES.CHANNEL)
-    VIDEO = lambda: SearchModes(SearchModes.MODES.VIDEO)
-    CLIP = lambda: SearchModes(SearchModes.MODES.CLIP)
-    URL = lambda: SearchModes(SearchModes.MODES.URL)
+    CHANNEL = "channel"
+    VIDEO = "video"
+    CLIP = "clip"
+    URL = "url"
 
     def __init__(self, searchMode):
         self.setMode(searchMode)
@@ -20,13 +14,13 @@ class SearchModes:
         return self._searchMode
 
     def isChannel(self):
-        return self._searchMode == self.MODES.CHANNEL
+        return self._searchMode == self.CHANNEL
 
     def isVideo(self):
-        return self._searchMode == self.MODES.VIDEO
+        return self._searchMode == self.VIDEO
 
     def isClip(self):
-        return self._searchMode == self.MODES.CLIP
+        return self._searchMode == self.CLIP
 
     def isUrl(self):
-        return self._searchMode == self.MODES.URL
+        return self._searchMode == self.URL

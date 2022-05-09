@@ -3,39 +3,38 @@ from Core.Ui import *
 
 
 class Loading(QtWidgets.QDialog, UiFile.loading):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super(Loading, self).__init__(parent=parent)
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
-        self.setWindowIcon(QtGui.QIcon(Config.ICON_IMAGE))
-        self.appLogo.setContentsMargins(10, 10, 10, 10)
-        self.appLogoLoader = Utils.ImageLoader(self.appLogo, Config.LOGO_IMAGE_WHITE)
+        self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
+        self.appLogo.setMargin(10)
         self.appName.setText(Config.APP_NAME)
-        self.version.setText("{} {}".format(Config.APP_NAME, Config.VERSION))
+        self.version.setText(f"{Config.APP_NAME} {Config.VERSION}")
         self.copyright.setText(Config.getCopyrightInfo())
         self.setStatus(T("starting", ellipsis=True))
-        self.loadingThread = LoadingThread()
-        self.loadingThread.progressSignal.connect(self.setStatus)
-        self.loadingThread.loadCompleteSignal.connect(self.close)
+        self.closeEnabled = False
+        Updater.updateProgress.connect(self.updateProgress)
+        self.loadingThread = Utils.WorkerThread(target=Updater.update, parent=self)
+        self.loadingThread.finished.connect(self.close)
         self.loadingThread.start()
 
+    def updateProgress(self, progress):
+        if progress == 0:
+            self.setStatus(T("#Checking for updates", ellipsis=True))
+        elif progress == Updater.TOTAL_TASK_COUNT:
+            self.setStatus(T("starting", ellipsis=True))
+        else:
+            self.setStatus(f"{T('#Loading Data', ellipsis=True)} {progress}/{Updater.TOTAL_TASK_COUNT - 1}")
+
     def setStatus(self, status):
-        self.info.setText(status)
+        self.status.setText(status)
 
     def close(self):
-        self.closeEvent = lambda event: None
+        self.closeEnabled = True
         super().close()
 
     def closeEvent(self, event):
-        event.ignore()
-
-class LoadingThread(QtCore.QThread):
-    progressSignal = QtCore.pyqtSignal(str)
-    loadCompleteSignal = QtCore.pyqtSignal()
-
-    def run(self):
-        for progress in Updater.update():
-            if progress == 0:
-                self.progressSignal.emit(T("#Checking for updates", ellipsis=True))
-            else:
-                self.progressSignal.emit("{} {}/2".format(T("#Loading Data", ellipsis=True), progress))
-        self.loadCompleteSignal.emit()
+        if self.closeEnabled:
+            super().closeEvent(event)
+        else:
+            event.ignore()

@@ -14,7 +14,7 @@ class Utils(OSUtils, SystemUtils, UiUtils):
                 key = "{" + key + "}"
                 value = str(value)
                 if string[index:].startswith(key):
-                    string = "{}{}{}".format(string[:index], value, string[index + len(key):])
+                    string = f"{string[:index]}{value}{string[index + len(key):]}"
                     index += len(value) - 1
                     break
             index += 1
@@ -31,12 +31,12 @@ class Utils(OSUtils, SystemUtils, UiUtils):
 
     @staticmethod
     def formatTime(h, m, s):
-        return "{:02}:{:02}:{:02}".format(h, m, s)
+        return f"{h:02}:{m:02}:{s:02}"
 
     @staticmethod
-    def getDocs(file, language, **kwargs):
+    def getDoc(file, language, **kwargs):
         try:
-            with open(Utils.joinPath(Config.DOCS_ROOT, language, "{}.html".format(file)), "r", encoding="utf-8") as file:
+            with open(Utils.joinPath(Config.DOCS_ROOT, language, file), "r", encoding="utf-8") as file:
                 return T(file.read(), **kwargs)
         except:
             return ""

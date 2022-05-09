@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 
 from urllib.parse import urlencode
@@ -16,7 +17,7 @@ class OSUtils:
 
     @staticmethod
     def openUrl(url):
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
+        return QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
 
     @staticmethod
     def copyToClipboard(text):
@@ -24,13 +25,13 @@ class OSUtils:
 
     @staticmethod
     def joinPath(*args):
-        return "/".join(map(lambda string: string.strip("\\/"), args)).replace("\\", "/")
+        return "/".join([string.strip("\\/") for string in args]).replace("\\", "/")
 
     @staticmethod
     def joinUrl(*args, params=None):
-        url = "/".join(map(lambda string: string.strip("/"), args))
+        url = "/".join([string.strip("/") for string in args])
         if params != None:
-            return "{}?{}".format(url, urlencode(params))
+            return f"{url}?{urlencode(params)}"
         else:
             return url
 
@@ -57,3 +58,11 @@ class OSUtils:
         for key, value in characters.items():
             name = name.replace(key, value)
         return name.strip()
+
+    @staticmethod
+    def getOSInfo():
+        return f"{platform.system()} {platform.release()} {platform.version()}; {platform.machine()};"
+
+    @staticmethod
+    def shutdownSystem(message, time=10):
+        os.system(f"shutdown /s /c \"{message}\" /t {time}")

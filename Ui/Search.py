@@ -1,13 +1,13 @@
-from Core.App import App
 from Core.Ui import *
 from Services.Messages import Messages
 from Search import Engine
 from Search.Helper.SearchHelper import SearchHelper
+from Search.Modes import SearchModes
 
 
 class Search(QtWidgets.QDialog, UiFile.search):
-    def __init__(self, mode):
-        super().__init__(parent=App.getActiveWindow())
+    def __init__(self, mode, parent=None):
+        super(Search, self).__init__(parent=parent)
         self.mode = mode
         self.setup()
 
@@ -20,7 +20,7 @@ class Search(QtWidgets.QDialog, UiFile.search):
             self.window_title.setText(T("#Search by Video / Clip ID"))
             self.showSearchHelper(SearchHelper.getVideoClipIdExamples())
         else:
-            self.window_title.setText(T("#Search by Channel / Video / Clip / Playlist URL"))
+            self.window_title.setText(T("#Search by Channel / Video / Clip URL"))
             self.showSearchHelper(SearchHelper.getUrlExamples())
         if self.mode.isChannel() and len(DB.general.getBookmarks()) != 0:
             self.currentText = self.queryComboBox.currentText
@@ -28,6 +28,8 @@ class Search(QtWidgets.QDialog, UiFile.search):
         else:
             self.currentText = self.query.text
             self.query.textChanged.connect(self.checkText)
+        self.searchThread = Utils.WorkerThread(parent=self)
+        self.searchThread.resultSignal.connect(self.processSearchResult)
         self.showInputPage()
 
     def showInputPage(self):
@@ -49,35 +51,37 @@ class Search(QtWidgets.QDialog, UiFile.search):
     def accept(self):
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
         query = self.getCurrentQuery()
-        if self.mode.isVideo():
-            if not query.isnumeric():
-                self.mode.setMode(self.mode.MODES.CLIP)
+        if self.mode.isVideo() and not query.isnumeric():
+            mode = SearchModes(SearchModes.CLIP)
+        else:
+            mode = self.mode
         self.searchProgress.setText(T({
-            self.mode.MODES.CHANNEL: "#Checking channel info",
-            self.mode.MODES.VIDEO: "#Checking video info",
-            self.mode.MODES.CLIP: "#Checking clip info",
-            self.mode.MODES.URL: "#Checking URL"
-        }[self.mode.getMode()], ellipsis=True))
+            mode.CHANNEL: "#Checking channel info",
+            mode.VIDEO: "#Checking video info",
+            mode.CLIP: "#Checking clip info",
+            mode.URL: "#Checking URL"
+        }[mode.getMode()], ellipsis=True))
         self.queryArea.setCurrentIndex(2)
-        self.searchThread = Engine.SearchThread(
+        self.searchThread.setup(
             target=Engine.Search.Query,
-            callback=self.processSearchResult,
-            args=(self.mode, query)
+            args=(mode, query),
+            kwargs={"searchExternalContent": DB.advanced.isExternalContentUrlEnabled()},
         )
+        self.searchThread.start()
 
     def processSearchResult(self, result):
         if result.success:
-            return super().accept(result.data)
+            super().accept(result.data)
         else:
             self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
             self.showInputPage()
-            if result.error == Engine.Exceptions.InvalidURL:
-                Utils.info("no-results-found", "#This URL is invalid.")
-            elif result.error == Engine.Exceptions.ChannelNotFound:
-                Utils.info("no-results-found", "#Channel not found.")
-            elif result.error == Engine.Exceptions.VideoNotFound:
-                Utils.info("no-results-found", "#Video not found.")
-            elif result.error == Engine.Exceptions.ClipNotFound:
-                Utils.info("no-results-found", "#Clip not found.")
+            if isinstance(result.error, Engine.Exceptions.InvalidURL):
+                self.info("no-results-found", "#This URL is invalid.")
+            elif isinstance(result.error, Engine.Exceptions.ChannelNotFound):
+                self.info("no-results-found", "#Channel not found.")
+            elif isinstance(result.error, Engine.Exceptions.VideoNotFound):
+                self.info("no-results-found", "#Video not found.")
+            elif isinstance(result.error, Engine.Exceptions.ClipNotFound):
+                self.info("no-results-found", "#Clip not found.")
             else:
-                Utils.info(*Messages.INFO.NETWORK_ERROR)
+                self.info(*Messages.INFO.NETWORK_ERROR)

@@ -1,5 +1,6 @@
 from .Config import Config
 
+from Core.App import App
 from Services.Utils.OSUtils import OSUtils
 
 import os
@@ -31,17 +32,24 @@ class _TempManager:
             pass
 
     def cleanup(self):
-        for filename in os.listdir(Config.TEMP_LIST_DIRECTORY):
+        files = os.listdir(Config.TEMP_LIST_DIRECTORY)
+        if len(files) == 0:
+            return
+        else:
+            App.logger.info("Cleaning up temp files.")
+        for filename in files:
+            path = OSUtils.joinPath(Config.TEMP_LIST_DIRECTORY, filename)
             try:
-                self.cleanTempDirKeyFile(os.path.join(Config.TEMP_LIST_DIRECTORY, filename))
-            except:
-                pass
+                self.cleanTempDirKeyFile(path)
+            except Exception as e:
+                App.logger.exception(e)
 
     def cleanTempDirKeyFile(self, tempDirKeyFile):
         if OSUtils.isFile(tempDirKeyFile):
             with open(tempDirKeyFile) as file:
                 tempDir = file.read()
                 if OSUtils.isDirectory(tempDir):
+                    App.logger.info(f"Removing temp directory: {tempDir}")
                     OSUtils.removeDirectory(tempDir)
             OSUtils.removeFile(tempDirKeyFile)
 

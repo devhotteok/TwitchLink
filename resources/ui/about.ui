@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
+    <width>700</width>
     <height>600</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="font">
-   <font>
-    <family>Arial Rounded MT Bold</family>
-   </font>
   </property>
   <property name="windowTitle">
    <string>About</string>
@@ -27,7 +16,7 @@
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
-  <layout class="QVBoxLayout" name="DialogLayout">
+  <layout class="QVBoxLayout" name="FormLayout">
    <item>
     <widget class="QLabel" name="window_title">
      <property name="sizePolicy">
@@ -38,7 +27,6 @@
      </property>
      <property name="font">
       <font>
-       <family>Arial Rounded MT Bold</family>
        <pointsize>12</pointsize>
       </font>
      </property>
@@ -58,22 +46,76 @@
     <widget class="QWidget" name="infoArea" native="true">
      <layout class="QVBoxLayout" name="infoAreaLayout">
       <item>
-       <widget class="QLabel" name="appLabel">
+       <widget class="QWidget" name="appLabelArea" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <family>Arial Rounded MT Bold</family>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>App</string>
-        </property>
+        <layout class="QHBoxLayout" name="appLabelAreaLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="appLogo">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="pixmap">
+            <pixmap>../img/logo.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="appNameLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>App Name</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
@@ -90,29 +132,54 @@
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line_1">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="copyrightLabel">
+       <widget class="QLabel" name="versionInfoLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <family>Arial Rounded MT Bold</family>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
         <property name="text">
-         <string>Copyright</string>
+         <string>Version Info</string>
         </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignLeft">
+       <widget class="QWidget" name="updateInfoArea" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QHBoxLayout" name="updateInfoAreaLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="updateInfoLabel">
+           <property name="text">
+            <string>Update Info</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="updateButton">
+           <property name="text">
+            <string>Update</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
@@ -145,7 +212,6 @@
         </property>
         <property name="font">
          <font>
-          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
@@ -184,7 +250,6 @@
         </property>
         <property name="font">
          <font>
-          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
@@ -194,16 +259,27 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="contactInfoLabel">
+       <widget class="QWidget" name="contactInfoArea" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text">
-         <string>Contact Info</string>
-        </property>
+        <layout class="QFormLayout" name="contactInfoAreaLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+        </layout>
        </widget>
       </item>
       <item>
@@ -214,7 +290,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="donateLabel">
+       <widget class="QLabel" name="sponsorLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -223,17 +299,16 @@
         </property>
         <property name="font">
          <font>
-          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Donate</string>
+         <string>Sponsor</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="donateInfoLabel">
+       <widget class="QLabel" name="sponsorInfoLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -241,12 +316,12 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Donate Info</string>
+         <string>Sponsor Info</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="donateButton">
+       <widget class="QPushButton" name="sponsorButton">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -254,58 +329,15 @@
          </size>
         </property>
         <property name="text">
-         <string>Donate</string>
+         <string>Become a Sponsor</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

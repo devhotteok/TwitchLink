@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1110</width>
-    <height>624</height>
+    <height>633</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,14 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="font">
-   <font>
-    <family>Arial Rounded MT Bold</family>
-   </font>
-  </property>
-  <property name="windowTitle">
-   <string>Download</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -38,7 +30,6 @@
      </property>
      <property name="font">
       <font>
-       <family>Arial Rounded MT Bold</family>
        <pointsize>12</pointsize>
       </font>
      </property>
@@ -79,7 +70,6 @@
        <widget class="QLabel" name="user_name">
         <property name="font">
          <font>
-          <family>Arial Rounded MT Bold</family>
           <pointsize>12</pointsize>
          </font>
         </property>
@@ -124,7 +114,6 @@ border-radius: 10px;</string>
           <widget class="QLabel" name="liveLabel">
            <property name="font">
             <font>
-             <family>Arial Rounded MT Bold</family>
              <pointsize>10</pointsize>
              <weight>75</weight>
              <bold>true</bold>
@@ -139,6 +128,29 @@ border-radius: 10px;</string>
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="openLogsButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Logs</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../icons/text_file.svg</normaloff>../icons/text_file.svg</iconset>
+        </property>
        </widget>
       </item>
      </layout>
@@ -231,12 +243,6 @@ border-radius: 10px;</string>
           <height>0</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>400</height>
-         </size>
-        </property>
         <layout class="QVBoxLayout" name="infoAreaLayout">
          <property name="leftMargin">
           <number>0</number>
@@ -284,71 +290,6 @@ border-radius: 10px;</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="dateInfo">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Date:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="durationInfo">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Duration:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="view_countInfo">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>View Count:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="resolutionInfo">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Resolution:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="fileInfo">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>File:</string>
-              </property>
-             </widget>
-            </item>
             <item row="0" column="1">
              <widget class="QLabel" name="title">
               <property name="sizePolicy">
@@ -359,6 +300,19 @@ border-radius: 10px;</string>
               </property>
               <property name="text">
                <string>Title</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="dateInfo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Date:</string>
               </property>
              </widget>
             </item>
@@ -375,6 +329,19 @@ border-radius: 10px;</string>
               </property>
              </widget>
             </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="durationInfo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Duration:</string>
+              </property>
+             </widget>
+            </item>
             <item row="2" column="1">
              <widget class="QLabel" name="duration">
               <property name="sizePolicy">
@@ -385,6 +352,19 @@ border-radius: 10px;</string>
               </property>
               <property name="text">
                <string>Duration</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="view_countInfo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>View Count:</string>
               </property>
              </widget>
             </item>
@@ -401,6 +381,19 @@ border-radius: 10px;</string>
               </property>
              </widget>
             </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="resolutionInfo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Resolution:</string>
+              </property>
+             </widget>
+            </item>
             <item row="4" column="1">
              <widget class="QLabel" name="resolution">
               <property name="sizePolicy">
@@ -411,6 +404,19 @@ border-radius: 10px;</string>
               </property>
               <property name="text">
                <string>Resolution</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="fileInfo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>File:</string>
               </property>
              </widget>
             </item>
@@ -481,14 +487,189 @@ border-radius: 10px;</string>
             </item>
             <item>
              <widget class="QLabel" name="category">
-              <property name="font">
-               <font>
-                <family>Arial Rounded MT Bold</family>
-               </font>
-              </property>
               <property name="text">
                <string>Category</string>
               </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="tagArea" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <layout class="QHBoxLayout" name="tagAreaLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QWidget" name="unmuteVideoTag" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(145, 71, 255);
+border-radius: 10px;</string>
+              </property>
+              <layout class="QVBoxLayout" name="unmuteVideoTagLayout">
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>3</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>3</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="unmuteVideoTagLabel">
+                 <property name="font">
+                  <font>
+                   <pointsize>10</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Unmute Video</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="updateTrackTag" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(145, 71, 255);
+border-radius: 10px;</string>
+              </property>
+              <layout class="QVBoxLayout" name="updateTrackTagLayout">
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>3</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>3</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="updateTrackTagLabel">
+                 <property name="font">
+                  <font>
+                   <pointsize>10</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Update Track</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="prioritizeTag" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(145, 71, 255);
+border-radius: 10px;</string>
+              </property>
+              <layout class="QVBoxLayout" name="prioritizeTagLayout">
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>3</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>3</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="prioritizeTagLabel">
+                 <property name="font">
+                  <font>
+                   <pointsize>10</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Prioritize</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
@@ -616,6 +797,29 @@ border-radius: 10px;</string>
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="dataLoss">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(255, 0, 0);</string>
+           </property>
+           <property name="text">
+            <string>Missing 0 segments (00:00:00)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_1">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
           <widget class="QLabel" name="currentSize">
            <property name="text">
             <string>0.0B</string>
@@ -645,35 +849,28 @@ border-radius: 10px;</string>
          </property>
          <item>
           <widget class="QLabel" name="status">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Status</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item alignment="Qt::AlignLeft">
           <widget class="QPushButton" name="skipWaitingButton">
            <property name="text">
             <string>Skip</string>
            </property>
           </widget>
          </item>
-         <item>
-          <spacer name="horizontalSpacer_1">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="forceEncodingButton">
+         <item alignment="Qt::AlignRight">
+          <widget class="QPushButton" name="skipDownloadButton">
            <property name="text">
-            <string>Force Encoding</string>
+            <string>Skip Download</string>
            </property>
           </widget>
          </item>
@@ -698,6 +895,12 @@ border-radius: 10px;</string>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
      <layout class="QHBoxLayout" name="buttonAreaLayout">
       <property name="leftMargin">
        <number>0</number>
@@ -714,16 +917,10 @@ border-radius: 10px;</string>
       <item>
        <widget class="QPushButton" name="pauseButton">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>50</height>
-         </size>
         </property>
         <property name="text">
          <string>Pause</string>
@@ -733,16 +930,10 @@ border-radius: 10px;</string>
       <item>
        <widget class="QPushButton" name="cancelButton">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>50</height>
-         </size>
         </property>
         <property name="text">
          <string>Cancel</string>
@@ -751,10 +942,16 @@ border-radius: 10px;</string>
       </item>
       <item>
        <widget class="QPushButton" name="openFolderButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>100</width>
-          <height>50</height>
+          <height>0</height>
          </size>
         </property>
         <property name="text">
@@ -764,10 +961,16 @@ border-radius: 10px;</string>
       </item>
       <item>
        <widget class="QPushButton" name="openFileButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>100</width>
-          <height>50</height>
+          <height>0</height>
          </size>
         </property>
         <property name="text">

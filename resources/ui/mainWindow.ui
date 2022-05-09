@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>600</height>
+    <width>1500</width>
+    <height>850</height>
    </rect>
   </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="centralWidgetLayout">
+   <layout class="QHBoxLayout" name="centralWidgetLayout">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -28,19 +31,392 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QWidget" name="navigationBar" native="true">
+      <property name="styleSheet">
+       <string notr="true">#navigationBar {
+	background: rgba(145, 71, 255, 255);
+}</string>
+      </property>
+      <layout class="QVBoxLayout" name="navigationBarLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QToolButton" name="searchPageButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Search</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QToolButton {
+	background: rgba(255, 255, 255, 150);
+	border: none;
+}
+
+QToolButton:hover {
+	background: rgba(200, 200, 200, 255);
+}
+
+QToolButton:checked {
+	background: rgba(255, 255, 255, 255);
+}</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../icons/search.svg</normaloff>../icons/search.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="downloadsPageButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Downloads</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QToolButton {
+	background: rgba(255, 255, 255, 150);
+	border: none;
+}
+
+QToolButton:hover {
+	background: rgba(200, 200, 200, 255);
+}
+
+QToolButton:checked {
+	background: rgba(255, 255, 255, 255);
+}</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../icons/download.svg</normaloff>../icons/download.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_1">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QToolButton" name="accountPageButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Account</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QToolButton {
+	background: rgba(255, 255, 255, 150);
+	border: none;
+}
+
+QToolButton:hover {
+	background: rgba(200, 200, 200, 255);
+}
+
+QToolButton:checked {
+	background: rgba(255, 255, 255, 255);
+}</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../icons/account.svg</normaloff>../icons/account.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="settingsPageButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Settings</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QToolButton {
+	background: rgba(255, 255, 255, 150);
+	border: none;
+}
+
+QToolButton:hover {
+	background: rgba(200, 200, 200, 255);
+}
+
+QToolButton:checked {
+	background: rgba(255, 255, 255, 255);
+}</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../icons/settings.svg</normaloff>../icons/settings.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="documentPageButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Document</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QToolButton {
+	background: rgba(255, 255, 255, 150);
+	border: none;
+}
+
+QToolButton:hover {
+	background: rgba(200, 200, 200, 255);
+}
+
+QToolButton:checked {
+	background: rgba(255, 255, 255, 255);
+}</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../icons/info.svg</normaloff>../icons/info.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="navigationArea">
       <property name="currentIndex">
-       <number>-1</number>
+       <number>1</number>
       </property>
-      <property name="documentMode">
-       <bool>true</bool>
-      </property>
-      <property name="tabsClosable">
-       <bool>true</bool>
-      </property>
-      <property name="movable">
-       <bool>true</bool>
-      </property>
+      <widget class="QWidget" name="searchPage">
+       <layout class="QVBoxLayout" name="searchPageLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="downloadsPage">
+       <layout class="QVBoxLayout" name="downloadsPageLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="accountPage">
+       <layout class="QVBoxLayout" name="accountPageLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="settingsPage">
+       <layout class="QVBoxLayout" name="settingsPageLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="documentPage">
+       <layout class="QVBoxLayout" name="documentPageLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -50,24 +426,10 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>700</width>
-     <height>21</height>
+     <width>1500</width>
+     <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionNewDownloader"/>
-   </widget>
-   <widget class="QMenu" name="menuSettings">
-    <property name="title">
-     <string>Settings</string>
-    </property>
-    <addaction name="actionSettings"/>
-    <addaction name="separator"/>
-    <addaction name="actionAccount"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
@@ -76,32 +438,15 @@
     <addaction name="actionAbout"/>
     <addaction name="actionTermsOfService"/>
    </widget>
-   <widget class="QMenu" name="menuDonate">
+   <widget class="QMenu" name="menuContribute">
     <property name="title">
-     <string>Donate</string>
+     <string>Contribute</string>
     </property>
-    <addaction name="actionDonate"/>
+    <addaction name="actionSponsor"/>
    </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
-   <addaction name="menuDonate"/>
+   <addaction name="menuContribute"/>
   </widget>
-  <action name="actionNewDownloader">
-   <property name="text">
-    <string>New Downloader</string>
-   </property>
-  </action>
-  <action name="actionSettings">
-   <property name="text">
-    <string>Settings</string>
-   </property>
-  </action>
-  <action name="actionAccount">
-   <property name="text">
-    <string>Account</string>
-   </property>
-  </action>
   <action name="actionGettingStarted">
    <property name="text">
     <string>Getting Started</string>
@@ -114,12 +459,12 @@
   </action>
   <action name="actionTermsOfService">
    <property name="text">
-    <string>Terms Of Service</string>
+    <string>Terms of Service</string>
    </property>
   </action>
-  <action name="actionDonate">
+  <action name="actionSponsor">
    <property name="text">
-    <string>Donate</string>
+    <string>Become a Sponsor</string>
    </property>
   </action>
  </widget>

@@ -3,6 +3,7 @@ from .Config import Config
 
 from Core.Config import Config as CoreConfig
 from Services.Utils.OSUtils import OSUtils
+from Services.Twitch.Gql.TwitchGqlModels import Channel
 from Search import Engine
 
 import atexit
@@ -41,8 +42,9 @@ class WebDriver:
             pass
 
 
-class AuthEngine():
-    def run(self):
+class TwitchAuth():
+    @staticmethod
+    def login():
         with WebDriver() as driver:
             try:
                 driver.get(Config.LOGIN_PAGE)
@@ -50,9 +52,11 @@ class AuthEngine():
                 while token == None:
                     token = driver.get_cookie("auth-token")
                 username = driver.get_cookie("login")
-                self.username = username["value"]
-                self.token = token["value"]
-                self.expiry = token["expiry"]
+                return {
+                    "username": username["value"],
+                    "token": token["value"],
+                    "expiry": token["expiry"]
+                }
             except:
                 raise Exceptions.AuthError
 
@@ -63,23 +67,23 @@ class TwitchAccount:
 
     def login(self):
         self.logout()
-        auth = AuthEngine()
-        auth.run()
-        self.setAuthData(auth.username, auth.token, auth.expiry)
+        data = TwitchAuth.login()
+        self.setAuthData(data["username"], data["token"], data["expiry"])
 
     def logout(self):
         self.username = None
         self.token = ""
         self.expiry = None
-        self.data = None
-        self.connected = False
+        self.data = Channel({})
+
+    def isConnected(self):
+        return self.username != None
 
     def setAuthData(self, username, token, expiry):
         self.logout()
         self.username = username
         self.token = token
         self.expiry = datetime.fromtimestamp(expiry) if type(expiry) == int else None
-        self.connected = True
         self.updateAccount()
 
     def checkToken(self):
@@ -93,9 +97,10 @@ class TwitchAccount:
         self.updateAccountData()
 
     def updateAccountData(self):
-        if self.connected:
+        if self.isConnected():
             try:
                 self.data = Engine.Search.Channel(self.username)
+                self.data.stream = None
             except Engine.Exceptions.ChannelNotFound:
                 self.logout()
                 raise Exceptions.UserNotFound

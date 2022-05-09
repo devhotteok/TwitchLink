@@ -1,68 +1,76 @@
 # TwitchLink
 
-[![GitHub issues](https://img.shields.io/github/issues/devhotteok/TwitchLink?style=for-the-badge)](https://github.com/devhotteok/TwitchLink/issues) [![GitHub forks](https://img.shields.io/github/forks/devhotteok/TwitchLink?style=for-the-badge)](https://github.com/devhotteok/TwitchLink/network) [![GitHub stars](https://img.shields.io/github/stars/devhotteok/TwitchLink?style=for-the-badge)](https://github.com/devhotteok/TwitchLink/stargazers) [![GitHub license](https://img.shields.io/github/license/devhotteok/TwitchLink?style=for-the-badge)](https://github.com/devhotteok/TwitchLink/blob/main/LICENSE)
+[![Platform][badge-platforms]][Releases] [![Latest Release][badge-latest-release]][Releases] [![GitHub issues][badge-issues]][issues] [![GitHub forks][badge-forks]][Forks] [![GitHub stars][badge-stars]][Stars] [![GitHub license][badge-license]][License]
 
-##### Twitch Stream/Video/Clip Downloader
+##### Twitch Stream / Video / Clip Downloader
 
-[![TwitchLink Logo](./.github/img/logo.png)](https://twitchlink.github.io)
+[![TwitchLink Logo](./.github/img/logo.png)][Homepage]
 
 #
 
 ## Homepage
-- [TwitchLink Homepage](https://twitchlink.github.io)
+- [TwitchLink Homepage][Homepage]
 - For more information, visit this homepage.
 
 
 ## Download
 
-- **TwitchLink** for Windows 10 or higher. [[Install]](https://github.com/devhotteok/TwitchLink/releases)
+- **TwitchLink** for Windows 10 or higher. [[Install]][Releases]
 
 
 ## Features
 
-- **Download Streams, Videos, Clips**
-- **Download subscribers-only Videos**
-- **Download Thumbnails**
-- **Unmute Videos**
-- **Super Fast Download**
-- **Time Selection For Video Downloads**
+- **Stream / Video / Clip Download Support**
+- **Subscribers-Only Video Download Support**
+- **Thumbnail Download Support**
+- **Audio Only Download Support**
+- **Video Unmute Support**
+- **Video Cropping Support**
 - **Channel Bookmarks**
 - **Filename Templates**
-- **Language/Time Localization**
+- **User-Friendly UI**
+- **Language / Time Localization**
 - **Free & Open Source**
 
 
 ## Support & Issues
 
-### Notice
-
 **TwitchLink** is a Free & Open Source Project.
 
-I made this for those who were disappointed about Twitch's behavior on DMCA problems, which made a lot of streamers to delete their clips, and stop saving their live replays.
-With TwitchLink, you can download streams, videos, and clips to make an archive of your channel.
-
-I'm just a university student, not an experienced software engineer, and this is not my job.
-I'm developing TwitchLink in my free time for no money.
-Which means, my response or patch might be slow.
-Just be patient, it may take a while for me to look at it.
-
-- Email : devhotteok@gmail.com
-- Discord : DevHotteok#6437
-- Donate : [Contribute to TwitchLink](https://twitchlink.github.io/donate)
+- Email: twitchlinkhelp@gmail.com
+- Discord: [DevHotteok](https://discord.gg/4p8ytb2rkt)
+- Donate: [Become a Sponsor][Donate]
 
 ***
 
 ### Follow the checklist below when creating a new issue!
 
-- **Take a look at the latest issues [here](https://github.com/devhotteok/TwitchLink/issues).**
+- **Take a look at the latest issues [here][Issues].**
 - **Maybe your problem has already been reported or resolved.**
 - Try to use the latest version of **TwitchLink**.
-- Provide as much information about the problem as possible. (Channel, Stream/Video/Clip ID, Url, Settings)
+- Provide as much information about the problem as possible.
 - Try to describe the problem as detailed as possible.
+- If there is a problem with the download, please provide the download log.
+- **Please use English. This is a global project.**
 
 
 ## License
 
-[MIT License](https://github.com/devhotteok/TwitchLink/blob/main/LICENSE)
+[MIT License][License]
 
 ⓒ 2021 DevHotteok.
+
+
+[Homepage]: https://twitchlink.github.io
+[Donate]: https://twitchlink.github.io/donate
+[Releases]: https://github.com/devhotteok/TwitchLink/releases
+[Issues]: https://github.com/devhotteok/TwitchLink/issues
+[Forks]: https://github.com/devhotteok/TwitchLink/network
+[Stars]: https://github.com/devhotteok/TwitchLink/stargazers
+[License]: https://github.com/devhotteok/TwitchLink/blob/main/LICENSE
+[badge-platforms]: https://img.shields.io/badge/platform-win-green?style=for-the-badge
+[badge-latest-release]: https://img.shields.io/github/v/release/devhotteok/TwitchLink?style=for-the-badge
+[badge-issues]: https://img.shields.io/github/issues/devhotteok/TwitchLink?style=for-the-badge
+[badge-forks]: https://img.shields.io/github/forks/devhotteok/TwitchLink?style=for-the-badge
+[badge-stars]: https://img.shields.io/github/stars/devhotteok/TwitchLink?style=for-the-badge
+[badge-license]: https://img.shields.io/github/license/devhotteok/TwitchLink?style=for-the-badge

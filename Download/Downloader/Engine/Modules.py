@@ -1,10 +1,15 @@
+from Services.Utils.SystemUtils import SystemUtils
+
+
 class Setup:
-    def __init__(self, downloadInfo, **kwargs):
+    def __init__(self, downloadInfo):
         self.downloadInfo = downloadInfo
         if self.downloadInfo.type.isVideo():
-            self.unmuteVideo = kwargs.get("unmuteVideo", True)
-            self.updateTrack = kwargs.get("updateTrack", False)
-            self.priority = kwargs.get("priority", 0) * 2
+            self.unmuteVideo = self.downloadInfo.isUnmuteVideoEnabled()
+            self.updateTrack = self.downloadInfo.isUpdateTrackEnabled()
+            self.priority = (1 if self.downloadInfo.isPrioritizeEnabled() else 0) * 2
+        elif self.downloadInfo.type.isClip():
+            self.priority = (1 if self.downloadInfo.isPrioritizeEnabled() else 0) * 2
 
 
 class State:
@@ -121,10 +126,12 @@ class Progress:
     def __init__(self):
         self.file = 0
         self.totalFiles = 0
+        self.missingFiles = 0
         self.seconds = 0
         self.totalSeconds = 0
-        self.size = "0.0B"
-        self.totalSize = "0.0B"
+        self.missingSeconds = 0
+        self.size = SystemUtils.formatByteSize(0)
+        self.totalSize = SystemUtils.formatByteSize(0)
         self.byteSize = 0
         self.totalByteSize = 0
 

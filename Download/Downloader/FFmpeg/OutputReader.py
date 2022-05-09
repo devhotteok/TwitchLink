@@ -5,7 +5,9 @@ import re
 
 class ProgressMessages:
     file = re.compile("\[.* @ .*\] Opening \'(.*)\' for reading")
+    missing = re.compile("\[.* @ .*\] Failed to open segment (\d*) of playlist .*")
     encoding = re.compile(".*size=.*time=.*bitrate=.*speed=.*")
+
 
 
 class ExceptionMessages:
@@ -14,10 +16,14 @@ class ExceptionMessages:
 
 
 class FFmpegOutputReader:
-    def __init__(self, process):
+    def __init__(self, process, logger=None):
         self.process = process
+        self.logger = logger
 
     def reader(self):
+        return self._read() if self.logger == None else self._readWithLogs()
+
+    def _read(self):
         line = ""
         for line in self.process.stdout:
             progressData = self.getProgressData(line)
@@ -25,16 +31,29 @@ class FFmpegOutputReader:
                 yield progressData
         self.checkError(self.process.wait(), line)
 
+    def _readWithLogs(self):
+        line = ""
+        for line in self.process.stdout:
+            self.logger.debug(line.strip("\n"))
+            progressData = self.getProgressData(line)
+            if progressData != None:
+                yield progressData
+        returnCode = self.process.wait()
+        self.logger.info(f"Subprocess ended with exit code {returnCode}.")
+        self.checkError(returnCode, line)
+
     def checkError(self, returnCode, line):
         if returnCode == 0:
             return
+        #########저장공간 부족 오류
+        #########네트워크 오류
         errorType = line.rsplit(":", 1)[-1].strip()
         if errorType == ExceptionMessages.directory or errorType == ExceptionMessages.permission:
             raise Exceptions.FileSystemError
         raise Exceptions.UnexpectedError
 
     def getProgressData(self, line):
-        return self.getFileData(line) or self.getEncodingData(line)
+        return self.getFileData(line) or self.getMissingData(line) or self.getEncodingData(line)
 
     def getFileData(self, line):
         checkFile = re.search(ProgressMessages.file, line)
@@ -42,6 +61,13 @@ class FFmpegOutputReader:
             return None
         else:
             return {"file": checkFile.group(1)}
+
+    def getMissingData(self, line):
+        checkMissing = re.search(ProgressMessages.missing, line)
+        if checkMissing == None:
+            return None
+        else:
+            return {"missing": int(checkMissing.group(1))}
 
     def getEncodingData(self, line):
         checkEncoding = re.search(ProgressMessages.encoding, line)

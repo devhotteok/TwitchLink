@@ -19,7 +19,7 @@ class Service(Service):
                                             stdout=self.log_file,
                                             stderr=self.log_file,
                                             stdin=PIPE,
-                                            creationflags=0x08000000)
+                                            creationflags=subprocess.CREATE_NO_WINDOW)
         except TypeError:
             raise
         except OSError as err:

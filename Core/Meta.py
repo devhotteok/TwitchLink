@@ -4,7 +4,7 @@ import datetime
 class Meta:
     APP_NAME = "TwitchLink"
 
-    VERSION = "1.1.1"
+    VERSION = "2.0.0"
 
     AUTHOR = "DevHotteok"
 
@@ -20,16 +20,8 @@ class Meta:
 
     @classmethod
     def getCopyrightInfo(cls):
-        thisYear = datetime.datetime.now().year
-        if cls.FIRST_VERSION_RELEASED.year < thisYear:
-            year = "{}-{}".format(cls.FIRST_VERSION_RELEASED.year, thisYear)
-        else:
-            year = cls.FIRST_VERSION_RELEASED.year
-        return "ⓒ {} {}.".format(year, cls.AUTHOR)
+        return f"ⓒ {max(cls.FIRST_VERSION_RELEASED.year, datetime.datetime.now().year)} {cls.AUTHOR}."
 
     @classmethod
     def getProjectInfo(cls):
-        return "{}\n\n[Author]\n{}\n\n[License]\n{} License\n\n{}".format(cls.APP_NAME, cls.AUTHOR, cls.LICENSE, cls.getCopyrightInfo())
-
-
-print(Meta.getProjectInfo())
+        return f"{cls.APP_NAME} {cls.VERSION}\n\n[Author]\n{cls.AUTHOR}\n\n[License]\n{cls.LICENSE} License\n\n{cls.getCopyrightInfo()}"

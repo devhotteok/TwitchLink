@@ -1,23 +1,59 @@
 from Core.App import App
-from Core.GlobalExceptions import Exceptions
-from Services.Messages import Messages
-from Services.Utils.Utils import Utils
-from Services.Translator.Translator import T
-from Database.Database import DB
 from Download.Downloader.Engine.Engine import TwitchDownloader
 
+from PyQt5 import QtCore
 
-class _DownloadManager:
-    def __init__(self):
+
+class _DownloadManager(QtCore.QObject):
+    createdSignal = QtCore.pyqtSignal(object)
+    destroyedSignal = QtCore.pyqtSignal(object)
+    completedSignal = QtCore.pyqtSignal(object)
+    runningCountChangedSignal = QtCore.pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(_DownloadManager, self).__init__(parent=parent)
         self.downloaders = {}
+        self.runningDownloaders = []
+        self.singleDownloader = None
 
-    def start(self, *args, **kwargs):
-        downloader = TwitchDownloader(*args, **kwargs)
-        downloader.hasUpdate.connect(self.handleDownloader)
-        downloader.done.connect(self.handleDownloadResult)
-        downloaderId = id(downloader)
+    def onStart(self, downloader):
+        if len(self.runningDownloaders) == 0:
+            self.showDownloaderProgress(downloader)
+        elif len(self.runningDownloaders) == 1:
+            self.hideDownloaderProgress(complete=False)
+        self.runningDownloaders.append(downloader)
+        self.runningCountChangedSignal.emit(len(self.runningDownloaders))
+
+    def onFinish(self, downloader):
+        self.runningDownloaders.remove(downloader)
+        if len(self.runningDownloaders) == 0:
+            self.hideDownloaderProgress(complete=True)
+        elif len(self.runningDownloaders) == 1:
+            self.showDownloaderProgress(self.runningDownloaders[0])
+        self.completedSignal.emit(downloader.getId())
+        self.runningCountChangedSignal.emit(len(self.runningDownloaders))
+
+    def showDownloaderProgress(self, downloader):
+        self.singleDownloader = downloader
+        self.singleDownloader.hasUpdate.connect(self.handleSingleDownloader)
+        App.taskbar.show(indeterminate=self.singleDownloader.setup.downloadInfo.type.isStream())
+        self.singleDownloader.hasUpdate.emit()
+
+    def hideDownloaderProgress(self, complete):
+        self.singleDownloader.hasUpdate.disconnect(self.handleSingleDownloader)
+        self.singleDownloader = None
+        if complete:
+            App.taskbar.complete()
+        else:
+            App.taskbar.hide()
+
+    def create(self, downloadInfo):
+        downloader = TwitchDownloader(downloadInfo, parent=self)
+        downloader.needSetup.connect(self.onStart)
+        downloader.needCleanup.connect(self.onFinish)
+        downloaderId = downloader.getId()
         self.downloaders[downloaderId] = downloader
-        downloader.start()
+        self.createdSignal.emit(downloaderId)
         return downloaderId
 
     def get(self, downloaderId):
@@ -34,76 +70,49 @@ class _DownloadManager:
     def remove(self, downloaderId):
         self.downloaders[downloaderId].cancel()
         self.downloaders[downloaderId].wait()
-        del self.downloaders[downloaderId]
+        self.downloaders.pop(downloaderId).setParent(None)
+        self.destroyedSignal.emit(downloaderId)
 
-    def removeAll(self):
-        self.cancelAll()
-        self.waitAll()
-        self.downloaders = {}
+    def getRunningDownloaders(self):
+        return self.runningDownloaders
 
     def isDownloaderRunning(self):
-        for downloader in self.downloaders.values():
-            if downloader.isRunning():
-                return True
-        return False
+        return len(self.getRunningDownloaders()) != 0
 
     def isShuttingDown(self):
-        for downloader in self.downloaders.values():
-            if downloader.status.terminateState.isFalse():
+        for downloader in self.runningDownloaders:
+            if not downloader.setup.downloadInfo.type.isClip() and downloader.status.terminateState.isFalse():
                 return False
         return True
 
-    def getRunningDownloadersCount(self):
-        return sum(1 for downloader in self.downloaders.values() if downloader.isRunning())
-
-    def handleDownloader(self, downloader):
-        downloadersCount = self.getRunningDownloadersCount()
-        if downloadersCount == 0:
-            App.taskbar.complete()
-        if downloadersCount == 1:
-            downloadType = downloader.setup.downloadInfo.type
-            status = downloader.status
-            progress = downloader.progress
-            if downloadType.isVideo():
-                if status.isEncoding():
-                    App.taskbar.setValue(progress.timeProgress)
-                else:
-                    App.taskbar.setValue(progress.fileProgress)
-            elif downloadType.isClip():
-                App.taskbar.setValue(progress.byteSizeProgress)
-            if not status.terminateState.isFalse():
-                App.taskbar.stop()
-            elif not status.pauseState.isFalse() or status.isWaiting() or status.isEncoding():
-                App.taskbar.pause()
-            elif not App.taskbar.isVisible():
-                App.taskbar.show(indeterminate=downloadType.isStream())
+    def handleSingleDownloader(self):
+        if self.singleDownloader.setup.downloadInfo.type.isStream():
+            self.handleStreamProgress(self.singleDownloader)
+        elif self.singleDownloader.setup.downloadInfo.type.isVideo():
+            self.handleVideoProgress(self.singleDownloader)
         else:
-            App.taskbar.hide()
+            self.handleClipProgress(self.singleDownloader)
 
-    def handleDownloadResult(self, downloader):
-        if downloader.status.terminateState.isTrue():
-            error = downloader.status.getError()
-            if error != None:
-                if error == Exceptions.FileSystemError:
-                    Utils.info(*Messages.INFO.FILE_SYSTEM_ERROR)
-                elif error == Exceptions.NetworkError:
-                    Utils.info(*Messages.INFO.NETWORK_ERROR)
-                else:
-                    Utils.info(*Messages.INFO.DOWNLOAD_ERROR)
-        elif DB.general.isAutoCloseEnabled() and not downloader.setup.downloadInfo.type.isClip():
-            App.exit()
+    def handleStreamProgress(self, downloader):
+        status = downloader.status
+        if not status.terminateState.isFalse():
+            App.taskbar.stop()
+
+    def handleVideoProgress(self, downloader):
+        status = downloader.status
+        progress = downloader.progress
+        if status.isEncoding():
+            App.taskbar.setValue(progress.timeProgress)
         else:
-            fileName = downloader.setup.downloadInfo.getAbsoluteFileName()
-            if Utils.ask(
-                "download-complete",
-                "{}\n\n{}".format(T("#Download completed."), fileName),
-                okText="open",
-                cancelText="ok"
-            ):
-                try:
-                    Utils.openFile(fileName)
-                except:
-                    Utils.info(*Messages.INFO.FILE_NOT_FOUND)
+            App.taskbar.setValue(progress.fileProgress)
+        if not status.terminateState.isFalse():
+            App.taskbar.stop()
+        elif not status.pauseState.isFalse() or status.isWaiting() or status.isEncoding():
+            App.taskbar.pause()
+
+    def handleClipProgress(self, downloader):
+        progress = downloader.progress
+        App.taskbar.setValue(progress.byteSizeProgress)
 
 
 DownloadManager = _DownloadManager()

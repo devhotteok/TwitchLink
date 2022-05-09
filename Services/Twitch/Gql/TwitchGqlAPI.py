@@ -2,7 +2,7 @@ from .TwitchGqlModels import *
 from .TwitchGqlOperations import *
 from .TwitchGqlConfig import Config
 
-from Services.NetworkRequests import requests
+from Services.NetworkRequests import Network
 
 
 class Exceptions:
@@ -16,14 +16,14 @@ class Exceptions:
                 self.data = response.getData()
 
         def __str__(self):
-            return "Network Error\nstatus_code : {}\n{}".format(self.status_code, self.data)
+            return f"Network Error\nstatus_code: {self.status_code}\n{self.data}"
 
     class ApiError(Exception):
         def __init__(self, data):
             self.data = data
 
         def __str__(self):
-            return "Twitch API Error\nresponse : {}".format(self.data)
+            return f"Twitch API Error\nresponse: {self.data}"
 
     class DataNotFound(Exception):
         def __str__(self):
@@ -42,7 +42,7 @@ class GqlEngine:
     def api(self, operation, variables, headers=None):
         payload = self.loadOperations(operation, variables)
         try:
-            response = requests.post(Config.SERVER, headers=headers or {"Client-ID": Config.CLIENT_ID}, json=payload)
+            response = Network.session.post(Config.SERVER, headers=headers or {"Client-ID": Config.CLIENT_ID}, json=payload)
         except:
             raise Exceptions.NetworkError(None)
         if response.status_code == 200:

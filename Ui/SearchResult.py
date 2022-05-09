@@ -1,13 +1,14 @@
-from Core.App import App
 from Core.Ui import *
 from Search import Engine
 from Services.Messages import Messages
-from Services.Utils.ResizableGrid import ResizableGrid
 from Services.Twitch.Gql import TwitchGqlModels
-from Download.DownloadManager import DownloadManager
 
 
-class SearchResult(QtWidgets.QDialog, UiFile.searchResult):
+class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
+    accountPageShowRequested = QtCore.pyqtSignal()
+
+    CHANNEL_URL = "https://twitch.tv/{login}"
+
     SEARCH_SCROLL_POSITION = 300
 
     SEARCH_TYPES = [
@@ -31,82 +32,105 @@ class SearchResult(QtWidgets.QDialog, UiFile.searchResult):
         ("all", "ALL_TIME")
     ]
 
-    def __init__(self, data):
-        super().__init__(parent=App.getActiveWindow())
-        self.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint)
-        self.videoList = ResizableGrid(self.videoArea.layout())
-        self.videoWidgetWidth = Ui.VideoDownloadWidget(self, None, resizable=False).minimumSizeHint().width()
-        self.allocatedWidth = self.scrollArea.verticalScrollBar().sizeHint().width() + self.scrollAreaContents.layout().contentsMargins().left() + self.scrollAreaContents.layout().contentsMargins().right()
-        self.scrollArea.setMinimumWidth(self.videoWidgetWidth + self.allocatedWidth)
-        self.scrollArea.showEvent = Utils.hook(self.scrollArea.showEvent, self.hookEventCalcColumn)
-        self.scrollArea.resizeEvent = Utils.hook(self.scrollArea.resizeEvent, self.hookEventCalcColumn)
-        self.scrollArea.verticalScrollBar().valueChanged.connect(self.searchMoreVideos)
-        self.setDownloadEnabled(True)
+    def __init__(self, data, parent=None):
+        super(SearchResult, self).__init__(parent=parent)
         self.data = data
+        self.viewIcon = Utils.setSvgIcon(self.viewIcon, Icons.VIEWER_ICON)
+        self.infoIcon = Utils.setSvgIcon(self.infoIcon, Icons.INFO_ICON)
         self.setup()
-        self.downloaderId = None
-        self.downloader = None
-
-    def hookEventCalcColumn(self, originalFunction):
-        self.calcColumn()
-        return originalFunction()
-
-    def calcColumn(self):
-        column = (self.scrollArea.width() - self.allocatedWidth) // self.videoWidgetWidth
-        if self.videoList.getColumn() != column:
-            self.scrollArea.verticalScrollBar().setValue(0)
-            self.videoList.setColumn(column)
-
-    def setDownloadEnabled(self, enabled):
-        self.downloadEnabled = enabled
-        if hasattr(self, "channel"):
-            if self.channel.stream != None:
-                self.channelMainWidget.setEnabled(enabled)
-        self.scrollArea.setEnabled(self.downloadEnabled)
+        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.videoArea.palette().color(QtGui.QPalette.Window).name()};}}")
+        self.videoArea.setStyleSheet("#videoArea {background-color: transparent;}")
+        self.videoArea.verticalScrollBar().setSingleStep(30)
+        self.videoArea.verticalScrollBar().valueChanged.connect(self.searchMoreVideos)
 
     def setLoading(self, loading):
         self.loading = loading
-        if self.loading:
+        if self.isLoading():
             self.searchType.setEnabled(False)
             self.sortOrFilter.setEnabled(False)
+            self.refreshVideoListButton.setEnabled(False)
             self.statusLabel.setText(T("loading", ellipsis=True))
             self.loadingLabel.show()
         else:
             self.searchType.setEnabled(True)
             self.sortOrFilter.setEnabled(True)
+            self.refreshVideoListButton.setEnabled(True)
             self.statusLabel.setText(T("no-results-found"))
             self.loadingLabel.hide()
+        if self.videoArea.count() == 0:
+            self.stackedWidget.setCurrentIndex(0)
+        else:
+            self.stackedWidget.setCurrentIndex(1)
+
+    def isLoading(self):
+        return self.loading
 
     def setup(self):
         if type(self.data) == TwitchGqlModels.Channel:
-            self.channel = self.data
-            self.window_title.setText(T("#{channel}'s channel", channel=self.data.displayName))
-            self.showChannel()
-            self.searchType.addItems(list(map(lambda item: T(item[0]), self.SEARCH_TYPES)))
+            self.showChannel(self.data)
+            self.searchType.addItems([T(item[0]) for item in self.SEARCH_TYPES])
             self.searchType.setCurrentIndex(0)
             self.searchType.currentIndexChanged.connect(self.loadSortOrFilter)
             self.sortOrFilter.currentIndexChanged.connect(self.setSearchOptions)
+            self.refreshChannelButton.clicked.connect(self.refreshChannel)
+            self.refreshChannelThread = Utils.WorkerThread(parent=self)
+            self.refreshChannelThread.resultSignal.connect(self.processChannelRefreshResult)
+            self.refreshVideoListButton.clicked.connect(self.refreshVideoList)
+            self.searchThread = Utils.WorkerThread(parent=self)
+            self.searchThread.resultSignal.connect(self.processSearchResult)
+            self.openInWebBrowserButton.clicked.connect(self.openInWebBrowser)
             self.loadSortOrFilter(0)
         else:
-            self.tabWidget.setTabVisible(0, False)
-            self.window_title.setText(T("#Video ID : {id}", id=self.data.id) if type(self.data) == TwitchGqlModels.Video else T("#Clip ID : {slug}", slug=self.data.slug))
+            self.tabWidget.setCurrentIndex(1)
+            self.tabWidget.tabBar().hide()
+            if type(self.data) == TwitchGqlModels.Video:
+                videoType = T("video")
+                videoId = self.data.id
+            else:
+                videoType = T("clip")
+                videoId = self.data.slug
+            self.setWindowTitle(f"{videoType}: {videoId}")
+            self.window_title.setText(f"{videoType} {T('id')}: {videoId}")
             self.controlArea.hide()
             self.addVideos([self.data])
             self.setLoading(False)
-        self.progressArea.hide()
 
-    def showChannel(self):
+    def refreshChannel(self):
+        self.refreshChannelButton.setEnabled(False)
+        self.refreshChannelThread.setup(
+            target=Engine.Search.Channel,
+            args=(self.channel.login,)
+        )
+        self.refreshChannelThread.start()
+
+    def processChannelRefreshResult(self, result):
+        if result.success:
+            self.showChannel(result.data)
+        else:
+            if isinstance(result.error, Engine.Exceptions.ChannelNotFound):
+                self.info("unable-to-download", "#Channel not found. Deleted or temporary error.")
+            else:
+                self.info(*Messages.INFO.NETWORK_ERROR)
+        self.refreshChannelButton.setEnabled(True)
+
+    def showChannel(self, channel):
+        self.channel = channel
+        self.setWindowTitle(self.channel.displayName)
+        self.window_title.setText(T("#{channel}'s channel", channel=self.channel.displayName))
         if self.channel.stream == None:
-            self.liveLabel.setText(T("offline"))
+            self.liveLabel.setText(T("offline").upper())
+            self.viewIcon.hide()
             self.viewer_count.hide()
             videoData = self.channel
         else:
-            self.liveLabel.setText(T("live"))
-            self.viewer_count.setText(T("#{viewer} viewers", viewer=self.channel.stream.viewersCount))
+            self.liveLabel.setText(T("live" if self.channel.stream.isLive() else "rerun").upper())
+            self.viewIcon.show()
+            self.viewer_count.show()
+            self.viewer_count.setText(self.channel.stream.viewersCount)
             videoData = self.channel.stream
-        self.channelMainWidget = Ui.VideoDownloadWidget(self, videoData)
-        Utils.setPlaceholder(self.channelMainWidgetPlaceholder, self.channelMainWidget)
-        self.profileImageLoader = Utils.ImageLoader(self.profile_image, self.channel.profileImageURL, Config.PROFILE_IMAGE, preferredSize=(600, 600), refresh=True)
+        self.channelMainWidget = Utils.setPlaceholder(self.channelMainWidget, Ui.VideoDownloadWidget(videoData, parent=self))
+        self.channelMainWidget.accountPageShowRequested.connect(self.accountPageShowRequested.emit)
+        self.profile_image.loadImage(filePath=Images.PROFILE_IMAGE, url=self.channel.profileImageURL, urlFormatSize=ImageSize.USER_PROFILE, refresh=True)
         self.display_name.setText(self.channel.displayName)
         self.description.setText(self.channel.description)
         self.followers.setText(T("#{followers} followers", followers=self.channel.followers))
@@ -118,9 +142,12 @@ class SearchResult(QtWidgets.QDialog, UiFile.searchResult):
             broadcasterType = "streamer"
         self.broadcaster_type.setText(T(broadcasterType))
 
+    def openInWebBrowser(self):
+        Utils.openUrl(self.CHANNEL_URL.format(login=self.channel.login))
+
     def loadSortOrFilter(self, index):
         self.sortOrFilter.clear()
-        self.sortOrFilter.addItems(list(map(lambda item: T(item[0]), self.FILTER_LIST if self.SEARCH_TYPES[index][0] == "clips" else self.SORT_LIST)))
+        self.sortOrFilter.addItems([T(item[0]) for item in (self.FILTER_LIST if self.SEARCH_TYPES[index][0] == "clips" else self.SORT_LIST)])
         self.sortOrFilter.setCurrentIndex(0)
 
     def setSearchOptions(self, index):
@@ -129,25 +156,27 @@ class SearchResult(QtWidgets.QDialog, UiFile.searchResult):
         self.channelVideosLabel.setText(T("#{channel}'s {searchType}", channel=self.channel.displayName, searchType=T(self.SEARCH_TYPES[self.searchType.currentIndex()][0])))
         self.searchVideos()
 
+    def refreshVideoList(self):
+        self.searchVideos()
+
     def searchVideos(self, cursor=""):
-        self.setLoading(True)
         if cursor == "":
             self.clearVideoList()
+        self.setLoading(True)
         if self.SEARCH_TYPES[self.searchType.currentIndex()][0] == "clips":
             filter = self.FILTER_LIST[self.sortOrFilter.currentIndex()][1]
-            self.searchThread = Engine.SearchThread(
+            self.searchThread.setup(
                 target=Engine.Search.ChannelClips,
-                callback=self.processSearchResult,
                 args=(self.channel.login, filter, cursor)
             )
         else:
             videoType = self.SEARCH_TYPES[self.searchType.currentIndex()][1]
             sort = self.SORT_LIST[self.sortOrFilter.currentIndex()][1]
-            self.searchThread = Engine.SearchThread(
+            self.searchThread.setup(
                 target=Engine.Search.ChannelVideos,
-                callback=self.processSearchResult,
                 args=(self.channel.login, videoType, sort, cursor)
             )
+        self.searchThread.start()
 
     def processSearchResult(self, result):
         if result.success:
@@ -156,94 +185,37 @@ class SearchResult(QtWidgets.QDialog, UiFile.searchResult):
             self.setLoading(False)
         else:
             self.setLoading(False)
-            if result.error == Engine.Exceptions.ChannelNotFound:
-                Utils.info("error", "#Channel not found. Deleted or temporary error.")
+            if isinstance(result.error, Engine.Exceptions.ChannelNotFound):
+                self.info("error", "#Channel not found. Deleted or temporary error.")
             else:
-                Utils.info(*Messages.INFO.NETWORK_ERROR)
+                self.info(*Messages.INFO.NETWORK_ERROR)
 
     def searchMoreVideos(self, value):
         if type(self.data) != TwitchGqlModels.Channel:
             return
-        if self.loading:
+        if self.isLoading():
             return
         if self.searchResult.hasNextPage:
-            if (self.scrollArea.verticalScrollBar().maximum() - value) < self.SEARCH_SCROLL_POSITION:
+            if (self.videoArea.verticalScrollBar().maximum() - value) < self.SEARCH_SCROLL_POSITION:
                 self.searchVideos(self.searchResult.cursor)
 
     def addVideos(self, videos):
         for data in videos:
-            self.videoList.addWidget(Ui.VideoDownloadWidget(self, data, resizable=False))
-            if len(self.videoList.widgets) % 6 == 1:
-                if AdManager.Config.SHOW:
-                    self.videoList.addWidget(AdManager.Ad(minimumSize=QtCore.QSize(300, 250), responsive=False))
-        self.reloadVideoAreaStatus()
+            videoDownloadWidget = Ui.VideoDownloadWidget(data, resizable=False, parent=self)
+            videoDownloadWidget.accountPageShowRequested.connect(self.accountPageShowRequested.emit)
+            self.addWidget(videoDownloadWidget)
+            if AdManager.Config.SHOW:
+                if self.videoArea.count() % 6 == 1:
+                    self.addWidget(AdManager.Ad(minimumSize=videoDownloadWidget.sizeHint(), responsive=False, parent=self), fitContent = False)
+
+    def addWidget(self, widget, fitContent=True):
+        widget.setContentsMargins(10, 10, 10, 10)
+        item = QtWidgets.QListWidgetItem(parent=self.videoArea)
+        item.setSizeHint(widget.sizeHint())
+        if fitContent:
+            self.videoArea.setMinimumWidth(item.sizeHint().width() + self.videoArea.verticalScrollBar().sizeHint().width())
+        self.videoArea.setItemWidget(item, widget)
 
     def clearVideoList(self):
-        self.scrollArea.verticalScrollBar().setValue(0)
-        self.videoList.clearAll()
-        self.reloadVideoAreaStatus()
-
-    def reloadVideoAreaStatus(self):
-        noWidget = len(self.videoList.widgets) == 0
-        self.videoArea.setVisible(not noWidget)
-        self.statusLabel.setVisible(noWidget)
-
-    def askDownload(self, downloadInfo):
-        downloadInfo = Ui.DownloadMenu(downloadInfo).exec()
-        if downloadInfo != False:
-            self.accept(downloadInfo)
-
-    def downloadStream(self, downloadInfo):
-        self.askDownload(downloadInfo)
-
-    def downloadVideo(self, downloadInfo):
-        self.askDownload(downloadInfo)
-
-    def downloadClip(self, downloadInfo):
-        downloadInfo = Ui.DownloadMenu(downloadInfo).exec()
-        if downloadInfo != False:
-            self.setDownloadEnabled(False)
-            self.downloaderId = DownloadManager.start(downloadInfo)
-            self.downloader = DownloadManager.get(self.downloaderId)
-            self.connectDownloader()
-
-    def connectDownloader(self):
-        self.downloader.statusUpdate.connect(self.handleClipStatus)
-        self.downloader.progressUpdate.connect(self.handleClipProgress)
-        self.downloader.finished.connect(self.handleDownloadResult)
-        self.handleClipProgress(self.downloader.progress)
-        self.handleClipStatus(self.downloader.status)
-
-    def disconnectDownloader(self):
-        self.downloader.statusUpdate.disconnect(self.handleClipStatus)
-        self.downloader.progressUpdate.disconnect(self.handleClipProgress)
-        self.downloader.finished.disconnect(self.handleDownloadResult)
-
-    def handleClipStatus(self, status):
-        pass
-
-    def handleClipProgress(self, progress):
-        self.clipProgress(downloadProgress=progress.byteSizeProgress)
-
-    def clipProgress(self, downloadProgress=0):
-        self.progressLabel.setText(T("downloading", ellipsis=True))
-        self.downloadingProgress.setValue(downloadProgress)
-        self.downloadingProgress.show()
-        self.progressArea.show()
-
-    def handleDownloadResult(self):
-        self.setDownloadEnabled(True)
-        self.progressArea.hide()
-        if self.downloader.status.getError() == None:
-            self.progressLabel.setText(T("download-complete"))
-        else:
-            self.progressLabel.setText(T("download-failed"))
-        self.disconnectDownloader()
-        DownloadManager.remove(self.downloaderId)
-
-    def closeEvent(self, event):
-        if self.downloader != None:
-            if self.downloader.isRunning():
-                Utils.info("warning", "#There is a download in progress.")
-                return event.ignore()
-        return super().closeEvent(event)
+        self.videoArea.verticalScrollBar().setValue(0)
+        self.videoArea.clear()

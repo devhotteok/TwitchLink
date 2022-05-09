@@ -1,20 +1,30 @@
 from Core.Config import Config
-from Services.NetworkRequests import requests
+from Services.NetworkRequests import Network
 from Services.Utils.OSUtils import OSUtils
 from Services.ContentManager import ContentManager
 from Services.Translator.Translator import Translator
+from Services.Document import DocumentData, DocumentButtonData
+
+from PyQt5 import QtCore
 
 
 class Exceptions:
     class ConnectionFailure(Exception):
         def __str__(self):
             return "Connection Failure"
+
+    class UnexpectedError(Exception):
+        def __str__(self):
+            return "Unexpected Error"
+
     class Unavailable(Exception):
         def __str__(self):
             return "Unavailable"
+
     class UpdateRequired(Exception):
         def __str__(self):
             return "Update Required"
+
     class UpdateFound(Exception):
         def __str__(self):
             return "Update Found"
@@ -22,31 +32,44 @@ class Exceptions:
 
 class _Status:
     CONNECTION_FAILURE = 0
-    UNAVAILABLE = 1
-    UPDATE_REQUIRED = 2
-    UPDATE_FOUND = 3
-    AVAILABLE = 4
+    UNEXPECTED_ERROR = 1
+    UNAVAILABLE = 2
+    UPDATE_REQUIRED = 3
+    UPDATE_FOUND = 4
+    AVAILABLE = 5
 
-    class Notice:
-        def __init__(self, data):
-            self.message = data.get("message")
-            self.url = data.get("url")
 
     class Version:
         def __init__(self, data):
             self.latestVersion = data.get("latestVersion")
             self.updateRequired = not Config.VERSION in data.get("compatibleVersions", []) and self.latestVersion != Config.VERSION
-            self.updateNote = data.get("updateNote", {}).get(Translator.getLanguage())
+            updateNoteData = data.get("updateNote", {}).get(Translator.getLanguage(), {})
+            self.updateNote = updateNoteData.get("content")
+            self.updateNoteType = updateNoteData.get("contentType")
             self.updateUrl = data.get("updateUrl", Config.HOMEPAGE_URL)
 
     def __init__(self):
         self.setStatus(self.UNAVAILABLE)
-        self.syncData({})
+        self.updateStatusData({})
+        self.updateNotifications({})
 
-    def syncData(self, data):
+    def updateStatusData(self, data):
         self.operational = data.get("operational", False)
-        self.notice = self.Notice(data.get("notice", {}).get(Translator.getLanguage(), {}))
+        operationalInfoData = data.get("operationalInfo", {}).get(Translator.getLanguage(), {})
+        self.operationalInfo = operationalInfoData.get("content")
+        self.operationalInfoType = operationalInfoData.get("contentType")
         self.version = self.Version(data.get("version", {}))
+
+    def updateNotifications(self, data):
+        self.notifications = [
+            DocumentData(
+                **(notification | {"buttons": [
+                    DocumentButtonData(
+                        **button
+                    ) for button in notification.get("buttons", [])
+                ]})
+            ) for notification in data.get(Translator.getLanguage(), [])
+        ]
 
     def setStatus(self, appStatus):
         self.appStatus = appStatus
@@ -54,17 +77,23 @@ class _Status:
     def getStatus(self):
         return self.appStatus
 
-    def isRunnable(self):
+    def isOperational(self):
         return self.appStatus == self.UPDATE_FOUND or self.appStatus == self.AVAILABLE
 
 
-class _Updater:
-    def __init__(self):
+class _Updater(QtCore.QObject):
+    updateProgress = QtCore.pyqtSignal(int)
+    updateComplete = QtCore.pyqtSignal()
+
+    TOTAL_TASK_COUNT = 4
+
+    def __init__(self, parent=None):
+        super(_Updater, self).__init__(parent=parent)
         self.status = _Status()
 
     def update(self):
         try:
-            yield 0
+            self.updateProgress.emit(0)
             try:
                 self.updateStatus()
             except Exceptions.Unavailable:
@@ -73,24 +102,30 @@ class _Updater:
                 self.status.setStatus(self.status.UPDATE_FOUND)
             else:
                 self.status.setStatus(self.status.AVAILABLE)
-            yield 1
+            self.updateProgress.emit(1)
+            self.updateNotifications()
+            self.updateProgress.emit(2)
             self.updateConfig()
-            yield 2
+            self.updateProgress.emit(3)
             self.updateRestrictions()
+            self.updateProgress.emit(4)
         except Exceptions.ConnectionFailure:
             self.status.setStatus(self.status.CONNECTION_FAILURE)
+        except Exceptions.UnexpectedError:
+            self.status.setStatus(self.status.UNEXPECTED_ERROR)
         except:
             self.status.setStatus(self.status.UPDATE_REQUIRED)
+        self.updateComplete.emit()
 
     def updateStatus(self):
         try:
-            response = requests.get(OSUtils.joinUrl(Config.SERVER_URL, "status.json"))
+            response = Network.session.get(OSUtils.joinUrl(Config.SERVER_URL, "status.json", params={"version": Config.VERSION}))
         except:
             raise Exceptions.ConnectionFailure
         if response.status_code == 200:
             try:
                 data = response.json()
-                self.status.syncData(data)
+                self.status.updateStatusData(data)
             except:
                 raise Exceptions.UpdateRequired
             if self.status.operational:
@@ -104,40 +139,54 @@ class _Updater:
         else:
             raise Exceptions.ConnectionFailure
 
+    def updateNotifications(self):
+        try:
+            response = Network.session.get(OSUtils.joinUrl(Config.SERVER_URL, "notifications.json", params={"version": Config.VERSION}))
+        except:
+            raise Exceptions.ConnectionFailure
+        if response.status_code == 200:
+            try:
+                data = response.json()
+                self.status.updateNotifications(data)
+            except:
+                raise Exceptions.UnexpectedError
+        else:
+            raise Exceptions.ConnectionFailure
+
     def updateConfig(self):
         try:
-            response = requests.get(OSUtils.joinUrl(Config.SERVER_URL, "config.json"))
+            response = Network.session.get(OSUtils.joinUrl(Config.SERVER_URL, "config.json", params={"version": Config.VERSION}))
         except:
             raise Exceptions.ConnectionFailure
         if response.status_code == 200:
             try:
                 from Core.Config import Config as CoreConfig
-                from Services.Utils.Image.Config import Config as ImageLoaderConfig
+                from Services.Image.Config import Config as ImageConfig
                 from Services.Account.Config import Config as AuthConfig
                 from Services.Ad.Config import Config as AdConfig
                 from Services.Translator.Config import Config as TranslatorConfig
                 from Services.Temp.Config import Config as TempConfig
+                from Services.Logging.Config import Config as LogConfig
                 from Services.Twitch.Gql.TwitchGqlConfig import Config as GqlConfig
                 from Services.Twitch.Playback.TwitchPlaybackConfig import Config as PlaybackConfig
                 from Search.Config import Config as SearchConfig
                 from Search.Helper.Config import Config as SearchHelperConfig
                 from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
                 from Download.Downloader.FFmpeg.Config import Config as FFmpegConfig
-                from Download.Downloader.Task.Config import Config as TaskConfig
                 CONFIG_FILES = {
                     "": CoreConfig,
-                    "IMAGE_LOADER": ImageLoaderConfig,
+                    "IMAGE": ImageConfig,
                     "AUTH": AuthConfig,
                     "AD": AdConfig,
                     "TRANSLATOR": TranslatorConfig,
                     "TEMP": TempConfig,
+                    "LOG": LogConfig,
                     "API": GqlConfig,
                     "PLAYBACK": PlaybackConfig,
                     "SEARCH": SearchConfig,
                     "SEARCH_HELPER": SearchHelperConfig,
                     "DOWNLOAD_ENGINE": DownloadEngineConfig,
-                    "FFMPEG": FFmpegConfig,
-                    "TASK": TaskConfig
+                    "FFMPEG": FFmpegConfig
                 }
                 data = response.json()
                 configData = data.get("global")
@@ -154,13 +203,13 @@ class _Updater:
                         configTarget = getattr(configTarget, target)
                     setattr(configTarget, configPath[-1], value)
             except:
-                raise Exceptions.UpdateRequired
+                raise Exceptions.UnexpectedError
         else:
             raise Exceptions.ConnectionFailure
 
     def updateRestrictions(self):
         try:
-            response = requests.get(OSUtils.joinUrl(Config.SERVER_URL, "restrictions.json"))
+            response = Network.session.get(OSUtils.joinUrl(Config.SERVER_URL, "restrictions.json", params={"version": Config.VERSION}))
         except:
             raise Exceptions.ConnectionFailure
         if response.status_code == 200:
@@ -168,7 +217,7 @@ class _Updater:
                 data = response.json()
                 ContentManager.setRestrictions(data)
             except:
-                raise Exceptions.UpdateRequired
+                raise Exceptions.UnexpectedError
         else:
             raise Exceptions.ConnectionFailure
 

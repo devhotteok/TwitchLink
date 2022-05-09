@@ -12,29 +12,24 @@ class Config:
         "en": {
             "name": "English",
             "preferredTimezone": "US/Eastern",
-            "font": {
-                "default": "Arial, Open Sans, 나눔고딕",
-                "doc": "Arial, Open Sans"
-            }
+            "font": "Arial, Open Sans, 나눔고딕"
         },
         "ko": {
             "name": "한국어",
             "preferredTimezone": "Asia/Seoul",
-            "font": {
-                "default": "나눔고딕",
-                "doc": "Open Sans"
-            }
+            "font": "나눔고딕"
         }
     }
 
     TRANSLATION_LIST = [
         "mainWindow",
         "loading",
+        "setup",
         "settings",
-        "formInfo",
+        "propertyView",
         "account",
         "about",
-        "termsOfService",
+        "documentView",
         "home",
         "search",
         "videoWidget",

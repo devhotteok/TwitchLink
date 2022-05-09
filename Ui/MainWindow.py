@@ -1,126 +1,164 @@
 from Core.App import App
-from Core.StatusCode import StatusCode
 from Core.Updater import Updater
 from Core.Ui import *
 from Services.Messages import Messages
+from Services.Image.Loader import ImageLoader
+from Services.Document import DocumentData, DocumentButtonData
 from Download.DownloadManager import DownloadManager
+from Ui.Operators.NavigationBar import NavigationBar
+from Ui.Operators.SearchPage import SearchPage
+from Ui.Operators.DownloadsPage import DownloadsPage
+from Ui.Operators.DocumentPage import DocumentPage
+from Ui.Operators.ProgressDialog import ProgressDialog
 
-import os
 
-
-class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowIcon(QtGui.QIcon(Config.ICON_IMAGE))
-        self.setupMenuBar()
-        self.tabWidget.tabBar().hide()
-        self.tabWidget.tabCloseRequested.connect(self.closeTab)
-
-    def start(self):
-        Ui.Loading().exec()
-        self.addTab(Ui.Home(), unclosable=True)
-        self.show()
-        self.onStartThread = Utils.WorkerThread()
-        self.onStartThread.finished.connect(self.onStart)
-        self.onStartThread.start()
-
-    def onStart(self):
-        self.showStatus()
-        if Updater.status.isRunnable():
-            if DB.termsOfService.getAgreedTime() == None:
-                self.openTermsOfService()
-        else:
-            App.exit()
-
-    def showStatus(self):
-        status = Updater.status.getStatus()
-        if status == Updater.status.CONNECTION_FAILURE:
-            Utils.info(*Messages.INFO.SERVER_CONNECTION_FAILED)
-        elif status == Updater.status.UNAVAILABLE:
-            infoText = Updater.status.notice.message or T("#{appName} is currently unavailable.", appName=Config.APP_NAME)
-            if Updater.status.notice.url == None:
-                Utils.info("warning", infoText)
-            else:
-                if Utils.ask("warning", infoText, okText="details", cancelText="ok",  defaultOk=True):
-                    Utils.openUrl(Updater.status.notice.url)
-        elif status == Updater.status.AVAILABLE:
-            if Updater.status.notice.message != None:
-                if Updater.status.notice.url == None:
-                    Utils.info("notice", Updater.status.notice.message)
-                else:
-                    if Utils.ask("notice", Updater.status.notice.message, okText="details", cancelText="ok",  defaultOk=True):
-                        Utils.openUrl(Updater.status.notice.url)
-        else:
-            updateInfoTitle = T("#Optional update" if status == Updater.status.UPDATE_FOUND else "#Update required")
-            updateInfoString = T("#A new version of {appName} has been released!", appName=Config.APP_NAME)
-            if Updater.status.version.updateNote != None:
-                updateInfoString = "{}\n\n\n{} {}\n\n{}".format(updateInfoString, Config.APP_NAME, Updater.status.version.latestVersion, Updater.status.version.updateNote)
-            if Utils.ask(updateInfoTitle, updateInfoString, okText="update", cancelText="ok" if status == Updater.status.UPDATE_FOUND else "cancel", defaultOk=True):
-                Utils.openUrl(Updater.status.version.updateUrl)
-
-    def closeEvent(self, event):
-        event.ignore()
-        if DownloadManager.isDownloaderRunning():
-            if Utils.ask(*(Messages.ASK.APP_EXIT if DownloadManager.isShuttingDown() else Messages.ASK.APP_EXIT_WHILE_DOWNLOADING)):
-                Utils.wait("shutting-down", T("#Shutting down downloader", ellipsis=True), target=DownloadManager.removeAll).exec()
-                self.shutdown()
-        else:
-            if Utils.ask(*Messages.ASK.APP_EXIT):
-                self.shutdown()
-
-    def shutdown(self):
-        self.saveWindow()
-        App.exit()
-
-    def setupMenuBar(self):
-        self.actionNewDownloader.triggered.connect(self.openNewDownloader)
-        self.actionSettings.triggered.connect(self.openSettings)
-        self.actionAccount.triggered.connect(self.openAccount)
+class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent=parent)
+        self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
         self.actionGettingStarted.triggered.connect(self.gettingStarted)
         self.actionAbout.triggered.connect(self.openAbout)
         self.actionTermsOfService.triggered.connect(self.openTermsOfService)
-        self.actionDonate.triggered.connect(self.donate)
-        for widgetType in [QtWidgets.QMenuBar, QtWidgets.QMenu, QtWidgets.QAction]:
-            for widget in self.findChildren(widgetType):
-                widget.setFont(Translator.getFont(widget.font()))
+        self.actionSponsor.triggered.connect(self.sponsor)
+        self.navigationBar = NavigationBar(self.navigationArea, parent=self)
+        self.searchPageObject = self.navigationBar.addPage(self.searchPageButton, self.searchPage)
+        self.downloadsPageObject = self.navigationBar.addPage(self.downloadsPageButton, self.downloadsPage)
+        self.accountPageObject = self.navigationBar.addPage(self.accountPageButton, self.accountPage)
+        self.settingsPageObject = self.navigationBar.addPage(self.settingsPageButton, self.settingsPage)
+        self.documentPageObject = self.navigationBar.addPage(self.documentPageButton, self.documentPage)
+        self.search = SearchPage(self.searchPageObject, parent=self)
+        self.search.accountPageShowRequested.connect(self.accountPageObject.show)
+        self.searchPage.layout().addWidget(self.search)
+        self.downloads = DownloadsPage(self.downloadsPageObject, parent=self)
+        self.downloads.appShutdownRequested.connect(self.shutdown)
+        self.downloads.systemShutdownRequested.connect(self.shutdownSystem)
+        self.downloadsPage.layout().addWidget(self.downloads)
+        self.account = Ui.Account(parent=self)
+        self.account.profileImageChanged.connect(self.accountPageObject.setPageIcon)
+        self.account.updateAccountImage()
+        self.accountPage.layout().addWidget(self.account)
+        self.settings = Ui.Settings(parent=self)
+        self.settings.restartRequired.connect(self.restart)
+        self.settingsPage.layout().addWidget(self.settings)
+        self.document = DocumentPage(self.documentPageObject, parent=self)
+        self.document.accountRefreshRequested.connect(self.account.refreshAccount)
+        self.document.appShutdownRequested.connect(self.shutdown)
+        self.documentPage.layout().addWidget(self.document)
+        App.appStarted.connect(self.start, QtCore.Qt.QueuedConnection)
 
-    def openNewDownloader(self):
-        os.startfile(Config.APP_PATH)
+    def start(self):
+        if DB.setup.needSetup():
+            if Ui.Setup().exec():
+                App.restart()
+            else:
+                App.exit()
+        else:
+            Ui.Loading().exec()
+            self.loadWindowGeometry()
+            self.setup()
 
-    def openSettings(self, page=0):
-        try:
-            Ui.Settings(page).exec()
-        except:
-            Utils.info("error", "#An error occurred while loading settings.")
-            DB.reset()
+    def setup(self):
+        status = Updater.status.getStatus()
+        if status == Updater.status.CONNECTION_FAILURE:
+            self.show()
+            self.info(*Messages.INFO.SERVER_CONNECTION_FAILED)
+            self.shutdown()
+            return
+        elif status == Updater.status.UNEXPECTED_ERROR:
+            self.show()
+            self.info(*Messages.INFO.UNEXPECTED_ERROR)
+            self.shutdown()
+            return
+        elif status == Updater.status.UNAVAILABLE:
+            self.document.showDocument(
+                DocumentData(
+                    title=T("warning"),
+                    content=Updater.status.operationalInfo or T("#{appName} is currently unavailable.", appName=Config.APP_NAME),
+                    contentType=Updater.status.operationalInfoType if Updater.status.operationalInfo else "text",
+                    modal=True,
+                    buttons=[
+                        DocumentButtonData(text="ok", action=self.shutdown, default=True)
+                    ]
+                )
+            )
+        elif status != Updater.status.AVAILABLE:
+            self.document.showDocument(
+                DocumentData(
+                    title=T("recommended-update" if status == Updater.status.UPDATE_FOUND else "required-update"),
+                    content=Updater.status.version.updateNote or f"{T('#A new version of {appName} has been released!', appName=Config.APP_NAME)}\n\n[{Config.APP_NAME} {Updater.status.version.latestVersion}]",
+                    contentType=Updater.status.version.updateNoteType if Updater.status.version.updateNote else "text",
+                    modal=status == Updater.status.UPDATE_REQUIRED,
+                    buttons=[
+                        DocumentButtonData(text=T("update"), action="open:{}".format(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": DB.localization.getLanguage()})), role="accept", default=True),
+                        DocumentButtonData(text=T("cancel"), action=self.document.appShutdownRequested.emit if status == Updater.status.UPDATE_REQUIRED else None, role="reject", default=False)
+                    ]
+                ),
+                icon=Icons.UPDATE_ICON
+            )
+        if Updater.status.isOperational():
+            for notification in Updater.status.notifications:
+                self.document.showDocument(notification, icon=None if notification.modal else Icons.NOTICE_ICON)
+            if DB.setup.getTermsOfServiceAgreement() == None:
+                self.openTermsOfService()
+            else:
+                self.account.refreshAccount()
+        else:
+            self.menuBar().setEnabled(False)
+        if self.document.count() != 0:
+            self.document.setCurrentIndex(0)
+        self.show()
 
-    def openAccount(self):
-        while Ui.Account().exec() == StatusCode.RESTART:
-            pass
+    def closeEvent(self, event):
+        super().closeEvent(event)
+        if DownloadManager.isDownloaderRunning():
+            if self.ask(*(Messages.ASK.APP_EXIT if DownloadManager.isShuttingDown() else Messages.ASK.APP_EXIT_WHILE_DOWNLOADING)):
+                self.shutdown()
+            else:
+                event.ignore()
+        else:
+            if self.ask(*Messages.ASK.APP_EXIT):
+                self.shutdown()
+            else:
+                event.ignore()
 
     def gettingStarted(self):
         Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": DB.localization.getLanguage()}))
 
     def openAbout(self):
-        Ui.About().exec()
+        self.document.openAbout()
 
     def openTermsOfService(self):
-        Ui.TermsOfService().exec()
+        self.document.openTermsOfService()
 
-    def donate(self):
-       Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": DB.localization.getLanguage()}))
+    def sponsor(self):
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": DB.localization.getLanguage()}))
 
-    def showDownload(self, downloaderId):
-        self.setCurrentTab(self.addTab(Ui.Download(downloaderId)))
+    def cleanup(self):
+        DownloadManager.cancelAll()
+        ImageLoader.threadPool.clear()
+        DownloadManager.waitAll()
+        ImageLoader.threadPool.waitForDone()
 
-    def addTab(self, ui, unclosable=False):
-        index = self.tabWidget.addTab(ui, T(ui.windowTitle()))
-        if unclosable:
-            self.tabWidget.tabBar().setTabButton(index, 1, None)
-        return index
+    def waitForCleanup(self):
+        if DownloadManager.isDownloaderRunning() or ImageLoader.threadPool.activeThreadCount() != 0:
+            msg = ProgressDialog(cancelAllowed=False, parent=self)
+            msg.setWindowTitle(T("shutting-down"))
+            msg.setLabelText(T("#Shutting down all downloads" if DownloadManager.isDownloaderRunning() else "shutting-down", ellipsis=True))
+            msg.setRange(0, 0)
+            msg.exec(target=self.cleanup)
 
-    def setCurrentTab(self, index):
-        self.tabWidget.setCurrentIndex(index)
+    def restart(self):
+        self.shutdown(restart=True)
 
-    def closeTab(self, index):
-        self.tabWidget.widget(index).close()
+    def shutdown(self, restart=False):
+        self.waitForCleanup()
+        self.saveWindowGeometry()
+        if restart:
+            App.restart()
+        else:
+            App.exit()
+
+    def shutdownSystem(self):
+        self.waitForCleanup()
+        App.exit()
+        Utils.shutdownSystem(message=T("#Shutdown by {appName}'s scheduled download completion task.", appName=Config.APP_NAME))

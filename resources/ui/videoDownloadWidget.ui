@@ -10,10 +10,8 @@
     <height>338</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <family>Arial Rounded MT Bold</family>
-   </font>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
   </property>
   <layout class="QVBoxLayout" name="FormLayout">
    <property name="leftMargin">
@@ -29,14 +27,14 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="videoWidgetPlaceholder" native="true">
+    <widget class="QWidget" name="videoWidget" native="true">
      <property name="minimumSize">
       <size>
        <width>384</width>
        <height>282</height>
       </size>
      </property>
-     <layout class="QVBoxLayout" name="videoWidgetPlaceholderLayout">
+     <layout class="QVBoxLayout" name="videoWidgetLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>

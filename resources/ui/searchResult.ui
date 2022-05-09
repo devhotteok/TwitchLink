@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>426</width>
-    <height>676</height>
+    <height>660</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="font">
-   <font>
-    <family>Arial Rounded MT Bold</family>
-   </font>
   </property>
   <property name="windowTitle">
    <string>Search Result</string>
@@ -27,7 +16,7 @@
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
-  <layout class="QVBoxLayout" name="DialogLayout">
+  <layout class="QVBoxLayout" name="FormLayout">
    <item>
     <widget class="QLabel" name="window_title">
      <property name="sizePolicy">
@@ -38,7 +27,6 @@
      </property>
      <property name="font">
       <font>
-       <family>Arial Rounded MT Bold</family>
        <pointsize>12</pointsize>
       </font>
      </property>
@@ -59,11 +47,11 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="live">
+     <widget class="QWidget" name="stream">
       <attribute name="title">
-       <string>Live</string>
+       <string>Stream</string>
       </attribute>
-      <layout class="QVBoxLayout" name="liveLayout">
+      <layout class="QVBoxLayout" name="streamLayout">
        <item>
         <widget class="QWidget" name="liveArea" native="true">
          <property name="sizePolicy">
@@ -121,7 +109,6 @@ border-radius: 10px;</string>
               <widget class="QLabel" name="liveLabel">
                <property name="font">
                 <font>
-                 <family>Arial Rounded MT Bold</family>
                  <pointsize>10</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
@@ -152,9 +139,45 @@ border-radius: 10px;</string>
            </spacer>
           </item>
           <item>
+           <widget class="QLabel" name="viewIcon">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="pixmap">
+             <pixmap>../icons/viewer.svg</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="viewer_count">
             <property name="text">
-             <string>Viewer Count</string>
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="refreshChannelButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Refresh</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../icons/update.svg</normaloff>../icons/update.svg</iconset>
             </property>
            </widget>
           </item>
@@ -162,14 +185,14 @@ border-radius: 10px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="channelMainWidgetPlaceholder" native="true">
+        <widget class="QWidget" name="channelMainWidget" native="true">
          <property name="minimumSize">
           <size>
            <width>384</width>
            <height>338</height>
           </size>
          </property>
-         <layout class="QVBoxLayout" name="channelMainWidgetPlaceholderLayout">
+         <layout class="QVBoxLayout" name="channelMainWidgetLayout">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -189,16 +212,16 @@ border-radius: 10px;</string>
         <widget class="QWidget" name="channelInfo" native="true">
          <layout class="QHBoxLayout" name="channelInfoLayout">
           <property name="leftMargin">
-           <number>10</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>10</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>10</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>10</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QWidget" name="profileArea" native="true">
@@ -209,7 +232,7 @@ border-radius: 10px;</string>
              </sizepolicy>
             </property>
             <layout class="QVBoxLayout" name="profileAreaLayout">
-             <item>
+             <item alignment="Qt::AlignHCenter">
               <widget class="QLabel" name="profile_image">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -222,11 +245,6 @@ border-radius: 10px;</string>
                  <width>100</width>
                  <height>100</height>
                 </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>맑은 고딕</family>
-                </font>
                </property>
                <property name="styleSheet">
                 <string notr="true"/>
@@ -254,17 +272,16 @@ border-radius: 10px;</string>
                </property>
               </widget>
              </item>
-             <item>
+             <item alignment="Qt::AlignHCenter">
               <widget class="QLabel" name="display_name">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="font">
                 <font>
-                 <family>Arial Rounded MT Bold</family>
                  <pointsize>10</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
@@ -346,7 +363,6 @@ border-radius: 10px;</string>
                  <widget class="QLabel" name="broadcaster_type">
                   <property name="font">
                    <font>
-                    <family>Arial Rounded MT Bold</family>
                     <pointsize>10</pointsize>
                     <weight>75</weight>
                     <bold>true</bold>
@@ -364,6 +380,29 @@ border-radius: 10px;</string>
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignTop">
+           <widget class="QToolButton" name="openInWebBrowserButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Open in Web Browser</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../icons/launch.svg</normaloff>../icons/launch.svg</iconset>
+            </property>
            </widget>
           </item>
          </layout>
@@ -401,7 +440,6 @@ border-radius: 10px;</string>
             </property>
             <property name="font">
              <font>
-              <family>Arial Rounded MT Bold</family>
               <pointsize>12</pointsize>
              </font>
             </property>
@@ -442,146 +480,152 @@ border-radius: 10px;</string>
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QToolButton" name="refreshVideoListButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Refresh</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../icons/update.svg</normaloff>../icons/update.svg</iconset>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
        <item>
-        <widget class="QScrollArea" name="scrollArea">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>300</height>
-          </size>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustToContents</enum>
-         </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-         <widget class="QWidget" name="scrollAreaContents">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>382</width>
-            <height>437</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="scrollAreaContentsLayout">
+        <widget class="QStackedWidget" name="stackedWidget">
+         <widget class="QWidget" name="statusPage">
+          <layout class="QVBoxLayout" name="statusPageLayout">
            <property name="leftMargin">
-            <number>10</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>10</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>10</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>10</number>
+            <number>0</number>
            </property>
            <item>
-            <widget class="QWidget" name="videoArea" native="true">
-             <layout class="QGridLayout" name="videoAreaLayout">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <property name="spacing">
-               <number>0</number>
-              </property>
+            <widget class="QFrame" name="statusFrame">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Sunken</enum>
+             </property>
+             <layout class="QVBoxLayout" name="statusFrameLayout">
+              <item alignment="Qt::AlignHCenter|Qt::AlignBottom">
+               <widget class="QLabel" name="infoIcon">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="pixmap">
+                 <pixmap>../icons/info.svg</pixmap>
+                </property>
+                <property name="scaledContents">
+                 <bool>true</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item alignment="Qt::AlignTop">
+               <widget class="QLabel" name="statusLabel">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Status</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="videoPage">
+          <layout class="QVBoxLayout" name="videoPageLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
-            <widget class="QLabel" name="statusLabel">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+            <widget class="QListWidget" name="videoArea">
+             <property name="focusPolicy">
+              <enum>Qt::NoFocus</enum>
              </property>
-             <property name="font">
-              <font>
-               <family>Arial Rounded MT Bold</family>
-               <pointsize>12</pointsize>
-              </font>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
-             <property name="text">
-              <string>Status</string>
+             <property name="autoScroll">
+              <bool>false</bool>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragDrop</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
+             </property>
+             <property name="verticalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <property name="resizeMode">
+              <enum>QListView::Adjust</enum>
+             </property>
+             <property name="viewMode">
+              <enum>QListView::IconMode</enum>
              </property>
             </widget>
            </item>
           </layout>
          </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QWidget" name="progressArea" native="true">
-         <layout class="QHBoxLayout" name="progressAreaLayout">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="progressLabel">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Progress</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QProgressBar" name="downloadingProgress">
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
        </item>
        <item>

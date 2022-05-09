@@ -1,5 +1,6 @@
-from Services.Utils.WorkerThreads import WorkerThread
+from Services.Threading.WorkerThread import WorkerThread
 
+import locale
 import pytz
 
 from datetime import datetime
@@ -9,29 +10,29 @@ class SystemUtils:
     WorkerThread = WorkerThread
 
     @staticmethod
-    def hook(originalFunction, hookingFunction):
-        return lambda *args, **kwargs: hookingFunction(lambda: originalFunction(*args, **kwargs))
+    def getSystemLanguage():
+        return locale.getdefaultlocale()[0] or "en_US"
 
     @staticmethod
     def getTimezone(timezone):
-        return datetime.now(pytz.timezone(timezone)).utcoffset()
+        return pytz.timezone(timezone)
 
     @staticmethod
     def getTimezoneList():
         return list(pytz.common_timezones)
 
     @classmethod
-    def getLocalTimezone(cls, preferredTimezones=None):
-        timezoneList = cls.getLocalTimezoneList() or preferredTimezones or cls.getTimezoneList()
-        for timezone in preferredTimezones or []:
-            if timezone in timezoneList:
-                return timezone
-        return timezoneList[0]
+    def getLocalTimezone(cls, preferred=None):
+        timezoneList = cls.getLocalTimezoneList() or cls.getTimezoneList()
+        if preferred in timezoneList:
+            return cls.getTimezone(preferred)
+        else:
+            return cls.getTimezone(timezoneList[0])
 
     @classmethod
     def getLocalTimezoneList(cls):
-        utcLocalOffset = datetime.now() - datetime.utcnow()
-        return [timezone for timezone in cls.getTimezoneList() if utcLocalOffset == cls.getTimezone(timezone)]
+        localUtcOffset = datetime.now() - datetime.utcnow()
+        return [timezone for timezone in cls.getTimezoneList() if localUtcOffset == cls.getTimezone(timezone)]
 
     @staticmethod
     def formatByteSize(size):
@@ -52,5 +53,5 @@ class SystemUtils:
                         break
                     size /= 1024
                     key += 1
-                return "{}{}".format(round(size, 2), sizeUnits[key])
+                return f"{round(size, 2)}{sizeUnits[key]}"
         return size
