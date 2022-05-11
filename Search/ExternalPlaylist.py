@@ -13,20 +13,8 @@ class ExternalPlaylist(TwitchPlaybackAccessTokens.TwitchPlaybackAccessToken, Twi
         super(ExternalPlaylist, self).__init__(TwitchPlaybackAccessTokens.TwitchPlaybackAccessTokenTypes.STREAM)
         self.url = url
         self.checkUrl()
-        self.checkContent()
 
     def checkUrl(self):
-        try:
-            response = Network.session.head(self.url)
-            if response.status_code != 200:
-                raise
-            contentType = response.headers["content-type"].lower().split("/")
-            if contentType[0] != "application" or "mpegurl" not in contentType[1]:
-                raise
-        except:
-            raise Exceptions.PlaylistNotFound
-
-    def checkContent(self):
         try:
             response = Network.session.get(self.url)
             if response.status_code != 200:

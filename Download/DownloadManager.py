@@ -30,8 +30,8 @@ class _DownloadManager(QtCore.QObject):
             self.hideDownloaderProgress(complete=True)
         elif len(self.runningDownloaders) == 1:
             self.showDownloaderProgress(self.runningDownloaders[0])
-        self.completedSignal.emit(downloader.getId())
         self.runningCountChangedSignal.emit(len(self.runningDownloaders))
+        self.completedSignal.emit(downloader.getId())
 
     def showDownloaderProgress(self, downloader):
         self.singleDownloader = downloader

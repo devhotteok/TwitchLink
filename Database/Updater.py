@@ -38,9 +38,15 @@ class Updaters:
             "1.0.4": None,
             "1.1.0": None,
             "1.1.1": None,
-            "2.0.0": cls.Update_2_0_0
+            "2.0.0": cls.Update_2_0_0,
+            "2.0.1": None
         }
-        if versionFrom in VERSIONS:
-            return list(VERSIONS.values())[list(VERSIONS.keys()).index(versionFrom) + 1:]
-        else:
-            return [cls.CleanUnknownVersion]
+        updaters = []
+        versionFound = False
+        for key, value in VERSIONS.items():
+            if versionFound:
+                if value != None:
+                    updaters.append(value)
+            elif key == versionFrom:
+                versionFound = True
+        return updaters if versionFound else [cls.CleanUnknownVersion]

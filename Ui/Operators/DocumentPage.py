@@ -20,7 +20,8 @@ class DocumentPage(DocumentViewer):
         return documentView
 
     def openAbout(self):
-        self.setCurrentIndex(self.getUniqueTabIndex(Ui.About) or self.addTab(Ui.About(parent=self), icon=Icons.INFO_ICON, uniqueValue=Ui.About))
+        tabIndex = self.getUniqueTabIndex(Ui.About)
+        self.setCurrentIndex(self.addTab(Ui.About(parent=self), icon=Icons.INFO_ICON, uniqueValue=Ui.About) if tabIndex == None else tabIndex)
         self.pageObject.show()
 
     def openTermsOfService(self):

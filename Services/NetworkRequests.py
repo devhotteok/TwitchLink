@@ -5,12 +5,10 @@ import functools
 import json
 import requests
 
-from requests import utils
-
 
 def default_user_agent(name=f"{Config.APP_NAME}/{Config.VERSION} ({OSUtils.getOSInfo()})"):
     return name
-utils.default_user_agent = default_user_agent
+requests.utils.default_user_agent = default_user_agent
 
 
 class Response(requests.Response):
@@ -33,7 +31,6 @@ class Response(requests.Response):
 requests.Response.text = Response.text
 requests.Response.json = Response.json
 requests.Response.getData = Response.getData
-
 
 
 class Network:

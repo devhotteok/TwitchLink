@@ -45,8 +45,6 @@ class FFmpegOutputReader:
     def checkError(self, returnCode, line):
         if returnCode == 0:
             return
-        #########저장공간 부족 오류
-        #########네트워크 오류
         errorType = line.rsplit(":", 1)[-1].strip()
         if errorType == ExceptionMessages.directory or errorType == ExceptionMessages.permission:
             raise Exceptions.FileSystemError

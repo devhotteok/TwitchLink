@@ -47,10 +47,10 @@
 
 - **Take a look at the latest issues [here][Issues].**
 - **Maybe your problem has already been reported or resolved.**
-- Try to use the latest version of **TwitchLink**.
-- Provide as much information about the problem as possible.
-- Try to describe the problem as detailed as possible.
-- If there is a problem with the download, please provide the download log.
+- **Use the latest version of TwitchLink.**
+- **Provide as much information about the problem as possible.**
+- **Try to describe the problem as detailed as possible.**
+- **If there is a problem using the app, please attach the log file with the issue.**
 - **Please use English. This is a global project.**
 
 

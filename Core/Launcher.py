@@ -28,6 +28,7 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
             self._server = QtNetwork.QLocalServer(parent=self)
             self.newInstanceStarted = self._server.newConnection
             self._server.listen(guid)
+            sys.excepthook = self.excepthook
         else:
             self.logger.error("Another instance of this application is already running.")
             self._socket = QtNetwork.QLocalSocket(parent=self)
@@ -41,3 +42,7 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
         self.logger.info(f"Application exited with exit code {returnCode}.")
         self.logger.info(f"All logs were written to '{self.logger.getPath()}'.")
         return returnCode
+
+    def excepthook(self, exc_type, exc_value, exc_tb):
+        self.logger.exception("Unexpected Error", exc_info=(exc_type, exc_value, exc_tb))
+        self.exit(self.EXIT_CODE.UNEXPECTED_ERROR)

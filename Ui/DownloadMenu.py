@@ -139,8 +139,6 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.info("video-crop", "#Video crop is based on the closest point in the crop range that can be processed.")
 
     def askSaveDirectory(self):
-        self.downloadInfo.setDirectory(self.downloadInfo.history.getUpdatedDirectory())
-        self.reloadFileDirectory()
         directory = self.downloadInfo.getAbsoluteFileName()
         filters = self.downloadInfo.getAvailableFormats()
         initialFilter = self.downloadInfo.fileFormat

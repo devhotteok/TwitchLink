@@ -2,8 +2,6 @@ from Services.Utils.Utils import Utils
 from Services.Translator.Translator import T
 from Database.Database import DB
 
-import datetime
-
 import os
 
 
@@ -94,24 +92,6 @@ class DownloadInfo:
 
     def checkResolutionInFileName(self):
         return "{resolution}" in self.getFileNameTemplate()
-
-    def getObjectData(self, object):
-        if hasattr(object, "__dict__"):
-            return self.getObjectData(object.__dict__)
-        elif isinstance(object, dict):
-            data = {}
-            for key in object:
-                data[key] = self.getObjectData(object[key])
-            return data
-        elif isinstance(object, list):
-            data = []
-            for value in object:
-                data.append(self.getObjectData(value))
-            return data
-        elif isinstance(object, datetime.datetime) or isinstance(object, datetime.timedelta):
-            return self.getObjectData(str(object))
-        else:
-            return object
 
     def setResolution(self, resolution):
         self.resolution = resolution

@@ -27,6 +27,7 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.bookmarkList.model().rowsInserted.connect(self.saveBookmark)
         self.bookmarkList.model().rowsMoved.connect(self.saveBookmark)
         self.bookmarkList.model().rowsRemoved.connect(self.saveBookmark)
+        self.bookmarkList.currentRowChanged.connect(self.reloadBookmarkArea)
         self.newBookmark.returnPressed.connect(self.tryAddBookmark)
         self.newBookmark.textChanged.connect(self.reloadBookmarkArea)
         self.addBookmarkButton.clicked.connect(self.tryAddBookmark)
