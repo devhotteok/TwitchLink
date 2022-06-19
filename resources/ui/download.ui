@@ -881,7 +881,7 @@ border-radius: 10px;</string>
     </widget>
    </item>
    <item>
-    <widget class="Line" name="cancel_line">
+    <widget class="Line" name="button_line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

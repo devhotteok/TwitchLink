@@ -63,11 +63,21 @@ class _Status:
     def updateNotifications(self, data):
         self.notifications = [
             DocumentData(
-                **(notification | {"buttons": [
+                contentId=notification.get("contentId", None),
+                contentVersion=notification.get("contentVersion", 0),
+                title=notification.get("title", ""),
+                content=notification.get("content", ""),
+                contentType=notification.get("contentType", ""),
+                modal=notification.get("modal", False),
+                blockExpiry=notification.get("blockExpiry", False),
+                buttons=[
                     DocumentButtonData(
-                        **button
+                        text=button.get("text", ""),
+                        action=button.get("action", None),
+                        role=button.get("role", "accept"),
+                        default=button.get("default", False)
                     ) for button in notification.get("buttons", [])
-                ]})
+                ]
             ) for notification in data.get(Translator.getLanguage(), [])
         ]
 

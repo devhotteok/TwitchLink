@@ -16,7 +16,7 @@ from Download.Downloader.Engine.Config import Config as EngineConfig
 
 import json
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class Setup:
@@ -163,6 +163,7 @@ class Temp:
             ImageConfig.DATA_TYPE: DownloadHistory.ThumbnailHistory()
         }
         self._windowGeometry = {}
+        self._blockedContent = {}
 
     def getDownloadHistory(self, contentType):
         return self._downloadHistory[contentType]
@@ -176,6 +177,19 @@ class Temp:
     def getWindowGeometry(self, windowName):
         return self._windowGeometry[windowName]
 
+    def isContentBlocked(self, contentId, contentVersion):
+        if contentId in self._blockedContent:
+            oldContentVersion, blockExpiry = self._blockedContent[contentId]
+            if contentVersion != oldContentVersion or (blockExpiry != None and blockExpiry < datetime.now()):
+                del self._blockedContent[contentId]
+                return False
+            else:
+                return True
+        else:
+            return False
+
+    def blockContent(self, contentId, contentVersion, blockExpiry=None):
+        self._blockedContent[contentId] = (contentVersion, None if blockExpiry == None else datetime.now() + timedelta(days=blockExpiry))
 
 class Download:
     def __init__(self):

@@ -1,5 +1,3 @@
-from .PrioritizedTask import TaskResult
-
 from Services.Threading.MutexLocker import MutexLocker
 from Services.Threading.WaitCondition import WaitCondition
 
@@ -34,7 +32,7 @@ class TaskStatus:
 
 
 class TaskManager(QtCore.QObject):
-    taskCompleteSignal = QtCore.pyqtSignal(TaskResult)
+    taskCompleteSignal = QtCore.pyqtSignal(object)
 
     def __init__(self, threadPool, parent=None):
         super(TaskManager, self).__init__(parent=parent)
@@ -69,7 +67,7 @@ class TaskManager(QtCore.QObject):
                     self._pausedCondition.makeTrue()
                 elif len(self.tasks) == 0:
                     self._doneCondition.makeTrue()
-        self.taskCompleteSignal.emit(task.result)
+        self.taskCompleteSignal.emit(task)
 
     @property
     def ifPaused(self):

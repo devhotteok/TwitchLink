@@ -97,7 +97,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             )
         if Updater.status.isOperational():
             for notification in Updater.status.notifications:
-                self.document.showDocument(notification, icon=None if notification.modal else Icons.NOTICE_ICON)
+                if notification.blockExpiry == False or not DB.temp.isContentBlocked(notification.contentId, notification.contentVersion):
+                    self.document.showDocument(notification, icon=None if notification.modal else Icons.NOTICE_ICON)
             if DB.setup.getTermsOfServiceAgreement() == None:
                 self.openTermsOfService()
             else:

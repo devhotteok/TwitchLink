@@ -3,7 +3,7 @@ from Core.Config import Config
 from Services.Utils.Utils import Utils
 from Services.Image.Presets import *
 from Services.Translator.Translator import Translator, T
-from Services.Ad import AdManager
+from Services import Ad
 from Database.Database import DB
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets, uic
@@ -54,9 +54,9 @@ def loadUi(name):
         def setAds(self):
             adArea = self.findChildren(QtWidgets.QWidget, QtCore.QRegExp("^adArea_\d+$"))
             adGroup = self.findChildren(QtWidgets.QWidget, QtCore.QRegExp("^adGroup_\d+$"))
-            if AdManager.Config.SHOW:
+            if Ad.Config.SHOW:
                 for widget in adArea:
-                    Utils.setPlaceholder(widget, AdManager.Ad(minimumSize=widget.minimumSize(), responsive=True, parent=self))
+                    Utils.setPlaceholder(widget, Ad.AdWidget(adId=f"{self.__class__.__name__}.{widget.objectName()}", adSize=widget.minimumSize(), responsive=True, parent=self))
             else:
                 for widget in adArea + adGroup:
                     widget.setParent(None)

@@ -25,20 +25,29 @@ class FFmpegOutputReader:
 
     def _read(self):
         line = ""
-        for line in self.process.stdout:
-            progressData = self.getProgressData(line)
-            if progressData != None:
-                yield progressData
+        try:
+            for line in self.process.stdout:
+                progressData = self.getProgressData(line)
+                if progressData != None:
+                    yield progressData
+        except:
+            pass
         self.checkError(self.process.wait(), line)
 
     def _readWithLogs(self):
         line = ""
-        for line in self.process.stdout:
-            self.logger.debug(line.strip("\n"))
-            progressData = self.getProgressData(line)
-            if progressData != None:
-                yield progressData
+        try:
+            for line in self.process.stdout:
+                self.logger.debug(line.strip("\n"))
+                progressData = self.getProgressData(line)
+                if progressData != None:
+                    yield progressData
+        except Exception as e:
+            self.logger.error("Unable to read output properly.")
+            self.logger.exception(e)
         returnCode = self.process.wait()
+        if self.process.notResponding:
+            self.logger.info("Subprocess was unresponsive and forced to terminate.")
         self.logger.info(f"Subprocess ended with exit code {returnCode}.")
         self.checkError(returnCode, line)
 

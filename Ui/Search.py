@@ -6,6 +6,13 @@ from Search.Modes import SearchModes
 
 
 class Search(QtWidgets.QDialog, UiFile.search):
+    SEARCH_MESSAGE = {
+        SearchModes.CHANNEL: "#Checking channel info",
+        SearchModes.VIDEO: "#Checking video info",
+        SearchModes.CLIP: "#Checking clip info",
+        SearchModes.URL: "#Checking URL"
+    }
+
     def __init__(self, mode, parent=None):
         super(Search, self).__init__(parent=parent)
         self.mode = mode
@@ -51,20 +58,13 @@ class Search(QtWidgets.QDialog, UiFile.search):
     def accept(self):
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
         query = self.getCurrentQuery()
-        if self.mode.isVideo() and not query.isnumeric():
-            mode = SearchModes(SearchModes.CLIP)
-        else:
-            mode = self.mode
-        self.searchProgress.setText(T({
-            mode.CHANNEL: "#Checking channel info",
-            mode.VIDEO: "#Checking video info",
-            mode.CLIP: "#Checking clip info",
-            mode.URL: "#Checking URL"
-        }[mode.getMode()], ellipsis=True))
+        if self.mode.isVideo() or self.mode.isClip():
+            self.mode.setMode(SearchModes.VIDEO if query.isnumeric() else SearchModes.CLIP)
+        self.searchProgress.setText(T(self.SEARCH_MESSAGE[self.mode.getMode()], ellipsis=True))
         self.queryArea.setCurrentIndex(2)
         self.searchThread.setup(
             target=Engine.Search.Query,
-            args=(mode, query),
+            args=(self.mode, query),
             kwargs={"searchExternalContent": DB.advanced.isExternalContentUrlEnabled()},
         )
         self.searchThread.start()

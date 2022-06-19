@@ -19,7 +19,7 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
 
     def __init__(self, guid, argv):
         super(SingleApplicationLauncher, self).__init__(argv)
-        self.logger = Logger(fileName=f"{Config.APP_NAME}_{id(self)}.txt")
+        self.logger = Logger(fileName=f"{Config.APP_NAME}_{id(self)}.log")
         self.logger.info(f"\n\n{Config.getProjectInfo()}\n")
         self.logger.info(OSUtils.getOSInfo())
         self.shared = QtCore.QSharedMemory(guid, parent=self)

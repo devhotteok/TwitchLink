@@ -28,15 +28,21 @@ class PropertyView(QtWidgets.QDialog, UiFile.propertyView, WindowGeometryManager
     def setFormData(self):
         for key, value in self.formData.items():
             if not isinstance(key, QtCore.QObject):
-                if not isinstance(key, str):
-                    key = str(key)
-                key = QtWidgets.QLabel(T(key) if self.enableLabelTranslation else key)
-                if self.targetVideoWidget != None:
-                    key.setText(f"{key.text()}:")
+                if isinstance(key, str):
+                    if self.enableLabelTranslation:
+                        key = T(key)
+                    if self.targetVideoWidget != None:
+                        key = f"{key}:"
+                label = QtWidgets.QLabel()
+                label.setText(key)
+                key = label
             if not isinstance(value, QtCore.QObject):
-                if not isinstance(value, str):
-                    value = str(value)
-                value = QtWidgets.QLabel(T(value) if self.enableFieldTranslation else value)
+                if isinstance(value, str):
+                    if self.enableFieldTranslation:
+                        value = T(value)
+                label = QtWidgets.QLabel()
+                label.setText(value)
+                value = label
                 if self.targetVideoWidget != None:
                     value.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
             if self.enableLabelSelection and type(key) == QtWidgets.QLabel:

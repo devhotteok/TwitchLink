@@ -23,7 +23,10 @@ class DownloadsPage(TabManager):
         self.addTab(self.downloads, icon=Icons.FOLDER_ICON, closable=False)
         DownloadManager.createdSignal.connect(self.downloaderCreated)
         DownloadManager.destroyedSignal.connect(self.downloaderDestroyed)
+        DownloadManager.startedSignal.connect(self.downloadStarted)
         DownloadManager.completedSignal.connect(self.downloadCompleted)
+        DownloadManager.completedSignal.connect(self.processCompleteEvent, QtCore.Qt.QueuedConnection)
+        DownloadManager.completedSignal.connect(self.performDownloadCompleteAction, QtCore.Qt.QueuedConnection)
         DownloadManager.runningCountChangedSignal.connect(self.changePageText)
 
     def openDownloadTab(self, downloaderId):
@@ -42,20 +45,27 @@ class DownloadsPage(TabManager):
         self.downloads.downloaderCreated(downloaderId)
         if DB.general.isOpenProgressWindowEnabled():
             self.openDownloadTab(downloaderId)
+        DownloadManager.get(downloaderId).start()
 
     def downloaderDestroyed(self, downloaderId):
         self.downloads.downloaderDestroyed(downloaderId)
         self.closeDownloadTab(downloaderId)
 
+    def downloadStarted(self, downloaderId):
+        self.downloads.downloadStarted(downloaderId)
+
     def downloadCompleted(self, downloaderId):
         self.downloads.downloadCompleted(downloaderId)
-        if not DownloadManager.isDownloaderRunning():
-            self.performDownloadCompleteAction()
+
+    def processCompleteEvent(self, downloaderId):
+        self.downloads.processCompleteEvent(downloaderId)
 
     def changePageText(self, downloadersCount):
         self.pageObject.setPageName("" if downloadersCount == 0 else str(downloadersCount))
 
     def performDownloadCompleteAction(self):
+        if DownloadManager.isDownloaderRunning():
+            return
         if self.downloads.downloadCompleteAction.currentIndex() == DownloadCompleteAction.SHUTDOWN_APP:
             if TimedMessageBox(
                 T("warning"),
@@ -73,7 +83,6 @@ class DownloadsPage(TabManager):
                 time=Config.SYSTEM_SHUTDOWN_TIMEOUT,
                 parent=self
             )
-            dialog.setMinimumSize(self.size() / 2)
             dialog.exec()
             if not dialog.wasCanceled():
                 self.systemShutdownRequested.emit()

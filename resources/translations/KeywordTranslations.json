@@ -387,6 +387,30 @@
     "en": "Created Time",
     "ko": "생성시간"
   },
+  "year": {
+    "en": "Year",
+    "ko": "년"
+  },
+  "month": {
+    "en": "Month",
+    "ko": "월"
+  },
+  "day": {
+    "en": "Day",
+    "ko": "일"
+  },
+  "hour": {
+    "en": "Hour",
+    "ko": "시"
+  },
+  "minute": {
+    "en": "Minute",
+    "ko": "분"
+  },
+  "second": {
+    "en": "Second",
+    "ko": "초"
+  },
   "views": {
     "en": "Views",
     "ko": "조회수"

@@ -16,12 +16,12 @@ class DocumentButtonData:
 
 
 class DocumentData:
-    def __init__(self, contentId=None, date=None, title="", content="", contentType="text", modal=False, blockable=False, buttons=None):
+    def __init__(self, contentId=None, contentVersion=0, title="", content="", contentType="text", modal=False, blockExpiry=False, buttons=None):
         self.contentId = contentId
-        self.date = date
+        self.contentVersion = contentVersion
         self.title = title
         self.content = content
         self.contentType = contentType
         self.modal = modal
-        self.blockable = blockable
+        self.blockExpiry = blockExpiry
         self.buttons = buttons or []

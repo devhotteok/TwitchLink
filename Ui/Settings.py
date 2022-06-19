@@ -114,7 +114,13 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         return {
             f"{{{timeType}_at}}": f"{T(f'{timeType}-at')} (XXXX-XX-XX XX:XX:XX)",
             "{date}": f"{T(f'{timeType}-date')} (XXXX-XX-XX)",
-            "{time}": f"{T(f'{timeType}-time')} (XX:XX:XX)"
+            "{year}": f"{T(f'{timeType}-date')} - {T('year')}",
+            "{month}": f"{T(f'{timeType}-date')} - {T('month')}",
+            "{day}": f"{T(f'{timeType}-date')} - {T('day')}",
+            "{time}": f"{T(f'{timeType}-time')} (XX:XX:XX)",
+            "{hour}": f"{T(f'{timeType}-time')} - {T('hour')}",
+            "{minute}": f"{T(f'{timeType}-time')} - {T('minute')}",
+            "{second}": f"{T(f'{timeType}-time')} - {T('second')}"
         }
 
     def showStreamTemplateInfo(self):

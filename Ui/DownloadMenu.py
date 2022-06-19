@@ -30,8 +30,8 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         elif self.downloadInfo.type.isVideo():
             self.setupCropArea()
             h, m, s = Utils.toTime(self.downloadInfo.videoData.lengthSeconds.totalSeconds())
-            self.startSpinH.setMaximum(h + 1)
-            self.endSpinH.setMaximum(h + 1)
+            self.fromSpinH.setMaximum(h + 1)
+            self.toSpinH.setMaximum(h + 1)
             self.reloadCropArea()
             self.unmuteVideoCheckBox.setChecked(self.downloadInfo.isUnmuteVideoEnabled())
             self.unmuteVideoCheckBox.toggled.connect(self.downloadInfo.setUnmuteVideoEnabled)
@@ -71,37 +71,37 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
 
     def setupCropArea(self):
         self.cropArea.setTitle(f"{T('crop')} / {T('#Total Length: {duration}', duration=self.downloadInfo.videoData.lengthSeconds)}")
-        self.startCheckBox.stateChanged.connect(self.reloadCropArea)
-        self.endCheckBox.stateChanged.connect(self.checkUpdateTrack)
-        self.startSpinH.valueChanged.connect(self.reloadStartRange)
-        self.startSpinM.valueChanged.connect(self.reloadStartRange)
-        self.startSpinS.valueChanged.connect(self.reloadStartRange)
-        self.endSpinH.valueChanged.connect(self.reloadEndRange)
-        self.endSpinM.valueChanged.connect(self.reloadEndRange)
-        self.endSpinS.valueChanged.connect(self.reloadEndRange)
+        self.cropFromStartRadioButton.toggled.connect(self.reloadCropArea)
+        self.cropToEndRadioButton.toggled.connect(self.checkUpdateTrack)
+        self.fromSpinH.valueChanged.connect(self.reloadStartRange)
+        self.fromSpinM.valueChanged.connect(self.reloadStartRange)
+        self.fromSpinS.valueChanged.connect(self.reloadStartRange)
+        self.toSpinH.valueChanged.connect(self.reloadEndRange)
+        self.toSpinM.valueChanged.connect(self.reloadEndRange)
+        self.toSpinS.valueChanged.connect(self.reloadEndRange)
         self.cropInfo.clicked.connect(self.showCropInfo)
 
     def reloadStartRange(self):
-        self.setStartSpin(*self.checkCropRange(*self.getStartSpin(), maximum=Utils.toSeconds(*self.getEndSpin())))
+        self.setFromSpin(*self.checkCropRange(*self.getFromSpin(), maximum=Utils.toSeconds(*self.getToSpin())))
 
     def reloadEndRange(self):
-        self.setEndSpin(*self.checkCropRange(*self.getEndSpin(), minimum=Utils.toSeconds(*self.getStartSpin())))
+        self.setToSpin(*self.checkCropRange(*self.getToSpin(), minimum=Utils.toSeconds(*self.getFromSpin())))
 
-    def getStartSpin(self):
-        return self.startSpinH.value(), self.startSpinM.value(), self.startSpinS.value()
+    def getFromSpin(self):
+        return self.fromSpinH.value(), self.fromSpinM.value(), self.fromSpinS.value()
 
-    def getEndSpin(self):
-        return self.endSpinH.value(), self.endSpinM.value(), self.endSpinS.value()
+    def getToSpin(self):
+        return self.toSpinH.value(), self.toSpinM.value(), self.toSpinS.value()
 
-    def setStartSpin(self, h, m, s):
-        self.startSpinH.setValueSilent(h)
-        self.startSpinM.setValueSilent(m)
-        self.startSpinS.setValueSilent(s)
+    def setFromSpin(self, h, m, s):
+        self.fromSpinH.setValueSilent(h)
+        self.fromSpinM.setValueSilent(m)
+        self.fromSpinS.setValueSilent(s)
 
-    def setEndSpin(self, h, m, s):
-        self.endSpinH.setValueSilent(h)
-        self.endSpinM.setValueSilent(m)
-        self.endSpinS.setValueSilent(s)
+    def setToSpin(self, h, m, s):
+        self.toSpinH.setValueSilent(h)
+        self.toSpinM.setValueSilent(m)
+        self.toSpinS.setValueSilent(s)
 
     def checkCropRange(self, h, m, s, maximum=None, minimum=None):
         videoTotalSeconds = self.downloadInfo.videoData.lengthSeconds.totalSeconds()
@@ -120,20 +120,20 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
             return Utils.toTime(totalSeconds)
 
     def reloadCropArea(self):
-        self.startTimeBar.setEnabled(not self.startCheckBox.isChecked())
-        self.endTimeBar.setEnabled(not self.endCheckBox.isChecked())
-        if self.startCheckBox.isChecked():
-            self.setStartSpin(0, 0, 0)
-        if self.endCheckBox.isChecked():
-            self.setEndSpin(*Utils.toTime(self.downloadInfo.videoData.lengthSeconds.totalSeconds()))
+        self.fromTimeBar.setEnabled(not self.cropFromStartRadioButton.isChecked())
+        self.toTimeBar.setEnabled(not self.cropToEndRadioButton.isChecked())
+        if self.cropFromStartRadioButton.isChecked():
+            self.setFromSpin(0, 0, 0)
+        if self.cropToEndRadioButton.isChecked():
+            self.setToSpin(*Utils.toTime(self.downloadInfo.videoData.lengthSeconds.totalSeconds()))
 
     def checkUpdateTrack(self):
         self.reloadCropArea()
-        if self.updateTrackCheckBox.isChecked() and not self.endCheckBox.isChecked():
+        if self.updateTrackCheckBox.isChecked() and not self.cropToEndRadioButton.isChecked():
             if self.ask("warning", "#Update track mode is currently enabled.\nSetting the end of the crop range will not track updates.\nProceed?", defaultOk=True):
                 self.updateTrackCheckBox.setCheckState(QtCore.Qt.Unchecked)
             else:
-                self.endCheckBox.setCheckState(QtCore.Qt.Checked)
+                self.cropToEndRadioButton.setCheckState(QtCore.Qt.Checked)
 
     def showCropInfo(self):
         self.info("video-crop", "#Video crop is based on the closest point in the crop range that can be processed.")
@@ -158,9 +158,9 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
 
     def setUpdateTrack(self, updateTrack):
         self.downloadInfo.setUpdateTrackEnabled(updateTrack)
-        if self.updateTrackCheckBox.isChecked() and not self.endCheckBox.isChecked():
+        if self.updateTrackCheckBox.isChecked() and not self.cropToEndRadioButton.isChecked():
             if self.ask("warning", "#The end of the crop range is currently set.\nEnabling update track mode will ignore the end of the crop range and continue downloading.\nProceed?", defaultOk=True):
-                self.endCheckBox.setCheckState(QtCore.Qt.Checked)
+                self.cropToEndRadioButton.setCheckState(QtCore.Qt.Checked)
             else:
                 self.updateTrackCheckBox.setCheckState(QtCore.Qt.Unchecked)
 
@@ -203,12 +203,12 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         super().accept(self.downloadInfo)
 
     def saveCropRange(self):
-        if self.startCheckBox.isChecked():
+        if self.cropFromStartRadioButton.isChecked():
             start = None
         else:
-            start = Utils.toSeconds(*self.getStartSpin())
-        if self.endCheckBox.isChecked():
+            start = Utils.toSeconds(*self.getFromSpin())
+        if self.cropToEndRadioButton.isChecked():
             end = None
         else:
-            end = Utils.toSeconds(*self.getEndSpin())
+            end = Utils.toSeconds(*self.getToSpin())
         self.downloadInfo.setCropRange(start, end)

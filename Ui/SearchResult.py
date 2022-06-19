@@ -204,9 +204,17 @@ class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
             videoDownloadWidget = Ui.VideoDownloadWidget(data, resizable=False, parent=self)
             videoDownloadWidget.accountPageShowRequested.connect(self.accountPageShowRequested.emit)
             self.addWidget(videoDownloadWidget)
-            if AdManager.Config.SHOW:
-                if self.videoArea.count() % 6 == 1:
-                    self.addWidget(AdManager.Ad(minimumSize=videoDownloadWidget.sizeHint(), responsive=False, parent=self), fitContent = False)
+            if Ad.Config.SHOW:
+                if self.videoArea.count() % Ad.Config.FREQUENCY == 1:
+                    self.addWidget(
+                        Ad.AdWidget(
+                            adId=f"videoArea.{self.videoArea.count() // Ad.Config.FREQUENCY}",
+                            adSize=videoDownloadWidget.sizeHint(),
+                            responsive=False,
+                            parent=self
+                        ),
+                        fitContent=False
+                    )
 
     def addWidget(self, widget, fitContent=True):
         widget.setContentsMargins(10, 10, 10, 10)

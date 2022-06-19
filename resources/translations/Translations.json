@@ -23,6 +23,14 @@
     "en": "A new version of {appName} has been released!",
     "ko": "{appName}의 새로운 버전이 출시되었습니다!"
   },
+  "#Do not show this again.": {
+    "en": "Do not show this again.",
+    "ko": "다시 보지 않기"
+  },
+  "#Do not show this again for {blockExpiry} days.": {
+    "en": "Do not show this again for {blockExpiry} days.",
+    "ko": "{blockExpiry}일 동안 다시 보지 않기"
+  },
   "#There are one or more downloads in progress.\nAre you sure you want to stop/cancel and exit?": {
     "en": "There are one or more downloads in progress.\nAre you sure you want to stop/cancel and exit?",
     "ko": "하나 이상의 진행 중인 다운로드가 있습니다.\n중지/취소하고 종료하시겠습니까?"

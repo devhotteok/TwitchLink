@@ -1,12 +1,10 @@
 from Core.Ui import *
 from Services.Messages import Messages
-from Services.Threading.MutexLocker import MutexLocker
 from Download.DownloadManager import DownloadManager
 
 
 class DownloaderControl:
     def __init__(self):
-        self.actionLock = MutexLocker()
         self._removeEnabled = False
         self._removeRegistered = False
 
@@ -95,7 +93,6 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.downloader.progressUpdate.connect(self.handleClipProgress)
             self.handleClipStatus(self.downloader.status)
             self.handleClipProgress(self.downloader.progress)
-        self.downloader.start()
 
     def tryRemoveDownloader(self):
         if self.control.isRemoveEnabled():
@@ -106,12 +103,11 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
                     self.downloader.cancel()
                 else:
                     return
-            self.setEnabled(False)
-            with self.control.actionLock:
-                if self.control.isRemoveEnabled():
-                    self.removeDownloader()
-                else:
-                    self.control.registerRemove()
+            if self.control.isRemoveEnabled():
+                self.removeDownloader()
+            else:
+                self.setEnabled(False)
+                self.control.registerRemove()
 
     def removeDownloader(self):
         DownloadManager.remove(self.downloaderId)
@@ -241,13 +237,11 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         self.progressBar.setValue(100)
         self.pauseButton.hide()
         self.cancelButton.hide()
-        self.showResult()
-        with self.control.actionLock:
-            self.control.enableRemove()
-            if self.control.isRemoveRegistered():
-                self.removeDownloader()
 
-    def showResult(self):
+    def processCompleteEvent(self):
+        self.control.enableRemove()
+        if self.control.isRemoveRegistered():
+            self.removeDownloader()
         if self.downloader.status.terminateState.isTrue():
             error = self.downloader.status.getError()
             if error != None:

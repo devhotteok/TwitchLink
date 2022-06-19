@@ -31,14 +31,16 @@ class DocumentView(QtWidgets.QWidget, UiFile.documentView):
     def __init__(self, document, parent=None):
         super(DocumentView, self).__init__(parent=parent)
         self.contentId = document.contentId
-        self.date = document.date
+        self.contentVersion = document.contentVersion
         self.setTitle(document.title)
         self.setContent(document.content, document.contentType)
         self.setModal(document.modal)
-        self.setBlockable(document.blockable)
+        self.setBlockExpiry(False if self.contentId == None else document.blockExpiry)
         for button in document.buttons:
             self.addButton(button)
         self.buttonBox.accepted.connect(self.requestClose)
+        if self.isBlockable():
+            self.buttonBox.accepted.connect(self.checkContentBlock)
         self.buttonBox.rejected.connect(self.requestClose)
 
     def setTitle(self, title):
@@ -57,9 +59,13 @@ class DocumentView(QtWidgets.QWidget, UiFile.documentView):
     def setModal(self, modal):
         self.modal = modal
 
-    def setBlockable(self, blockable):
-        self.blockable = blockable
-        if self.blockable:
+    def setBlockExpiry(self, blockExpiry):
+        self.blockExpiry = blockExpiry
+        if self.isBlockable():
+            if self.blockExpiry == None:
+                self.checkBox.setText(T("#Do not show this again."))
+            else:
+                self.checkBox.setText(T("#Do not show this again for {blockExpiry} days.", blockExpiry=blockExpiry))
             self.checkBox.show()
         else:
             self.checkBox.hide()
@@ -73,7 +79,7 @@ class DocumentView(QtWidgets.QWidget, UiFile.documentView):
         return self.modal
 
     def isBlockable(self):
-        return self.blockable
+        return self.blockExpiry != False
 
     def accept(self):
         self.buttonBox.accepted.emit()
@@ -83,3 +89,7 @@ class DocumentView(QtWidgets.QWidget, UiFile.documentView):
 
     def requestClose(self):
         self.closeRequested.emit(self)
+
+    def checkContentBlock(self):
+        if self.checkBox.isChecked():
+            DB.temp.blockContent(self.contentId, self.contentVersion, self.blockExpiry)

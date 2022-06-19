@@ -10,8 +10,8 @@ from PyQt5 import QtCore
 
 
 class EngineSetup(QtCore.QThread):
-    needSetup = QtCore.pyqtSignal(object)
-    needCleanup = QtCore.pyqtSignal(object)
+    started = QtCore.pyqtSignal(object)
+    finished = QtCore.pyqtSignal(object)
     statusUpdate = QtCore.pyqtSignal(Modules.Status)
     progressUpdate = QtCore.pyqtSignal(Modules.Progress)
     dataUpdate = QtCore.pyqtSignal(dict)
@@ -24,6 +24,14 @@ class EngineSetup(QtCore.QThread):
         self.progress = Modules.Progress()
         self.actionLock = MutexLocker()
         self.setupLogger()
+        super().started.connect(self.emitStartedSignal)
+        super().finished.connect(self.emitFinishedSignal)
+
+    def emitStartedSignal(self):
+        self.started.emit(self)
+
+    def emitFinishedSignal(self):
+        self.finished.emit(self)
 
     def getId(self):
         return id(self)
@@ -32,12 +40,11 @@ class EngineSetup(QtCore.QThread):
         name = f"{Config.APP_NAME}_Download_{self.getId()}"
         self.logger = Logger(
             name=name,
-            fileName=f"{name}.txt",
+            fileName=f"{name}.log",
         )
         self.logger.debug(f"{Config.APP_NAME} {Config.VERSION}\n\n[Download Info]\n{ObjectLogger.generateObjectLog(self.setup.downloadInfo)}")
 
     def run(self):
-        self.needSetup.emit(self)
         self.logger.info("Download Started")
         try:
             self.download()
@@ -64,7 +71,6 @@ class EngineSetup(QtCore.QThread):
                 self.logger.info("Download Failed")
         else:
             self.logger.info("Download Completed")
-        self.needCleanup.emit(self)
 
     def download(self):
         pass

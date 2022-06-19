@@ -29,6 +29,7 @@ class DownloadInfo:
 
     def getFileNameTemplateVariables(self):
         if self.type.isStream():
+            startedAt = self.stream.createdAt.asTimezone(DB.localization.getTimezone())
             return {
                 "type": T(self.type.toString()),
                 "id": self.stream.id,
@@ -37,12 +38,19 @@ class DownloadInfo:
                 "channel": self.stream.broadcaster.login,
                 "channel_name": self.stream.broadcaster.displayName,
                 "channel_formatted_name": self.stream.broadcaster.formattedName(),
-                "started_at": self.stream.createdAt.asTimezone(DB.localization.getTimezone()),
-                "date": self.stream.createdAt.date(DB.localization.getTimezone()),
-                "time": self.stream.createdAt.time(DB.localization.getTimezone()),
+                "started_at": startedAt,
+                "date": startedAt.date(),
+                "year": f"{startedAt.year:04}",
+                "month": f"{startedAt.month:02}",
+                "day": f"{startedAt.day:02}",
+                "time": startedAt.time(),
+                "hour": f"{startedAt.hour:02}",
+                "minute": f"{startedAt.minute:02}",
+                "second": f"{startedAt.second:02}",
                 "resolution": self.resolution.resolutionName
             }
         elif self.type.isVideo():
+            publishedAt = self.video.publishedAt.asTimezone(DB.localization.getTimezone())
             return {
                 "type": T(self.type.toString()),
                 "id": self.video.id,
@@ -52,13 +60,20 @@ class DownloadInfo:
                 "channel_name": self.video.owner.displayName,
                 "channel_formatted_name": self.video.owner.formattedName(),
                 "duration": self.video.lengthSeconds,
-                "published_at": self.video.publishedAt.asTimezone(DB.localization.getTimezone()),
-                "date": self.video.publishedAt.date(DB.localization.getTimezone()),
-                "time": self.video.publishedAt.time(DB.localization.getTimezone()),
+                "published_at": publishedAt,
+                "date": publishedAt.date(),
+                "year": f"{publishedAt.year:04}",
+                "month": f"{publishedAt.month:02}",
+                "day": f"{publishedAt.day:02}",
+                "time": publishedAt.time(),
+                "hour": f"{publishedAt.hour:02}",
+                "minute": f"{publishedAt.minute:02}",
+                "second": f"{publishedAt.second:02}",
                 "views": self.video.viewCount,
                 "resolution": self.resolution.resolutionName
             }
         else:
+            createdAt = self.clip.createdAt.asTimezone(DB.localization.getTimezone())
             return {
                 "type": T(self.type.toString()),
                 "id": self.clip.id,
@@ -72,9 +87,15 @@ class DownloadInfo:
                 "creator_name": self.clip.curator.displayName,
                 "creator_formatted_name": self.clip.curator.formattedName(),
                 "duration": self.clip.durationSeconds,
-                "created_at": self.clip.createdAt.asTimezone(DB.localization.getTimezone()),
-                "date": self.clip.createdAt.date(DB.localization.getTimezone()),
-                "time": self.clip.createdAt.time(DB.localization.getTimezone()),
+                "created_at": createdAt,
+                "date": createdAt.date(),
+                "year": f"{createdAt.year:04}",
+                "month": f"{createdAt.month:02}",
+                "day": f"{createdAt.day:02}",
+                "time": createdAt.time(),
+                "hour": f"{createdAt.hour:02}",
+                "minute": f"{createdAt.minute:02}",
+                "second": f"{createdAt.second:02}",
                 "views": self.clip.viewCount,
                 "resolution": self.resolution.resolutionName
             }

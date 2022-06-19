@@ -78,7 +78,7 @@ class VideoHistory(FileHistory, AudioFormatHistory):
 
     def __init__(self):
         super(VideoHistory, self).__init__()
-        self.setUnmuteVideoEnabled(True)
+        self.setUnmuteVideoEnabled(False)
         self.setUpdateTrackEnabled(False)
 
     def setUnmuteVideoEnabled(self, unmuteVideo):

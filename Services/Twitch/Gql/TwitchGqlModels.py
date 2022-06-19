@@ -1,12 +1,25 @@
 import pytz
 
-from datetime import datetime, timedelta
+import datetime
+
+
+class _datetime(datetime.datetime):
+    def __str__(self):
+        return self.strftime("%Y-%m-%d %H:%M:%S")
+
+    def __repr__(self):
+        return self.__str__()
+
+    def details(self):
+        return f"{self.__str__()} {self.tzname()} ({self.tzinfo.zone})"
+datetime.datetime = _datetime
 
 
 class DataUtils:
     @staticmethod
     def cleanString(string):
         return string.replace("\n", "").replace("\r", "")
+
 
 class TimeUtils:
     class Datetime:
@@ -16,12 +29,12 @@ class TimeUtils:
             if string == None:
                 string = self.DEFAULT_DATETIME
             try:
-                self.datetime = datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=pytz.utc)
+                self.datetime = pytz.utc.localize(datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%fZ"))
             except:
                 try:
-                    self.datetime = datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
+                    self.datetime = pytz.utc.localize(datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ"))
                 except:
-                    self.datetime = datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
+                    self.datetime = pytz.utc.localize(datetime.datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M:%SZ"))
 
         def __str__(self):
             return self.datetime.__str__()
@@ -46,7 +59,7 @@ class TimeUtils:
 
     class Duration:
         def __init__(self, seconds):
-            self.timedelta = timedelta(seconds=seconds)
+            self.timedelta = datetime.timedelta(seconds=seconds)
 
         def totalSeconds(self):
             return int(self.timedelta.total_seconds())
@@ -74,9 +87,7 @@ class User(TwitchGqlObject):
         self.createdAt = TimeUtils.Datetime(data.get("createdAt"))
 
     def formattedName(self):
-        if self.id == None:
-            return "Unknown User"
-        if self.displayName.lower() == self.login:
+        if self.displayName.lower() == self.login.lower():
             return self.displayName
         else:
             return f"{self.displayName}({self.login})"

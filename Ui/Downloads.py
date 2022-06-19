@@ -36,8 +36,14 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
         self.previewWidgetView.takeItem(self.previewWidgetView.row(self.previewItems.pop(downloaderId)))
         self.showPreviewCount()
 
+    def downloadStarted(self, downloaderId):
+        self.processPreview(downloaderId)
+
     def downloadCompleted(self, downloaderId):
         self.processPreview(downloaderId)
+
+    def processCompleteEvent(self, downloaderId):
+        self.previewItems[downloaderId].widget.processCompleteEvent()
 
     def processPreview(self, downloaderId):
         self.setPreviewHidden(downloaderId, not self.filterPreview(downloaderId))

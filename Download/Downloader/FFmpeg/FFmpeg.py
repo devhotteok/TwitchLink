@@ -58,6 +58,7 @@ class FFmpeg(QtCore.QObject):
             startupinfo=startupinfo,
             creationflags=priority
         )
+        self.process.notResponding = False
 
     def output(self, logger=None):
         return FFmpegOutputReader(self.process, logger).reader()
@@ -75,10 +76,11 @@ class FFmpeg(QtCore.QObject):
 
     def _killProcess(self):
         try:
+            self.process.communicate(input="q", timeout=Config.KILL_TIMEOUT)
+        except:
+            self.process.notResponding = True
             try:
-                self.process.communicate(input="q", timeout=Config.KILL_TIMEOUT)
-            except:
                 self.process.kill()
                 self.process.communicate()
-        except:
-            pass
+            except:
+                pass

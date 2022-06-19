@@ -52,7 +52,7 @@ class VideoDownloader(EngineSetup):
         url = self.setup.downloadInfo.getUrl().rsplit("/", 1)[0]
         processedFiles = []
         with self.actionLock:
-            self.taskManager.taskCompleteSignal.connect(self.segmentDownloadResult)
+            self.taskManager.taskCompleteSignal.connect(self.segmentDownloadComplete)
             self.taskManager.ifPaused.connect(self.taskPaused)
             self.taskManager.start()
         while self.status.terminateState.isFalse():
@@ -108,11 +108,11 @@ class VideoDownloader(EngineSetup):
             except:
                 break
 
-    def segmentDownloadResult(self, result):
-        if not result.success:
-            urls = "\n".join(result.task.urls)
-            self.logger.warning(f"Failed to download segment: {result.task.segment.fileName} [{result.error}]\n{urls}")
-            if isinstance(result.error, Exceptions.FileSystemError):
+    def segmentDownloadComplete(self, task):
+        if not task.result.success:
+            urls = "\n".join(task.urls)
+            self.logger.warning(f"Failed to download segment: {task.segment.fileName} [{task.result.error}]\n{urls}")
+            if isinstance(task.result.error, Exceptions.FileSystemError):
                 self.cancel()
                 self.status.raiseError(Exceptions.FileSystemError)
                 return

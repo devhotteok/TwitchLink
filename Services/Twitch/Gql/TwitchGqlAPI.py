@@ -7,7 +7,7 @@ from Services.NetworkRequests import Network
 
 class Exceptions:
     class NetworkError(Exception):
-        def __init__(self, response):
+        def __init__(self, response=None):
             if response == None:
                 self.status_code = None
                 self.data = "Unable to connect to server"
@@ -44,7 +44,7 @@ class GqlEngine:
         try:
             response = Network.session.post(Config.SERVER, headers=headers or {"Client-ID": Config.CLIENT_ID}, json=payload)
         except:
-            raise Exceptions.NetworkError(None)
+            raise Exceptions.NetworkError
         if response.status_code == 200:
             try:
                 json = response.json()

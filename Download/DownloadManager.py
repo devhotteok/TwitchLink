@@ -7,6 +7,7 @@ from PyQt5 import QtCore
 class _DownloadManager(QtCore.QObject):
     createdSignal = QtCore.pyqtSignal(object)
     destroyedSignal = QtCore.pyqtSignal(object)
+    startedSignal = QtCore.pyqtSignal(object)
     completedSignal = QtCore.pyqtSignal(object)
     runningCountChangedSignal = QtCore.pyqtSignal(int)
 
@@ -23,6 +24,7 @@ class _DownloadManager(QtCore.QObject):
             self.hideDownloaderProgress(complete=False)
         self.runningDownloaders.append(downloader)
         self.runningCountChangedSignal.emit(len(self.runningDownloaders))
+        self.startedSignal.emit(downloader.getId())
 
     def onFinish(self, downloader):
         self.runningDownloaders.remove(downloader)
@@ -49,8 +51,8 @@ class _DownloadManager(QtCore.QObject):
 
     def create(self, downloadInfo):
         downloader = TwitchDownloader(downloadInfo, parent=self)
-        downloader.needSetup.connect(self.onStart)
-        downloader.needCleanup.connect(self.onFinish)
+        downloader.started.connect(self.onStart)
+        downloader.finished.connect(self.onFinish)
         downloaderId = downloader.getId()
         self.downloaders[downloaderId] = downloader
         self.createdSignal.emit(downloaderId)
@@ -113,6 +115,5 @@ class _DownloadManager(QtCore.QObject):
     def handleClipProgress(self, downloader):
         progress = downloader.progress
         App.taskbar.setValue(progress.byteSizeProgress)
-
 
 DownloadManager = _DownloadManager()
