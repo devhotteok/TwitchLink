@@ -11,7 +11,7 @@ class Utils(OSUtils, SystemUtils, UiUtils):
         index = 0
         while index < len(string):
             for key, value in kwargs.items():
-                key = "{" + key + "}"
+                key = f"{{{key}}}"
                 value = str(value)
                 if string[index:].startswith(key):
                     string = f"{string[:index]}{value}{string[index + len(key):]}"

@@ -40,7 +40,8 @@ class Updaters:
             "1.1.1": None,
             "2.0.0": cls.Update_2_0_0,
             "2.0.1": None,
-            "2.0.2": None
+            "2.0.2": None,
+            "2.1.0": None,
         }
         updaters = []
         versionFound = False

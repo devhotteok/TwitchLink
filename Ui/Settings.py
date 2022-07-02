@@ -13,6 +13,8 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.openProgressWindow.toggled.connect(DB.general.setOpenProgressWindowEnabled)
         self.notify.setChecked(DB.general.isNotifyEnabled())
         self.notify.toggled.connect(DB.general.setNotifyEnabled)
+        self.confirmExit.setChecked(DB.general.isConfirmExitEnabled())
+        self.confirmExit.toggled.connect(DB.general.setConfirmExitEnabled)
         self.streamFilename.setText(DB.templates.getStreamFilename())
         self.streamFilename.editingFinished.connect(self.setStreamFilename)
         self.streamTemplateInfo.clicked.connect(self.showStreamTemplateInfo)
@@ -233,8 +235,8 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
 
     def resetSettings(self):
         if self.ask("reset-settings", "#This will reset all settings.\nProceed?"):
-            DB.reset()
             self.requestRestart()
+            DB.reset()
 
     def requestRestart(self):
         self.restartRequired.emit()

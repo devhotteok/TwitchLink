@@ -4,6 +4,7 @@ from .Config import Config
 from Services.Utils.OSUtils import OSUtils
 
 import logging
+import datetime
 
 
 class Logger:
@@ -49,3 +50,7 @@ class Logger:
 
     def getPath(self):
         return self.filePath
+
+    @classmethod
+    def getFormattedTime(cls):
+        return datetime.datetime.now().strftime("%Y.%m.%d_%H-%M-%S")

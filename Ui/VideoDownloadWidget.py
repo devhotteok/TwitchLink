@@ -51,10 +51,10 @@ class VideoDownloadWidget(QtWidgets.QWidget, UiFile.videoDownloadWidget):
             stream = result.data
             if stream.hideAds == False:
                 if DB.account.isUserLoggedIn():
-                    adBlockFailReason = "#Ads can't be blocked because your account does not have a subscription to this channel."
+                    adBlockFailReason = "#Your account does not have a subscription to this channel."
                 else:
-                    adBlockFailReason = "#Ads can't be blocked because you are not currently logged in."
-                if not self.ask("warning", T("#This stream contains ads.\nTo block ads, you need to log in with a subscribed account.\n{adBlockFailReason}\n\n{appName} will block ads, but in some cases it may fail.\nIf it fails, you'll see an alternate screen.\nProceed?", adBlockFailReason=T(adBlockFailReason), appName=Config.APP_NAME), contentTranslate=False):
+                    adBlockFailReason = "#You are not currently logged in."
+                if not self.ask("warning", T("#This stream contains ads.\n{appName} will block ads, but may fail, in which case an alternate screen will be displayed.\n\nTo completely block ads, you must log in with a subscribed account.\n{adBlockFailReason}\n\nProceed?", adBlockFailReason=T(adBlockFailReason), appName=Config.APP_NAME), contentTranslate=False):
                     return
             self.askDownload(DownloadInfo(self.data, stream))
         elif isinstance(result.error, TwitchPlaybackAccessTokens.Exceptions.Forbidden):

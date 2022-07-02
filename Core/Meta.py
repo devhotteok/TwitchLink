@@ -4,7 +4,7 @@ import datetime
 class Meta:
     APP_NAME = "TwitchLink"
 
-    VERSION = "2.0.2"
+    VERSION = "2.1.0"
 
     AUTHOR = "DevHotteok"
 

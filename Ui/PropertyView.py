@@ -33,14 +33,14 @@ class PropertyView(QtWidgets.QDialog, UiFile.propertyView, WindowGeometryManager
                         key = T(key)
                     if self.targetVideoWidget != None:
                         key = f"{key}:"
-                label = QtWidgets.QLabel()
+                label = QtWidgets.QLabel(parent=self)
                 label.setText(key)
                 key = label
             if not isinstance(value, QtCore.QObject):
                 if isinstance(value, str):
                     if self.enableFieldTranslation:
                         value = T(value)
-                label = QtWidgets.QLabel()
+                label = QtWidgets.QLabel(parent=self)
                 label.setText(value)
                 value = label
                 if self.targetVideoWidget != None:

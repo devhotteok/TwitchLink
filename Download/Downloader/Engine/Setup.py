@@ -37,10 +37,9 @@ class EngineSetup(QtCore.QThread):
         return id(self)
 
     def setupLogger(self):
-        name = f"{Config.APP_NAME}_Download_{self.getId()}"
         self.logger = Logger(
-            name=name,
-            fileName=f"{name}.log",
+            name=f"Download_{self.getId()}",
+            fileName=f"{Config.APP_NAME}_Download_{Logger.getFormattedTime()}#{self.getId()}.log"
         )
         self.logger.debug(f"{Config.APP_NAME} {Config.VERSION}\n\n[Download Info]\n{ObjectLogger.generateObjectLog(self.setup.downloadInfo)}")
 

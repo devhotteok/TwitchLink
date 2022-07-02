@@ -87,9 +87,9 @@ class _Translator:
         font.setFamily(Config.LANGUAGES[self.getLanguage()]["font"])
         return font
 
-    def translate(self, string, autoFormat=True, ellipsis=False, **kwargs):
+    def translate(self, string, ellipsis=False, **kwargs):
         string = self.translateString(string)
-        if autoFormat:
+        if kwargs:
             string = string.format(**kwargs)
         if ellipsis:
             return f"{string}..."

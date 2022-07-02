@@ -82,7 +82,7 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
                 )
             )
         elif status != Updater.status.AVAILABLE:
-            self.document.showDocument(
+            updateInfo = self.document.showDocument(
                 DocumentData(
                     title=T("recommended-update" if status == Updater.status.UPDATE_FOUND else "required-update"),
                     content=Updater.status.version.updateNote or f"{T('#A new version of {appName} has been released!', appName=Config.APP_NAME)}\n\n[{Config.APP_NAME} {Updater.status.version.latestVersion}]",
@@ -90,11 +90,13 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
                     modal=status == Updater.status.UPDATE_REQUIRED,
                     buttons=[
                         DocumentButtonData(text=T("update"), action="open:{}".format(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": DB.localization.getLanguage()})), role="accept", default=True),
-                        DocumentButtonData(text=T("cancel"), action=self.document.appShutdownRequested.emit if status == Updater.status.UPDATE_REQUIRED else None, role="reject", default=False)
+                        DocumentButtonData(text=T("cancel"), role="reject", default=False)
                     ]
                 ),
                 icon=Icons.UPDATE_ICON
             )
+            if status == Updater.status.UPDATE_REQUIRED:
+                updateInfo.closeRequested.connect(self.document.appShutdownRequested)
         if Updater.status.isOperational():
             for notification in Updater.status.notifications:
                 if notification.blockExpiry == False or not DB.temp.isContentBlocked(notification.contentId, notification.contentVersion):
@@ -111,16 +113,18 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
 
     def closeEvent(self, event):
         super().closeEvent(event)
-        if DownloadManager.isDownloaderRunning():
-            if self.ask(*(Messages.ASK.APP_EXIT if DownloadManager.isShuttingDown() else Messages.ASK.APP_EXIT_WHILE_DOWNLOADING)):
+        if DownloadManager.isDownloaderRunning() and not DownloadManager.isShuttingDown():
+            if self.ask(*Messages.ASK.APP_EXIT_WHILE_DOWNLOADING):
                 self.shutdown()
             else:
                 event.ignore()
-        else:
+        elif DB.general.isConfirmExitEnabled():
             if self.ask(*Messages.ASK.APP_EXIT):
                 self.shutdown()
             else:
                 event.ignore()
+        else:
+            self.shutdown()
 
     def gettingStarted(self):
         Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": DB.localization.getLanguage()}))

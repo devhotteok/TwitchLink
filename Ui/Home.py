@@ -13,10 +13,14 @@ class Home(QtWidgets.QWidget, UiFile.home):
         super(Home, self).__init__(parent=parent)
         self.appLogo.setMargin(10)
         self.appName.setText(Config.APP_NAME)
-        self.channel_id.clicked.connect(self.searchChannel)
-        self.video_id.clicked.connect(self.searchVideo)
-        self.video_url.clicked.connect(self.searchUrl)
+        self.smartSearchButton.clicked.connect(self.smartSearch)
+        self.channelSearchButton.clicked.connect(self.searchChannel)
+        self.videoClipSearchButton.clicked.connect(self.searchVideo)
+        self.urlSearchButton.clicked.connect(self.searchUrl)
         self.copyright.setText(Config.getCopyrightInfo())
+
+    def smartSearch(self):
+        self.startSearch(SearchModes(SearchModes.UNKNOWN))
 
     def searchChannel(self):
         self.startSearch(SearchModes(SearchModes.CHANNEL))

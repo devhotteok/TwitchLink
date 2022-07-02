@@ -65,11 +65,13 @@ class _QLabel(QtWidgets.QLabel):
         self._keepImageRatio = keepImageRatio
 
     def setText(self, text):
-        super().setText(str(text))
         if isinstance(text, datetime):
+            timeData = text.strftime("%Y-%m-%d %H:%M:%S")
+            super().setText(timeData)
             self._useAutoToolTip = False
-            self.setToolTip(text.details())
+            self.setToolTip(f"{timeData} {text.tzname()} ({text.tzinfo.zone})")
         else:
+            super().setText(str(text))
             self._useAutoToolTip = True
 
     def paintEvent(self, event):

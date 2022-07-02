@@ -8,12 +8,10 @@ class AdWidget(QtWidgets.QWidget):
         super(AdWidget, self).__init__(parent=parent)
         self.adId = adId
         self.adSize = adSize
+        self.responsive = responsive
         self.setLayout(QtWidgets.QHBoxLayout(self))
         self.layout().setContentsMargins(0, 0, 0, 0)
-        if responsive:
-            self.setMinimumSize(self.adSize)
-        else:
-            self.setFixedSize(self.adSize)
+        self.setMinimumSize(self.adSize)
 
     def sizeHint(self):
         return self.minimumSize()

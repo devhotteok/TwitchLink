@@ -34,7 +34,7 @@ class _AdManager(QtCore.QObject):
             cachedAd.noReferenceFound.connect(self._removeCache)
             self.cache[adWidget.adId] = cachedAd
         self.cache[adWidget.adId].addReference(id(adWidget))
-        self.cache[adWidget.adId].adObject.setNewParent(adWidget)
+        self.cache[adWidget.adId].adObject.moveTo(adWidget)
 
     def removeAd(self, adWidget):
         if adWidget.adId in self.cache:

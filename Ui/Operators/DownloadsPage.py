@@ -79,7 +79,7 @@ class DownloadsPage(TabManager):
         elif self.downloads.downloadCompleteAction.currentIndex() == DownloadCompleteAction.SHUTDOWN_SYSTEM:
             dialog = TimedCancelDialog(
                 T("warning"),
-                T("#The system will shut down after {seconds} seconds.", autoFormat=False),
+                T("#The system will shut down after {seconds} seconds."),
                 time=Config.SYSTEM_SHUTDOWN_TIMEOUT,
                 parent=self
             )

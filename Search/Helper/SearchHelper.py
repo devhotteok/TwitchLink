@@ -7,8 +7,12 @@ class SearchHelper:
         return Config.CHANNEL_ID_EXAMPLES
 
     @staticmethod
-    def getVideoClipIdExamples():
-        return Config.VIDEO_CLIP_ID_EXAMPLES
+    def getVideoIdExamples():
+        return Config.VIDEO_ID_EXAMPLES
+
+    @staticmethod
+    def getClipIdExamples():
+        return Config.CLIP_ID_EXAMPLES
 
     @staticmethod
     def getUrlExamples():

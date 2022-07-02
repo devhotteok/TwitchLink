@@ -1,4 +1,4 @@
-from .UrlParser import TwitchUrlParser
+from .QueryParser import TwitchQueryParser
 from .ExternalPlaylist import ExternalPlaylist
 
 from Core import GlobalExceptions
@@ -23,22 +23,32 @@ class Exceptions(GlobalExceptions.Exceptions):
         def __str__(self):
             return "Clip Not Found"
 
+    class NoResultsFound(Exception):
+        def __str__(self):
+            return "No Results Found"
+
 
 class Search:
     API = TwitchGqlAPI.TwitchGqlAPI()
 
     @classmethod
     def Query(cls, mode, query, searchExternalContent=False):
-        if mode.isUrl():
-            parseUrl = TwitchUrlParser(query)
-            mode, query = parseUrl.type, parseUrl.data
-            if mode == None:
-                if searchExternalContent:
-                    try:
-                        return ExternalPlaylist(query)
-                    except:
-                        pass
-                raise Exceptions.InvalidURL
+        if mode.isUnknown():
+            parsedData = TwitchQueryParser.parseQuery(query)
+            for mode, query in parsedData:
+                try:
+                    return cls.Mode(mode, query, searchExternalContent)
+                except TwitchGqlAPI.Exceptions.NetworkError:
+                    raise Exceptions.NetworkError
+                except:
+                    pass
+            raise Exceptions.NoResultsFound
+        elif mode.isUrl():
+            mode, query = TwitchQueryParser.parseUrl(query)
+        return cls.Mode(mode, query, searchExternalContent)
+
+    @classmethod
+    def Mode(cls, mode, query, searchExternalContent=False):
         if mode.isChannel():
             try:
                 return cls.API.getChannel(login=query)
@@ -49,11 +59,18 @@ class Search:
                 return cls.API.getVideo(query)
             except TwitchGqlAPI.Exceptions.DataNotFound:
                 raise Exceptions.VideoNotFound
-        else:
+        elif mode.isClip():
             try:
                 return cls.API.getClip(query)
             except TwitchGqlAPI.Exceptions.DataNotFound:
                 raise Exceptions.ClipNotFound
+        else:
+            if searchExternalContent:
+                try:
+                    return ExternalPlaylist(query)
+                except:
+                    pass
+            raise Exceptions.InvalidURL
 
     @classmethod
     def Channel(cls, username):

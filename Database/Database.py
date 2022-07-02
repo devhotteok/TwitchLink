@@ -65,6 +65,7 @@ class General:
     def __init__(self):
         self._openProgressWindow = True
         self._notify = True
+        self._confirmExit = True
         self._bookmarks = []
 
     def setOpenProgressWindowEnabled(self, openProgressWindow):
@@ -72,6 +73,9 @@ class General:
 
     def setNotifyEnabled(self, notify):
         self._notify = notify
+
+    def setConfirmExitEnabled(self, confirmExit):
+        self._confirmExit = confirmExit
 
     def setBookmarks(self, bookmarks):
         self._bookmarks = bookmarks
@@ -81,6 +85,9 @@ class General:
 
     def isNotifyEnabled(self):
         return self._notify
+
+    def isConfirmExitEnabled(self):
+        return self._confirmExit
 
     def getBookmarks(self):
         return self._bookmarks

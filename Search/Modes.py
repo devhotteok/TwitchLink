@@ -3,6 +3,7 @@ class SearchModes:
     VIDEO = "video"
     CLIP = "clip"
     URL = "url"
+    UNKNOWN = "unknown"
 
     def __init__(self, searchMode):
         self.setMode(searchMode)
@@ -24,3 +25,6 @@ class SearchModes:
 
     def isUrl(self):
         return self._searchMode == self.URL
+
+    def isUnknown(self):
+        return self._searchMode == self.UNKNOWN

@@ -75,6 +75,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="confirmExit">
+            <property name="text">
+             <string>Show exit confirmation dialog</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

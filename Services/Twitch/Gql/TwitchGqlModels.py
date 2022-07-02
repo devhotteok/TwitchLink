@@ -1,18 +1,5 @@
-import pytz
-
 import datetime
-
-
-class _datetime(datetime.datetime):
-    def __str__(self):
-        return self.strftime("%Y-%m-%d %H:%M:%S")
-
-    def __repr__(self):
-        return self.__str__()
-
-    def details(self):
-        return f"{self.__str__()} {self.tzname()} ({self.tzinfo.zone})"
-datetime.datetime = _datetime
+import pytz
 
 
 class DataUtils:
