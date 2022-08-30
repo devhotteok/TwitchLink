@@ -3,12 +3,16 @@ from .Config import Config
 
 from Services.Utils.OSUtils import OSUtils
 
+from PyQt5 import QtCore
+
 import logging
-import datetime
+import time
 
 
 class Logger:
-    def __init__(self, name="", directory=Config.LOG_ROOT, fileName=""):
+    logging.Formatter.converter = time.gmtime
+
+    def __init__(self, name="", directory=Config.LOG_ROOT, fileName="", propagate=False):
         self.logger = logging.getLogger(name)
         self.debug = self.logger.debug
         self.info = self.logger.info
@@ -16,8 +20,13 @@ class Logger:
         self.error = self.logger.error
         self.critical = self.logger.critical
         self.exception = self.logger.exception
+        if fileName == "":
+            self.filePath = ""
+        else:
+            OSUtils.createDirectory(directory)
+            self.filePath = OSUtils.joinPath(directory, fileName)
         if not self.logger.handlers:
-            self.logger.propagate = False
+            self.logger.propagate = propagate
             self.logger.setLevel(logging.DEBUG)
             for handler in Config.STREAM_HANDLERS:
                 if self.filterHandler(handler):
@@ -26,11 +35,8 @@ class Logger:
                         maxLevel=handler["maxLevel"],
                         formatString=handler["formatString"]
                     ))
-            if fileName == "":
-                self.filePath = ""
+            if self.filePath == "":
                 return
-            OSUtils.createDirectory(directory)
-            self.filePath = OSUtils.joinPath(directory, fileName)
             for handler in Config.FILE_HANDLERS:
                 if self.filterHandler(handler):
                     self.logger.addHandler(FileHandler(
@@ -53,4 +59,4 @@ class Logger:
 
     @classmethod
     def getFormattedTime(cls):
-        return datetime.datetime.now().strftime("%Y.%m.%d_%H-%M-%S")
+        return QtCore.QDateTime.currentDateTimeUtc().toString("yyyy.MM.dd_HH-mm-ss")

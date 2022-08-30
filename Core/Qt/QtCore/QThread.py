@@ -18,4 +18,4 @@ class _QThread(QtCore.QThread):
         if self.isRunning():
             self.requestInterruption()
             self.setParent(None)
-QtCore.QThread = _QThread
+QtCore.QThread = _QThread #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)

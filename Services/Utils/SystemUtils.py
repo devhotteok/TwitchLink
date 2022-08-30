@@ -1,41 +1,29 @@
 from Services.Threading.WorkerThread import WorkerThread
 
-import locale
-import pytz
-
-from datetime import datetime
+from PyQt5 import QtCore
 
 
 class SystemUtils:
     WorkerThread = WorkerThread
 
     @staticmethod
-    def getSystemLanguage():
-        return locale.getdefaultlocale()[0] or "en_US"
+    def getSystemLocale():
+        return QtCore.QLocale.system()
 
     @staticmethod
-    def getTimezone(timezone):
-        return pytz.timezone(timezone)
-
-    @staticmethod
-    def getTimezoneList():
-        return list(pytz.common_timezones)
+    def getTimezone(timezoneId):
+        return QtCore.QTimeZone(timezoneId)
 
     @classmethod
-    def getLocalTimezone(cls, preferred=None):
-        timezoneList = cls.getLocalTimezoneList() or cls.getTimezoneList()
-        if preferred in timezoneList:
-            return cls.getTimezone(preferred)
-        else:
-            return cls.getTimezone(timezoneList[0])
+    def getTimezoneNameList(cls):
+        return [cls.getTimezone(timezoneId).name() for timezoneId in QtCore.QTimeZone.availableTimeZoneIds()]
 
     @classmethod
-    def getLocalTimezoneList(cls):
-        localUtcOffset = datetime.now() - datetime.utcnow()
-        return [timezone for timezone in cls.getTimezoneList() if localUtcOffset == cls.getTimezone(timezone)]
+    def getLocalTimezone(cls):
+        return cls.getTimezone(QtCore.QTimeZone.systemTimeZoneId())
 
     @staticmethod
-    def formatByteSize(size):
+    def getByteSize(size):
         sizeUnits = {
             0: "B",
             1: "KB",
@@ -44,14 +32,31 @@ class SystemUtils:
             4: "TB"
         }
         size = str(size).upper()
+        for key, value in sizeUnits.items():
+            check = size.strip(value)
+            try:
+                byteSize = float(check)
+                break
+            except:
+                continue
+        else:
+            byteSize = 0
+        for _ in range(key):
+            byteSize *= 1024
+        return int(byteSize)
+
+    @staticmethod
+    def formatByteSize(byteSize):
+        sizeUnits = {
+            0: "B",
+            1: "KB",
+            2: "MB",
+            3: "GB",
+            4: "TB"
+        }
         for key in sizeUnits:
-            check = size.strip(sizeUnits[key])
-            if check.isnumeric():
-                size = float(check)
-                while size >= 1000:
-                    if key == 4:
-                        break
-                    size /= 1024
-                    key += 1
-                return f"{round(size, 2)}{sizeUnits[key]}"
-        return size
+            if byteSize < 1000:
+                break
+            else:
+                byteSize /= 1024
+        return f"{round(byteSize, 2)}{sizeUnits[key]}"

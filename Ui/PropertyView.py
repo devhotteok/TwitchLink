@@ -1,6 +1,5 @@
 from Core.Ui import *
-from Services.Messages import Messages
-from Services.Image.Config import Config as ImageConfig
+from Ui.Components.Utils.VideoWidgetImageSaver import VideoWidgetImageSaver
 
 
 class PropertyView(QtWidgets.QDialog, UiFile.propertyView, WindowGeometryManager):
@@ -16,12 +15,12 @@ class PropertyView(QtWidgets.QDialog, UiFile.propertyView, WindowGeometryManager
         if self.targetVideoWidget == None:
             self.tabWidget.setTabVisible(1, False)
             self.videoWidget.hide()
-            self.line.hide()
+            self.line_1.hide()
         else:
             self.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint)
             self.loadWindowGeometry()
             self.finished.connect(self.saveWindowGeometry)
-            self.videoWidget = Utils.setPlaceholder(self.videoWidget, Ui.VideoWidget(self.targetVideoWidget.data, resizable=True, viewOnly=True, thumbnailSync=self.targetVideoWidget.thumbnail_image, categorySync=self.targetVideoWidget.category_image, parent=self))
+            self.videoWidget = Utils.setPlaceholder(self.videoWidget, Ui.VideoWidget(self.targetVideoWidget.data, resizable=True, viewOnly=True, thumbnailSync=self.targetVideoWidget.thumbnailImage, categorySync=self.targetVideoWidget.categoryImage, parent=self))
             self.setPreviewTab()
         self.setFormData()
 
@@ -53,52 +52,21 @@ class PropertyView(QtWidgets.QDialog, UiFile.propertyView, WindowGeometryManager
         self.propertyViewArea.adjustSize()
 
     def setPreviewTab(self):
-        self.preview_image.setImageSizePolicy((384, 216), (1920, 1080))
-        self.preview_image.syncImage(self.targetVideoWidget.thumbnail_image)
-        self.embedUrl = self.targetVideoWidget.thumbnail_image.getImageUrl()
+        self.previewImage.setImageSizePolicy((384, 216), (1920, 1080))
+        self.previewImage.syncImage(self.targetVideoWidget.thumbnailImage)
+        self.embedUrl = self.targetVideoWidget.thumbnailImage.getImageUrl()
         if self.embedUrl == "":
             self.saveImageButton.setEnabled(False)
             self.urlArea.setEnabled(False)
         else:
             self.saveImageButton.clicked.connect(self.saveImage)
             self.urlData.setText(self.embedUrl)
+            self.urlData.setToolTip(self.embedUrl)
             self.copyUrlButton.clicked.connect(self.copyUrl)
             self.openUrlButton.clicked.connect(self.openUrl)
 
     def saveImage(self):
-        history = DB.temp.getDownloadHistory(ImageConfig.DATA_TYPE)
-        directory = history.getUpdatedDirectory()
-        filters = history.getAvailableFormats()
-        initialFilter = history.getFormat()
-        fileName = Utils.askSaveDirectory(Utils.joinPath(directory, self.createFileName()), filters, initialFilter, parent=self)
-        if fileName != None:
-            try:
-                self.targetVideoWidget.thumbnail_image.pixmap().save(fileName)
-            except:
-                self.info(*Messages.INFO.FILE_SYSTEM_ERROR)
-            else:
-                history.setAbsoluteFileName(fileName)
-                if self.ask(
-                    "save-complete",
-                    f"{T('#Save completed.')}\n\n{fileName}",
-                    contentTranslate=False,
-                    okText="open",
-                    cancelText="ok"
-                ):
-                    try:
-                        Utils.openFile(fileName)
-                    except:
-                        self.info(*Messages.INFO.FILE_NOT_FOUND)
-
-    def createFileName(self):
-        return Utils.getValidFileName(
-            "[{type} {preview}] [{channel}] {id}".format(
-                type=self.formData["file-type"],
-                preview=T("preview"),
-                channel=self.formData["channel"],
-                id=self.targetVideoWidget.data.id
-            )
-        )
+        VideoWidgetImageSaver.saveImage(self, self.targetVideoWidget)
 
     def copyUrl(self):
         Utils.copyToClipboard(self.embedUrl)

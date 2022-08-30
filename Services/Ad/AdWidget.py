@@ -12,13 +12,19 @@ class AdWidget(QtWidgets.QWidget):
         self.setLayout(QtWidgets.QHBoxLayout(self))
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.setMinimumSize(self.adSize)
+        self._connected = False
 
     def sizeHint(self):
         return self.minimumSize()
 
     def showEvent(self, event):
-        AdManager.setAd(self)
+        try:
+            AdManager.setAd(self)
+            self._connected = True
+        except:
+            self.hide()
         super().showEvent(event)
 
     def __del__(self):
-        AdManager.removeAd(self)
+        if self._connected:
+            AdManager.removeAd(self)

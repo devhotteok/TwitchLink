@@ -1,10 +1,10 @@
 from Core.Ui import *
-from Services.Messages import Messages
-from Download.DownloadManager import DownloadManager
+from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
+from Ui.Components.Utils.DownloadChecker import DownloadChecker
 
 
 class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager):
-    def __init__(self, downloadInfo, viewOnly=False, parent=None):
+    def __init__(self, downloadInfo, parent=None):
         super(DownloadMenu, self).__init__(parent=parent)
         self.finished.connect(self.saveWindowGeometry)
         self.ignoreKey(QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter)
@@ -12,39 +12,48 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.downloadInfo = downloadInfo
         self.setWindowGeometryKey(f"{self.getWindowGeometryKey()}/{self.downloadInfo.type.toString()}")
         self.loadWindowGeometry()
-        self.videoWidget = Utils.setPlaceholder(self.videoWidget, Ui.VideoWidget(self.downloadInfo.videoData, viewOnly=viewOnly, parent=self))
+        self.videoWidget = Utils.setPlaceholder(self.videoWidget, Ui.VideoWidget(self.downloadInfo.videoData, viewOnly=False, parent=self))
+        self.alertIcon = Utils.setSvgIcon(self.alertIcon, Icons.ALERT_RED_ICON)
         self.loadOptions()
 
     def loadOptions(self):
-        self.window_title.setText(T("#Download {type}", type=T(self.downloadInfo.type.toString())))
+        self.windowTitleLabel.setText(T("#Download {type}", type=T(self.downloadInfo.type.toString())))
         self.reloadFileDirectory()
         self.fileFormat.currentTextChanged.connect(self.setFormat)
         self.searchDirectory.clicked.connect(self.askSaveDirectory)
         for resolution in self.downloadInfo.accessToken.getResolutions():
-            self.resolution.addItem(resolution.displayName, resolution)
-        self.resolution.setCurrentIndex(0)
+            self.resolution.addItem(resolution.displayName)
+        self.resolution.setCurrentIndex(self.downloadInfo.selectedResolutionIndex)
         self.resolution.currentIndexChanged.connect(self.setResolution)
         if self.downloadInfo.type.isStream():
             self.cropArea.hide()
-            self.advancedArea.hide()
+            self.unmuteVideoArea.hide()
+            self.updateTrackArea.hide()
+            self.prioritizeArea.hide()
+            self.optimizeFileCheckBox.setChecked(self.downloadInfo.isOptimizeFileEnabled())
+            self.optimizeFileCheckBox.toggled.connect(self.setOptimizeFile)
+            self.optimizeFileInfo.clicked.connect(self.showOptimizeFileInfo)
         elif self.downloadInfo.type.isVideo():
             self.setupCropArea()
-            h, m, s = Utils.toTime(self.downloadInfo.videoData.lengthSeconds.totalSeconds())
-            self.fromSpinH.setMaximum(h + 1)
-            self.toSpinH.setMaximum(h + 1)
-            self.reloadCropArea()
             self.unmuteVideoCheckBox.setChecked(self.downloadInfo.isUnmuteVideoEnabled())
             self.unmuteVideoCheckBox.toggled.connect(self.downloadInfo.setUnmuteVideoEnabled)
             self.unmuteVideoInfo.clicked.connect(self.showUnmuteVideoInfo)
             self.updateTrackCheckBox.setChecked(self.downloadInfo.isUpdateTrackEnabled())
             self.updateTrackCheckBox.toggled.connect(self.setUpdateTrack)
             self.updateTrackInfo.clicked.connect(self.showUpdateTrackInfo)
+            self.optimizeFileCheckBox.setChecked(self.downloadInfo.isOptimizeFileEnabled())
+            self.optimizeFileCheckBox.toggled.connect(self.setOptimizeFile)
+            self.optimizeFileInfo.clicked.connect(self.showOptimizeFileInfo)
+            self.prioritizeCheckBox.setChecked(self.downloadInfo.isPrioritizeEnabled())
             self.prioritizeCheckBox.toggled.connect(self.downloadInfo.setPrioritizeEnabled)
             self.prioritizeInfo.clicked.connect(self.showPrioritizeInfo)
+            self.reloadCropArea()
         else:
             self.cropArea.hide()
             self.unmuteVideoArea.hide()
             self.updateTrackArea.hide()
+            self.optimizeFileArea.hide()
+            self.prioritizeCheckBox.setChecked(self.downloadInfo.isPrioritizeEnabled())
             self.prioritizeCheckBox.toggled.connect(self.downloadInfo.setPrioritizeEnabled)
             self.prioritizeInfo.clicked.connect(self.showPrioritizeInfo)
 
@@ -62,15 +71,24 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.reloadFileDirectory()
 
     def setResolution(self, index):
-        self.downloadInfo.setResolution(self.resolution.itemData(index))
+        self.downloadInfo.setResolution(index)
         self.reloadFileDirectory()
-        if self.downloadInfo.checkResolutionInFileName():
+        if self.hasResolutionInFileNameTemplate():
             if self.ask("filename-change", "#The filename template contains a 'resolution' variable. Do you want to create a new filename based on the changed resolution?", defaultOk=True):
-                self.downloadInfo.setFileName(self.downloadInfo.createFileName())
+                self.downloadInfo.setFileName(self.downloadInfo.generateFileName())
                 self.reloadFileDirectory()
 
+    def hasResolutionInFileNameTemplate(self):
+        if self.downloadInfo.type.isStream():
+            fileNameTemplate = FileNameGenerator.getStreamFileNameTemplate()
+        elif self.downloadInfo.type.isVideo():
+            fileNameTemplate = FileNameGenerator.getVideoFileNameTemplate()
+        else:
+            fileNameTemplate = FileNameGenerator.getClipFileNameTemplate()
+        return "{resolution}" in fileNameTemplate
+
     def setupCropArea(self):
-        self.cropArea.setTitle(f"{T('crop')} / {T('#Total Length: {duration}', duration=self.downloadInfo.videoData.lengthSeconds)}")
+        self.cropArea.setTitle(f"{T('crop')} / {T('#Total Length: {duration}', duration=self.downloadInfo.videoData.durationString)}")
         self.cropFromStartRadioButton.toggled.connect(self.reloadCropArea)
         self.cropToEndRadioButton.toggled.connect(self.checkUpdateTrack)
         self.fromSpinH.valueChanged.connect(self.reloadStartRange)
@@ -80,12 +98,29 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.toSpinM.valueChanged.connect(self.reloadEndRange)
         self.toSpinS.valueChanged.connect(self.reloadEndRange)
         self.cropInfo.clicked.connect(self.showCropInfo)
+        h, m, s = Utils.toTime(self.downloadInfo.videoData.lengthSeconds)
+        self.fromSpinH.setMaximum(h + 1)
+        self.toSpinH.setMaximum(h + 1)
+        if self.downloadInfo.range[0] != None:
+            self.cropFromSelectRadioButton.setChecked(True)
+            self.setFromSpin(*Utils.toTime(self.downloadInfo.range[0] / 1000))
+        if self.downloadInfo.range[1] != None:
+            self.cropToSelectRadioButton.setChecked(True)
+            self.setToSpin(*Utils.toTime(self.downloadInfo.range[1] / 1000))
 
     def reloadStartRange(self):
-        self.setFromSpin(*self.checkCropRange(*self.getFromSpin(), maximum=Utils.toSeconds(*self.getToSpin())))
+        fromSpinSeconds = Utils.toSeconds(*self.getFromSpin())
+        toSpinSeconds = Utils.toSeconds(*self.getToSpin())
+        if fromSpinSeconds >= toSpinSeconds:
+            self.setToSpin(*self.checkCropRange(*Utils.toTime(fromSpinSeconds + 1)))
+        self.setFromSpin(*self.checkCropRange(*self.getFromSpin(), maximum=self.downloadInfo.videoData.lengthSeconds - 1))
 
     def reloadEndRange(self):
-        self.setToSpin(*self.checkCropRange(*self.getToSpin(), minimum=Utils.toSeconds(*self.getFromSpin())))
+        fromSpinSeconds = Utils.toSeconds(*self.getFromSpin())
+        toSpinSeconds = Utils.toSeconds(*self.getToSpin())
+        if fromSpinSeconds >= toSpinSeconds:
+            self.setFromSpin(*self.checkCropRange(*Utils.toTime(toSpinSeconds - 1)))
+        self.setToSpin(*self.checkCropRange(*self.getToSpin(), minimum=1))
 
     def getFromSpin(self):
         return self.fromSpinH.value(), self.fromSpinM.value(), self.fromSpinS.value()
@@ -104,11 +139,9 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.toSpinS.setValueSilent(s)
 
     def checkCropRange(self, h, m, s, maximum=None, minimum=None):
-        videoTotalSeconds = self.downloadInfo.videoData.lengthSeconds.totalSeconds()
+        videoTotalSeconds = self.downloadInfo.videoData.lengthSeconds
         if maximum == None:
             maximum = videoTotalSeconds
-        else:
-            maximum = min(maximum, videoTotalSeconds)
         if minimum == None:
             minimum = 0
         totalSeconds = Utils.toSeconds(h, m, s)
@@ -125,7 +158,11 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         if self.cropFromStartRadioButton.isChecked():
             self.setFromSpin(0, 0, 0)
         if self.cropToEndRadioButton.isChecked():
-            self.setToSpin(*Utils.toTime(self.downloadInfo.videoData.lengthSeconds.totalSeconds()))
+            self.setToSpin(*Utils.toTime(self.downloadInfo.videoData.lengthSeconds))
+        self.reloadCropInfoArea()
+
+    def reloadCropInfoArea(self):
+        self.cropInfoArea.setVisible((self.cropFromSelectRadioButton.isChecked() or self.cropToSelectRadioButton.isChecked()) and not self.optimizeFileCheckBox.isChecked())
 
     def checkUpdateTrack(self):
         self.reloadCropArea()
@@ -133,10 +170,10 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
             if self.ask("warning", "#Update track mode is currently enabled.\nSetting the end of the crop range will not track updates.\nProceed?", defaultOk=True):
                 self.updateTrackCheckBox.setCheckState(QtCore.Qt.Unchecked)
             else:
-                self.cropToEndRadioButton.setCheckState(QtCore.Qt.Checked)
+                self.cropToEndRadioButton.setChecked(True)
 
     def showCropInfo(self):
-        self.info("video-crop", "#Video crop is based on the closest point in the crop range that can be processed.")
+        self.info("information", T("#This will crop the video at a point near this range that requires less computation.\nThis may result in an error of seconds.\nActivate '{menuName}' for accurate processing.", menuName=T("optimize-file")), contentTranslate=False)
 
     def askSaveDirectory(self):
         directory = self.downloadInfo.getAbsoluteFileName()
@@ -151,7 +188,13 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.info("information", "#If there are no problems with the sound source used, or if there are parts that have been muted in error despite having permission to use them, you can use this function to unmute them.\nIn some cases, unmute may not be successful.")
 
     def showUpdateTrackInfo(self):
-        self.info("information", "#Downloads the live replay continuously until the live broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.")
+        self.info("information", "#Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.")
+
+    def showOptimizeFileInfo(self):
+        infoString = T("#Maintains {videoType} quality but reduces file size.\nThis increases the computation of the encoding process and consumes a lot of time.", videoType=T(self.downloadInfo.type.toString()))
+        warningString = T("#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.", videoType=T(self.downloadInfo.type.toString()))
+        optionInfoString = T("#Depending on the streamer's broadcast settings, this option may not have any effect." if self.downloadInfo.type.isStream() else "#Depending on the video properties, this option may not have any effect.")
+        self.info("information", f"{infoString}\n\n{warningString}\n\n{optionInfoString}", contentTranslate=False)
 
     def showPrioritizeInfo(self):
         self.info("information", "#This download will be prioritized. Downloads with this option take precedence over those without.")
@@ -160,55 +203,34 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.downloadInfo.setUpdateTrackEnabled(updateTrack)
         if self.updateTrackCheckBox.isChecked() and not self.cropToEndRadioButton.isChecked():
             if self.ask("warning", "#The end of the crop range is currently set.\nEnabling update track mode will ignore the end of the crop range and continue downloading.\nProceed?", defaultOk=True):
-                self.cropToEndRadioButton.setCheckState(QtCore.Qt.Checked)
+                self.cropToEndRadioButton.setChecked(True)
             else:
                 self.updateTrackCheckBox.setCheckState(QtCore.Qt.Unchecked)
 
-    def isFileNameDuplicate(self):
-        for downloader in DownloadManager.getRunningDownloaders():
-            if downloader.setup.downloadInfo.getAbsoluteFileName() == self.downloadInfo.getAbsoluteFileName():
-                return True
-        return False
-
-    def checkNetworkInstability(self):
-        if self.downloadInfo.type.isStream():
-            if DownloadManager.isDownloaderRunning():
-                return self.warnNetworkInstability("download", "live")
-        else:
-            for downloader in DownloadManager.getRunningDownloaders():
-                if downloader.setup.downloadInfo.type.isStream():
-                    return self.warnNetworkInstability("live-download", self.downloadInfo.type.toString())
-        return True
-
-    def warnNetworkInstability(self, downloadType, operationType):
-        return self.ask("warning", T("#You already have one or more {downloadType}s in progress.\nDepending on the network specifications, if you proceed with the {operationType} download, the live download may become unstable or interrupted.\nProceed?", downloadType=T(downloadType), operationType=T(operationType)), contentTranslate=False)
+    def setOptimizeFile(self, optimizeFile):
+        self.downloadInfo.setOptimizeFileEnabled(optimizeFile)
+        if self.downloadInfo.type.isVideo():
+            self.reloadCropInfoArea()
+        if optimizeFile:
+            self.info("warning", T("#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.", videoType=T(self.downloadInfo.type.toString())), contentTranslate=False)
 
     def accept(self):
-        if self.downloadInfo.type.isVideo():
-            self.saveCropRange()
-        if self.isFileNameDuplicate():
-            self.info("error", "#There is another download in progress with the same file name.")
+        downloadAvailableState = DownloadChecker.isDownloadAvailable(self.downloadInfo, parent=self)
+        if downloadAvailableState == DownloadChecker.State.AVAILABLE:
+            if self.downloadInfo.type.isVideo():
+                self.saveCropRange()
+            self.downloadInfo.saveOptionHistory()
+            super().accept(self.downloadInfo)
+        elif downloadAvailableState == DownloadChecker.State.NEED_NEW_FILE_NAME:
             self.askSaveDirectory()
-            return
-        elif Utils.isFile(self.downloadInfo.getAbsoluteFileName()):
-            if not self.ask(*Messages.ASK.FILE_OVERWRITE):
-                return
-        elif not Utils.isDirectory(self.downloadInfo.directory) or Utils.isDirectory(self.downloadInfo.getAbsoluteFileName()):
-            self.info(*Messages.INFO.UNAVAILABLE_FILENAME_OR_DIRECTORY)
-            self.askSaveDirectory()
-            return
-        if not self.checkNetworkInstability():
-            return
-        self.downloadInfo.saveHistory()
-        super().accept(self.downloadInfo)
 
     def saveCropRange(self):
         if self.cropFromStartRadioButton.isChecked():
             start = None
         else:
-            start = Utils.toSeconds(*self.getFromSpin())
+            start = Utils.toSeconds(*self.getFromSpin()) * 1000
         if self.cropToEndRadioButton.isChecked():
             end = None
         else:
-            end = Utils.toSeconds(*self.getToSpin())
+            end = Utils.toSeconds(*self.getToSpin()) * 1000
         self.downloadInfo.setCropRange(start, end)

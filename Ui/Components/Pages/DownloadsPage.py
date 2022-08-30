@@ -1,8 +1,8 @@
 from Core.Ui import *
 from Download.DownloadManager import DownloadManager
-from Ui.Operators.TabManager import TabManager
-from Ui.Operators.TimedMessageBox import TimedMessageBox
-from Ui.Operators.TimedCancelDialog import TimedCancelDialog
+from Ui.Components.Operators.TabManager import TabManager
+from Ui.Components.Widgets.TimedMessageBox import TimedMessageBox
+from Ui.Components.Widgets.TimedCancelDialog import TimedCancelDialog
 
 
 class DownloadCompleteAction:
@@ -12,6 +12,7 @@ class DownloadCompleteAction:
 
 
 class DownloadsPage(TabManager):
+    accountPageShowRequested = QtCore.pyqtSignal()
     appShutdownRequested = QtCore.pyqtSignal()
     systemShutdownRequested = QtCore.pyqtSignal()
 
@@ -20,6 +21,7 @@ class DownloadsPage(TabManager):
         self.pageObject = pageObject
         self.downloads = Ui.Downloads(parent=self)
         self.downloads.progressWindowRequested.connect(self.openDownloadTab)
+        self.downloads.downloadHistoryRequested.connect(self.openDownloadHistory)
         self.addTab(self.downloads, icon=Icons.FOLDER_ICON, closable=False)
         DownloadManager.createdSignal.connect(self.downloaderCreated)
         DownloadManager.destroyedSignal.connect(self.downloaderDestroyed)
@@ -31,15 +33,22 @@ class DownloadsPage(TabManager):
 
     def openDownloadTab(self, downloaderId):
         tabIndex = self.getUniqueTabIndex(downloaderId)
-        if tabIndex == None:
-            tabIndex = self.addTab(Ui.Download(downloaderId, parent=self), icon=Icons.DOWNLOAD_ICON, uniqueValue=downloaderId)
-        self.setCurrentIndex(tabIndex)
+        self.setCurrentIndex(self.addTab(Ui.Download(downloaderId, parent=self), icon=Icons.DOWNLOAD_ICON, uniqueValue=downloaderId) if tabIndex == None else tabIndex)
         self.pageObject.show()
 
     def closeDownloadTab(self, downloaderId):
         tabIndex = self.getUniqueTabIndex(downloaderId)
         if tabIndex != None:
             self.closeTab(tabIndex)
+
+    def openDownloadHistory(self):
+        tabIndex = self.getUniqueTabIndex(Ui.DownloadHistory)
+        if tabIndex == None:
+            downloadHistoryTab = Ui.DownloadHistory(parent=self)
+            downloadHistoryTab.accountPageShowRequested.connect(self.accountPageShowRequested)
+            tabIndex = self.addTab(downloadHistoryTab, icon=Icons.HISTORY_ICON, uniqueValue=Ui.DownloadHistory)
+        self.setCurrentIndex(tabIndex)
+        self.pageObject.show()
 
     def downloaderCreated(self, downloaderId):
         self.downloads.downloaderCreated(downloaderId)

@@ -1,16 +1,16 @@
-import datetime
+from PyQt5 import QtCore
 
 
 class Meta:
     APP_NAME = "TwitchLink"
 
-    VERSION = "2.1.0"
+    VERSION = "2.2.0"
 
     AUTHOR = "DevHotteok"
 
     LICENSE = "MIT"
 
-    FIRST_VERSION_RELEASED = datetime.date(2021, 2, 1)
+    FIRST_VERSION_RELEASED = QtCore.QDate(2021, 2, 1)
 
     class CONTACT:
         DISCORD = ""
@@ -20,7 +20,7 @@ class Meta:
 
     @classmethod
     def getCopyrightInfo(cls):
-        return f"ⓒ {max(cls.FIRST_VERSION_RELEASED.year, datetime.datetime.now().year)} {cls.AUTHOR}."
+        return f"ⓒ {max(cls.FIRST_VERSION_RELEASED.year(), QtCore.QDate().currentDate().year())} {cls.AUTHOR}."
 
     @classmethod
     def getProjectInfo(cls):

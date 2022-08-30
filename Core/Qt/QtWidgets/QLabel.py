@@ -3,8 +3,6 @@ from Services.Image.Loader import ImageLoader
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from datetime import datetime
-
 
 class _QLabel(QtWidgets.QLabel):
     imageChanged = QtCore.pyqtSignal(QtGui.QPixmap)
@@ -65,11 +63,11 @@ class _QLabel(QtWidgets.QLabel):
         self._keepImageRatio = keepImageRatio
 
     def setText(self, text):
-        if isinstance(text, datetime):
-            timeData = text.strftime("%Y-%m-%d %H:%M:%S")
-            super().setText(timeData)
+        if isinstance(text, QtCore.QDateTime):
+            timeString = text.toString("yyyy-MM-dd HH:mm:ss")
+            super().setText(timeString)
             self._useAutoToolTip = False
-            self.setToolTip(f"{timeData} {text.tzname()} ({text.tzinfo.zone})")
+            self.setToolTip(f"{timeString} ({text.timeZone().name()})")
         else:
             super().setText(str(text))
             self._useAutoToolTip = True
@@ -100,4 +98,4 @@ class _QLabel(QtWidgets.QLabel):
 
     def __del__(self):
         self.cancelImageRequest()
-QtWidgets.QLabel = _QLabel
+QtWidgets.QLabel = _QLabel #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)

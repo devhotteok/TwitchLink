@@ -34,7 +34,7 @@ class TermsOfService(DocumentView):
         else:
             self.checkBox.setEnabled(False)
             self.checkBox.setChecked(True)
-            self.checkBox.setText(T("#Agreed at {time}", time=DB.setup.getTermsOfServiceAgreement().strftime("%Y-%m-%d %H:%M:%S")))
+            self.checkBox.setText(T("#Agreed at {time}", time=DB.setup.getTermsOfServiceAgreement().toTimeZone(DB.localization.getTimezone()).toString("yyyy-MM-dd HH:mm:ss")))
             self.addButton(
                 DocumentButtonData(
                     text=T("ok"),

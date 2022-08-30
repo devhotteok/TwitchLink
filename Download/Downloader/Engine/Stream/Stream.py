@@ -13,17 +13,23 @@ class StreamDownloader(EngineSetup):
         with self.actionLock:
             if self.status.terminateState.isProcessing():
                 return
-            self.FFmpeg.start(self.setup.downloadInfo.getUrl(), self.setup.downloadInfo.getAbsoluteFileName(), logLevel=FFmpeg.LogLevel.WARNING, priority=FFmpeg.Priority.HIGH)
+            self.FFmpeg.startEncodingProcess(
+                target=self.setup.downloadInfo.getUrl(),
+                saveAs=self.setup.downloadInfo.getAbsoluteFileName(),
+                remux=not self.setup.downloadInfo.isOptimizeFileEnabled(),
+                logLevel=FFmpeg.LogLevel.WARNING,
+                priority=FFmpeg.Priority.HIGH
+            )
         self.status.setDownloading()
         self.syncStatus()
         for progress in self.FFmpeg.output(logger=self.logger):
             time = progress.get("time")
             if time != None:
-                self.progress.seconds = Utils.toSeconds(*time.split(".")[0].split(":"))
+                self.progress.milliseconds = Utils.toSeconds(*time.split(".")[0].split(":")) * 1000 + int(time.split(".")[1][:3])
             size = progress.get("size") or progress.get("Lsize")
             if size != None:
-                self.progress.totalSize = Utils.formatByteSize(size)
-                self.progress.size = self.progress.totalSize
+                self.progress.totalByteSize = Utils.getByteSize(size)
+                self.progress.byteSize = self.progress.totalByteSize
             self.syncProgress()
 
     def cancel(self):

@@ -1,1 +1,1 @@
-from . import QWebEngineView
+from . import QWebEngineProfile, QWebEngineView

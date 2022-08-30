@@ -7,8 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>320</height>
+    <height>329</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Setup</string>
@@ -165,7 +170,7 @@
      <widget class="QWidget" name="setupPage">
       <layout class="QVBoxLayout" name="setupPageLayout">
        <item>
-        <widget class="QLabel" name="window_title">
+        <widget class="QLabel" name="windowTitleLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -183,7 +188,7 @@
         </widget>
        </item>
        <item>
-        <widget class="Line" name="window_title_line">
+        <widget class="Line" name="windowTitleLine">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>

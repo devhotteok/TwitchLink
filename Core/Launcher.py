@@ -2,10 +2,12 @@ from Core import Qt
 from Core.Config import Config
 from Services.Utils.OSUtils import OSUtils
 from Services.Logging.Logger import Logger
+from Services.Logging.ErrorDetector import ErrorDetector
 
 from PyQt5 import QtCore, QtWidgets, QtNetwork
 
 import sys
+import uuid
 
 
 class ExitCode:
@@ -19,7 +21,7 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
 
     def __init__(self, guid, argv):
         super(SingleApplicationLauncher, self).__init__(argv)
-        self.logger = Logger(fileName=f"{Config.APP_NAME}_{Logger.getFormattedTime()}#{id(self)}.log")
+        self.logger = Logger(fileName=f"{Config.APP_NAME}_{Logger.getFormattedTime()}#{uuid.uuid4()}.log")
         self.logger.info(f"\n\n{Config.getProjectInfo()}\n")
         self.logger.info(OSUtils.getOSInfo())
         self.shared = QtCore.QSharedMemory(guid, parent=self)
@@ -28,6 +30,8 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
             self._server = QtNetwork.QLocalServer(parent=self)
             self.newInstanceStarted = self._server.newConnection
             self._server.listen(guid)
+            ErrorDetector.start(self.logger)
+            self.aboutToQuit.connect(ErrorDetector.saveAll)
             sys.excepthook = self.excepthook
         else:
             self.logger.error("Another instance of this application is already running.")
@@ -44,5 +48,5 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
         return returnCode
 
     def excepthook(self, exc_type, exc_value, exc_tb):
-        self.logger.exception("Unexpected Error", exc_info=(exc_type, exc_value, exc_tb))
+        self.logger.critical("Unexpected Error", exc_info=(exc_type, exc_value, exc_tb))
         self.exit(self.EXIT_CODE.UNEXPECTED_ERROR)

@@ -1,6 +1,8 @@
 from Core.Ui import *
 from Services.Messages import Messages
+from Search import ExternalPlaylist
 from Download.DownloadManager import DownloadManager
+from Ui.Components.Widgets.RetryDownloadButton import RetryDownloadButton
 
 
 class Download(QtWidgets.QWidget, UiFile.download):
@@ -10,50 +12,55 @@ class Download(QtWidgets.QWidget, UiFile.download):
         self.downloadInfo = self.downloader.setup.downloadInfo
         self.videoData = self.downloadInfo.videoData
         self.setWindowTitle(self.videoData.title)
-        self.window_title.setText(self.videoData.title)
-        self.category_image.loadImage(filePath=Images.CATEGORY_IMAGE, url=self.videoData.game.boxArtURL, urlFormatSize=ImageSize.CATEGORY)
+        self.windowTitleLabel.setText(self.videoData.title)
+        self.categoryImage.loadImage(filePath=Images.CATEGORY_IMAGE, url=self.videoData.game.boxArtURL, urlFormatSize=ImageSize.CATEGORY)
         self.category.setText(self.videoData.game.displayName)
         self.title.setText(self.videoData.title)
-        self.thumbnail_image.setImageSizePolicy((480, 270), (1920, 1080))
+        self.thumbnailImage.setImageSizePolicy((480, 270), (1920, 1080))
         if self.downloadInfo.type.isStream():
-            self.liveLabel.setText(T("live" if self.videoData.isLive() else "rerun").upper())
-            self.thumbnail_image.loadImage(filePath=Images.PREVIEW_IMAGE, url=self.videoData.previewImageURL, urlFormatSize=ImageSize.STREAM_PREVIEW, refresh=True)
-            self.user_name.setText(self.videoData.broadcaster.displayName)
-            self.date.setText(self.videoData.createdAt.asTimezone(DB.localization.getTimezone()))
-            self.view_countInfo.setText(f"{T('viewer-count')}:")
-            self.view_count.setText(self.videoData.viewersCount)
-            self.tagArea.hide()
+            self.showVideoType("stream" if self.videoData.isLive() else "rerun")
+            self.thumbnailImage.loadImage(filePath=Images.PREVIEW_IMAGE, url=self.videoData.previewImageURL, urlFormatSize=ImageSize.STREAM_PREVIEW, refresh=True)
+            self.channel.setText(self.videoData.broadcaster.displayName)
+            self.date.setText(self.videoData.createdAt.toTimeZone(DB.localization.getTimezone()))
+            self.viewCountInfo.setText(f"{T('viewer-count')}:")
+            self.viewCount.setText(self.videoData.viewersCount)
+            self.unmuteVideoTag.hide()
+            self.updateTrackTag.hide()
+            self.optimizeFileTag.setVisible(self.downloadInfo.isOptimizeFileEnabled())
+            self.prioritizeTag.hide()
             self.downloadProgressBar.setRange(0, 0)
             self.encodingProgressBar.setRange(0, 0)
             self.pauseButton.hide()
             self.cancelButton.setText(T("stop"))
         elif self.downloadInfo.type.isVideo():
-            self.liveLabelArea.hide()
-            self.thumbnail_image.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.previewThumbnailURL, urlFormatSize=ImageSize.VIDEO_THUMBNAIL)
-            self.user_name.setText(self.videoData.owner.displayName)
-            self.date.setText(self.videoData.publishedAt.asTimezone(DB.localization.getTimezone()))
+            self.showVideoType("video")
+            self.thumbnailImage.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.previewThumbnailURL, urlFormatSize=ImageSize.VIDEO_THUMBNAIL)
+            self.channel.setText(self.videoData.owner.displayName)
+            self.date.setText(self.videoData.publishedAt.toTimeZone(DB.localization.getTimezone()))
             start, end = self.downloadInfo.range
-            totalSeconds = self.videoData.lengthSeconds.totalSeconds()
+            totalSeconds = self.videoData.lengthSeconds
             durationSeconds = (end or totalSeconds) - (start or 0)
             self.showVideoDuration(start, end, totalSeconds, durationSeconds)
-            self.view_countInfo.setText(f"{T('view-count')}:")
-            self.view_count.setText(self.videoData.viewCount)
+            self.viewCountInfo.setText(f"{T('view-count')}:")
+            self.viewCount.setText(self.videoData.viewCount)
             self.unmuteVideoTag.setVisible(self.downloadInfo.isUnmuteVideoEnabled())
             self.updateTrackTag.setVisible(self.downloadInfo.isUpdateTrackEnabled())
+            self.optimizeFileTag.setVisible(self.downloadInfo.isOptimizeFileEnabled())
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
             self.skipWaitingButton.clicked.connect(self.skipWaiting)
             self.skipDownloadButton.clicked.connect(self.skipDownload)
             self.pauseButton.clicked.connect(self.pauseResume)
             self.cancelButton.setText(T("cancel"))
         else:
-            self.liveLabelArea.hide()
-            self.thumbnail_image.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.thumbnailURL, urlFormatSize=ImageSize.CLIP_THUMBNAIL)
-            self.user_name.setText(self.videoData.broadcaster.displayName)
-            self.date.setText(self.videoData.createdAt.asTimezone(DB.localization.getTimezone()))
-            self.duration.setText(self.videoData.durationSeconds)
-            self.view_count.setText(self.videoData.viewCount)
+            self.showVideoType("clip")
+            self.thumbnailImage.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.thumbnailURL, urlFormatSize=ImageSize.CLIP_THUMBNAIL)
+            self.channel.setText(self.videoData.broadcaster.displayName)
+            self.date.setText(self.videoData.createdAt.toTimeZone(DB.localization.getTimezone()))
+            self.duration.setText(self.videoData.durationString)
+            self.viewCount.setText(self.videoData.viewCount)
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
+            self.optimizeFileTag.hide()
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
             self.encodingLabel.hide()
             self.encodingProgressBar.hide()
@@ -66,11 +73,16 @@ class Download(QtWidgets.QWidget, UiFile.download):
         sizePolicy = self.skipWaitingButton.sizePolicy()
         sizePolicy.setRetainSizeWhenHidden(True)
         self.skipWaitingButton.setSizePolicy(sizePolicy)
+        sizePolicy = self.skipDownloadButton.sizePolicy()
+        sizePolicy.setRetainSizeWhenHidden(True)
         self.skipDownloadButton.setSizePolicy(sizePolicy)
         self.skipWaitingButton.hide()
         self.skipDownloadButton.hide()
         self.dataLoss.hide()
         self.cancelButton.clicked.connect(self.cancel)
+        self.retryButtonManager = RetryDownloadButton(self.downloadInfo, self.retryButton, self.downloader.getId(), buttonText=self.retryButton.text(), parent=self)
+        self.accountPageShowRequested = self.retryButtonManager.accountPageShowRequested
+        self.retryButton.hide()
         self.openFolderButton.clicked.connect(self.openFolder)
         self.openFileButton.clicked.connect(self.openFile)
         self.openFileButton.hide()
@@ -91,6 +103,8 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.downloader.dataUpdate.connect(self.handleVideoDataUpdate)
             self.handleVideoStatus(self.downloader.status)
             self.handleVideoProgress(self.downloader.progress)
+            if hasattr(self.downloader, "playlistManager"):
+                self.handleVideoDataUpdate({"playlistManager": self.downloader.playlistManager})
         else:
             self.downloader.statusUpdate.connect(self.handleClipStatus)
             self.downloader.progressUpdate.connect(self.handleClipProgress)
@@ -162,15 +176,13 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.skipDownloadButton.hide()
             if status.pauseState.isProcessing():
                 self.pauseButton.setEnabled(False)
-                self.cancelButton.setEnabled(False)
                 self.pauseButton.setText(T("pausing", ellipsis=True))
             else:
                 self.status.setText(T("paused"))
                 self.pauseButton.setEnabled(True)
-                self.cancelButton.setEnabled(True)
                 self.pauseButton.setText(T("resume"))
         elif status.isWaiting():
-            self.status.setText(f"{T('#Waiting for download')}: {status.getWaitingTime()}")
+            self.status.setText(f"{T('#Waiting for download')}({status.getWaitingCount()}/{status.getMaxWaitingCount()}): {status.getWaitingTime()}")
             self.skipWaitingButton.show()
             self.skipDownloadButton.show()
             self.downloadProgressBar.setRange(0, 0)
@@ -181,7 +193,10 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.skipDownloadButton.show()
             self.pauseButton.hide()
         elif status.isEncoding():
-            self.status.setText(f"{T('encoding', ellipsis=True)} ({T('download-skipped')})" if status.isDownloadSkipped() else T("encoding", ellipsis=True))
+            encodingString = T("encoding", ellipsis=True)
+            if self.downloadInfo.isOptimizeFileEnabled():
+                encodingString = f"{encodingString} [{T('optimize-file')}]"
+            self.status.setText(f"{encodingString} ({T('download-skipped')})" if status.isDownloadSkipped() else encodingString)
             self.skipWaitingButton.hide()
             self.skipDownloadButton.hide()
             self.downloadProgressBar.setRange(0, 100)
@@ -218,27 +233,29 @@ class Download(QtWidgets.QWidget, UiFile.download):
         self.currentSize.setText(progress.size)
 
     def handleClipProgress(self, progress):
-        self.downloadProgressBar.setValue(progress.byteSizeProgress)
+        self.downloadProgressBar.setValue(progress.sizeProgress)
         self.currentSize.setText(progress.size)
 
     def handleVideoDataUpdate(self, data):
-        playlist = data.get("playlist")
-        if playlist != None:
-            start, end = playlist.timeRange.timeFrom, playlist.timeRange.timeTo
-            totalSeconds = playlist.original.totalSeconds
-            durationSeconds = playlist.totalSeconds
-            self.showVideoDuration(start, end, totalSeconds, durationSeconds)
+        playlistManager = data.get("playlistManager")
+        if playlistManager != None:
+            totalSeconds = playlistManager.original.totalSeconds
+            durationSeconds = playlistManager.totalSeconds
+            self.showVideoDuration(*playlistManager.getTimeRange(), totalSeconds, durationSeconds)
+
+    def showVideoType(self, videoType):
+        self.videoTypeLabel.setText(f"{T('external-content')}:{T(videoType)}" if isinstance(self.downloadInfo.accessToken, ExternalPlaylist.ExternalPlaylist) else T(videoType))
 
     def showVideoDuration(self, start, end, totalSeconds, durationSeconds):
         if start == None and end == None:
             self.duration.setText(Utils.formatTime(*Utils.toTime(totalSeconds)))
         else:
             self.duration.setText(T(
-                "#{duration} - Crop: {totalDuration}({startTime}~{endTime})",
+                "#{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]",
                 duration=Utils.formatTime(*Utils.toTime(durationSeconds)),
                 totalDuration=Utils.formatTime(*Utils.toTime(totalSeconds)),
-                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start)),
-                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end))
+                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start / 1000)),
+                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end / 1000))
             ))
 
     def handleDownloadResult(self):
@@ -249,9 +266,16 @@ class Download(QtWidgets.QWidget, UiFile.download):
                     self.openFileButton.show()
                 else:
                     self.status.setText(T("download-canceled"))
+                    self.currentDuration.setText(Utils.formatTime(*Utils.toTime(0)))
                     self.currentSize.setText(Utils.formatByteSize(0))
+                    self.retryButton.show()
+                    self.downloadProgressBar.showWarning()
+                    self.encodingProgressBar.showWarning()
             else:
                 self.status.setText(T("download-aborted"))
+                self.retryButton.show()
+                self.downloadProgressBar.showError()
+                self.encodingProgressBar.showError()
         else:
             self.status.setText(f"{T('download-complete')} ({T('download-skipped')})" if self.downloader.status.isDownloadSkipped() else T("download-complete"))
             self.openFileButton.show()

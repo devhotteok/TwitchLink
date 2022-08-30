@@ -3,7 +3,6 @@ from .FileDownloader import FileDownloader
 from Download.Downloader.Engine.Setup import EngineSetup
 from Download.Downloader.Engine.ThreadPool import ThreadPool
 
-from Services.Utils.Utils import Utils
 from Services.Threading.WaitCondition import WaitCondition
 
 
@@ -31,13 +30,11 @@ class ClipDownloader(EngineSetup):
 
     def downloadStarted(self, totalByteSize):
         self.progress.totalByteSize = totalByteSize
-        self.progress.totalSize = Utils.formatByteSize(totalByteSize)
         self.status.setDownloading()
         self.syncStatus()
 
     def downloadProgressHandler(self, byteSize):
         self.progress.byteSize = byteSize
-        self.progress.size = Utils.formatByteSize(byteSize)
         self.syncProgress()
 
     def downloadFinished(self, task):

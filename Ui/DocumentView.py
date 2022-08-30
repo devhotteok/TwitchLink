@@ -45,14 +45,18 @@ class DocumentView(QtWidgets.QWidget, UiFile.documentView):
 
     def setTitle(self, title):
         self.setWindowTitle(title)
-        self.window_title.setText(title)
+        self.windowTitleLabel.setText(title)
 
     def setContent(self, content, contentType):
         if contentType == "html":
             self.contentBrowser.setHtml(content)
         elif contentType == "url":
-            self.contentBrowser = Utils.setPlaceholder(self.contentBrowser, QtWebEngineWidgets.QWebEngineView(parent=self))
-            self.contentBrowser.load(QtCore.QUrl(content))
+            try:
+                self.contentBrowser = Utils.setPlaceholder(self.contentBrowser, QtWebEngineWidgets.QWebEngineView(parent=self))
+            except Exception as e:
+                self.contentBrowser.setText(str(e))
+            else:
+                self.contentBrowser.load(QtCore.QUrl(content))
         else:
             self.contentBrowser.setText(content)
 

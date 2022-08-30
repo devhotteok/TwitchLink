@@ -57,7 +57,7 @@ class FFmpegOutputReader:
         errorType = line.rsplit(":", 1)[-1].strip()
         if errorType == ExceptionMessages.directory or errorType == ExceptionMessages.permission:
             raise Exceptions.FileSystemError
-        raise Exceptions.UnexpectedError
+        raise Exceptions.UnexpectedError(returnCode, line)
 
     def getProgressData(self, line):
         return self.getFileData(line) or self.getMissingData(line) or self.getEncodingData(line)

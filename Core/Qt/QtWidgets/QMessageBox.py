@@ -10,4 +10,4 @@ class _QMessageBox(QtWidgets.QMessageBox):
         self.setWindowTitle(title)
         self.setIcon(QtWidgets.QMessageBox.Information)
         self.setText(content)
-QtWidgets.QMessageBox = _QMessageBox
+QtWidgets.QMessageBox = _QMessageBox #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)

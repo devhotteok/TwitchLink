@@ -1,5 +1,5 @@
 from Core.Ui import *
-from Ui.Operators.TabManager import TabManager
+from Ui.Components.Operators.TabManager import TabManager
 
 
 class DocumentViewer(TabManager):

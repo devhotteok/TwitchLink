@@ -13,4 +13,4 @@ class _QTabBar(QtWidgets.QTabBar):
             width = super().tabSizeHint(index).height()
             height = super().tabSizeHint(index).width() + 50
         return QtCore.QSize(width, height)
-QtWidgets.QTabBar = _QTabBar
+QtWidgets.QTabBar = _QTabBar #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)

@@ -1,8 +1,12 @@
 from Core.Config import Config as CoreConfig
 from Services.Utils.OSUtils import OSUtils
 
+from PyQt5 import QtCore
+
+
 _P = OSUtils.joinPath
 _U = OSUtils.joinUrl
+
 
 class Config:
     TRANSLATORS_PATH = _P(CoreConfig.UI_ROOT, "translators")
@@ -10,13 +14,13 @@ class Config:
 
     LANGUAGES = {
         "en": {
+            "languageId": QtCore.QLocale.English,
             "name": "English",
-            "preferredTimezone": "US/Eastern",
             "font": "Arial, Open Sans, 나눔고딕"
         },
         "ko": {
+            "languageId": QtCore.QLocale.Korean,
             "name": "한국어",
-            "preferredTimezone": "Asia/Seoul",
             "font": "나눔고딕"
         }
     }
@@ -38,5 +42,8 @@ class Config:
         "downloadMenu",
         "downloads",
         "downloadPreview",
-        "download"
+        "download",
+        "downloadHistory",
+        "downloadHistoryView",
+        "webViewWidget"
     ]

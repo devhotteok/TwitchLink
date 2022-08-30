@@ -1,70 +1,66 @@
 from Core.Ui import *
 from Services.Messages import Messages
-from Services.Account import Auth
+from Services.Account import TwitchAccount
 
 
 class Account(QtWidgets.QWidget, UiFile.account):
+    startLoginRequested = QtCore.pyqtSignal()
+    cancelLoginRequested = QtCore.pyqtSignal()
     profileImageChanged = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(Account, self).__init__(parent=parent)
-        self.profile_image.setImageSizePolicy((50, 50), (300, 300))
+        self.profileImage.setImageSizePolicy((50, 50), (300, 300))
+        self.accountInfo.setText(T("#Log in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)", appName=CoreConfig.APP_NAME))
+        self.alertIcon = Utils.setSvgIcon(self.alertIcon, Icons.ALERT_RED_ICON)
         self.loginButton.clicked.connect(self.login)
+        self.continueButton.clicked.connect(self.startLoginRequested)
+        self.cancelButton.clicked.connect(self.cancelLogin)
         self.logoutButton.clicked.connect(self.logout)
         self.refreshAccountButton.clicked.connect(self.refreshAccount)
-        self.profile_image.imageChanged.connect(self.updateAccountImage)
-        self.thread = Utils.WorkerThread(parent=self)
+        self.profileImage.imageChanged.connect(self.updateAccountImage)
+        self.updateAccountThread = Utils.WorkerThread(target=DB.account.updateAccount, parent=self)
+        self.updateAccountThread.resultSignal.connect(self.accountUpdateResult)
+        DB.account._user.accountUpdated.connect(self.showAccount)
 
     def refreshAccount(self):
         self.accountMenu.setCurrentIndex(0)
         self.updateAccountImage()
-        self.thread.setup(target=DB.account.updateAccount, disconnect=True)
-        self.thread.resultSignal.connect(self.accountUpdateResult)
-        self.thread.start()
+        self.updateAccountThread.start()
 
     def accountUpdateResult(self, result):
-        self.showAccount()
         if not result.success:
-            if isinstance(result.error, Auth.Exceptions.InvalidToken) or isinstance(result.error, Auth.Exceptions.UserNotFound):
+            if isinstance(result.error, TwitchAccount.Exceptions.InvalidToken) or isinstance(result.error, TwitchAccount.Exceptions.UserNotFound):
                 self.info(*Messages.INFO.LOGIN_EXPIRED)
 
     def showAccount(self):
         if DB.account.isUserLoggedIn():
             self.accountMenu.setCurrentIndex(2)
-            self.profile_image.loadImage(filePath=Images.PROFILE_IMAGE, url=DB.account.getAccountData().profileImageURL, urlFormatSize=ImageSize.USER_PROFILE, refresh=True)
+            self.profileImage.loadImage(filePath=Images.PROFILE_IMAGE, url=DB.account.getAccountData().profileImageURL, urlFormatSize=ImageSize.USER_PROFILE, refresh=True)
             self.account.setText(DB.account.getAccountData().displayName)
         else:
             self.accountMenu.setCurrentIndex(1)
-            self.loginInfo.hide()
-            self.profile_image.cancelImageRequest()
+            self.infoArea.hide()
+            self.buttonArea.setCurrentIndex(0)
+            self.profileImage.cancelImageRequest()
             self.updateAccountImage()
-            self.loginButton.setAutoDefault(True)
 
     def updateAccountImage(self, image=None):
         self.profileImageChanged.emit(image or Icons.ACCOUNT_ICON)
 
     def login(self):
-        self.setEnabled(False)
-        self.loginInfo.show()
-        self.loginButton.setText(T("#Logging in", ellipsis=True))
-        self.thread.setup(target=DB.account.login, disconnect=True)
-        self.thread.resultSignal.connect(self.loginResult)
-        self.thread.start()
+        self.infoArea.show()
+        self.buttonArea.setCurrentIndex(1)
+        self.startLoginRequested.emit()
 
-    def loginResult(self, result):
-        self.setEnabled(True)
-        self.loginInfo.hide()
-        self.loginButton.setText(T("login"))
-        if result.success:
-            self.showAccount()
-        elif isinstance(result.error, Auth.Exceptions.BrowserNotFound):
-            self.info("error", "#Chrome browser or Edge browser is required to proceed.")
-        elif isinstance(result.error, Auth.Exceptions.BrowserNotLoadable):
-            self.info("error", "#Unable to load Chrome browser or Edge browser.\nIf the error persists, try Run as administrator.")
-        else:
-            self.info("error", "#Login failed.")
+    def cancelLogin(self):
+        if self.ask("cancel-login", "#Are you sure you want to cancel the login operation in progress?"):
+            self.cancelLoginRequested.emit()
+
+    def loginTabClosed(self):
+        self.infoArea.hide()
+        self.buttonArea.setCurrentIndex(0)
 
     def logout(self):
         if self.ask("logout", "#Are you sure you want to log out?"):
             DB.account.logout()
-            self.showAccount()

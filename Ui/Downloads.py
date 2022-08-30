@@ -7,10 +7,16 @@ class PreviewWidgetItem(QtWidgets.QListWidgetItem):
         super(PreviewWidgetItem, self).__init__(parent=parent)
         self.widget = Ui.DownloadPreview(downloaderId, parent=parent)
         self.widget.setContentsMargins(10, 10, 10, 10)
+        self.widget.resizedSignal.connect(self.resize)
+        self.resize()
+
+    def resize(self):
         self.setSizeHint(self.widget.sizeHint())
+
 
 class Downloads(QtWidgets.QWidget, UiFile.downloads):
     progressWindowRequested = QtCore.pyqtSignal(object)
+    downloadHistoryRequested = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super(Downloads, self).__init__(parent=parent)
@@ -18,10 +24,13 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
         self.typeFilter.currentIndexChanged.connect(self.updateFilter)
         self.statusFilter.currentIndexChanged.connect(self.updateFilter)
         self.updateFilter()
-        self.previewWidgetView.itemSelectionChanged.connect(self.removeSelection)
+        self.infoIcon = Utils.setSvgIcon(self.infoIcon, Icons.STORAGE_ICON)
+        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.Base).name()};}}")
+        self.previewWidgetView.itemSelectionChanged.connect(self.previewWidgetView.clearSelection)
         self.previewWidgetView.itemClicked.connect(self.openProgressWindow)
         self.previewWidgetView.verticalScrollBar().setSingleStep(30)
         self.showPreviewCount()
+        self.downloadHistoryButton.clicked.connect(self.downloadHistoryRequested)
         self.downloadCompleteActionInfo.clicked.connect(self.showDownloadCompleteActionInfo)
 
     def downloaderCreated(self, downloaderId):
@@ -54,13 +63,20 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
 
     def showPreviewCount(self):
         self.totalCount.setText(len(self.previewItems))
-        self.filteredCount.setText(self.getFilteredPreviewCount())
+        previewCount = self.getFilteredPreviewCount()
+        self.filteredCount.setText(previewCount)
+        if previewCount == 0:
+            self.infoLabel.setText(T("#Your downloads will be displayed here." if self.downloaderType == 0 and self.downloaderStatus == 0 else "#There are no matches for this filter."))
+            self.stackedWidget.setCurrentIndex(0)
+        else:
+            self.stackedWidget.setCurrentIndex(1)
 
     def updateFilter(self):
         self.downloaderType = self.typeFilter.currentIndex()
         self.downloaderStatus = self.statusFilter.currentIndex()
         for downloaderId in self.previewItems:
-            self.processPreview(downloaderId)
+            self.setPreviewHidden(downloaderId, not self.filterPreview(downloaderId))
+        self.showPreviewCount()
 
     def getFilteredPreviewCount(self):
         return sum(0 if item.isHidden() else 1 for item in self.previewItems.values())
@@ -92,10 +108,6 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
             return downloader.isFinished() and downloader.status.terminateState.isTrue() and downloader.status.getError() != None
         else:
             return downloader.isFinished() and downloader.status.terminateState.isTrue() and downloader.status.getError() == None
-
-    def removeSelection(self):
-        for item in self.previewWidgetView.selectedItems():
-            item.setSelected(False)
 
     def openProgressWindow(self, item):
         if item.widget.isEnabled():

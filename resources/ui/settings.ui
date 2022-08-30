@@ -6,18 +6,23 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>700</height>
+    <width>424</width>
+    <height>448</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
   </property>
   <property name="locale">
    <locale language="English" country="Kenya"/>
   </property>
   <layout class="QVBoxLayout" name="FormLayout">
    <item>
-    <widget class="QLabel" name="window_title">
+    <widget class="QLabel" name="windowTitleLabel">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -33,7 +38,7 @@
     </widget>
    </item>
    <item>
-    <widget class="Line" name="window_title_line">
+    <widget class="Line" name="windowTitleLine">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -41,9 +46,6 @@
    </item>
    <item>
     <widget class="QTabWidget" name="tabWidget">
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
      <widget class="QWidget" name="generalSettings">
       <attribute name="title">
        <string>General</string>
@@ -333,8 +335,8 @@
          </property>
          <layout class="QVBoxLayout" name="advancedAreaLayout">
           <item>
-           <widget class="QWidget" name="useExternalContentUrlArea" native="true">
-            <layout class="QHBoxLayout" name="useExternalContentUrlAreaLayout">
+           <widget class="QWidget" name="searchExternalContentArea" native="true">
+            <layout class="QHBoxLayout" name="searchExternalContentAreaLayout">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -348,14 +350,14 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QCheckBox" name="useExternalContentUrl">
+              <widget class="QCheckBox" name="searchExternalContent">
                <property name="text">
-                <string>Use external content URL</string>
+                <string>Allow searching external content</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="useExternalContentUrlInfo">
+              <widget class="QToolButton" name="searchExternalContentInfo">
                <property name="toolTip">
                 <string>Help</string>
                </property>
@@ -469,6 +471,12 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
             <property name="text">
              <string>Reset</string>
             </property>
@@ -494,6 +502,7 @@
         <widget class="QLabel" name="restrictedLabel">
          <property name="font">
           <font>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>

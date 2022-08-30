@@ -11,7 +11,7 @@ class Loading(QtWidgets.QDialog, UiFile.loading):
         self.appName.setText(Config.APP_NAME)
         self.version.setText(f"{Config.APP_NAME} {Config.VERSION}")
         self.copyright.setText(Config.getCopyrightInfo())
-        self.setStatus(T("starting", ellipsis=True))
+        self.setStatus(T("loading", ellipsis=True))
         self.closeEnabled = False
         Updater.updateProgress.connect(self.updateProgress)
         self.loadingThread = Utils.WorkerThread(target=Updater.update, parent=self)
@@ -22,7 +22,7 @@ class Loading(QtWidgets.QDialog, UiFile.loading):
         if progress == 0:
             self.setStatus(T("#Checking for updates", ellipsis=True))
         elif progress == Updater.TOTAL_TASK_COUNT:
-            self.setStatus(T("starting", ellipsis=True))
+            self.setStatus(T("loading", ellipsis=True))
         else:
             self.setStatus(f"{T('#Loading Data', ellipsis=True)} {progress}/{Updater.TOTAL_TASK_COUNT - 1}")
 

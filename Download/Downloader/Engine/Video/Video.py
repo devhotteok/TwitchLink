@@ -1,4 +1,4 @@
-from .PlaylistManager import Playlist
+from Download.Downloader.Engine.Video.Playlist.OnlinePlaylistManager import OnlinePlaylistManager
 from .SegmentDownloader import SegmentDownloader
 
 from Download.Downloader.Engine.Setup import EngineSetup
@@ -22,10 +22,14 @@ class VideoDownloader(EngineSetup):
         self.taskManager = TaskManager(ThreadPool, parent=self)
 
     def download(self):
-        self.setupSegmentDownload()
-        self.downloadSegments()
-        self.encode()
-        self.removeTempFiles()
+        try:
+            self.setupSegmentDownload()
+            self.downloadSegments()
+            self.encode()
+            self.removeTempFiles()
+        except Exception as e:
+            self.removeTempFiles()
+            raise e
 
     def setupSegmentDownload(self):
         try:
@@ -34,19 +38,20 @@ class VideoDownloader(EngineSetup):
         except Exception as e:
             self.logger.exception(e)
             raise Exceptions.FileSystemError
-        self.playlist = Playlist(
-            self.setup.downloadInfo.getUrl(),
-            Utils.joinPath(self.tempDirectory.name, f"{Config.PLAYLIST_FILE_NAME}.m3u8")
+        self.playlistManager = OnlinePlaylistManager(
+            url=self.setup.downloadInfo.getUrl(),
+            filePath=Utils.joinPath(self.tempDirectory.name, f"{Config.PLAYLIST_FILE_NAME}.m3u8"),
+            strictMode=self.setup.downloadInfo.isOptimizeFileEnabled()
         )
-        self.playlist.setRange(*self.setup.downloadInfo.range)
+        self.playlistManager.setRange(*self.setup.downloadInfo.range)
         self.syncPlaylistProgress()
 
     def syncPlaylistProgress(self):
-        self.logger.info(f"Total Segments: {len(self.playlist.getSegments())}")
-        self.logger.info(f"Total Seconds: {int(self.playlist.totalSeconds)}")
-        self.progress.totalFiles = len(self.playlist.segments)
-        self.progress.totalSeconds = self.playlist.totalSeconds
-        self.syncData({"playlist": self.playlist})
+        self.progress.totalFiles = len(self.playlistManager.getSegments())
+        self.progress.totalMilliseconds = self.playlistManager.totalMilliseconds
+        self.logger.info(f"Total Segments: {self.progress.totalFiles}")
+        self.logger.info(f"Total Seconds: {self.progress.totalSeconds}")
+        self.syncData({"playlistManager": self.playlistManager})
 
     def downloadSegments(self):
         url = self.setup.downloadInfo.getUrl().rsplit("/", 1)[0]
@@ -59,7 +64,7 @@ class VideoDownloader(EngineSetup):
             self.status.setDownloading()
             self.syncStatus()
             self.logger.info("Downloading Segments...")
-            for segment in self.playlist.getSegments():
+            for segment in self.playlistManager.getSegments():
                 if segment.fileName not in processedFiles:
                     processedFiles.append(segment.fileName)
                     segmentDownloader = SegmentDownloader(
@@ -71,12 +76,19 @@ class VideoDownloader(EngineSetup):
                     )
                     self.taskManager.add(task=segmentDownloader)
             self.taskManager.waitForDone()
-            if not (self.setup.updateTrack and self.playlist.timeRange.timeTo == None):
+            if not (self.setup.updateTrack and self.setup.downloadInfo.range[1] == None):
                 break
             if self.status.terminateState.isProcessing() or self.status.isDownloadSkipped():
                 break
-            self.logger.info("Waiting for Updates...")
+            if not self.getUpdates():
+                break
+
+    def getUpdates(self):
+        self.status.setWaitingCount(0)
+        while self.status.getWaitingCount() < Config.UPDATE_TRACK_MAX_RETRY_COUNT:
             self.status.setWaiting()
+            self.status.setWaitingCount(self.status.getWaitingCount() + 1)
+            self.logger.info(f"Waiting for Updates... {self.status.getWaitingCount()}/{Config.UPDATE_TRACK_MAX_RETRY_COUNT}")
             waitEnd = time.time() + Config.UPDATE_TRACK_DURATION
             while True:
                 prevWaiting = self.status.getWaitingTime()
@@ -87,6 +99,7 @@ class VideoDownloader(EngineSetup):
                     break
                 if self.status.isWaitingSkipped():
                     self.status.setSkipWaiting(False)
+                    self.status.setWaitingCount(Config.UPDATE_TRACK_MAX_RETRY_COUNT)
                     break
                 self.msleep(200)
             self.status.setWaitingTime(None)
@@ -94,19 +107,22 @@ class VideoDownloader(EngineSetup):
             self.syncStatus()
             if self.status.terminateState.isProcessing() or self.status.isDownloadSkipped():
                 break
-            prevFiles = self.playlist.getFileList()
+            prevFiles = self.playlistManager.getFileList()
             try:
                 self.logger.info("Updating Playlist...")
-                self.playlist.updatePlaylist()
+                self.playlistManager.updatePlaylist()
                 self.syncPlaylistProgress()
-                if prevFiles == self.playlist.getFileList():
-                    self.logger.info("Update Not Found")
+                if self.status.terminateState.isProcessing() or self.status.isDownloadSkipped():
                     break
+                if prevFiles == self.playlistManager.getFileList():
+                    self.logger.info("Update Not Found")
                 else:
                     self.logger.info("Update Found")
                     self.status.setUpdateFound()
+                    return True
             except:
-                break
+                pass
+        return False
 
     def segmentDownloadComplete(self, task):
         if not task.result.success:
@@ -126,7 +142,14 @@ class VideoDownloader(EngineSetup):
             self.status.setEncoding()
             self.syncStatus()
             self.logger.info("Encoding...")
-            self.FFmpeg.start(self.playlist.filePath, self.setup.downloadInfo.getAbsoluteFileName())
+            trimFrom, trimTo = self.playlistManager.getTrimRange()
+            self.FFmpeg.startEncodingProcess(
+                target=self.playlistManager.filePath,
+                saveAs=self.setup.downloadInfo.getAbsoluteFileName(),
+                trimFrom=None if trimFrom == None else trimFrom / 1000,
+                trimTo=None if trimTo == None else trimTo / 1000,
+                remux=not self.setup.downloadInfo.isOptimizeFileEnabled()
+            )
         processingFile = None
         for progress in self.FFmpeg.output(logger=self.logger):
             file = progress.get("file")
@@ -137,14 +160,14 @@ class VideoDownloader(EngineSetup):
             missing = progress.get("missing")
             if missing != None:
                 self.progress.missingFiles += 1
-                self.progress.missingSeconds += self.playlist.getSegments()[missing].duration
+                self.progress.missingMilliseconds += self.playlistManager.getSegments()[missing].durationMilliseconds
             time = progress.get("time")
             if time != None:
-                self.progress.seconds = Utils.toSeconds(*time.split(".")[0].split(":"))
+                self.progress.milliseconds = Utils.toSeconds(*time.split(".")[0].split(":")) * 1000 + int(time.split(".")[1][:3])
             size = progress.get("size") or progress.get("Lsize")
             if size != None:
-                self.progress.totalSize = Utils.formatByteSize(size)
-                self.progress.size = self.progress.totalSize
+                self.progress.totalByteSize = Utils.getByteSize(size)
+                self.progress.byteSize = self.progress.totalByteSize
             self.syncProgress()
 
     def removeFile(self, fileName):
@@ -156,7 +179,8 @@ class VideoDownloader(EngineSetup):
     def removeTempFiles(self):
         self.logger.info("Cleaning up...")
         try:
-            self.playlist.closeFile()
+            if hasattr(self, "playlistManager"):
+                self.playlistManager.closeFile()
         except Exception as e:
             self.logger.exception(e)
         try:

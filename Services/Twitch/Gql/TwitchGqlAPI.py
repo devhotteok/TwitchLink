@@ -69,6 +69,8 @@ class TwitchGqlAPI:
     def _raiseIfNone(self, data, model):
         if data == None:
             raise Exceptions.DataNotFound
+        elif int(data.get("id") or 0) == 0:
+            raise Exceptions.DataNotFound
         else:
             return model(data)
 

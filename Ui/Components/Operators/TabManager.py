@@ -19,12 +19,22 @@ class TabManager(QtWidgets.QTabWidget):
             if tabIndex != None:
                 return tabIndex
             self.uniqueTabs[uniqueValue] = widget
-        tabIndex = self.insertTab(index, widget, icon if isinstance(icon, QtGui.QIcon) else QtGui.QIcon(icon), widget.windowTitle())
+        tabIndex = self.insertTab(index, widget, icon if isinstance(icon, QtGui.QIcon) else QtGui.QIcon(icon), self.getInjectionSafeText(widget.windowTitle()))
         self.setTabToolTip(tabIndex, widget.windowTitle())
         if not closable:
             self.tabBar().setTabButton(tabIndex, 1, None)
         self.tabCountChanged.emit(self.count())
         return tabIndex
+
+    def setTabIcon(self, index, icon=QtGui.QIcon()):
+        return super().setTabIcon(index, icon if isinstance(icon, QtGui.QIcon) else QtGui.QIcon(icon))
+
+    def setTabText(self, index, text):
+        super().setTabText(index, self.getInjectionSafeText(text))
+        self.setTabToolTip(index, text)
+
+    def getInjectionSafeText(self, text):
+        return text.replace("&", "&&")
 
     def getUniqueTabIndex(self, uniqueValue):
         if uniqueValue in self.uniqueTabs:

@@ -1,133 +1,73 @@
-from Services.Utils.Utils import Utils
-from Services.Translator.Translator import T
 from Database.Database import DB
+from Database.EncoderDecoder import Codable
+from Services.Utils.Utils import Utils
+from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
 import os
+import copy
 
 
-class DownloadInfo:
+class DownloadInfo(Codable):
+    CODABLE_INIT_MODEL = False
+    CODABLE_STRICT_MODE = False
+
     def __init__(self, videoData, accessToken):
         self.videoData = videoData
         self.accessToken = accessToken
-        self.type = self.accessToken.type
-        self.history = DB.temp.getDownloadHistory(self.type.getType())
-        if self.accessToken.type.isStream():
+        if self.type.isStream():
             self.stream = videoData
-        elif self.accessToken.type.isVideo():
+            self.optimizeFile = self.optionHistory.isOptimizeFileEnabled()
+        elif self.type.isVideo():
             self.video = videoData
             self.range = [None, None]
-            self.unmuteVideo = self.history.isUnmuteVideoEnabled()
-            self.updateTrack = self.history.isUpdateTrackEnabled()
+            self.unmuteVideo = self.optionHistory.isUnmuteVideoEnabled()
+            self.updateTrack = self.optionHistory.isUpdateTrackEnabled()
+            self.optimizeFile = self.optionHistory.isOptimizeFileEnabled()
             self.prioritize = False
         else:
             self.clip = videoData
             self.prioritize = False
-        self.resolution = self.accessToken.getResolutions()[0]
-        self.directory = self.history.getUpdatedDirectory()
-        self.fileName = self.createFileName()
+        self.directory = self.optionHistory.getUpdatedDirectory()
+        self.selectedResolutionIndex = 0
+        self.fileName = self.generateFileName()
         self.fileFormat = self.getAvailableFormat()
 
-    def getFileNameTemplateVariables(self):
-        if self.type.isStream():
-            startedAt = self.stream.createdAt.asTimezone(DB.localization.getTimezone())
-            return {
-                "type": T(self.type.toString()),
-                "id": self.stream.id,
-                "title": self.stream.title,
-                "game": self.stream.game.displayName,
-                "channel": self.stream.broadcaster.login,
-                "channel_name": self.stream.broadcaster.displayName,
-                "channel_formatted_name": self.stream.broadcaster.formattedName(),
-                "started_at": startedAt,
-                "date": startedAt.date(),
-                "year": f"{startedAt.year:04}",
-                "month": f"{startedAt.month:02}",
-                "day": f"{startedAt.day:02}",
-                "time": startedAt.time(),
-                "hour": f"{startedAt.hour:02}",
-                "minute": f"{startedAt.minute:02}",
-                "second": f"{startedAt.second:02}",
-                "resolution": self.resolution.resolutionName
-            }
-        elif self.type.isVideo():
-            publishedAt = self.video.publishedAt.asTimezone(DB.localization.getTimezone())
-            return {
-                "type": T(self.type.toString()),
-                "id": self.video.id,
-                "title": self.video.title,
-                "game": self.video.game.displayName,
-                "channel": self.video.owner.login,
-                "channel_name": self.video.owner.displayName,
-                "channel_formatted_name": self.video.owner.formattedName(),
-                "duration": self.video.lengthSeconds,
-                "published_at": publishedAt,
-                "date": publishedAt.date(),
-                "year": f"{publishedAt.year:04}",
-                "month": f"{publishedAt.month:02}",
-                "day": f"{publishedAt.day:02}",
-                "time": publishedAt.time(),
-                "hour": f"{publishedAt.hour:02}",
-                "minute": f"{publishedAt.minute:02}",
-                "second": f"{publishedAt.second:02}",
-                "views": self.video.viewCount,
-                "resolution": self.resolution.resolutionName
-            }
-        else:
-            createdAt = self.clip.createdAt.asTimezone(DB.localization.getTimezone())
-            return {
-                "type": T(self.type.toString()),
-                "id": self.clip.id,
-                "title": self.clip.title,
-                "game": self.clip.game.displayName,
-                "slug": self.clip.slug,
-                "channel": self.clip.broadcaster.login,
-                "channel_name": self.clip.broadcaster.displayName,
-                "channel_formatted_name": self.clip.broadcaster.formattedName(),
-                "creator": self.clip.curator.login,
-                "creator_name": self.clip.curator.displayName,
-                "creator_formatted_name": self.clip.curator.formattedName(),
-                "duration": self.clip.durationSeconds,
-                "created_at": createdAt,
-                "date": createdAt.date(),
-                "year": f"{createdAt.year:04}",
-                "month": f"{createdAt.month:02}",
-                "day": f"{createdAt.day:02}",
-                "time": createdAt.time(),
-                "hour": f"{createdAt.hour:02}",
-                "minute": f"{createdAt.minute:02}",
-                "second": f"{createdAt.second:02}",
-                "views": self.clip.viewCount,
-                "resolution": self.resolution.resolutionName
-            }
+    def setAccessToken(self, accessToken):
+        self.accessToken = accessToken
+        self.setResolution(min(self.selectedResolutionIndex, len(self.accessToken.resolutions) - 1))
 
-    def getFileNameTemplate(self):
-        if self.type.isStream():
-            return DB.templates.getStreamFilename()
-        elif self.type.isVideo():
-            return DB.templates.getVideoFilename()
-        else:
-            return DB.templates.getClipFilename()
+    @property
+    def type(self):
+        return self.accessToken.type
 
-    def createFileName(self):
-        return Utils.getValidFileName(Utils.injectionSafeFormat(self.getFileNameTemplate(), **self.getFileNameTemplateVariables()))
+    @property
+    def optionHistory(self):
+        return DB.temp.getDownloadOptionHistory(self.type.getType())
 
-    def checkResolutionInFileName(self):
-        return "{resolution}" in self.getFileNameTemplate()
+    def generateFileName(self):
+        return FileNameGenerator.generateFileName(self.videoData, self.resolution.resolutionName)
 
-    def setResolution(self, resolution):
-        self.resolution = resolution
-        self.fileFormat = self.getAvailableFormat()
+    def setResolution(self, index):
+        self.selectedResolutionIndex = index
+        self.setFileFormat(self.getAvailableFormat(self.fileFormat))
 
-    def getAvailableFormat(self):
-        defaultFormat = self.history.getAudioFormat() if self.resolution.isAudioOnly() else self.history.getFormat()
+    @property
+    def resolution(self):
+        return self.accessToken.getResolutions()[self.selectedResolutionIndex]
+
+    def getAvailableFormat(self, currentFormat=None):
+        defaultFormat = self.optionHistory.getAudioFormat() if self.resolution.isAudioOnly() else self.optionHistory.getFormat()
         availableFormats = self.getAvailableFormats()
+        if currentFormat != None:
+            if currentFormat in availableFormats:
+                return currentFormat
         return defaultFormat if defaultFormat in availableFormats else availableFormats[0]
 
     def getAvailableFormats(self):
         if self.resolution.isAudioOnly():
-            return self.history.getAvailableAudioFormats()
+            return self.optionHistory.getAvailableAudioFormats()
         else:
-            return self.history.getAvailableFormats()
+            return self.optionHistory.getAvailableFormats()
 
     def setCropRange(self, start, end):
         self.range = [start, end]
@@ -136,7 +76,7 @@ class DownloadInfo:
         self.directory = directory
 
     def setAbsoluteFileName(self, absoluteFileName):
-        self.setDirectory(os.path.dirname(absoluteFileName))
+        self.directory = os.path.dirname(absoluteFileName)
         self.fileName, self.fileFormat = os.path.basename(absoluteFileName).rsplit(".", 1)
 
     def setFileName(self, fileName):
@@ -151,6 +91,9 @@ class DownloadInfo:
     def setUpdateTrackEnabled(self, updateTrack):
         self.updateTrack = updateTrack
 
+    def setOptimizeFileEnabled(self, optimizeFile):
+        self.optimizeFile = optimizeFile
+
     def setPrioritizeEnabled(self, prioritize):
         self.prioritize = prioritize
 
@@ -160,21 +103,30 @@ class DownloadInfo:
     def isUpdateTrackEnabled(self):
         return self.updateTrack
 
+    def isOptimizeFileEnabled(self):
+        return self.optimizeFile
+
     def isPrioritizeEnabled(self):
         return self.prioritize
 
-    def saveHistory(self):
-        self.history.setDirectory(self.directory)
+    def saveOptionHistory(self):
+        self.optionHistory.setDirectory(self.directory)
         if self.resolution.isAudioOnly():
-            self.history.setAudioFormat(self.fileFormat)
+            self.optionHistory.setAudioFormat(self.fileFormat)
         else:
-            self.history.setFormat(self.fileFormat)
-        if self.accessToken.type.isVideo():
-            self.history.setUnmuteVideoEnabled(self.unmuteVideo)
-            self.history.setUpdateTrackEnabled(self.updateTrack)
+            self.optionHistory.setFormat(self.fileFormat)
+        if self.type.isStream():
+            self.optionHistory.setOptimizeFileEnabled(self.optimizeFile)
+        elif self.type.isVideo():
+            self.optionHistory.setUnmuteVideoEnabled(self.unmuteVideo)
+            self.optionHistory.setUpdateTrackEnabled(self.updateTrack)
+            self.optionHistory.setOptimizeFileEnabled(self.optimizeFile)
 
     def getUrl(self):
         return self.resolution.url
 
     def getAbsoluteFileName(self):
         return f"{Utils.joinPath(self.directory, self.fileName)}.{self.fileFormat}"
+
+    def copy(self):
+        return copy.deepcopy(self)

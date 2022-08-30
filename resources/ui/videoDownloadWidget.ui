@@ -7,8 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>384</width>
-    <height>338</height>
+    <height>328</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -51,16 +56,61 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="downloadButton">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Download</string>
-     </property>
+    <widget class="QWidget" name="buttonArea" native="true">
+     <layout class="QHBoxLayout" name="buttonAreaLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="downloadButton">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Download</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../icons/download.svg</normaloff>../icons/download.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="instantDownloadButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>40</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Instant Download (Downloads immediately with options previously used for this type.)</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../icons/instant_download.svg</normaloff>../icons/instant_download.svg</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

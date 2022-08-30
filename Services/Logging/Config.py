@@ -1,10 +1,12 @@
-from Core.Config import Config as CoreConfig
+from Core.Config import Config as CoreConfig, _P
 
 import logging
 
 
 class Config:
     LOG_ROOT = CoreConfig.TEMP_PATH
+
+    ERROR_DETECTOR_FILE = _P(CoreConfig.DB_ROOT, "error_detector.json")
 
     TARGET_ROOT = "root"
     TARGET_NOT_ROOT = "not_root"

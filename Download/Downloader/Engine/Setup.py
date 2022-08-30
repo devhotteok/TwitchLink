@@ -8,6 +8,8 @@ from Services.Logging.ObjectLogger import ObjectLogger
 
 from PyQt5 import QtCore
 
+import uuid
+
 
 class EngineSetup(QtCore.QThread):
     started = QtCore.pyqtSignal(object)
@@ -19,6 +21,7 @@ class EngineSetup(QtCore.QThread):
 
     def __init__(self, downloadInfo, parent=None):
         super(EngineSetup, self).__init__(parent=parent)
+        self.uuid = uuid.uuid4()
         self.setup = Modules.Setup(downloadInfo)
         self.status = Modules.Status()
         self.progress = Modules.Progress()
@@ -34,11 +37,11 @@ class EngineSetup(QtCore.QThread):
         self.finished.emit(self)
 
     def getId(self):
-        return id(self)
+        return self.uuid
 
     def setupLogger(self):
         self.logger = Logger(
-            name=f"Download_{self.getId()}",
+            name=f"Downloader_{self.getId()}",
             fileName=f"{Config.APP_NAME}_Download_{Logger.getFormattedTime()}#{self.getId()}.log"
         )
         self.logger.debug(f"{Config.APP_NAME} {Config.VERSION}\n\n[Download Info]\n{ObjectLogger.generateObjectLog(self.setup.downloadInfo)}")

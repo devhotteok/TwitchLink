@@ -1,5 +1,5 @@
-from .EncoderDecoder import Encoder, Decoder
-from .Loader import DataLoader
+from .EncoderDecoder import Codable, Encoder, Decoder
+from .Updater import Updaters
 
 from Core.App import App
 from Core.Config import Config
@@ -7,19 +7,19 @@ from Services.Utils.OSUtils import OSUtils
 from Services.Utils.SystemUtils import SystemUtils
 from Services.Image.Loader import ImageLoader
 from Services.Image.Config import Config as ImageConfig
-from Services.Account.Auth import TwitchAccount
+from Services.Account.TwitchAccount import TwitchAccount
 from Services.Twitch.Playback.TwitchPlaybackAccessTokens import TwitchPlaybackAccessTokenTypes
 from Services.Translator.Translator import Translator
-from Download import DownloadHistory
+from Download import DownloadOptionHistory
 from Download.Downloader.Engine.ThreadPool import ThreadPool as DownloadThreadPool
 from Download.Downloader.Engine.Config import Config as EngineConfig
 
+from PyQt5 import QtCore
+
 import json
 
-from datetime import datetime, timedelta
 
-
-class Setup:
+class Setup(Codable):
     def __init__(self):
         self._needSetup = True
         self._termsOfServiceAgreement = None
@@ -31,17 +31,17 @@ class Setup:
         return self._needSetup
 
     def agreeTermsOfService(self):
-        self._termsOfServiceAgreement = datetime.now()
+        self._termsOfServiceAgreement = QtCore.QDateTime.currentDateTimeUtc()
 
     def getTermsOfServiceAgreement(self):
         return self._termsOfServiceAgreement
 
-class Account:
+class Account(Codable):
     def __init__(self):
         self._user = TwitchAccount()
 
-    def login(self):
-        self._user.login()
+    def login(self, username, token, expiry):
+        self._user.login(username, token, expiry)
 
     def logout(self):
         self._user.logout()
@@ -61,7 +61,7 @@ class Account:
     def getAuthToken(self):
         return self._user.token
 
-class General:
+class General(Codable):
     def __init__(self):
         self._openProgressWindow = True
         self._notify = True
@@ -92,7 +92,7 @@ class General:
     def getBookmarks(self):
         return self._bookmarks
 
-class Templates:
+class Templates(Codable):
     def __init__(self):
         self._streamFilename = "[{type}] [{channel_name}] [{date}] {title} {resolution}"
         self._videoFilename = "[{type}] [{channel_name}] [{date}] {title} {resolution}"
@@ -116,13 +116,16 @@ class Templates:
     def getClipFilename(self):
         return self._clipFilename
 
-class Advanced:
+class Advanced(Codable):
     def __init__(self):
-        self._externalContentUrl = True
+        self._searchExternalContent = True
         self.setCachingEnabled(False)
 
-    def setExternalContentUrlEnabled(self, enabled):
-        self._externalContentUrl = enabled
+    def __setup__(self):
+        self.reloadCaching()
+
+    def setSearchExternalContentEnabled(self, enabled):
+        self._searchExternalContent = enabled
 
     def setCachingEnabled(self, enabled):
         self._caching = enabled
@@ -131,16 +134,19 @@ class Advanced:
     def reloadCaching(self):
         ImageLoader.setCachingEnabled(self._caching)
 
-    def isExternalContentUrlEnabled(self):
-        return self._externalContentUrl
+    def isSearchExternalContentEnabled(self):
+        return self._searchExternalContent
 
     def isCachingEnabled(self):
         return self._caching
 
-class Localization:
+class Localization(Codable):
     def __init__(self):
         self.setLanguage(Translator.getDefaultLanguage())
-        self._timezone = SystemUtils.getLocalTimezone(preferred=Translator.getLanguageData()[Translator.getDefaultLanguage()]["preferredTimezone"])
+        self._timezone = SystemUtils.getLocalTimezone()
+
+    def __setup__(self):
+        self.reloadTranslator()
 
     def setLanguage(self, language):
         self._language = language
@@ -158,22 +164,43 @@ class Localization:
     def getTimezone(self):
         return self._timezone
 
-    def getTimezoneList(self):
-        return SystemUtils.getTimezoneList()
+    def getTimezoneNameList(self):
+        return SystemUtils.getTimezoneNameList()
 
-class Temp:
+class Temp(Codable):
     def __init__(self):
-        self._downloadHistory = {
-            TwitchPlaybackAccessTokenTypes.STREAM: DownloadHistory.StreamHistory(),
-            TwitchPlaybackAccessTokenTypes.VIDEO: DownloadHistory.VideoHistory(),
-            TwitchPlaybackAccessTokenTypes.CLIP: DownloadHistory.ClipHistory(),
-            ImageConfig.DATA_TYPE: DownloadHistory.ThumbnailHistory()
+        self._downloadHistory = []
+        self._downloadOptionHistory = {
+            TwitchPlaybackAccessTokenTypes.STREAM: DownloadOptionHistory.StreamHistory(),
+            TwitchPlaybackAccessTokenTypes.VIDEO: DownloadOptionHistory.VideoHistory(),
+            TwitchPlaybackAccessTokenTypes.CLIP: DownloadOptionHistory.ClipHistory(),
+            ImageConfig.DATA_TYPE: DownloadOptionHistory.ThumbnailHistory()
+        }
+        self._downloadStats = {
+            "totalFiles": 0,
+            "totalByteSize": 0
         }
         self._windowGeometry = {}
         self._blockedContent = {}
 
-    def getDownloadHistory(self, contentType):
-        return self._downloadHistory[contentType]
+    def getDownloadHistory(self):
+        return self._downloadHistory
+
+    def addDownloadHistory(self, downloadHistory):
+        self._downloadHistory.append(downloadHistory)
+
+    def removeDownloadHistory(self, downloadHistory):
+        self._downloadHistory.remove(downloadHistory)
+
+    def getDownloadOptionHistory(self, contentType):
+        return self._downloadOptionHistory[contentType]
+
+    def updateDownloadStats(self, fileSize):
+        self._downloadStats["totalFiles"] += 1
+        self._downloadStats["totalByteSize"] += fileSize
+
+    def getDownloadStats(self):
+        return self._downloadStats
 
     def hasWindowGeometry(self, windowName):
         return windowName in self._windowGeometry
@@ -187,7 +214,7 @@ class Temp:
     def isContentBlocked(self, contentId, contentVersion):
         if contentId in self._blockedContent:
             oldContentVersion, blockExpiry = self._blockedContent[contentId]
-            if contentVersion != oldContentVersion or (blockExpiry != None and blockExpiry < datetime.now()):
+            if contentVersion != oldContentVersion or (blockExpiry != None and blockExpiry < QtCore.QDateTime.currentDateTimeUtc()):
                 del self._blockedContent[contentId]
                 return False
             else:
@@ -196,11 +223,14 @@ class Temp:
             return False
 
     def blockContent(self, contentId, contentVersion, blockExpiry=None):
-        self._blockedContent[contentId] = (contentVersion, None if blockExpiry == None else datetime.now() + timedelta(days=blockExpiry))
+        self._blockedContent[contentId] = (contentVersion, None if blockExpiry == None else QtCore.QDateTime.currentDateTimeUtc().addDays(blockExpiry))
 
-class Download:
+class Download(Codable):
     def __init__(self):
         self.setDownloadSpeed(EngineConfig.RECOMMENDED_THREAD_LIMIT)
+
+    def __setup__(self):
+        self.reloadDownloadSpeed()
 
     def setDownloadSpeed(self, downloadSpeed):
         self._downloadSpeed = downloadSpeed
@@ -216,30 +246,28 @@ class Download:
 class Database:
     def __init__(self):
         self.version = Config.VERSION
-        self.load()
+        self.reset()
         App.aboutToQuit.connect(self.save)
 
     def load(self):
         self.reset()
         try:
             with open(Config.DB_FILE, "r", encoding="utf-8") as file:
-                DataLoader.load(self, Decoder.decode(json.load(file)))
+                for key, value in Decoder.decode(Updaters.update(json.load(file))).items():
+                    setattr(self, key, value)
         except Exception as e:
-            App.logger.critical("Unable to load data.")
+            App.logger.warning("Unable to load data.")
             App.logger.exception(e)
             self.reset()
             App.logger.info("Starting with default settings.")
-        self.advanced.reloadCaching()
-        self.localization.reloadTranslator()
-        self.download.reloadDownloadSpeed()
 
     def save(self):
         try:
             OSUtils.createDirectory(Config.DB_ROOT)
             with open(Config.DB_FILE, "w", encoding="utf-8") as file:
-                json.dump(Encoder.encode(self), file, indent=3)
+                json.dump(Encoder.encode(self.__dict__), file, indent=3)
         except Exception as e:
-            App.logger.critical("Unable to save data.")
+            App.logger.error("Unable to save data.")
             App.logger.exception(e)
 
     def reset(self):
@@ -254,3 +282,4 @@ class Database:
 
 
 DB = Database()
+DB.load()

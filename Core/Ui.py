@@ -90,6 +90,9 @@ class UiFile:
     downloads = loadUi("downloads")
     downloadPreview = loadUi("downloadPreview")
     download = loadUi("download")
+    downloadHistory = loadUi("downloadHistory")
+    downloadHistoryView = loadUi("downloadHistoryView")
+    webViewWidget = loadUi("webViewWidget")
 
 
 class Ui:
@@ -110,9 +113,12 @@ class Ui:
     Downloads = None
     DownloadPreview = None
     Download = None
+    DownloadHistory = None
+    DownloadHistoryView = None
+    WebViewWidget = None
 
 
-from Ui import MainWindow, Loading, Setup, Settings, PropertyView, Account, About, DocumentView, Home, Search, VideoWidget, VideoDownloadWidget, SearchResult, DownloadMenu, Downloads, DownloadPreview, Download
+from Ui import MainWindow, Loading, Setup, Settings, PropertyView, Account, About, DocumentView, Home, Search, VideoWidget, VideoDownloadWidget, SearchResult, DownloadMenu, Downloads, DownloadPreview, Download, DownloadHistory, DownloadHistoryView, WebViewWidget
 
 
 Ui.MainWindow = MainWindow.MainWindow
@@ -132,3 +138,6 @@ Ui.DownloadMenu = DownloadMenu.DownloadMenu
 Ui.Downloads = Downloads.Downloads
 Ui.DownloadPreview = DownloadPreview.DownloadPreview
 Ui.Download = Download.Download
+Ui.DownloadHistory = DownloadHistory.DownloadHistory
+Ui.DownloadHistoryView = DownloadHistoryView.DownloadHistoryView
+Ui.WebViewWidget = WebViewWidget.WebViewWidget

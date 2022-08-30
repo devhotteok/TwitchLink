@@ -1,64 +1,36 @@
-import datetime
-import pytz
+from Database.EncoderDecoder import Codable
+
+from PyQt5 import QtCore
 
 
 class DataUtils:
+    @staticmethod
+    def getId(string):
+        return None if string == None else int(string)
+
     @staticmethod
     def cleanString(string):
         return string.replace("\n", "").replace("\r", "")
 
 
 class TimeUtils:
-    class Datetime:
-        DEFAULT_DATETIME = "0001-01-01T00:00:00Z"
+    DEFAULT_DATETIME = "0001-01-01T00:00:00Z"
 
-        def __init__(self, string):
-            if string == None:
-                string = self.DEFAULT_DATETIME
-            try:
-                self.datetime = pytz.utc.localize(datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%fZ"))
-            except:
-                try:
-                    self.datetime = pytz.utc.localize(datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ"))
-                except:
-                    self.datetime = pytz.utc.localize(datetime.datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M:%SZ"))
+    @classmethod
+    def Datetime(cls, string):
+        try:
+            datetime = QtCore.QDateTime.fromString(string or cls.DEFAULT_DATETIME, QtCore.Qt.ISODateWithMs)
+            datetime.setTimeSpec(QtCore.Qt.UTC)
+            return datetime
+        except:
+            return QtCore.QDateTime.fromString(cls.DEFAULT_DATETIME, QtCore.Qt.ISODateWithMs)
 
-        def __str__(self):
-            return self.datetime.__str__()
 
-        def __repr__(self):
-            return self.__str__()
+class TwitchGqlObject(Codable):
+    @classmethod
+    def __model__(cls, data):
+        return cls({})
 
-        def asTimezone(self, tzinfo=None):
-            if tzinfo == None:
-                return self.datetime
-            else:
-                try:
-                    return self.datetime.astimezone(tz=tzinfo)
-                except:
-                    return self.datetime
-
-        def date(self, tzinfo=None):
-            return self.asTimezone(tzinfo).date()
-
-        def time(self, tzinfo=None):
-            return self.asTimezone(tzinfo).time()
-
-    class Duration:
-        def __init__(self, seconds):
-            self.timedelta = datetime.timedelta(seconds=seconds)
-
-        def totalSeconds(self):
-            return int(self.timedelta.total_seconds())
-
-        def __str__(self):
-            seconds = self.totalSeconds()
-            return f"{seconds // 3600:02}:{seconds % 3600 // 60:02}:{seconds % 3600 % 60:02}"
-
-        def __repr__(self):
-            return self.__str__()
-
-class TwitchGqlObject:
     def __str__(self):
         return f"<{self.__class__.__name__} {self.__dict__}>"
 
@@ -67,12 +39,13 @@ class TwitchGqlObject:
 
 class User(TwitchGqlObject):
     def __init__(self, data):
-        self.id = data.get("id")
+        self.id = DataUtils.getId(data.get("id"))
         self.login = data.get("login") or ""
         self.displayName = data.get("displayName", self.login)
         self.profileImageURL = data.get("profileImageURL") or ""
         self.createdAt = TimeUtils.Datetime(data.get("createdAt"))
 
+    @property
     def formattedName(self):
         if self.displayName.lower() == self.login.lower():
             return self.displayName
@@ -87,20 +60,25 @@ class Channel(User):
         self.offlineImageURL = data.get("offlineImageURL") or ""
         self.isPartner = data.get("roles", {}).get("isPartner", False)
         self.isAffiliate = data.get("roles", {}).get("isAffiliate", False)
+        self.isStaff = data.get("roles", {}).get("isStaff", False)
         self.followers = data.get("followers", {}).get("totalCount", 0)
         self.lastBroadcast = Broadcast(data.get("lastBroadcast") or {})
         self.stream = None if data.get("stream") == None else Stream(data.get("stream"))
 
+    @property
+    def isVerified(self):
+        return self.isPartner
+
 class Broadcast(TwitchGqlObject):
     def __init__(self, data):
-        self.id = data.get("id")
+        self.id = DataUtils.getId(data.get("id"))
         self.title = DataUtils.cleanString(data.get("title") or "")
         self.game = Game(data.get("game") or {})
         self.startedAt = TimeUtils.Datetime(data.get("startedAt"))
 
 class Stream(TwitchGqlObject):
     def __init__(self, data):
-        self.id = data.get("id")
+        self.id = DataUtils.getId(data.get("id"))
         self.title = DataUtils.cleanString(data.get("title") or "")
         self.game = Game(data.get("game") or {})
         self.type = data.get("type") or ""
@@ -117,20 +95,24 @@ class Stream(TwitchGqlObject):
 
 class Video(TwitchGqlObject):
     def __init__(self, data):
-        self.id = data.get("id")
+        self.id = DataUtils.getId(data.get("id"))
         self.title = DataUtils.cleanString(data.get("title") or "")
         self.game = Game(data.get("game") or {})
         self.previewThumbnailURL = data.get("previewThumbnailURL") or ""
         self.owner = User(data.get("owner") or {})
         self.creator = User(data.get("creator") or {})
-        self.lengthSeconds = TimeUtils.Duration(data.get("lengthSeconds", 0))
+        self.lengthSeconds = data.get("lengthSeconds", 0)
         self.createdAt = TimeUtils.Datetime(data.get("createdAt"))
         self.publishedAt = TimeUtils.Datetime(data.get("publishedAt"))
         self.viewCount = data.get("viewCount", 0)
 
+    @property
+    def durationString(self):
+        return f"{self.lengthSeconds // 3600:02}:{self.lengthSeconds % 3600 // 60:02}:{self.lengthSeconds % 3600 % 60:02}"
+
 class Clip(TwitchGqlObject):
     def __init__(self, data):
-        self.id = data.get("id")
+        self.id = DataUtils.getId(data.get("id"))
         self.title = DataUtils.cleanString(data.get("title") or "")
         self.game = Game(data.get("game") or {})
         self.thumbnailURL = data.get("thumbnailURL") or ""
@@ -138,13 +120,17 @@ class Clip(TwitchGqlObject):
         self.url = data.get("url") or ""
         self.broadcaster = User(data.get("broadcaster") or {})
         self.curator = User(data.get("curator") or {})
-        self.durationSeconds = TimeUtils.Duration(data.get("durationSeconds", 0))
+        self.durationSeconds = data.get("durationSeconds", 0)
         self.createdAt = TimeUtils.Datetime(data.get("createdAt"))
         self.viewCount = data.get("viewCount", 0)
 
+    @property
+    def durationString(self):
+        return f"{self.durationSeconds // 3600:02}:{self.durationSeconds % 3600 // 60:02}:{self.durationSeconds % 3600 % 60:02}"
+
 class Game(TwitchGqlObject):
     def __init__(self, data):
-        self.id = data.get("id")
+        self.id = DataUtils.getId(data.get("id"))
         self.name = data.get("name") or ""
         self.boxArtURL = data.get("boxArtURL") or ""
         self.displayName = data.get("displayName", self.name)

@@ -95,6 +95,7 @@ class _Updater(QtCore.QObject):
     updateProgress = QtCore.pyqtSignal(int)
     updateComplete = QtCore.pyqtSignal()
 
+    MAX_REDIRECT_COUNT = 10
     TOTAL_TASK_COUNT = 4
 
     def __init__(self, parent=None):
@@ -127,108 +128,99 @@ class _Updater(QtCore.QObject):
             self.status.setStatus(self.status.UPDATE_REQUIRED)
         self.updateComplete.emit()
 
-    def updateStatus(self):
-        try:
-            response = Network.session.get(OSUtils.joinUrl(Config.SERVER_URL, "status.json", params={"version": Config.VERSION}))
-        except:
-            raise Exceptions.ConnectionFailure
-        if response.status_code == 200:
+    def getData(self, url):
+        for requestCount in range(self.MAX_REDIRECT_COUNT + 1):
             try:
-                data = response.json()
-                self.status.updateStatusData(data)
-            except:
-                raise Exceptions.UpdateRequired
-            if self.status.operational:
-                if self.status.version.latestVersion != Config.VERSION:
-                    if self.status.version.updateRequired:
-                        raise Exceptions.UpdateRequired
+                response = Network.session.get(OSUtils.joinUrl(url, params={"version": Config.VERSION}))
+                if response.status_code == 200:
+                    if response.text.startswith("redirect:"):
+                        url = response.text.split(":", 1)[1]
                     else:
-                        raise Exceptions.UpdateFound
-            else:
-                raise Exceptions.Unavailable
+                        return response
+                else:
+                    raise
+            except:
+                break
+        raise Exceptions.ConnectionFailure
+
+    def updateStatus(self):
+        response = self.getData(OSUtils.joinUrl(Config.SERVER_URL, "status.json"))
+        try:
+            data = response.json()
+            self.status.updateStatusData(data)
+        except:
+            raise Exceptions.UpdateRequired
+        if self.status.operational:
+            if self.status.version.latestVersion != Config.VERSION:
+                if self.status.version.updateRequired:
+                    raise Exceptions.UpdateRequired
+                else:
+                    raise Exceptions.UpdateFound
         else:
-            raise Exceptions.ConnectionFailure
+            raise Exceptions.Unavailable
 
     def updateNotifications(self):
+        response = self.getData(OSUtils.joinUrl(Config.SERVER_URL, "notifications.json"))
         try:
-            response = Network.session.get(OSUtils.joinUrl(Config.SERVER_URL, "notifications.json", params={"version": Config.VERSION}))
+            data = response.json()
+            self.status.updateNotifications(data)
         except:
-            raise Exceptions.ConnectionFailure
-        if response.status_code == 200:
-            try:
-                data = response.json()
-                self.status.updateNotifications(data)
-            except:
-                raise Exceptions.UnexpectedError
-        else:
-            raise Exceptions.ConnectionFailure
+            raise Exceptions.UnexpectedError
 
     def updateConfig(self):
+        response = self.getData(OSUtils.joinUrl(Config.SERVER_URL, "config.json"))
         try:
-            response = Network.session.get(OSUtils.joinUrl(Config.SERVER_URL, "config.json", params={"version": Config.VERSION}))
+            from Core.Config import Config as CoreConfig
+            from Services.Image.Config import Config as ImageConfig
+            from Services.Account.Config import Config as AuthConfig
+            from Services.Ad.Config import Config as AdConfig
+            from Services.Translator.Config import Config as TranslatorConfig
+            from Services.Temp.Config import Config as TempConfig
+            from Services.Logging.Config import Config as LogConfig
+            from Services.Twitch.Gql.TwitchGqlConfig import Config as GqlConfig
+            from Services.Twitch.Playback.TwitchPlaybackConfig import Config as PlaybackConfig
+            from Search.Config import Config as SearchConfig
+            from Search.Helper.Config import Config as SearchHelperConfig
+            from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
+            from Download.Downloader.FFmpeg.Config import Config as FFmpegConfig
+            CONFIG_FILES = {
+                "": CoreConfig,
+                "IMAGE": ImageConfig,
+                "AUTH": AuthConfig,
+                "AD": AdConfig,
+                "TRANSLATOR": TranslatorConfig,
+                "TEMP": TempConfig,
+                "LOG": LogConfig,
+                "API": GqlConfig,
+                "PLAYBACK": PlaybackConfig,
+                "SEARCH": SearchConfig,
+                "SEARCH_HELPER": SearchHelperConfig,
+                "DOWNLOAD_ENGINE": DownloadEngineConfig,
+                "FFMPEG": FFmpegConfig
+            }
+            data = response.json()
+            configData = data.get("global")
+            configData.update(data.get("local").get(Translator.getLanguage()))
+            for key, value in configData.items():
+                if ":" in key:
+                    configTarget, configPath = key.split(":", 1)
+                    configTarget = CONFIG_FILES[configTarget]
+                else:
+                    configPath = key
+                    configTarget = CONFIG_FILES[""]
+                configPath = configPath.split(".")
+                for target in configPath[:-1]:
+                    configTarget = getattr(configTarget, target)
+                setattr(configTarget, configPath[-1], value)
         except:
-            raise Exceptions.ConnectionFailure
-        if response.status_code == 200:
-            try:
-                from Core.Config import Config as CoreConfig
-                from Services.Image.Config import Config as ImageConfig
-                from Services.Account.Config import Config as AuthConfig
-                from Services.Ad.Config import Config as AdConfig
-                from Services.Translator.Config import Config as TranslatorConfig
-                from Services.Temp.Config import Config as TempConfig
-                from Services.Logging.Config import Config as LogConfig
-                from Services.Twitch.Gql.TwitchGqlConfig import Config as GqlConfig
-                from Services.Twitch.Playback.TwitchPlaybackConfig import Config as PlaybackConfig
-                from Search.Config import Config as SearchConfig
-                from Search.Helper.Config import Config as SearchHelperConfig
-                from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
-                from Download.Downloader.FFmpeg.Config import Config as FFmpegConfig
-                CONFIG_FILES = {
-                    "": CoreConfig,
-                    "IMAGE": ImageConfig,
-                    "AUTH": AuthConfig,
-                    "AD": AdConfig,
-                    "TRANSLATOR": TranslatorConfig,
-                    "TEMP": TempConfig,
-                    "LOG": LogConfig,
-                    "API": GqlConfig,
-                    "PLAYBACK": PlaybackConfig,
-                    "SEARCH": SearchConfig,
-                    "SEARCH_HELPER": SearchHelperConfig,
-                    "DOWNLOAD_ENGINE": DownloadEngineConfig,
-                    "FFMPEG": FFmpegConfig
-                }
-                data = response.json()
-                configData = data.get("global")
-                configData.update(data.get("local").get(Translator.getLanguage()))
-                for key, value in configData.items():
-                    if ":" in key:
-                        configTarget, configPath = key.split(":", 1)
-                        configTarget = CONFIG_FILES[configTarget]
-                    else:
-                        configPath = key
-                        configTarget = CONFIG_FILES[""]
-                    configPath = configPath.split(".")
-                    for target in configPath[:-1]:
-                        configTarget = getattr(configTarget, target)
-                    setattr(configTarget, configPath[-1], value)
-            except:
-                raise Exceptions.UnexpectedError
-        else:
-            raise Exceptions.ConnectionFailure
+            raise Exceptions.UnexpectedError
 
     def updateRestrictions(self):
+        response = self.getData(OSUtils.joinUrl(Config.SERVER_URL, "restrictions.json"))
         try:
-            response = Network.session.get(OSUtils.joinUrl(Config.SERVER_URL, "restrictions.json", params={"version": Config.VERSION}))
+            data = response.json()
+            ContentManager.setRestrictions(data)
         except:
-            raise Exceptions.ConnectionFailure
-        if response.status_code == 200:
-            try:
-                data = response.json()
-                ContentManager.setRestrictions(data)
-            except:
-                raise Exceptions.UnexpectedError
-        else:
-            raise Exceptions.ConnectionFailure
+            raise Exceptions.UnexpectedError
 
 Updater = _Updater()

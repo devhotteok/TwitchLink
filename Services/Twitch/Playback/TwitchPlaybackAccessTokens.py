@@ -3,6 +3,7 @@ from .PlaylistReader import PlaylistReader
 from .TwitchPlaybackConfig import Config
 
 from Services.NetworkRequests import Network
+from Database.EncoderDecoder import Codable
 
 import json
 
@@ -59,7 +60,7 @@ class Exceptions:
             self.VIDEO_ID = VIDEO_ID
 
         def __str__(self):
-            return f"Video Restricted - Subscribers Only\nVideo: {self.VIDEO_ID}"
+            return f"Video Restricted - Subscriber-Only\nVideo: {self.VIDEO_ID}"
 
     class VideoNotFound(Exception):
         def __init__(self, VIDEO_ID):
@@ -82,7 +83,10 @@ class Exceptions:
         def __str__(self):
             return f"Invalid Resolution\nTry {self.resolutions}"
 
-class TwitchPlaybackAccessToken:
+class TwitchPlaybackAccessToken(Codable):
+    CODABLE_INIT_MODEL = False
+    CODABLE_STRICT_MODE = False
+
     def __init__(self, tokenType):
         self.type = TwitchPlaybackAccessTokenTypes(tokenType)
         self.resolutions = {}
@@ -243,7 +247,7 @@ class TwitchVideo(TwitchPlaybackAccessToken, PlaylistReader, ResolutionNameGener
                 "isLive": False,
                 "login": "",
                 "isVod": True,
-                "vodID": self.VIDEO_ID,
+                "vodID": str(self.VIDEO_ID),
                 "playerType": "embed"
             }
         }

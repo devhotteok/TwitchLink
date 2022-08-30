@@ -1,14 +1,14 @@
 from Core.Ui import *
-from Ui.Operators.DocumentViewer import DocumentViewer
-from Ui.Operators.TermsOfService import TermsOfService
+from Ui.Components.Operators.DocumentViewer import DocumentViewer
+from Ui.Components.Widgets.TermsOfService import TermsOfService
 
 
-class DocumentPage(DocumentViewer):
+class InformationPage(DocumentViewer):
     accountRefreshRequested = QtCore.pyqtSignal()
     appShutdownRequested = QtCore.pyqtSignal()
 
     def __init__(self, pageObject, parent=None):
-        super(DocumentPage, self).__init__(parent=parent)
+        super(InformationPage, self).__init__(parent=parent)
         self.pageObject = pageObject
         self.tabCountChanged.connect(self.updatePageState)
         self.updatePageState()

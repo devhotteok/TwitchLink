@@ -16,6 +16,11 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
   <property name="styleSheet">
    <string notr="true">#Dialog {
 	border: 5px solid rgba(145, 71, 255, 255);

@@ -21,7 +21,7 @@
 ## Features
 
 - **Stream / Video / Clip Download Support**
-- **Subscribers-Only Video Download Support**
+- **Subscriber-Only Video Download Support**
 - **Thumbnail Download Support**
 - **Audio Only Download Support**
 - **Video Unmute Support**

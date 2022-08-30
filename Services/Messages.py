@@ -4,7 +4,6 @@ class Info:
     FILE_NOT_FOUND = ("error", "#File not found.\nIt has been moved, renamed or deleted.")
     FILE_SYSTEM_ERROR = ("system-error", "#A system error has occurred.\n\nPossible Causes\n\n* Too long or invalid filename or path\n* Out of storage capacity\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.")
     NETWORK_ERROR = ("network-error", "#A network error has occurred.")
-    DOWNLOAD_ERROR = ("error", "#An error occurred while downloading.")
 
     UNAVAILABLE_FILENAME_OR_DIRECTORY = ("error", "#The target directory or filename is unavailable.")
 

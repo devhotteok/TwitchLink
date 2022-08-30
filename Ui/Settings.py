@@ -34,17 +34,17 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.newBookmark.textChanged.connect(self.reloadBookmarkArea)
         self.addBookmarkButton.clicked.connect(self.tryAddBookmark)
         self.removeBookmarkButton.clicked.connect(self.removeBookmark)
-        self.useExternalContentUrl.setChecked(DB.advanced.isExternalContentUrlEnabled())
-        self.useExternalContentUrl.toggled.connect(DB.advanced.setExternalContentUrlEnabled)
-        self.useExternalContentUrlInfo.clicked.connect(self.showExternalContentUrlInfo)
+        self.searchExternalContent.setChecked(DB.advanced.isSearchExternalContentEnabled())
+        self.searchExternalContent.toggled.connect(DB.advanced.setSearchExternalContentEnabled)
+        self.searchExternalContentInfo.clicked.connect(self.showSearchExternalContentInfo)
         self.useCaching.setChecked(DB.advanced.isCachingEnabled())
         self.useCaching.toggled.connect(DB.advanced.setCachingEnabled)
         self.useCachingInfo.clicked.connect(self.showCachingInfo)
         self.language.addItems(Translator.getLanguageList())
         self.language.setCurrentIndex(Translator.getLanguageKeyList().index(DB.localization.getLanguage()))
         self.language.currentIndexChanged.connect(self.setLanguage)
-        self.timezone.addItems(DB.localization.getTimezoneList())
-        self.timezone.setCurrentText(DB.localization.getTimezone().zone)
+        self.timezone.addItems(DB.localization.getTimezoneNameList())
+        self.timezone.setCurrentText(DB.localization.getTimezone().name())
         self.timezone.currentTextChanged.connect(self.setTimezone)
         self.recommendedSpeed.setText(EngineConfig.RECOMMENDED_THREAD_LIMIT)
         self.downloadSpeed.setRange(1, EngineConfig.MAX_THREAD_LIMIT)
@@ -99,17 +99,12 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
             "{game}": "category"
         }
 
-    def getResolutionInfo(self):
-        return {
-            "{resolution}": "file-resolution"
-        }
-
     def getNameInfo(self, nameType):
         translated = T(nameType)
         return {
             f"{{{nameType}}}": f"{translated} {T('username')}",
             f"{{{nameType}_name}}": f"{translated} {T('displayname')}",
-            f"{{{nameType}_formatted_name}}": T("#'displayname' if {nameType} Displayname is English, otherwise 'username(displayname)'", nameType=translated)
+            f"{{{nameType}_formatted_name}}": T("#'displayname' if {nameType} Displayname is English, otherwise 'displayname(username)'", nameType=translated)
         }
 
     def getTimeInfo(self, timeType):
@@ -123,6 +118,11 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
             "{hour}": f"{T(f'{timeType}-time')} - {T('hour')}",
             "{minute}": f"{T(f'{timeType}-time')} - {T('minute')}",
             "{second}": f"{T(f'{timeType}-time')} - {T('second')}"
+        }
+
+    def getResolutionInfo(self):
+        return {
+            "{resolution}": "file-resolution"
         }
 
     def showStreamTemplateInfo(self):
@@ -212,8 +212,8 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
     def saveBookmark(self):
         DB.general.setBookmarks([self.bookmarkList.item(index).text() for index in range(self.bookmarkList.count())])
 
-    def showExternalContentUrlInfo(self):
-        self.info("information", "#Recognize external content in URL search.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.")
+    def showSearchExternalContentInfo(self):
+        self.info("information", "#Allow URL Search to retrieve external content.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.")
 
     def showCachingInfo(self):
         self.info("information", "#Caches images for faster retrieval next time, but consumes a lot of memory(RAM).")
@@ -234,7 +234,7 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.speedSpinBox.setValueSilent(speed)
 
     def resetSettings(self):
-        if self.ask("reset-settings", "#This will reset all settings.\nProceed?"):
+        if self.ask("warning", "#This will reset all settings.\nProceed?"):
             self.requestRestart()
             DB.reset()
 

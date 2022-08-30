@@ -16,4 +16,4 @@ class _QProgressDialog(QtWidgets.QProgressDialog):
 
     def reject(self):
         self.canceled.emit()
-QtWidgets.QProgressDialog = _QProgressDialog
+QtWidgets.QProgressDialog = _QProgressDialog #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)

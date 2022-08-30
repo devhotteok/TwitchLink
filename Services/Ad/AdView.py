@@ -7,7 +7,6 @@ class AdView(QtWebEngineWidgets.QWebEngineView):
     def __init__(self, parent=None):
         super(AdView, self).__init__(parent=parent)
         self.adSize = (0, 0)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         self.setPage(AdPage(parent=self))
 
     def moveTo(self, widget):

@@ -27,6 +27,10 @@
     "en": "Notification",
     "ko": "알림"
   },
+  "delete-error-history": {
+    "en": "Delete Error History",
+    "ko": "오류 기록 삭제"
+  },
   "shutting-down": {
     "en": "Shutting Down",
     "ko": "종료하는 중"
@@ -47,13 +51,17 @@
     "en": "No Results Found",
     "ko": "검색 결과 없음"
   },
-  "reset-settings": {
-    "en": "Reset Settings",
-    "ko": "설정 초기화"
+  "developer-tools": {
+    "en": "Developer Tools",
+    "ko": "개발자 도구"
   },
   "login": {
     "en": "Login",
     "ko": "로그인"
+  },
+  "cancel-login": {
+    "en": "Cancel Login",
+    "ko": "로그인 취소"
   },
   "logout": {
     "en": "Logout",
@@ -93,7 +101,7 @@
   },
   "live": {
     "en": "Live",
-    "ko": "생방송"
+    "ko": "실시간"
   },
   "rerun": {
     "en": "Rerun",
@@ -127,9 +135,9 @@
     "en": "Crop",
     "ko": "자르기"
   },
-  "video-crop": {
-    "en": "Video Crop",
-    "ko": "비디오 자르기"
+  "optimize-file": {
+    "en": "Optimize File",
+    "ko": "파일 최적화"
   },
   "overwrite": {
     "en": "Overwrite",
@@ -223,6 +231,10 @@
     "en": "Network Error",
     "ko": "네트워크 오류"
   },
+  "contribute": {
+    "en": "Contribute",
+    "ko": "기여"
+  },
   "restart": {
     "en": "Restart",
     "ko": "재시작"
@@ -246,6 +258,14 @@
   "clip": {
     "en": "Clip",
     "ko": "클립"
+  },
+  "external-content": {
+    "en": "External Content",
+    "ko": "외부 콘텐츠"
+  },
+  "channel-offline-image": {
+    "en": "Channel Offline Image",
+    "ko": "채널 오프라인 이미지"
   },
   "preview": {
     "en": "Preview",
@@ -311,9 +331,21 @@
     "en": "Information",
     "ko": "정보"
   },
+  "view-file-properties": {
+    "en": "View File Properties",
+    "ko": "파일 속성 보기"
+  },
+  "view-image-properties": {
+    "en": "View Image Properties",
+    "ko": "이미지 속성 보기"
+  },
+  "save-image": {
+    "en": "Save Image",
+    "ko": "이미지 저장"
+  },
   "file-type": {
     "en": "File Type",
-    "ko": "파일 종류"
+    "ko": "파일 유형"
   },
   "id": {
     "en": "ID",

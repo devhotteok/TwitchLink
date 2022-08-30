@@ -23,6 +23,30 @@
     "en": "A new version of {appName} has been released!",
     "ko": "{appName}의 새로운 버전이 출시되었습니다!"
   },
+  "#We detected an error and disabled some features.\nClick '{buttonText}' to try again.": {
+    "en": "We detected an error and disabled some features.\nClick '{buttonText}' to try again.",
+    "ko": "오류를 감지하여 일부 기능을 비활성화하였습니다.\n다시 시도하려면 '{buttonText}' 버튼을 누르세요."
+  },
+  "#Some features may not be activated until the app is restarted.": {
+    "en": "Some features may not be activated until the app is restarted.",
+    "ko": "일부 기능은 기록 삭제 후 앱을 다시 실행해야 활성화될 수도 있습니다."
+  },
+  "#If the error persists, contact the developer.": {
+    "en": "If the error persists, contact the developer.",
+    "ko": "오류가 지속된다면 개발자에게 문의하세요."
+  },
+  "#This module cannot be loaded.": {
+    "en": "This module cannot be loaded.",
+    "ko": "해당 모듈을 불러올 수 없습니다."
+  },
+  "#It seems that some features are not compatible with your PC.": {
+    "en": "It seems that some features are not compatible with your PC.",
+    "ko": "사용자의 PC에서 일부 기능이 호환되지 않는 것 같습니다."
+  },
+  "#Try updating your graphics driver to the latest version.": {
+    "en": "Try updating your graphics driver to the latest version.",
+    "ko": "그래픽 드라이버를 최신 버전으로 업데이트하세요."
+  },
   "#Do not show this again.": {
     "en": "Do not show this again.",
     "ko": "다시 보지 않기"
@@ -95,6 +119,14 @@
     "en": "No Results Found.",
     "ko": "검색 결과가 없습니다."
   },
+  "#Your downloads will be displayed here.": {
+    "en": "Your downloads will be displayed here.",
+    "ko": "다운로드한 콘텐츠가 이곳에 표시됩니다."
+  },
+  "#There are no matches for this filter.": {
+    "en": "There are no matches for this filter.",
+    "ko": "필터 조건에 일치하는 결과가 없습니다."
+  },
   "#When all downloads are complete, it will perform the selected action.\nA warning notification will be displayed for a period of time so that the operation can be canceled.\nWhen the time expires, the action will be performed.": {
     "en": "When all downloads are complete, it will perform the selected action.\nA warning notification will be displayed for a period of time so that the operation can be canceled.\nWhen the time expires, the action will be performed.",
     "ko": "모든 다운로드가 끝나면 선택된 작업을 수행합니다.\n작업이 수행되기 전 일정 시간 동안 경고 알림이 표시되며 이때 작업을 취소할 수 있습니다.\n시간이 경과하면 작업이 수행됩니다."
@@ -103,33 +135,41 @@
     "en": "Filename Template Variables",
     "ko": "파일명 자동 생성 규칙 변수"
   },
-  "#'displayname' if {nameType} Displayname is English, otherwise 'username(displayname)'": {
-    "en": "'displayname' if {nameType} Displayname is English, otherwise 'username(displayname)'",
-    "ko": "{nameType} 사용자 닉네임이 영어라면 '닉네임', 그렇지 않으면 '아이디(닉네임)'"
+  "#'displayname' if {nameType} Displayname is English, otherwise 'displayname(username)'": {
+    "en": "'displayname' if {nameType} Displayname is English, otherwise 'displayname(username)'",
+    "ko": "{nameType} 사용자 닉네임이 영어라면 '닉네임', 그렇지 않으면 '닉네임(아이디)'"
   },
   "#This will reset all settings.\nProceed?": {
     "en": "This will reset all settings.\nProceed?",
     "ko": "모든 데이터가 초기화됩니다.\n진행하시겠습니까?"
   },
-  "#Logging in": {
-    "en": "Logging in",
-    "ko": "로그인 중"
+  "#Close the window by pressing [{key}].": {
+    "en": "Close the window by pressing [{key}].",
+    "ko": "[{key}]키를 이용해 닫을 수 있습니다."
   },
-  "#Chrome browser or Edge browser is required to proceed.": {
-    "en": "Chrome browser or Edge browser is required to proceed.",
-    "ko": "로그인을 진행하려면 Chrome 브라우저 또는 Edge 브라우저가 필요합니다."
+  "#Log in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)": {
+    "en": "Log in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)",
+    "ko": "로그인하여 Twitch 계정의 혜택을 {appName} 앱과 연동하세요.\n(생방송 광고 제거, 구독자 전용 생방송 다운로드, 구독자 전용 비디오 다운로드, Twitch Prime 또는 Twitch Turbo의 혜택 등)"
   },
-  "#Unable to load Chrome browser or Edge browser.\nIf the error persists, try Run as administrator.": {
-    "en": "Unable to load Chrome browser or Edge browser.\nIf the error persists, try Run as administrator.",
-    "ko": "Chrome 브라우저 또는 Edge 브라우저를 불러올 수 없습니다.\n오류가 지속된다면 프로그램을 관리자 권한으로 실행하세요."
-  },
-  "#Login failed.": {
-    "en": "Login failed.",
-    "ko": "로그인에 실패하였습니다."
+  "#Are you sure you want to cancel the login operation in progress?": {
+    "en": "Are you sure you want to cancel the login operation in progress?",
+    "ko": "진행 중인 로그인 작업을 취소하시겠습니까?"
   },
   "#Are you sure you want to log out?": {
     "en": "Are you sure you want to log out?",
     "ko": "정말 로그아웃하시겠습니까?"
+  },
+  "#You left the login page.": {
+    "en": "You left the login page.",
+    "ko": "로그인 페이지를 벗어났습니다."
+  },
+  "#Return to login page": {
+    "en": "Return to login page",
+    "ko": "로그인 페이지로 돌아가기"
+  },
+  "#Please follow the login procedure.": {
+    "en": "Please follow the login procedure.",
+    "ko": "로그인 절차를 따라주세요."
   },
   "#Twitch Stream / Video / Clip Downloader": {
     "en": "Twitch Stream / Video / Clip Downloader",
@@ -193,11 +233,11 @@
   },
   "#You need to log in to download subscriber-only videos.": {
     "en": "You need to log in to download subscriber-only videos.",
-    "ko": "구독자 전용 영상은 로그인을 통해 다운로드할 수 있습니다."
+    "ko": "구독자 전용 비디오는 로그인을 통해 다운로드할 수 있습니다."
   },
   "#This video is for subscribers only.\n{advice}": {
     "en": "This video is for subscribers only.\n{advice}",
-    "ko": "구독자 전용 영상입니다.\n{advice}"
+    "ko": "구독자 전용 비디오입니다.\n{advice}"
   },
   "#Clip not found. Deleted or temporary error.": {
     "en": "Clip not found. Deleted or temporary error.",
@@ -235,9 +275,9 @@
     "en": "You are not currently logged in.",
     "ko": "현재 로그인하지 않았습니다."
   },
-  "#This stream contains ads.\n{appName} will block ads, but may fail, in which case an alternate screen will be displayed.\n\nTo completely block ads, you must log in with a subscribed account.\n{adBlockFailReason}\n\nProceed?": {
-    "en": "This stream contains ads.\n{appName} will block ads, but may fail, in which case an alternate screen will be displayed.\n\nTo completely block ads, you must log in with a subscribed account.\n{adBlockFailReason}\n\nProceed?",
-    "ko": "이 생방송에는 광고가 송출됩니다.\n{appName}이/가 광고를 차단하지만 실패할 수 있으며 이 경우 대체화면이 표시됩니다.\n\n완전한 차단을 위해서는 구독된 계정의 로그인이 필요합니다.\n{adBlockFailReason}\n\n진행하시겠습니까?"
+  "#This stream may contain ads.\n{appName} will block ads, but may fail, in which case an alternate screen will be displayed.\n\nTo completely block ads, you must log in with a subscribed account.\n{adBlockFailReason}\n\nProceed?": {
+    "en": "This stream may contain ads.\n{appName} will block ads, but may fail, in which case an alternate screen will be displayed.\n\nTo completely block ads, you must log in with a subscribed account.\n{adBlockFailReason}\n\nProceed?",
+    "ko": "이 생방송에서 광고가 송출될 수 있습니다.\n{appName}이/가 광고를 차단하지만 실패할 수 있으며 이 경우 대체화면이 표시됩니다.\n\n완전한 차단을 위해서는 구독된 계정의 로그인이 필요합니다.\n{adBlockFailReason}\n\n진행하시겠습니까?"
   },
   "#Authentication of your account has been denied.": {
     "en": "Authentication of your account has been denied.",
@@ -267,13 +307,13 @@
     "en": "Update track mode is currently enabled.\nSetting the end of the crop range will not track updates.\nProceed?",
     "ko": "현재 업데이트 추적 모드가 활성화되어있습니다.\n자르기 범위의 끝부분을 설정하면 업데이트 추적을 하지 않습니다.\n진행하시겠습니까?"
   },
+  "#This will crop the video at a point near this range that requires less computation.\nThis may result in an error of seconds.\nActivate '{menuName}' for accurate processing.": {
+    "en": "This will crop the video at a point near this range that requires less computation.\nThis may result in an error of seconds.\nActivate '{menuName}' for accurate processing.",
+    "ko": "설정된 범위와 가장 가까운 연산량이 적은 지점에서 비디오를 자릅니다.\n초 단위의 오차가 발생할 수 있습니다.\n정확한 범위 처리를 원한다면 '{menuName}' 옵션을 활성화하세요."
+  },
   "#The end of the crop range is currently set.\nEnabling update track mode will ignore the end of the crop range and continue downloading.\nProceed?": {
     "en": "The end of the crop range is currently set.\nEnabling update track mode will ignore the end of the crop range and continue downloading.\nProceed?",
     "ko": "현재 자르기 범위의 끝부분이 설정되어 있습니다.\n업데이트 추적 모드를 활성화하면 자르기 범위의 끝부분을 무시하고 비디오를 끝까지 다운로드합니다.\n진행하시겠습니까?"
-  },
-  "#Video crop is based on the closest point in the crop range that can be processed.": {
-    "en": "Video crop is based on the closest point in the crop range that can be processed.",
-    "ko": "비디오 자르기는 자르기 범위에서 처리할 수 있는 가장 가까운 지점을 기준으로 합니다."
   },
   "#{fileFormat} file (*.{fileFormat})": {
     "en": "{fileFormat} file (*.{fileFormat})",
@@ -281,7 +321,7 @@
   },
   "#You already have one or more {downloadType}s in progress.\nDepending on the network specifications, if you proceed with the {operationType} download, the live download may become unstable or interrupted.\nProceed?": {
     "en": "You already have one or more {downloadType}s in progress.\nDepending on the network specifications, if you proceed with the {operationType} download, the live download may become unstable or interrupted.\nProceed?",
-    "ko": "이미 진행 중인 {downloadType}가 하나 이상 있습니다.\n네트워크 사양에 따라 {operationType} 다운로드를 함께 진행하면 생방송 다운로드가 불안정해지거나 중단될 수 있습니다.\n진행하시겠습니까?"
+    "ko": "이미 진행 중인 {downloadType}가 하나 이상 있습니다.\n네트워크 사양에 따라 {operationType} 다운로드를 함께 진행하면 실시간 다운로드가 불안정해지거나 중단될 수 있습니다.\n진행하시겠습니까?"
   },
   "#There is another download in progress with the same file name.": {
     "en": "There is another download in progress with the same file name.",
@@ -299,9 +339,9 @@
     "en": "Missing {missingFiles} segments ({missingSeconds})",
     "ko": "{missingFiles}개 구간 누락 ({missingSeconds})"
   },
-  "#{duration} - Crop: {totalDuration}({startTime}~{endTime})": {
-    "en": "{duration} - Crop: {totalDuration}({startTime}~{endTime})",
-    "ko": "{duration} - 자르기: {totalDuration}({startTime}~{endTime})"
+  "#{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]": {
+    "en": "{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]",
+    "ko": "{duration} [원본: {totalDuration} / 자르기: {startTime}~{endTime}]"
   },
   "#This will skip the rest of the download and encode the already downloaded part.\nProceed?": {
     "en": "This will skip the rest of the download and encode the already downloaded part.\nProceed?",
@@ -343,6 +383,10 @@
     "en": "An error occurred while downloading.",
     "ko": "다운로드 도중 오류가 발생하였습니다."
   },
+  "#If the error persists, try disabling the '{menuName}' option.": {
+    "en": "If the error persists, try disabling the '{menuName}' option.",
+    "ko": "오류가 지속된다면 '{menuName}' 옵션을 비활성화하세요."
+  },
   "#Folder not found.\nIt has been moved, renamed or deleted.": {
     "en": "Folder not found.\nIt has been moved, renamed or deleted.",
     "ko": "대상 폴더를 찾을 수 없습니다.\n이름이 변경되었거나 이동 또는 삭제되었습니다."
@@ -355,13 +399,17 @@
     "en": "A system error has occurred.\n\nPossible Causes\n\n* Too long or invalid filename or path\n* Out of storage capacity\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.",
     "ko": "시스템 오류가 발생하였습니다.\n\n가능한 원인\n\n* 너무 길거나 유효하지 않은 파일명 또는 경로\n* 저장 용량 부족\n* 해당 작업을 수행하기 위한 권한 필요\n\n오류가 지속된다면 프로그램을 관리자 권한으로 실행하세요."
   },
+  "#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.": {
+    "en": "You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.",
+    "ko": "지금까지 총 {totalFiles}({totalSize})개의 영상을 다운로드하셨습니다.\n더 나은 기능과 서비스를 위해 {appName} 개발에 기여해 주세요."
+  },
   "#Drag to change order.": {
     "en": "Drag to change order.",
     "ko": "드래그하여 순서를 변경합니다."
   },
-  "#Recognize external content in URL search.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.": {
-    "en": "Recognize external content in URL search.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.",
-    "ko": "URL 검색에서 외부 콘텐츠 링크를 인식합니다.\n스트리머 혹은 편집자가 대시보드 상의 비공개 영상을 다운로드할 수 있습니다.\nTwitch 외부의 콘텐츠를 다운로드할 수 있습니다."
+  "#Allow URL Search to retrieve external content.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.": {
+    "en": "Allow URL Search to retrieve external content.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.",
+    "ko": "URL 검색에서 외부 콘텐츠를 검색하도록 허용합니다.\n스트리머 혹은 편집자가 대시보드 상의 비공개 비디오를 다운로드할 수 있습니다.\nTwitch 외부의 콘텐츠를 다운로드할 수 있습니다."
   },
   "#Caches images for faster retrieval next time, but consumes a lot of memory(RAM).": {
     "en": "Caches images for faster retrieval next time, but consumes a lot of memory(RAM).",
@@ -379,13 +427,29 @@
     "en": "If there are no problems with the sound source used, or if there are parts that have been muted in error despite having permission to use them, you can use this function to unmute them.\nIn some cases, unmute may not be successful.",
     "ko": "사용된 음원에 문제가 없거나 정당한 이용 권한이 있음에도 불구하고 오류로 음소거된 부분이 있다면 이 기능을 사용하여 음소거를 해제할 수 있습니다.\n경우에 따라 음소거 해제에 성공하지 못할 수도 있습니다."
   },
-  "#Downloads the live replay continuously until the live broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.": {
-    "en": "Downloads the live replay continuously until the live broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.",
-    "ko": "생방송 다시보기를 생방송이 종료될 때까지 이어서 받아옵니다.\n일정 시간 동안 영상의 변동 사항이 없으면 다운로드가 종료됩니다."
+  "#Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.": {
+    "en": "Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.",
+    "ko": "실시간 다시보기를 방송이 종료될 때까지 이어서 받아옵니다.\n일정 시간 동안 비디오의 변동 사항이 없으면 다운로드가 종료됩니다."
+  },
+  "#Maintains {videoType} quality but reduces file size.\nThis increases the computation of the encoding process and consumes a lot of time.": {
+    "en": "Maintains {videoType} quality but reduces file size.\nThis increases the computation of the encoding process and consumes a lot of time.",
+    "ko": "{videoType} 화질은 유지하지만 파일 용량이 줄어듭니다.\n이 작업은 인코딩 과정의 연산량을 증가시키고 많은 시간을 소모합니다."
+  },
+  "#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.": {
+    "en": "This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.",
+    "ko": "이 작업은 리소스를 많이 소모합니다.\n사용자의 PC 사양에 따라 다른 프로세스의 성능에 영향을 줄 수도 있습니다.\n\n{videoType} 파일에 손상된 부분이 있다면 오류가 발생할 수도 있습니다."
+  },
+  "#Depending on the streamer's broadcast settings, this option may not have any effect.": {
+    "en": "Depending on the streamer's broadcast settings, this option may not have any effect.",
+    "ko": "스트리머의 방송 설정에 따라 이 옵션이 효과가 없을 수도 있습니다."
+  },
+  "#Depending on the video properties, this option may not have any effect.": {
+    "en": "Depending on the video properties, this option may not have any effect.",
+    "ko": "비디오 속성에 따라 이 옵션이 효과가 없을 수도 있습니다."
   },
   "#This download will be prioritized. Downloads with this option take precedence over those without.": {
     "en": "This download will be prioritized. Downloads with this option take precedence over those without.",
-    "ko": "이 다운로드를 우선적으로 처리합니다. 이 옵션이 선택된 다운로드들은 선택되지 않은 다운로드들 보다 우선적으로 다운로드됩니다."
+    "ko": "이 다운로드를 우선적으로 처리합니다. 이 옵션이 선택된 다운로드들은 선택되지 않은 다운로드들보다 우선적으로 다운로드됩니다."
   },
   "#{content} downloads for this channel have been restricted either by the streamer({channel})'s request or by the administrator.": {
     "en": "{content} downloads for this channel have been restricted either by the streamer({channel})'s request or by the administrator.",
@@ -395,8 +459,12 @@
     "en": "This content has been restricted by the request of the streamer({channel}) or by the administrator.",
     "ko": "스트리머({channel})의 요청 또는 관리자에 의해 제한된 콘텐츠입니다."
   },
-  "#To protect the rights of streamers, {appName} restrict downloads when a content restriction request is received.": {
-    "en": "To protect the rights of streamers, {appName} restrict downloads when a content restriction request is received.",
+  "#To protect the rights of streamers, {appName} restricts downloads when a content restriction request is received.": {
+    "en": "To protect the rights of streamers, {appName} restricts downloads when a content restriction request is received.",
     "ko": "{appName}은/는 스트리머의 권리를 보호하기 위해 콘텐츠 제한 요청이 접수되면 해당 콘텐츠의 다운로드를 제한합니다."
+  },
+  "#Attempts to start a new download based on your download history.\nFile data and download settings are generated based on this history and may differ from the current {contentType}. ({properties}, etc.)": {
+    "en": "Attempts to start a new download based on your download history.\nFile data and download settings are generated based on this history and may differ from the current {contentType}. ({properties}, etc.)",
+    "ko": "다운로드 기록을 바탕으로 새 다운로드를 시작하려 합니다.\n파일 정보 및 다운로드 설정이 이 기록을 바탕으로 생성되며 현재의 {contentType}와/과 다를 수 있습니다. ({properties} 등)"
   }
 }

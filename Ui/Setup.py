@@ -1,7 +1,5 @@
 from Core.Ui import *
 
-import datetime
-
 
 class Setup(QtWidgets.QDialog, UiFile.setup):
     def __init__(self, parent=None):
@@ -14,8 +12,8 @@ class Setup(QtWidgets.QDialog, UiFile.setup):
         self.language.addItems(Translator.getLanguageList())
         self.language.setCurrentIndex(Translator.getLanguageKeyList().index(DB.localization.getLanguage()))
         self.language.currentIndexChanged.connect(self.setLanguage)
-        self.timezone.addItems(DB.localization.getTimezoneList())
-        self.timezone.setCurrentText(DB.localization.getTimezone().zone)
+        self.timezone.addItems(DB.localization.getTimezoneNameList())
+        self.timezone.setCurrentText(DB.localization.getTimezone().name())
         self.timezone.currentTextChanged.connect(self.setTimezone)
         self.showTimezoneTime()
         self.timer = QtCore.QTimer(parent=self)
@@ -31,7 +29,7 @@ class Setup(QtWidgets.QDialog, UiFile.setup):
         self.showTimezoneTime()
 
     def showTimezoneTime(self):
-        self.timezoneTimeLabel.setText(datetime.datetime.now(tz=DB.localization.getTimezone()))
+        self.timezoneTimeLabel.setText(QtCore.QDateTime.currentDateTimeUtc().toTimeZone(DB.localization.getTimezone()))
 
     def proceed(self):
         self.stackedWidget.setCurrentIndex(1)

@@ -10,6 +10,14 @@
     <height>282</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::CustomContextMenu</enum>
+  </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
@@ -27,7 +35,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="thumbnail_image">
+    <widget class="QLabel" name="thumbnailImage">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -39,6 +47,9 @@
        <width>384</width>
        <height>216</height>
       </size>
+     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
      </property>
      <property name="text">
       <string/>
@@ -70,7 +81,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="category_image">
+       <widget class="QLabel" name="categoryImage">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -156,10 +167,16 @@
       </item>
       <item>
        <widget class="QToolButton" name="more">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="maximumSize">
          <size>
           <width>40</width>
-          <height>60</height>
+          <height>16777215</height>
          </size>
         </property>
         <property name="toolTip">

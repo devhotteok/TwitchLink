@@ -62,12 +62,12 @@ class TaskManager(QtCore.QObject):
     def _taskComplete(self, task):
         with self._actionLock:
             self.runningTasks.remove(task)
+            self.taskCompleteSignal.emit(task)
             if len(self.runningTasks) == 0:
                 if self.status.isPaused():
                     self._pausedCondition.makeTrue()
                 elif len(self.tasks) == 0:
                     self._doneCondition.makeTrue()
-        self.taskCompleteSignal.emit(task)
 
     @property
     def ifPaused(self):

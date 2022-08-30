@@ -7,8 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>426</width>
-    <height>660</height>
+    <height>622</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Search Result</string>
@@ -18,9 +23,9 @@
   </property>
   <layout class="QVBoxLayout" name="FormLayout">
    <item>
-    <widget class="QLabel" name="window_title">
+    <widget class="QLabel" name="windowTitleLabel">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -36,7 +41,7 @@
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line">
+    <widget class="Line" name="windowTitleLine">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -158,7 +163,7 @@ border-radius: 10px;</string>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="viewer_count">
+           <widget class="QLabel" name="viewerCount">
             <property name="text">
              <string>0</string>
             </property>
@@ -177,7 +182,7 @@ border-radius: 10px;</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../icons/update.svg</normaloff>../icons/update.svg</iconset>
+              <normaloff>../icons/reload.svg</normaloff>../icons/reload.svg</iconset>
             </property>
            </widget>
           </item>
@@ -225,15 +230,12 @@ border-radius: 10px;</string>
           </property>
           <item>
            <widget class="QWidget" name="profileArea" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <layout class="QVBoxLayout" name="profileAreaLayout">
-             <item alignment="Qt::AlignHCenter">
-              <widget class="QLabel" name="profile_image">
+            <layout class="QHBoxLayout" name="profileAreaLayout">
+             <property name="spacing">
+              <number>12</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="profileImage">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -242,8 +244,8 @@ border-radius: 10px;</string>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>100</width>
-                 <height>100</height>
+                 <width>80</width>
+                 <height>80</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -272,108 +274,160 @@ border-radius: 10px;</string>
                </property>
               </widget>
              </item>
-             <item alignment="Qt::AlignHCenter">
-              <widget class="QLabel" name="display_name">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>10</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Channel</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="channelMeta" native="true">
-            <layout class="QVBoxLayout" name="channelMetaLayout">
              <item>
-              <widget class="QLabel" name="description">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Description</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="followers">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Followers</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QWidget" name="broadcaster_typeArea" native="true">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>80</width>
-                 <height>20</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 0, 0);
-border-radius: 10px;</string>
-               </property>
-               <layout class="QVBoxLayout" name="broadcaster_typeAreaLayout">
+              <widget class="QWidget" name="channelMeta" native="true">
+               <layout class="QVBoxLayout" name="channelMetaLayout">
                 <property name="leftMargin">
-                 <number>5</number>
+                 <number>0</number>
                 </property>
                 <property name="topMargin">
-                 <number>3</number>
+                 <number>0</number>
                 </property>
                 <property name="rightMargin">
-                 <number>5</number>
+                 <number>0</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>3</number>
+                 <number>0</number>
                 </property>
+                <item alignment="Qt::AlignLeft">
+                 <widget class="QWidget" name="displayNameArea" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <layout class="QHBoxLayout" name="displayNameAreaLayout">
+                   <property name="spacing">
+                    <number>3</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="displayName">
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>Channel</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="verifiedIcon">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="pixmap">
+                      <pixmap>../icons/verified.svg</pixmap>
+                     </property>
+                     <property name="scaledContents">
+                      <bool>true</bool>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
                 <item>
-                 <widget class="QLabel" name="broadcaster_type">
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
+                 <widget class="QLabel" name="description">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Broadcaster Type</string>
+                   <string>Description</string>
                   </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="followers">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
                   </property>
+                  <property name="text">
+                   <string>Followers</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QWidget" name="broadcasterTypeArea" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+border-radius: 10px;</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="broadcasterTypeAreaLayout">
+                   <property name="leftMargin">
+                    <number>5</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>5</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>3</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="broadcasterType">
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>Broadcaster Type</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                </layout>
@@ -493,7 +547,7 @@ border-radius: 10px;</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../icons/update.svg</normaloff>../icons/update.svg</iconset>
+              <normaloff>../icons/reload.svg</normaloff>../icons/reload.svg</iconset>
             </property>
            </widget>
           </item>

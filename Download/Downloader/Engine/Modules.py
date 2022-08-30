@@ -1,3 +1,5 @@
+from .Config import Config
+
 from Services.Utils.SystemUtils import SystemUtils
 
 
@@ -51,6 +53,7 @@ class Status:
         self.pauseState = State()
         self.terminateState = State()
         self._status = Status.PREPARING
+        self._waitingCount = 0
         self._waitingTime = None
         self._updateFound = False
         self._skipWaiting = False
@@ -71,6 +74,15 @@ class Status:
 
     def isWaiting(self):
         return self._status == Status.WAITING
+
+    def setWaitingCount(self, waitingCount):
+        self._waitingCount = waitingCount
+
+    def getWaitingCount(self):
+        return self._waitingCount
+
+    def getMaxWaitingCount(self):
+        return Config.UPDATE_TRACK_MAX_RETRY_COUNT
 
     def setWaitingTime(self, waitingTime):
         self._waitingTime = waitingTime
@@ -127,11 +139,9 @@ class Progress:
         self.file = 0
         self.totalFiles = 0
         self.missingFiles = 0
-        self.seconds = 0
-        self.totalSeconds = 0
-        self.missingSeconds = 0
-        self.size = SystemUtils.formatByteSize(0)
-        self.totalSize = SystemUtils.formatByteSize(0)
+        self.milliseconds = 0
+        self.totalMilliseconds = 0
+        self.missingMilliseconds = 0
         self.byteSize = 0
         self.totalByteSize = 0
 
@@ -148,5 +158,25 @@ class Progress:
         return self.getPercentage(self.seconds, self.totalSeconds)
 
     @property
-    def byteSizeProgress(self):
+    def seconds(self):
+        return self.milliseconds / 1000
+
+    @property
+    def totalSeconds(self):
+        return self.totalMilliseconds / 1000
+
+    @property
+    def missingSeconds(self):
+        return self.missingMilliseconds / 1000
+
+    @property
+    def size(self):
+        return SystemUtils.formatByteSize(self.byteSize)
+
+    @property
+    def totalSize(self):
+        return SystemUtils.formatByteSize(self.totalByteSize)
+
+    @property
+    def sizeProgress(self):
         return self.getPercentage(self.byteSize, self.totalByteSize)

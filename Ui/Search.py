@@ -21,23 +21,23 @@ class Search(QtWidgets.QDialog, UiFile.search):
 
     def setup(self):
         if self.mode.isChannel():
-            self.window_title.setText(T("#Search by Channel ID"))
+            self.windowTitleLabel.setText(T("#Search by Channel ID"))
             self.showSearchExamples(
                 SearchHelper.getChannelIdExamples()
             )
         elif self.mode.isVideo():
-            self.window_title.setText(T("#Search by Video / Clip ID"))
+            self.windowTitleLabel.setText(T("#Search by Video / Clip ID"))
             self.showSearchExamples(
                 SearchHelper.getVideoIdExamples(),
                 SearchHelper.getClipIdExamples()
             )
         elif self.mode.isUrl():
-            self.window_title.setText(T("#Search by Channel / Video / Clip URL"))
+            self.windowTitleLabel.setText(T("#Search by Channel / Video / Clip URL"))
             self.showSearchExamples(
                 SearchHelper.getUrlExamples()
             )
         else:
-            self.window_title.setText(T("#Enter your search term."))
+            self.windowTitleLabel.setText(T("#Enter your search term."))
             self.showSearchExamples(
                 SearchHelper.getChannelIdExamples(),
                 SearchHelper.getVideoIdExamples(),
@@ -84,7 +84,7 @@ class Search(QtWidgets.QDialog, UiFile.search):
         self.searchThread.setup(
             target=Engine.Search.Query,
             args=(self.mode, query),
-            kwargs={"searchExternalContent": DB.advanced.isExternalContentUrlEnabled()},
+            kwargs={"searchExternalContent": DB.advanced.isSearchExternalContentEnabled()},
         )
         self.searchThread.start()
 

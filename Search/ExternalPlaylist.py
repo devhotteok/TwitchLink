@@ -14,6 +14,10 @@ class ExternalPlaylist(TwitchPlaybackAccessTokens.TwitchPlaybackAccessToken, Twi
         self.url = url
         self.checkUrl()
 
+    @property
+    def totalSeconds(self):
+        return self.totalMilliSeconds / 1000
+
     def checkUrl(self):
         try:
             response = Network.session.get(self.url)
@@ -36,18 +40,18 @@ class ExternalPlaylist(TwitchPlaybackAccessTokens.TwitchPlaybackAccessToken, Twi
             "EXT-X-TARGETDURATION": False,
             "EXT-X-ENDLIST": False
         }
-        totalSeconds = 0.0
+        totalMilliSeconds = 0
         for line in playlist.split("\n"):
             tag = self.getTag(line)
             if tag != None:
                 if tag.name in hasRequiredTags:
                     hasRequiredTags[tag.name] = True
                 if tag.name == "EXTINF":
-                    totalSeconds += float(tag.data[0])
+                    totalMilliSeconds += int(float(tag.data[0]) * 1000)
         if not all(list(hasRequiredTags.values())[0:2]):
             raise
         if hasRequiredTags["EXT-X-ENDLIST"]:
-            self.totalSeconds = totalSeconds
+            self.totalMilliSeconds = totalMilliSeconds
             self.type.setType(self.type.VIDEO)
         else:
             self.type.setType(self.type.STREAM)

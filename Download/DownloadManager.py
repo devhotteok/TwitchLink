@@ -109,11 +109,11 @@ class _DownloadManager(QtCore.QObject):
             App.taskbar.setValue(progress.fileProgress)
         if not status.terminateState.isFalse():
             App.taskbar.stop()
-        elif not status.pauseState.isFalse() or status.isWaiting() or status.isEncoding():
+        elif not status.pauseState.isFalse() or status.isWaiting() or status.isUpdating() or status.isEncoding():
             App.taskbar.pause()
 
     def handleClipProgress(self, downloader):
         progress = downloader.progress
-        App.taskbar.setValue(progress.byteSizeProgress)
+        App.taskbar.setValue(progress.sizeProgress)
 
 DownloadManager = _DownloadManager()

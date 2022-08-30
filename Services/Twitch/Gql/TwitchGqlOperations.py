@@ -7,11 +7,13 @@ class getChannel:
             displayName
             description
             createdAt
+            primaryColorHex
             profileImageURL(width: 300)
             offlineImageURL
             roles {
               isPartner
               isAffiliate
+              isStaff
             }
             followers {
               totalCount

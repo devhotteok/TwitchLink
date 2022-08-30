@@ -1,5 +1,6 @@
 from Core.Config import Config
 from Services.Utils.OSUtils import OSUtils
+from Database.EncoderDecoder import Codable
 
 import os
 
@@ -63,14 +64,26 @@ class AudioFormatHistory:
         return self.SUPPORTED_AUDIO_FORMATS
 
 
-class StreamHistory(FileHistory, AudioFormatHistory):
+class OptimizeFileHistory:
+    def __init__(self):
+        super(OptimizeFileHistory, self).__init__()
+        self.setOptimizeFileEnabled(False)
+
+    def setOptimizeFileEnabled(self, optimizeFile):
+        self._optimizeFile = optimizeFile
+
+    def isOptimizeFileEnabled(self):
+        return self._optimizeFile
+
+
+class StreamHistory(FileHistory, AudioFormatHistory, OptimizeFileHistory, Codable):
     SUPPORTED_FORMATS = [
         "ts",
         "mp4"
     ]
 
 
-class VideoHistory(FileHistory, AudioFormatHistory):
+class VideoHistory(FileHistory, AudioFormatHistory, OptimizeFileHistory, Codable):
     SUPPORTED_FORMATS = [
         "ts",
         "mp4"
@@ -94,13 +107,13 @@ class VideoHistory(FileHistory, AudioFormatHistory):
         return self._updateTrack
 
 
-class ClipHistory(FileHistory):
+class ClipHistory(FileHistory, Codable):
     SUPPORTED_FORMATS = [
         "mp4"
     ]
 
 
-class ThumbnailHistory(FileHistory):
+class ThumbnailHistory(FileHistory, Codable):
     SUPPORTED_FORMATS = [
         "jpg",
         "png"

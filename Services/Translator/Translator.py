@@ -6,6 +6,7 @@ from Services.Utils.SystemUtils import SystemUtils
 
 from PyQt5 import QtCore, QtGui
 
+import os
 import json
 
 
@@ -35,8 +36,10 @@ class _Translator:
     def load(self):
         language = self.getLanguage()
         directory = QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.TranslationsPath)
-        for fileName in [f"qtbase_{language}"]:
-            self._loadTranslator(fileName, directory)
+        for fileName in os.listdir(directory):
+            if os.path.isfile(os.path.join(directory, fileName)):
+                if fileName.endswith(f"_{language}.qm"):
+                    self._loadTranslator(fileName, directory)
         directory = OSUtils.joinPath(Config.TRANSLATORS_PATH, language)
         for fileName in Config.TRANSLATION_LIST:
             self._loadTranslator(fileName, directory)
@@ -53,9 +56,6 @@ class _Translator:
             self.app.removeTranslator(translator)
         self.translators = []
 
-    def getLanguageData(self):
-        return Config.LANGUAGES
-
     def getLanguageList(self):
         return [language["name"] for language in Config.LANGUAGES.values()]
 
@@ -63,12 +63,11 @@ class _Translator:
         return list(Config.LANGUAGES)
 
     def getDefaultLanguage(self):
-        languageKeyList = self.getLanguageKeyList()
-        systemLanguage = SystemUtils.getSystemLanguage().split("_")[0]
-        if systemLanguage in languageKeyList:
-            return systemLanguage
-        else:
-            return languageKeyList[0]
+        systemLanguage = SystemUtils.getSystemLocale().language()
+        for key, value in Config.LANGUAGES.items():
+            if systemLanguage == value["languageId"]:
+                return key
+        return self.getLanguageCode(0)
 
     def getLanguageCode(self, index):
         return self.getLanguageKeyList()[index]

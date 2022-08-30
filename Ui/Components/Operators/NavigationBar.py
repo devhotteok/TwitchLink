@@ -51,6 +51,8 @@ class PageObject(QtCore.QObject):
 
 
 class NavigationBar(QtCore.QObject):
+    focusChanged = QtCore.pyqtSignal(bool)
+
     def __init__(self, stackedWidget, parent=None):
         super(NavigationBar, self).__init__(parent=parent)
         self.stackedWidget = stackedWidget
@@ -77,10 +79,12 @@ class NavigationBar(QtCore.QObject):
         for page in self.pages:
             if page != pageObject:
                 self.blockPage(page)
+        self.focusChanged.emit(True)
 
     def unfocus(self):
         for page in self.pages:
             self.unblockPage(page)
+        self.focusChanged.emit(False)
 
     def showPageButton(self, pageObject):
         pageObject.hidden = False

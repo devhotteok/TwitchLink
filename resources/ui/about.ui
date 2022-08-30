@@ -10,6 +10,11 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>About</string>
   </property>
@@ -18,9 +23,9 @@
   </property>
   <layout class="QVBoxLayout" name="FormLayout">
    <item>
-    <widget class="QLabel" name="window_title">
+    <widget class="QLabel" name="windowTitleLabel">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -36,7 +41,7 @@
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line">
+    <widget class="Line" name="windowTitleLine">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -196,7 +201,7 @@
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line_2">
+       <widget class="Line" name="line_1">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -234,7 +239,7 @@
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line_3">
+       <widget class="Line" name="line_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -283,7 +288,7 @@
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line_4">
+       <widget class="Line" name="line_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>

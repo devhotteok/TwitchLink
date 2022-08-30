@@ -34,12 +34,12 @@ class Home(QtWidgets.QWidget, UiFile.home):
     def startSearch(self, mode):
         searchResult = Ui.Search(mode, parent=self).exec()
         if searchResult != False:
-            if type(searchResult) == ExternalPlaylist.ExternalPlaylist:
+            if isinstance(searchResult, ExternalPlaylist.ExternalPlaylist):
                 if searchResult.type.isStream():
                     data = TwitchGqlModels.Stream({"title": "Unknown Stream", "game": {"name": "Unknown"}, "broadcaster": {"login": "Unknown User"}})
                 else:
                     data = TwitchGqlModels.Video({"title": "Unknown Video", "game": {"name": "Unknown"}, "owner": {"login": "Unknown User"}, "lengthSeconds": searchResult.totalSeconds})
-                downloadInfo = Ui.DownloadMenu(DownloadInfo(data, searchResult), viewOnly=True, parent=self).exec()
+                downloadInfo = Ui.DownloadMenu(DownloadInfo(data, searchResult), parent=self).exec()
                 if downloadInfo != False:
                     DownloadManager.create(downloadInfo)
             else:

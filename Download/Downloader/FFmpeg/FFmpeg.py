@@ -34,7 +34,33 @@ class FFmpeg(QtCore.QObject):
         super(FFmpeg, self).__init__(parent=parent)
         self.process = None
 
-    def start(self, target, saveAs, logLevel=LogLevel.INFO, priority=Priority.NORMAL):
+    def startEncodingProcess(self, target, saveAs, trimFrom=None, trimTo=None, remux=True, logLevel=LogLevel.INFO, priority=Priority.NORMAL):
+        self.start(
+            [
+                *(() if trimFrom == None else ("-ss", str(trimFrom))),
+                *(() if trimTo == None else ("-to", str(trimTo))),
+                "-i",
+                target,
+                *self.getCodecParams(fileName=saveAs, remux=remux),
+                saveAs
+            ],
+            logLevel=logLevel,
+            priority=priority
+        )
+
+    def getCodecParams(self, fileName, remux):
+        fileFormat = fileName.rsplit(".", 1)[-1]
+        isAudioOnly = fileFormat in ["aac", "mp3"]
+        audioCodec = self.getAudioCodecParams(fileFormat, remux=remux)
+        return audioCodec if isAudioOnly else (*self.getVideoCodecParams(fileFormat, remux=remux), *audioCodec)
+
+    def getVideoCodecParams(self, fileFormat, remux):
+        return ("-c:v", "copy") if remux else ("-c:v", "libx264")
+
+    def getAudioCodecParams(self, fileFormat, remux):
+        return ("-c:a", "libmp3lame") if fileFormat == "mp3" else (("-c:a", "copy") if remux else ("-c:a", "aac"))
+
+    def start(self, params, logLevel=LogLevel.INFO, priority=Priority.NORMAL):
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         self.process = subprocess.Popen(
@@ -45,10 +71,7 @@ class FFmpeg(QtCore.QObject):
                 "-loglevel",
                 logLevel,
                 "-stats",
-                "-i",
-                target,
-                *(("-c:a", "libmp3lame") if saveAs.endswith(".mp3") else ("-c", "copy")),
-                saveAs
+                *params
             ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
