@@ -58,6 +58,7 @@ class Channel(User):
         self.description = data.get("description") or ""
         self.primaryColorHex = data.get("primaryColorHex") or ""
         self.offlineImageURL = data.get("offlineImageURL") or ""
+        self.profileURL = data.get("profileURL") or ""
         self.isPartner = data.get("roles", {}).get("isPartner", False)
         self.isAffiliate = data.get("roles", {}).get("isAffiliate", False)
         self.isStaff = data.get("roles", {}).get("isStaff", False)
@@ -101,14 +102,15 @@ class Video(TwitchGqlObject):
         self.previewThumbnailURL = data.get("previewThumbnailURL") or ""
         self.owner = User(data.get("owner") or {})
         self.creator = User(data.get("creator") or {})
-        self.lengthSeconds = data.get("lengthSeconds", 0)
+        self.lengthSeconds = float(data.get("lengthSeconds", 0))
         self.createdAt = TimeUtils.Datetime(data.get("createdAt"))
         self.publishedAt = TimeUtils.Datetime(data.get("publishedAt"))
         self.viewCount = data.get("viewCount", 0)
 
     @property
     def durationString(self):
-        return f"{self.lengthSeconds // 3600:02}:{self.lengthSeconds % 3600 // 60:02}:{self.lengthSeconds % 3600 % 60:02}"
+        seconds = int(self.lengthSeconds)
+        return f"{seconds // 3600:02}:{seconds % 3600 // 60:02}:{seconds % 3600 % 60:02}"
 
 class Clip(TwitchGqlObject):
     def __init__(self, data):
@@ -120,13 +122,14 @@ class Clip(TwitchGqlObject):
         self.url = data.get("url") or ""
         self.broadcaster = User(data.get("broadcaster") or {})
         self.curator = User(data.get("curator") or {})
-        self.durationSeconds = data.get("durationSeconds", 0)
+        self.durationSeconds = float(data.get("durationSeconds", 0))
         self.createdAt = TimeUtils.Datetime(data.get("createdAt"))
         self.viewCount = data.get("viewCount", 0)
 
     @property
     def durationString(self):
-        return f"{self.durationSeconds // 3600:02}:{self.durationSeconds % 3600 // 60:02}:{self.durationSeconds % 3600 % 60:02}"
+        seconds = int(self.durationSeconds)
+        return f"{seconds // 3600:02}:{seconds % 3600 // 60:02}:{seconds % 3600 % 60:02}"
 
 class Game(TwitchGqlObject):
     def __init__(self, data):

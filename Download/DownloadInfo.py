@@ -40,6 +40,10 @@ class DownloadInfo(Codable):
     def type(self):
         return self.accessToken.type
 
+    def getRangeInSeconds(self):
+        start, end = self.range
+        return (None if start == None else start / 1000, None if end == None else end / 1000)
+
     @property
     def optionHistory(self):
         return DB.temp.getDownloadOptionHistory(self.type.getType())

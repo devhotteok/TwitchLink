@@ -39,11 +39,11 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.actionSponsor.triggered.connect(self.sponsor)
         self.navigationBar = NavigationBar(self.navigationArea, parent=self)
         self.navigationBar.focusChanged.connect(self.onFocusChange)
-        self.searchPageObject = self.navigationBar.addPage(self.searchPageButton, self.searchPage)
-        self.downloadsPageObject = self.navigationBar.addPage(self.downloadsPageButton, self.downloadsPage)
-        self.accountPageObject = self.navigationBar.addPage(self.accountPageButton, self.accountPage)
-        self.settingsPageObject = self.navigationBar.addPage(self.settingsPageButton, self.settingsPage)
-        self.informationPageObject = self.navigationBar.addPage(self.informationPageButton, self.informationPage)
+        self.searchPageObject = self.navigationBar.addPage(self.searchPageButton, self.searchPage, icon=Icons.SEARCH_ICON)
+        self.downloadsPageObject = self.navigationBar.addPage(self.downloadsPageButton, self.downloadsPage, icon=Icons.DOWNLOAD_ICON)
+        self.accountPageObject = self.navigationBar.addPage(self.accountPageButton, self.accountPage, icon=Icons.ACCOUNT_ICON)
+        self.settingsPageObject = self.navigationBar.addPage(self.settingsPageButton, self.settingsPage, icon=Icons.SETTINGS_ICON)
+        self.informationPageObject = self.navigationBar.addPage(self.informationPageButton, self.informationPage, icon=Icons.INFO_ICON)
         self.search = SearchPage(self.searchPageObject, parent=self)
         self.search.accountPageShowRequested.connect(self.accountPageObject.show)
         self.searchPage.layout().addWidget(self.search)
@@ -102,6 +102,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             )
             if status == Updater.status.UPDATE_REQUIRED:
                 updateInfo.closeRequested.connect(self.information.appShutdownRequested)
+            else:
+                updateInfo.buttonBox.accepted.connect(self.information.appShutdownRequested)
         if Updater.status.isOperational():
             for notification in Updater.status.notifications:
                 if notification.blockExpiry == False or not DB.temp.isContentBlocked(notification.contentId, notification.contentVersion):
@@ -183,6 +185,5 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             App.exit()
 
     def shutdownSystem(self):
-        self.waitForCleanup()
-        App.exit()
+        self.shutdown()
         Utils.shutdownSystem(message=T("#Shutdown by {appName}'s scheduled download completion task.", appName=Config.APP_NAME))

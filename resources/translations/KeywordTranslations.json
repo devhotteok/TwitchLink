@@ -223,6 +223,22 @@
     "en": "Download Canceled",
     "ko": "다운로드 취소됨"
   },
+  "creating": {
+    "en": "Creating",
+    "ko": "생성 중"
+  },
+  "file-not-found": {
+    "en": "File Not Found",
+    "ko": "파일을 찾을 수 없음"
+  },
+  "open-file": {
+    "en": "Open File",
+    "ko": "파일 열기"
+  },
+  "view-logs": {
+    "en": "View Logs",
+    "ko": "로그 보기"
+  },
   "system-error": {
     "en": "System Error",
     "ko": "시스템 오류"

@@ -10,16 +10,19 @@ class PageObject(QtCore.QObject):
     buttonShowRequested = QtCore.pyqtSignal(object)
     buttonHideRequested = QtCore.pyqtSignal(object)
 
-    def __init__(self, button, widget, parent=None):
+    def __init__(self, button, widget, icon=None, parent=None):
         super(PageObject, self).__init__(parent=parent)
         self.button = button
         self.widget = widget
         self.blocked = False
         self.hidden = False
         self.button.clicked.connect(self.show)
+        if icon != None:
+            self.setPageIcon(icon)
 
-    def setPageIcon(self, icon):
+    def setPageIcon(self, icon, size=None):
         self.button.setIcon(QtGui.QIcon(icon))
+        self.button.setIconSize(size or QtCore.QSize(24, 24))
 
     def setPageName(self, name):
         self.button.setText(name)
@@ -106,8 +109,8 @@ class NavigationBar(QtCore.QObject):
     def getCurrentPage(self):
         return self.currentPage
 
-    def addPage(self, button, widget):
-        pageObject = PageObject(button, widget, parent=self)
+    def addPage(self, button, widget, icon=None):
+        pageObject = PageObject(button, widget, icon=icon, parent=self)
         pageObject.showRequested.connect(self.setCurrentPage)
         pageObject.blockRequested.connect(self.blockPage)
         pageObject.unblockRequested.connect(self.unblockPage)

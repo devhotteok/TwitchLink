@@ -46,7 +46,7 @@ class Account(QtWidgets.QWidget, UiFile.account):
             self.updateAccountImage()
 
     def updateAccountImage(self, image=None):
-        self.profileImageChanged.emit(image or Icons.ACCOUNT_ICON)
+        self.profileImageChanged.emit(image)
 
     def login(self):
         self.infoArea.show()

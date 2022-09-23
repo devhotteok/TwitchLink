@@ -527,70 +527,126 @@
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="cropInfoArea" native="true">
-           <layout class="QHBoxLayout" name="cropInfoAreaLayout">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="alertIcon">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>18</width>
-                <height>18</height>
-               </size>
-              </property>
-              <property name="pixmap">
-               <pixmap>../icons/alert_red.svg</pixmap>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="cropInfoLabel">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>This may not be accurate with your current settings.</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="cropInfo">
-              <property name="toolTip">
-               <string>Help</string>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <widget class="QStackedWidget" name="cropInfoArea">
+           <widget class="QWidget" name="cropSettingsInfoArea">
+            <layout class="QHBoxLayout" name="cropSettingsInfoAreaLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="cropSettingsInfoIcon">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>18</width>
+                 <height>18</height>
+                </size>
+               </property>
+               <property name="pixmap">
+                <pixmap>../icons/info.svg</pixmap>
+               </property>
+               <property name="scaledContents">
+                <bool>true</bool>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cropSettingsInfoLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>This may not be accurate with your current settings.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="cropSettingsInfoButton">
+               <property name="toolTip">
+                <string>Help</string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="cropRangeInfoArea">
+            <layout class="QHBoxLayout" name="cropRangeInfoAreaLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="cropRangeInfoIcon">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>18</width>
+                 <height>18</height>
+                </size>
+               </property>
+               <property name="pixmap">
+                <pixmap>../icons/alert_red.svg</pixmap>
+               </property>
+               <property name="scaledContents">
+                <bool>true</bool>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cropRangeInfoLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Please specify a valid range.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </widget>
          </item>
         </layout>

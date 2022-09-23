@@ -66,7 +66,7 @@ class PlaylistManager:
 
     def getApproximateTotalMilliseconds(self):
         start, end = self.getApproximateTimeRange()
-        return (end or self.ranged.totalMilliseconds) - (start or 0)
+        return (end or self.original.totalMilliseconds) - (start or 0)
 
     def playlistUpdated(self):
         self.ranged = self.original.getRangedPlaylist()

@@ -138,7 +138,6 @@ class ResolutionNameGenerator:
         else:
             return name
 
-
 class TwitchStream(TwitchPlaybackAccessToken, PlaylistReader, ResolutionNameGenerator):
     def __init__(self, CHANNEL_NAME, OAUTH_TOKEN=""):
         super(TwitchStream, self).__init__(TwitchPlaybackAccessTokenTypes.STREAM)

@@ -37,7 +37,7 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.thumbnailImage.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.previewThumbnailURL, urlFormatSize=ImageSize.VIDEO_THUMBNAIL)
             self.channel.setText(self.videoData.owner.displayName)
             self.date.setText(self.videoData.publishedAt.toTimeZone(DB.localization.getTimezone()))
-            start, end = self.downloadInfo.range
+            start, end = self.downloadInfo.getRangeInSeconds()
             totalSeconds = self.videoData.lengthSeconds
             durationSeconds = (end or totalSeconds) - (start or 0)
             self.showVideoDuration(start, end, totalSeconds, durationSeconds)
@@ -78,7 +78,8 @@ class Download(QtWidgets.QWidget, UiFile.download):
         self.skipDownloadButton.setSizePolicy(sizePolicy)
         self.skipWaitingButton.hide()
         self.skipDownloadButton.hide()
-        self.dataLoss.hide()
+        self.mutedInfo.hide()
+        self.missingInfo.hide()
         self.cancelButton.clicked.connect(self.cancel)
         self.retryButtonManager = RetryDownloadButton(self.downloadInfo, self.retryButton, self.downloader.getId(), buttonText=self.retryButton.text(), parent=self)
         self.accountPageShowRequested = self.retryButtonManager.accountPageShowRequested
@@ -227,9 +228,12 @@ class Download(QtWidgets.QWidget, UiFile.download):
         self.downloadProgressBar.setValue(progress.fileProgress)
         self.encodingProgressBar.setValue(progress.timeProgress)
         self.currentDuration.setText(f"{Utils.formatTime(*Utils.toTime(progress.seconds))} / {Utils.formatTime(*Utils.toTime(progress.totalSeconds))}")
+        if progress.mutedFiles != 0:
+            self.mutedInfo.show()
+            self.mutedInfo.setText(T("#Failed to unmute {mutedFiles} segments ({mutedSeconds})", mutedFiles=progress.mutedFiles, mutedSeconds=Utils.formatTime(*Utils.toTime(progress.mutedSeconds))))
         if progress.missingFiles != 0:
-            self.dataLoss.show()
-            self.dataLoss.setText(T("#Missing {missingFiles} segments ({missingSeconds})", missingFiles=progress.missingFiles, missingSeconds=Utils.formatTime(*Utils.toTime(progress.missingSeconds))))
+            self.missingInfo.show()
+            self.missingInfo.setText(T("#Missing {missingFiles} segments ({missingSeconds})", missingFiles=progress.missingFiles, missingSeconds=Utils.formatTime(*Utils.toTime(progress.missingSeconds))))
         self.currentSize.setText(progress.size)
 
     def handleClipProgress(self, progress):
@@ -239,9 +243,12 @@ class Download(QtWidgets.QWidget, UiFile.download):
     def handleVideoDataUpdate(self, data):
         playlistManager = data.get("playlistManager")
         if playlistManager != None:
+            startMilliseconds, endMilliseconds = playlistManager.getTimeRange()
+            start = None if startMilliseconds == None else startMilliseconds / 1000
+            end = None if endMilliseconds == None else endMilliseconds / 1000
             totalSeconds = playlistManager.original.totalSeconds
             durationSeconds = playlistManager.totalSeconds
-            self.showVideoDuration(*playlistManager.getTimeRange(), totalSeconds, durationSeconds)
+            self.showVideoDuration(start, end, totalSeconds, durationSeconds)
 
     def showVideoType(self, videoType):
         self.videoTypeLabel.setText(f"{T('external-content')}:{T(videoType)}" if isinstance(self.downloadInfo.accessToken, ExternalPlaylist.ExternalPlaylist) else T(videoType))
@@ -254,8 +261,8 @@ class Download(QtWidgets.QWidget, UiFile.download):
                 "#{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]",
                 duration=Utils.formatTime(*Utils.toTime(durationSeconds)),
                 totalDuration=Utils.formatTime(*Utils.toTime(totalSeconds)),
-                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start / 1000)),
-                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end / 1000))
+                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start)),
+                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end))
             ))
 
     def handleDownloadResult(self):
@@ -267,6 +274,8 @@ class Download(QtWidgets.QWidget, UiFile.download):
                 else:
                     self.status.setText(T("download-canceled"))
                     self.currentDuration.setText(Utils.formatTime(*Utils.toTime(0)))
+                    self.mutedInfo.hide()
+                    self.missingInfo.hide()
                     self.currentSize.setText(Utils.formatByteSize(0))
                     self.retryButton.show()
                     self.downloadProgressBar.showWarning()

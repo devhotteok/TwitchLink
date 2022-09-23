@@ -10,6 +10,7 @@ class getChannel:
             primaryColorHex
             profileImageURL(width: 300)
             offlineImageURL
+            profileURL
             roles {
               isPartner
               isAffiliate

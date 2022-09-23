@@ -138,9 +138,11 @@ class Progress:
     def __init__(self):
         self.file = 0
         self.totalFiles = 0
+        self.mutedFiles = 0
         self.missingFiles = 0
         self.milliseconds = 0
         self.totalMilliseconds = 0
+        self.mutedMilliseconds = 0
         self.missingMilliseconds = 0
         self.byteSize = 0
         self.totalByteSize = 0
@@ -164,6 +166,10 @@ class Progress:
     @property
     def totalSeconds(self):
         return self.totalMilliseconds / 1000
+
+    @property
+    def mutedSeconds(self):
+        return self.mutedMilliseconds / 1000
 
     @property
     def missingSeconds(self):

@@ -11,6 +11,10 @@
     "en": "A temporary error occurred while connecting to the server.\nPlease try again later.",
     "ko": "서버와 연결 중 일시적인 오류가 발생하였습니다.\n잠시 후 다시 시도하세요."
   },
+  "#An unexpected error has occurred.": {
+    "en": "An unexpected error has occurred.",
+    "ko": "예기치 못한 오류가 발생하였습니다"
+  },
   "#An unexpected error has occurred.\nPlease try again later.": {
     "en": "An unexpected error has occurred.\nPlease try again later.",
     "ko": "예기치 못한 오류가 발생하였습니다.\n잠시 후 다시 시도하세요."
@@ -133,7 +137,7 @@
   },
   "#Filename Template Variables": {
     "en": "Filename Template Variables",
-    "ko": "파일명 자동 생성 규칙 변수"
+    "ko": "파일명 생성 규칙 변수"
   },
   "#'displayname' if {nameType} Displayname is English, otherwise 'displayname(username)'": {
     "en": "'displayname' if {nameType} Displayname is English, otherwise 'displayname(username)'",
@@ -297,7 +301,7 @@
   },
   "#The filename template contains a 'resolution' variable. Do you want to create a new filename based on the changed resolution?": {
     "en": "The filename template contains a 'resolution' variable. Do you want to create a new filename based on the changed resolution?",
-    "ko": "파일명 자동 생성 규칙에 '해상도' 변수가 포함되어 있습니다. 변경된 해상도를 바탕으로 파일명을 새롭게 생성하시겠습니까?"
+    "ko": "파일명 생성 규칙에 '해상도' 변수가 포함되어 있습니다. 변경된 해상도를 바탕으로 파일명을 새롭게 생성하시겠습니까?"
   },
   "#Total Length: {duration}": {
     "en": "Total Length: {duration}",
@@ -334,6 +338,10 @@
   "#The target directory or filename is unavailable.": {
     "en": "The target directory or filename is unavailable.",
     "ko": "대상 디렉토리 또는 파일명을 사용할 수 없습니다."
+  },
+  "#Failed to unmute {mutedFiles} segments ({mutedSeconds})": {
+    "en": "Failed to unmute {mutedFiles} segments ({mutedSeconds})",
+    "ko": "{mutedFiles}개 구간 음소거 해제 실패 ({mutedSeconds})"
   },
   "#Missing {missingFiles} segments ({missingSeconds})": {
     "en": "Missing {missingFiles} segments ({missingSeconds})",
@@ -401,7 +409,7 @@
   },
   "#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.": {
     "en": "You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.",
-    "ko": "지금까지 총 {totalFiles}({totalSize})개의 영상을 다운로드하셨습니다.\n더 나은 기능과 서비스를 위해 {appName} 개발에 기여해 주세요."
+    "ko": "지금까지 총 {totalFiles}({totalSize})개의 영상을 다운로드하셨습니다.\n더 나은 기능과 서비스를 위해 {appName}의 발전에 기여해 주세요."
   },
   "#Drag to change order.": {
     "en": "Drag to change order.",
@@ -431,9 +439,9 @@
     "en": "Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.",
     "ko": "실시간 다시보기를 방송이 종료될 때까지 이어서 받아옵니다.\n일정 시간 동안 비디오의 변동 사항이 없으면 다운로드가 종료됩니다."
   },
-  "#Maintains {videoType} quality but reduces file size.\nThis increases the computation of the encoding process and consumes a lot of time.": {
-    "en": "Maintains {videoType} quality but reduces file size.\nThis increases the computation of the encoding process and consumes a lot of time.",
-    "ko": "{videoType} 화질은 유지하지만 파일 용량이 줄어듭니다.\n이 작업은 인코딩 과정의 연산량을 증가시키고 많은 시간을 소모합니다."
+  "#Reduces file size while maintaining {videoType} quality without any visual differences.\nThis increases the computation of the encoding process and consumes a lot of time.": {
+    "en": "Reduces file size while maintaining {videoType} quality without any visual differences.\nThis increases the computation of the encoding process and consumes a lot of time.",
+    "ko": "{videoType} 화질을 시각적인 차이가 없을 정도로 유지하면서 파일의 용량을 줄입니다.\n이 작업은 인코딩 과정의 연산량을 증가시키고 많은 시간을 소모합니다."
   },
   "#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.": {
     "en": "This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.",
@@ -463,8 +471,8 @@
     "en": "To protect the rights of streamers, {appName} restricts downloads when a content restriction request is received.",
     "ko": "{appName}은/는 스트리머의 권리를 보호하기 위해 콘텐츠 제한 요청이 접수되면 해당 콘텐츠의 다운로드를 제한합니다."
   },
-  "#Attempts to start a new download based on your download history.\nFile data and download settings are generated based on this history and may differ from the current {contentType}. ({properties}, etc.)": {
-    "en": "Attempts to start a new download based on your download history.\nFile data and download settings are generated based on this history and may differ from the current {contentType}. ({properties}, etc.)",
+  "#Attempting to start a new download based on your download history.\nFile data and download settings are generated based on this history and may differ from the current {contentType}. ({properties}, etc.)": {
+    "en": "Attempting to start a new download based on your download history.\nFile data and download settings are generated based on this history and may differ from the current {contentType}. ({properties}, etc.)",
     "ko": "다운로드 기록을 바탕으로 새 다운로드를 시작하려 합니다.\n파일 정보 및 다운로드 설정이 이 기록을 바탕으로 생성되며 현재의 {contentType}와/과 다를 수 있습니다. ({properties} 등)"
   }
 }

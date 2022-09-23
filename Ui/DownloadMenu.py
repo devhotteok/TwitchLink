@@ -13,7 +13,8 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.setWindowGeometryKey(f"{self.getWindowGeometryKey()}/{self.downloadInfo.type.toString()}")
         self.loadWindowGeometry()
         self.videoWidget = Utils.setPlaceholder(self.videoWidget, Ui.VideoWidget(self.downloadInfo.videoData, viewOnly=False, parent=self))
-        self.alertIcon = Utils.setSvgIcon(self.alertIcon, Icons.ALERT_RED_ICON)
+        self.cropSettingsInfoIcon = Utils.setSvgIcon(self.cropSettingsInfoIcon, Icons.INFO_ICON)
+        self.cropRangeInfoIcon = Utils.setSvgIcon(self.cropRangeInfoIcon, Icons.ALERT_RED_ICON)
         self.loadOptions()
 
     def loadOptions(self):
@@ -91,36 +92,42 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.cropArea.setTitle(f"{T('crop')} / {T('#Total Length: {duration}', duration=self.downloadInfo.videoData.durationString)}")
         self.cropFromStartRadioButton.toggled.connect(self.reloadCropArea)
         self.cropToEndRadioButton.toggled.connect(self.checkUpdateTrack)
-        self.fromSpinH.valueChanged.connect(self.reloadStartRange)
-        self.fromSpinM.valueChanged.connect(self.reloadStartRange)
-        self.fromSpinS.valueChanged.connect(self.reloadStartRange)
-        self.toSpinH.valueChanged.connect(self.reloadEndRange)
-        self.toSpinM.valueChanged.connect(self.reloadEndRange)
-        self.toSpinS.valueChanged.connect(self.reloadEndRange)
-        self.cropInfo.clicked.connect(self.showCropInfo)
+        self.fromSpinH.valueChanged.connect(self.startRangeChanged)
+        self.fromSpinM.valueChanged.connect(self.startRangeChanged)
+        self.fromSpinS.valueChanged.connect(self.startRangeChanged)
+        self.toSpinH.valueChanged.connect(self.endRangeChanged)
+        self.toSpinM.valueChanged.connect(self.endRangeChanged)
+        self.toSpinS.valueChanged.connect(self.endRangeChanged)
+        self.cropSettingsInfoButton.clicked.connect(self.showCropInfo)
         h, m, s = Utils.toTime(self.downloadInfo.videoData.lengthSeconds)
         self.fromSpinH.setMaximum(h + 1)
         self.toSpinH.setMaximum(h + 1)
-        if self.downloadInfo.range[0] != None:
+        range = self.downloadInfo.getRangeInSeconds()
+        if range[0] != None:
             self.cropFromSelectRadioButton.setChecked(True)
-            self.setFromSpin(*Utils.toTime(self.downloadInfo.range[0] / 1000))
-        if self.downloadInfo.range[1] != None:
+            self.setFromSpin(*Utils.toTime(range[0]))
+        if range[1] != None:
             self.cropToSelectRadioButton.setChecked(True)
-            self.setToSpin(*Utils.toTime(self.downloadInfo.range[1] / 1000))
+            self.setToSpin(*Utils.toTime(range[1]))
 
-    def reloadStartRange(self):
-        fromSpinSeconds = Utils.toSeconds(*self.getFromSpin())
-        toSpinSeconds = Utils.toSeconds(*self.getToSpin())
-        if fromSpinSeconds >= toSpinSeconds:
-            self.setToSpin(*self.checkCropRange(*Utils.toTime(fromSpinSeconds + 1)))
+    def startRangeChanged(self):
         self.setFromSpin(*self.checkCropRange(*self.getFromSpin(), maximum=self.downloadInfo.videoData.lengthSeconds - 1))
 
-    def reloadEndRange(self):
+    def endRangeChanged(self):
+        self.setToSpin(*self.checkCropRange(*self.getToSpin(), minimum=1))
+
+    def isCropRangeInvalid(self):
         fromSpinSeconds = Utils.toSeconds(*self.getFromSpin())
         toSpinSeconds = Utils.toSeconds(*self.getToSpin())
-        if fromSpinSeconds >= toSpinSeconds:
-            self.setFromSpin(*self.checkCropRange(*Utils.toTime(toSpinSeconds - 1)))
-        self.setToSpin(*self.checkCropRange(*self.getToSpin(), minimum=1))
+        return fromSpinSeconds >= toSpinSeconds
+
+    def validateCropRange(self):
+        invalid = self.isCropRangeInvalid()
+        styleSheet = "QSpinBox, QLabel {color: red;}" if invalid else ""
+        self.fromTimeBar.setStyleSheet(styleSheet)
+        self.toTimeBar.setStyleSheet(styleSheet)
+        self.reloadCropInfoArea()
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(not invalid)
 
     def getFromSpin(self):
         return self.fromSpinH.value(), self.fromSpinM.value(), self.fromSpinS.value()
@@ -132,11 +139,13 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.fromSpinH.setValueSilent(h)
         self.fromSpinM.setValueSilent(m)
         self.fromSpinS.setValueSilent(s)
+        self.validateCropRange()
 
     def setToSpin(self, h, m, s):
         self.toSpinH.setValueSilent(h)
         self.toSpinM.setValueSilent(m)
         self.toSpinS.setValueSilent(s)
+        self.validateCropRange()
 
     def checkCropRange(self, h, m, s, maximum=None, minimum=None):
         videoTotalSeconds = self.downloadInfo.videoData.lengthSeconds
@@ -162,7 +171,10 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.reloadCropInfoArea()
 
     def reloadCropInfoArea(self):
-        self.cropInfoArea.setVisible((self.cropFromSelectRadioButton.isChecked() or self.cropToSelectRadioButton.isChecked()) and not self.optimizeFileCheckBox.isChecked())
+        showSettingsInfo = (self.cropFromSelectRadioButton.isChecked() or self.cropToSelectRadioButton.isChecked()) and not self.optimizeFileCheckBox.isChecked()
+        showRangeInfo = self.isCropRangeInvalid()
+        self.cropInfoArea.setCurrentIndex(1 if showRangeInfo else 0)
+        self.cropInfoArea.setVisible(showRangeInfo or showSettingsInfo)
 
     def checkUpdateTrack(self):
         self.reloadCropArea()
@@ -191,7 +203,7 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.info("information", "#Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.")
 
     def showOptimizeFileInfo(self):
-        infoString = T("#Maintains {videoType} quality but reduces file size.\nThis increases the computation of the encoding process and consumes a lot of time.", videoType=T(self.downloadInfo.type.toString()))
+        infoString = T("#Reduces file size while maintaining {videoType} quality without any visual differences.\nThis increases the computation of the encoding process and consumes a lot of time.", videoType=T(self.downloadInfo.type.toString()))
         warningString = T("#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.", videoType=T(self.downloadInfo.type.toString()))
         optionInfoString = T("#Depending on the streamer's broadcast settings, this option may not have any effect." if self.downloadInfo.type.isStream() else "#Depending on the video properties, this option may not have any effect.")
         self.info("information", f"{infoString}\n\n{warningString}\n\n{optionInfoString}", contentTranslate=False)

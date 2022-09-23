@@ -82,10 +82,7 @@ class _DownloadManager(QtCore.QObject):
         return len(self.getRunningDownloaders()) != 0
 
     def isShuttingDown(self):
-        for downloader in self.runningDownloaders:
-            if not downloader.setup.downloadInfo.type.isClip() and downloader.status.terminateState.isFalse():
-                return False
-        return True
+        return not any(downloader.status.terminateState.isFalse() for downloader in self.runningDownloaders)
 
     def handleSingleDownloader(self):
         if self.singleDownloader.setup.downloadInfo.type.isStream():

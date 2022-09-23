@@ -842,6 +842,9 @@ border-radius: 10px;</string>
       <item row="3" column="1">
        <widget class="QWidget" name="fileInfoArea" native="true">
         <layout class="QHBoxLayout" name="fileInfoAreaLayout">
+         <property name="spacing">
+          <number>10</number>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -862,7 +865,17 @@ border-radius: 10px;</string>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="dataLoss">
+          <widget class="QLabel" name="mutedInfo">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(31, 71, 136);</string>
+           </property>
+           <property name="text">
+            <string>Failed to unmute 0 segments (00:00:00)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="missingInfo">
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 0, 0);</string>
            </property>

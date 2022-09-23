@@ -125,8 +125,13 @@ class VideoDownloader(EngineSetup):
         return False
 
     def segmentDownloadComplete(self, task):
-        if not task.result.success:
-            urls = "\n".join(task.urls)
+        if task.result.success:
+            if self.setup.unmuteVideo and task.result.data.muted:
+                self.logger.warning(f"Failed to unmute segment: {task.segment.fileName}")
+                self.progress.mutedFiles += 1
+                self.progress.mutedMilliseconds += task.segment.durationMilliseconds
+        else:
+            urls = "\n".join(segmentUrl.url for segmentUrl in task.segmentUrls)
             self.logger.warning(f"Failed to download segment: {task.segment.fileName} [{task.result.error}]\n{urls}")
             if isinstance(task.result.error, Exceptions.FileSystemError):
                 self.cancel()

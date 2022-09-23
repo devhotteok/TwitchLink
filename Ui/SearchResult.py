@@ -7,8 +7,6 @@ from Search import Engine
 class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
     accountPageShowRequested = QtCore.pyqtSignal()
 
-    CHANNEL_URL = "https://twitch.tv/{username}"
-
     DEFAULT_CHANNEL_PRIMARY_COLOR = "9147ff"
 
     SEARCH_SCROLL_POSITION = 300
@@ -159,7 +157,7 @@ class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
         self.broadcasterTypeArea.setStyleSheet(f"color: rgb(255, 255, 255);background-color: {themeColor};border-radius: 10px;")
 
     def openInWebBrowser(self):
-        Utils.openUrl(self.CHANNEL_URL.format(username=self.channel.login))
+        Utils.openUrl(self.channel.profileURL)
 
     def loadSortOrFilter(self, index):
         self.sortOrFilter.clear()

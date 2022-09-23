@@ -12,10 +12,15 @@ class AccountPage(WebViewTabManager):
         self.account = Ui.Account(parent=self)
         self.account.startLoginRequested.connect(self.openLogin)
         self.account.cancelLoginRequested.connect(self.closeLogin)
-        self.account.profileImageChanged.connect(self.pageObject.setPageIcon)
-        self.account.updateAccountImage()
+        self.account.profileImageChanged.connect(self.profileImageChanged)
         self.loginTabClosed.connect(self.account.loginTabClosed)
         self.addTab(self.account, icon=Icons.ACCOUNT_ICON, closable=False)
+
+    def profileImageChanged(self, icon):
+        if icon == None:
+            self.pageObject.setPageIcon(Icons.ACCOUNT_ICON)
+        else:
+            self.pageObject.setPageIcon(icon, size=QtCore.QSize(32, 32))
 
     def refreshAccount(self):
         self.account.refreshAccount()

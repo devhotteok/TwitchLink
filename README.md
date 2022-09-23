@@ -8,6 +8,24 @@
 
 #
 
+##### Preview
+<img src="https://twitchlink.github.io/resources/github/GitHub_README_1.png">
+<table>
+    <tr>
+        <td>
+            <img src="https://twitchlink.github.io/resources/github/GitHub_README_2.png">
+        </td>
+        <td>
+            <img src="https://twitchlink.github.io/resources/github/GitHub_README_3.png">
+        </td>
+        <td>
+            <img src="https://twitchlink.github.io/resources/github/GitHub_README_4.png">
+        </td>
+    </tr>
+</table>
+
+#
+
 ## Homepage
 - [TwitchLink Homepage][Homepage]
 - For more information, visit this homepage.
@@ -45,7 +63,7 @@
 
 ### Follow the checklist below when creating a new issue!
 
-- **Take a look at the latest issues [here][Issues].**
+- **Take a look at the latest issues. [[Issues]][Issues]**
 - **Maybe your problem has already been reported or resolved.**
 - **Use the latest version of TwitchLink.**
 - **Provide as much information about the problem as possible.**

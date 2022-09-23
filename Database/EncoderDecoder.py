@@ -49,6 +49,19 @@ class Codable:
         else:
             return cls.__new__(cls)
 
+    def __update__(self, data):
+        if self.CODABLE_STRICT_MODE:
+            for key, value in data.items():
+                if hasattr(self, key):
+                    setattr(self, key, value)
+                else:
+                    raise Exceptions.DataMismatchError(self.__class__, key, data, self.__dict__)
+        else:
+            self.__dict__.update(data)
+
+    def __setup__(self):
+        pass
+
     @classmethod
     def __load__(cls, data):
         if not all(key in data.keys() for key in cls.CODABLE_REQUIRED_DATA):
@@ -57,19 +70,9 @@ class Codable:
             obj = cls.__model__(data)
         except:
             raise Exceptions.ModelCreateError(cls, data)
-        if cls.CODABLE_STRICT_MODE:
-            for key, value in data.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-                else:
-                    raise Exceptions.DataMismatchError(cls, key, data, obj.__dict__)
-        else:
-            obj.__dict__.update(data)
+        obj.__update__(data)
         obj.__setup__()
         return obj
-
-    def __setup__(self):
-        pass
 
     def __save__(self):
         return self.__dict__

@@ -54,7 +54,7 @@ class DocumentView(QtWidgets.QWidget, UiFile.documentView):
             try:
                 self.contentBrowser = Utils.setPlaceholder(self.contentBrowser, QtWebEngineWidgets.QWebEngineView(parent=self))
             except Exception as e:
-                self.contentBrowser.setText(str(e))
+                self.contentBrowser.setText(f"{T('#An unexpected error has occurred.')}\n{e}")
             else:
                 self.contentBrowser.load(QtCore.QUrl(content))
         else:

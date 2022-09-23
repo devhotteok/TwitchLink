@@ -1,6 +1,7 @@
 from Core.Ui import *
 from Services.Messages import Messages
 from Search import ExternalPlaylist
+from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
 from Download.DownloadManager import DownloadManager
 from Ui.Components.Widgets.RetryDownloadButton import RetryDownloadButton
 
@@ -53,7 +54,7 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.thumbnailImage.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.previewThumbnailURL, urlFormatSize=ImageSize.VIDEO_THUMBNAIL)
             self.channel.setText(self.videoData.owner.displayName)
             self.date.setText(self.videoData.publishedAt.toTimeZone(DB.localization.getTimezone()))
-            start, end = self.downloadInfo.range
+            start, end = self.downloadInfo.getRangeInSeconds()
             totalSeconds = self.videoData.lengthSeconds
             durationSeconds = (end or totalSeconds) - (start or 0)
             self.showVideoDuration(start, end, totalSeconds, durationSeconds)
@@ -82,8 +83,7 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         self.retryButton.hide()
         self.openFolderButton.clicked.connect(self.openFolder)
         self.openFileButton.clicked.connect(self.openFile)
-        self.openFileButton.setEnabled(False)
-        self.openFileButton.setIcon(QtGui.QIcon(Icons.DOWNLOADING_FILE_ICON))
+        self.setOpenFileButton(downloadingFile=True)
         self.closeButton.clicked.connect(self.tryRemoveDownloader)
         self.alertIcon = Utils.setSvgIcon(self.alertIcon, Icons.ALERT_RED_ICON)
         self.alertIcon.hide()
@@ -221,9 +221,12 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
     def handleVideoDataUpdate(self, data):
         playlistManager = data.get("playlistManager")
         if playlistManager != None:
+            startMilliseconds, endMilliseconds = playlistManager.getTimeRange()
+            start = None if startMilliseconds == None else startMilliseconds / 1000
+            end = None if endMilliseconds == None else endMilliseconds / 1000
             totalSeconds = playlistManager.original.totalSeconds
             durationSeconds = playlistManager.totalSeconds
-            self.showVideoDuration(*playlistManager.getTimeRange(), totalSeconds, durationSeconds)
+            self.showVideoDuration(start, end, totalSeconds, durationSeconds)
 
     def showVideoType(self, videoType):
         self.videoTypeLabel.setText(f"{T('external-content')}:{T(videoType)}" if isinstance(self.downloadInfo.accessToken, ExternalPlaylist.ExternalPlaylist) else T(videoType))
@@ -236,32 +239,30 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
                 "#{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]",
                 duration=Utils.formatTime(*Utils.toTime(durationSeconds)),
                 totalDuration=Utils.formatTime(*Utils.toTime(totalSeconds)),
-                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start / 1000)),
-                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end / 1000))
+                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start)),
+                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end))
             ))
 
     def handleDownloadResult(self):
         if self.downloader.status.terminateState.isTrue():
             if self.downloader.status.getError() == None:
                 if self.downloadInfo.type.isStream():
-                    self.openFileButton.setEnabled(True)
-                    self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_ICON))
+                    self.setOpenFileButton(openFile=True)
                     self.statusArea.hide()
                 else:
                     self.retryButton.show()
-                    self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_NOT_FOUND_ICON))
+                    self.setOpenFileButton(fileNotFound=True)
                     self.status.setText(T("download-canceled"))
                     self.alertIcon.show()
                     self.progressBar.showWarning()
             else:
                 self.retryButton.show()
-                self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_NOT_FOUND_ICON))
+                self.setOpenFileButton(fileNotFound=True)
                 self.status.setText(T("download-aborted"))
                 self.alertIcon.show()
                 self.progressBar.showError()
         else:
-            self.openFileButton.setEnabled(True)
-            self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_ICON))
+            self.setOpenFileButton(openFile=True)
             self.statusArea.hide()
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
@@ -282,10 +283,10 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         if self.needStatsUpdate():
             DB.temp.updateDownloadStats(self.downloader.progress.totalByteSize)
             downloadStats = DB.temp.getDownloadStats()
-            if downloadStats["totalFiles"] < 100:
-                showContributeInfo = downloadStats["totalFiles"] in [10, 30, 50]
+            if downloadStats["totalFiles"] < DownloadEngineConfig.SHOW_STATS[0]:
+                showContributeInfo = downloadStats["totalFiles"] in DownloadEngineConfig.SHOW_STATS[1]
             else:
-                showContributeInfo = downloadStats["totalFiles"] % 100 == 0
+                showContributeInfo = downloadStats["totalFiles"] % DownloadEngineConfig.SHOW_STATS[0] == 0
         else:
             showContributeInfo = False
         self.control.enableRemove()
@@ -319,5 +320,20 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
                 except:
                     self.info(*Messages.INFO.FILE_NOT_FOUND)
         if showContributeInfo:
-            if self.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=downloadStats["totalFiles"], totalSize=Utils.formatByteSize(downloadStats["totalByteSize"]), appName=Config.APP_NAME), contentTranslate=False):
+            if self.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=downloadStats["totalFiles"], totalSize=Utils.formatByteSize(downloadStats["totalByteSize"]), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True):
                 Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": DB.localization.getLanguage()}))
+
+    def setOpenFileButton(self, openFile=False, downloadingFile=False, fileNotFound=False):
+        buttonText = T("open-file")
+        if openFile:
+            self.openFileButton.setEnabled(True)
+            self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_ICON))
+            self.openFileButton.setToolTip(buttonText)
+        elif downloadingFile:
+            self.openFileButton.setEnabled(False)
+            self.openFileButton.setIcon(QtGui.QIcon(Icons.DOWNLOADING_FILE_ICON))
+            self.openFileButton.setToolTip(f"{buttonText}({T('downloading', ellipsis=True)})")
+        elif fileNotFound:
+            self.openFileButton.setEnabled(False)
+            self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_NOT_FOUND_ICON))
+            self.openFileButton.setToolTip(f"{buttonText}({T('file-not-found')})")

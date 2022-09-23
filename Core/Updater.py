@@ -78,7 +78,7 @@ class _Status:
                         default=button.get("default", False)
                     ) for button in notification.get("buttons", [])
                 ]
-            ) for notification in data.get(Translator.getLanguage(), [])
+            ) for notification in data.get(Translator.getLanguage(), []) if Config.VERSION in notification.get("targetVersion", [Config.VERSION])
         ]
 
     def setStatus(self, appStatus):

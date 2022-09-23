@@ -29,7 +29,7 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
             self.thumbnailImage.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.previewThumbnailURL, urlFormatSize=ImageSize.VIDEO_THUMBNAIL)
             self.channel.setText(self.videoData.owner.displayName)
             self.date.setText(self.videoData.publishedAt.toTimeZone(DB.localization.getTimezone()))
-            start, end = self.downloadInfo.range
+            start, end = self.downloadInfo.getRangeInSeconds()
             totalSeconds = self.videoData.lengthSeconds
             durationSeconds = (end or totalSeconds) - (start or 0)
             self.showVideoDuration(start, end, totalSeconds, durationSeconds)
@@ -64,24 +64,19 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
         self.result.setText(T(self.downloadHistory.result))
         if self.downloadHistory.result == self.downloadHistory.Result.completed or self.downloadHistory.result == self.downloadHistory.Result.skipped or self.downloadHistory.result == self.downloadHistory.Result.stopped:
             self.setCursor(QtCore.Qt.PointingHandCursor)
-            self.openFileButton.setEnabled(True)
-            self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_ICON))
-            self.openLogsButton.setEnabled(True)
-            self.openLogsButton.setIcon(QtGui.QIcon(Icons.TEXT_FILE_ICON))
+            self.setOpenFileButton(openFile=True)
+            self.setOpenLogsButton(viewLogs=True)
         else:
             self.setCursor(QtCore.Qt.ArrowCursor)
-            self.openFileButton.setEnabled(False)
             if self.downloadHistory.result == self.downloadHistory.Result.downloading:
-                self.openFileButton.setIcon(QtGui.QIcon(Icons.DOWNLOADING_FILE_ICON))
-                self.openLogsButton.setEnabled(False)
-                self.openLogsButton.setIcon(QtGui.QIcon(Icons.GENERATING_FILE_ICON))
+                self.setOpenFileButton(downloadingFile=True)
+                self.setOpenLogsButton(creatingFile=True)
             else:
                 styleSheet = "QLabel {color: #ff0000;}"
                 self.channel.setStyleSheet(styleSheet)
                 self.videoArea.setStyleSheet(styleSheet)
-                self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_NOT_FOUND_ICON))
-                self.openLogsButton.setEnabled(True)
-                self.openLogsButton.setIcon(QtGui.QIcon(Icons.TEXT_FILE_ICON))
+                self.setOpenFileButton(fileNotFound=True)
+                self.setOpenLogsButton(viewLogs=True)
 
     def openFolder(self):
         try:
@@ -115,6 +110,32 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
                 "#{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]",
                 duration=Utils.formatTime(*Utils.toTime(durationSeconds)),
                 totalDuration=Utils.formatTime(*Utils.toTime(totalSeconds)),
-                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start / 1000)),
-                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end / 1000))
+                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start)),
+                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end))
             ))
+
+    def setOpenFileButton(self, openFile=False, downloadingFile=False, fileNotFound=False):
+        buttonText = T("open-file")
+        if openFile:
+            self.openFileButton.setEnabled(True)
+            self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_ICON))
+            self.openFileButton.setToolTip(buttonText)
+        elif downloadingFile:
+            self.openFileButton.setEnabled(False)
+            self.openFileButton.setIcon(QtGui.QIcon(Icons.DOWNLOADING_FILE_ICON))
+            self.openFileButton.setToolTip(f"{buttonText}({T('downloading', ellipsis=True)})")
+        elif fileNotFound:
+            self.openFileButton.setEnabled(False)
+            self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_NOT_FOUND_ICON))
+            self.openFileButton.setToolTip(f"{buttonText}({T('file-not-found')})")
+
+    def setOpenLogsButton(self, viewLogs=False, creatingFile=False):
+        buttonText = T("view-logs")
+        if viewLogs:
+            self.openLogsButton.setEnabled(True)
+            self.openLogsButton.setIcon(QtGui.QIcon(Icons.TEXT_FILE_ICON))
+            self.openLogsButton.setToolTip(buttonText)
+        elif creatingFile:
+            self.openLogsButton.setEnabled(False)
+            self.openLogsButton.setIcon(QtGui.QIcon(Icons.CREATING_FILE_ICON))
+            self.openLogsButton.setToolTip(f"{buttonText}({T('creating', ellipsis=True)})")
