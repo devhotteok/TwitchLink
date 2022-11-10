@@ -76,7 +76,7 @@ class OptimizeFileHistory:
         return self._optimizeFile
 
 
-class StreamHistory(FileHistory, AudioFormatHistory, OptimizeFileHistory, Codable):
+class StreamHistory(FileHistory, AudioFormatHistory, Codable):
     SUPPORTED_FORMATS = [
         "ts",
         "mp4"

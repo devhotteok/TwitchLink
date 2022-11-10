@@ -89,7 +89,7 @@ class Stream(TwitchGqlObject):
         self.viewersCount = data.get("viewersCount", 0)
 
     def isLive(self):
-        return self.type == "live"
+        return not self.isRerun()
 
     def isRerun(self):
         return self.type == "rerun"

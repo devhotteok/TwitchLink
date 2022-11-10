@@ -37,4 +37,4 @@ class VideoWidgetImageSaver:
         if isinstance(videoData, TwitchGqlModels.Channel):
             return f"[{T('channel-offline-image')}] {videoData.formattedName}"
         else:
-            return f"[{T('preview')}] {FileNameGenerator.generateFileName(videoData, T('unknown'))}"
+            return f"[{T('preview')}] {FileNameGenerator.generateFileName(videoData, None)}"

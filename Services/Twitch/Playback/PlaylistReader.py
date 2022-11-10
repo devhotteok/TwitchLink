@@ -1,4 +1,8 @@
+from . import TwitchPlaybackModels
+
 import re
+
+from urllib.parse import urljoin
 
 
 class PlaylistTag:
@@ -15,7 +19,7 @@ class PlaylistTag:
             return f"#{self.name}"
 
 
-class PlaylistReader:
+class PlaylistTagReader:
     TAG_WITH_DATA = re.compile("#(.*?):(.*)")
     TAG_WITHOUT_DATA = re.compile("#(.*)")
 
@@ -75,3 +79,30 @@ class PlaylistReader:
                 data[key] = data[key].strip("\'\"")
                 quotation = None
         return data
+
+
+class PlaylistReader(PlaylistTagReader):
+    def getPlaylistUrl(self, playlist, host=""):
+        resolutions = {}
+        expect = False
+        for line in playlist.split("\n"):
+            tag = self.getTag(line)
+            if tag != None:
+                if tag.name == "EXT-X-MEDIA":
+                    expect = tag.data
+                continue
+            if expect != False:
+                resolution = self.generateResolution(expect, urljoin(host, line))
+                resolutions[resolution.groupId] = resolution
+                expect = False
+                continue
+        return dict(sorted(resolutions.items(), key=lambda item: (item[1].isSource(), item[1].frameRate or 0, item[1].quality or 0), reverse=True))
+
+    def generateResolution(self, data, url):
+        return TwitchPlaybackModels.Resolution(
+            name=data.get("NAME", ""),
+            groupId=data.get("GROUP-ID", ""),
+            url=url,
+            autoSelect=data.get("AUTOSELECT", "") == "YES",
+            default=data.get("DEFAULT", "") == "YES"
+        )

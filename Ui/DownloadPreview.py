@@ -4,6 +4,7 @@ from Search import ExternalPlaylist
 from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
 from Download.DownloadManager import DownloadManager
 from Ui.Components.Widgets.RetryDownloadButton import RetryDownloadButton
+from Ui.Components.Utils.ResolutionNameGenerator import ResolutionNameGenerator
 
 
 class DownloaderControl:
@@ -44,7 +45,7 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.date.setText(self.videoData.createdAt.toTimeZone(DB.localization.getTimezone()))
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.setVisible(self.downloadInfo.isOptimizeFileEnabled())
+            self.optimizeFileTag.hide()
             self.prioritizeTag.hide()
             self.progressBar.setRange(0, 0)
             self.pauseButton.hide()
@@ -76,7 +77,7 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
             self.pauseButton.hide()
             self.cancelButton.setText(T("cancel"))
-        self.resolution.setText(self.downloadInfo.resolution.displayName)
+        self.resolution.setText(ResolutionNameGenerator.generateResolutionName(self.downloadInfo.resolution))
         self.file.setText(self.downloadInfo.getAbsoluteFileName())
         self.retryButtonManager = RetryDownloadButton(self.downloadInfo, self.retryButton, self.downloader.getId(), parent=self)
         self.accountPageShowRequested = self.retryButtonManager.accountPageShowRequested
@@ -189,8 +190,9 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.pauseButton.hide()
         elif status.isEncoding():
             encodingString = T("encoding", ellipsis=True)
-            if self.downloadInfo.isOptimizeFileEnabled():
-                encodingString = f"{encodingString} [{T('optimize-file')}]"
+            if self.downloadInfo.type.isVideo():
+                if self.downloadInfo.isOptimizeFileEnabled():
+                    encodingString = f"{encodingString} [{T('optimize-file')}]"
             self.status.setText(f"{encodingString} ({T('download-skipped')})" if status.isDownloadSkipped() else encodingString)
             self.progressBar.setRange(0, 100)
             self.progressBar.setValue(self.downloader.progress.timeProgress)

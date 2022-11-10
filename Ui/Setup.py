@@ -25,7 +25,7 @@ class Setup(QtWidgets.QDialog, UiFile.setup):
         DB.localization.setLanguage(Translator.getLanguageCode(index))
 
     def setTimezone(self, timezone):
-        DB.localization.setTimezone(timezone)
+        DB.localization.setTimezone(bytes(timezone, encoding="utf-8"))
         self.showTimezoneTime()
 
     def showTimezoneTime(self):

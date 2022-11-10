@@ -16,7 +16,7 @@ class StreamDownloader(EngineSetup):
             self.FFmpeg.startEncodingProcess(
                 target=self.setup.downloadInfo.getUrl(),
                 saveAs=self.setup.downloadInfo.getAbsoluteFileName(),
-                remux=not self.setup.downloadInfo.isOptimizeFileEnabled(),
+                remux=True,
                 logLevel=FFmpeg.LogLevel.WARNING,
                 priority=FFmpeg.Priority.HIGH
             )

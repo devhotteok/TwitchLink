@@ -32,14 +32,16 @@ class ContentManager:
 
     @classmethod
     def checkRestrictions(cls, channel, content):
+        channelId = str(channel.id)
+        contentId = str(content.id)
         if type(content) == TwitchGqlModels.Stream:
             contentType = "stream"
         elif type(content) == TwitchGqlModels.Video:
             contentType = "video"
         else:
             contentType = "clip"
-        if channel.id in cls.restrictions["channel"]:
-            if contentType in cls.restrictions["channel"][channel.id]:
-                raise Exceptions.RestrictedContent(channel, contentType, content.id, cls.restrictions["channel"][channel.id][contentType], RestrictionType.CONTENT_TYPE)
-        if content.id in cls.restrictions[contentType]:
-            raise Exceptions.RestrictedContent(channel, contentType, content.id, cls.restrictions[contentType][content.id], RestrictionType.CONTENT_ID)
+        if channelId in cls.restrictions["channel"]:
+            if contentType in cls.restrictions["channel"][channelId]:
+                raise Exceptions.RestrictedContent(channel, contentType, contentId, cls.restrictions["channel"][channelId][contentType], RestrictionType.CONTENT_TYPE)
+        if contentId in cls.restrictions[contentType]:
+            raise Exceptions.RestrictedContent(channel, contentType, contentId, cls.restrictions[contentType][contentId], RestrictionType.CONTENT_ID)

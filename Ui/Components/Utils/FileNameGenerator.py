@@ -108,7 +108,13 @@ class FileNameGenerator:
         return DB.templates.getClipFilename()
 
     @classmethod
-    def generateFileName(cls, videoData, resolutionText):
+    def generateFileName(cls, videoData, resolution):
+        if resolution == None:
+            resolutionText = T("unknown")
+        elif resolution.isAudioOnly():
+            resolutionText = T("audio-only")
+        else:
+            resolutionText = resolution.name
         if isinstance(videoData, TwitchGqlModels.Stream):
             template = cls.getStreamFileNameTemplate()
             variables = cls.getStreamFileNameTemplateVariables(videoData, resolutionText)

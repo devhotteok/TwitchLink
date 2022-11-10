@@ -1,5 +1,5 @@
 from .QueryParser import TwitchQueryParser
-from .ExternalPlaylist import ExternalPlaylist
+from .ExternalPlaylist import ExternalPlaylistReader
 
 from Core import GlobalExceptions
 from Services.Twitch.Gql import TwitchGqlAPI
@@ -67,7 +67,7 @@ class Search:
         else:
             if searchExternalContent:
                 try:
-                    return ExternalPlaylist(query)
+                    return ExternalPlaylistReader(query).checkUrl()
                 except:
                     pass
             raise Exceptions.InvalidURL

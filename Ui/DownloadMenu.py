@@ -1,5 +1,6 @@
 from Core.Ui import *
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
+from Ui.Components.Utils.ResolutionNameGenerator import ResolutionNameGenerator
 from Ui.Components.Utils.DownloadChecker import DownloadChecker
 
 
@@ -23,17 +24,12 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.fileFormat.currentTextChanged.connect(self.setFormat)
         self.searchDirectory.clicked.connect(self.askSaveDirectory)
         for resolution in self.downloadInfo.accessToken.getResolutions():
-            self.resolution.addItem(resolution.displayName)
+            self.resolution.addItem(ResolutionNameGenerator.generateResolutionName(resolution))
         self.resolution.setCurrentIndex(self.downloadInfo.selectedResolutionIndex)
         self.resolution.currentIndexChanged.connect(self.setResolution)
         if self.downloadInfo.type.isStream():
             self.cropArea.hide()
-            self.unmuteVideoArea.hide()
-            self.updateTrackArea.hide()
-            self.prioritizeArea.hide()
-            self.optimizeFileCheckBox.setChecked(self.downloadInfo.isOptimizeFileEnabled())
-            self.optimizeFileCheckBox.toggled.connect(self.setOptimizeFile)
-            self.optimizeFileInfo.clicked.connect(self.showOptimizeFileInfo)
+            self.advancedArea.hide()
         elif self.downloadInfo.type.isVideo():
             self.setupCropArea()
             self.unmuteVideoCheckBox.setChecked(self.downloadInfo.isUnmuteVideoEnabled())

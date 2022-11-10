@@ -16,7 +16,6 @@ class DownloadInfo(Codable):
         self.accessToken = accessToken
         if self.type.isStream():
             self.stream = videoData
-            self.optimizeFile = self.optionHistory.isOptimizeFileEnabled()
         elif self.type.isVideo():
             self.video = videoData
             self.range = [None, None]
@@ -49,7 +48,7 @@ class DownloadInfo(Codable):
         return DB.temp.getDownloadOptionHistory(self.type.getType())
 
     def generateFileName(self):
-        return FileNameGenerator.generateFileName(self.videoData, self.resolution.resolutionName)
+        return FileNameGenerator.generateFileName(self.videoData, self.resolution)
 
     def setResolution(self, index):
         self.selectedResolutionIndex = index
@@ -119,9 +118,7 @@ class DownloadInfo(Codable):
             self.optionHistory.setAudioFormat(self.fileFormat)
         else:
             self.optionHistory.setFormat(self.fileFormat)
-        if self.type.isStream():
-            self.optionHistory.setOptimizeFileEnabled(self.optimizeFile)
-        elif self.type.isVideo():
+        if self.type.isVideo():
             self.optionHistory.setUnmuteVideoEnabled(self.unmuteVideo)
             self.optionHistory.setUpdateTrackEnabled(self.updateTrack)
             self.optionHistory.setOptimizeFileEnabled(self.optimizeFile)

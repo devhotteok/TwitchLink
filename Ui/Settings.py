@@ -224,7 +224,7 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.requestRestart()
 
     def setTimezone(self, timezone):
-        DB.localization.setTimezone(timezone)
+        DB.localization.setTimezone(bytes(timezone, encoding="utf-8"))
         self.info("restart", "#Restart due to time zone change.")
         self.requestRestart()
 

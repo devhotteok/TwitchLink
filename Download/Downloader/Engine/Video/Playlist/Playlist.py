@@ -1,4 +1,4 @@
-from Services.Twitch.Playback.PlaylistReader import PlaylistReader
+from Services.Twitch.Playback.PlaylistReader import PlaylistTagReader
 
 
 class Exceptions:
@@ -40,7 +40,7 @@ class Segment:
         return self.__str__()
 
 
-class Playlist(PlaylistReader):
+class Playlist(PlaylistTagReader):
     class Range:
         def __init__(self):
             self.setRange()

@@ -11,6 +11,7 @@ class TwitchPlaybackObject(Codable):
     def __repr__(self):
         return self.__str__()
 
+
 class TwitchPlaybackAccessTokenTypes(TwitchPlaybackObject):
     STREAM = "stream"
     VIDEO = "video"
@@ -37,68 +38,60 @@ class TwitchPlaybackAccessTokenTypes(TwitchPlaybackObject):
     def toString(self):
         return self.getType()
 
-class StreamUrl(TwitchPlaybackObject):
-    def __init__(self, channel, resolutionName, url, data, source, chunked, audioOnly):
+
+class Resolution(TwitchPlaybackObject):
+    def __init__(self, name, groupId, url, autoSelect=True, default=True):
+        self.name = name
+        self.groupId = groupId
+        self.url = url
+        self.autoSelect = autoSelect
+        self.default = default
+        self.parseResolution()
+
+    def parseResolution(self):
+        for parseString in [self.groupId, self.name]:
+            try:
+                parsed = parseString.split("p", 1)
+                self.frameRate = int(parsed[0])
+                try:
+                    self.quality = int(parsed[1])
+                except:
+                    self.quality = None
+                return
+            except:
+                pass
+        self.frameRate = None
+        self.quality = None
+
+    def isSource(self):
+        return self.groupId == "chunked"
+
+    def isAudioOnly(self):
+        return self.groupId == "audio_only"
+
+
+class StreamUrl(Resolution):
+    def __init__(self, channel, name, groupId, url, autoSelect=True, default=True):
+        super(StreamUrl, self).__init__(name, groupId, url, autoSelect, default)
         self.channel = channel
-        self.resolutionName = resolutionName
-        self.url = url
-        self.data = data
-        self.source = source
-        self.chunked = chunked
-        self.audioOnly = audioOnly
-
-    @property
-    def displayName(self):
-        name = self.resolutionName
-        if self.source:
-            name = f"{name} (source)"
-        if self.chunked:
-            name = f"{name} (chunked)"
-        return name
-
-    def isAudioOnly(self):
-        return self.audioOnly
 
     def __str__(self):
-        return f"<{self.__class__.__name__} [{self.channel}] [{self.resolutionName}]>"
+        return f"<{self.__class__.__name__} [{self.channel}] [{self.name}]>"
 
-class VideoUrl(TwitchPlaybackObject):
-    def __init__(self, videoId, resolutionName, url, data, source, chunked, audioOnly):
+
+class VideoUrl(Resolution):
+    def __init__(self, videoId, name, groupId, url, autoSelect=True, default=True):
+        super(VideoUrl, self).__init__(name, groupId, url, autoSelect, default)
         self.videoId = videoId
-        self.resolutionName = resolutionName
-        self.url = url
-        self.data = data
-        self.source = source
-        self.chunked = chunked
-        self.audioOnly = audioOnly
-
-    @property
-    def displayName(self):
-        name = self.resolutionName
-        if self.source:
-            name = f"{name} (source)"
-        if self.chunked:
-            name = f"{name} (chunked)"
-        return name
-
-    def isAudioOnly(self):
-        return self.audioOnly
 
     def __str__(self):
-        return f"<{self.__class__.__name__} [{self.videoId}] [{self.resolutionName}]>"
+        return f"<{self.__class__.__name__} [{self.videoId}] [{self.name}]>"
 
-class ClipUrl(TwitchPlaybackObject):
-    def __init__(self, slug, resolutionName, url):
+
+class ClipUrl(Resolution):
+    def __init__(self, slug, name, url):
+        super(ClipUrl, self).__init__(name, name, url)
         self.slug = slug
-        self.resolutionName = resolutionName
-        self.url = url
-
-    @property
-    def displayName(self):
-        return self.resolutionName
-
-    def isAudioOnly(self):
-        return False
 
     def __str__(self):
-        return f"<{self.__class__.__name__} [{self.slug}] [{self.resolutionName}]>"
+        return f"<{self.__class__.__name__} [{self.slug}] [{self.name}]>"

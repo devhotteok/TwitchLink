@@ -57,6 +57,12 @@ class Updaters:
             downloadData["__type__"] = "obj:Database.Database:Download"
         return data
 
+    @staticmethod
+    def Update_2_2_2(data):
+        data["temp"].pop("_downloadHistory", None)
+        data["temp"]["_downloadOptionHistory"]["stream"].pop("_optimizeFile", None)
+        return data
+
     @classmethod
     def getUpdaters(cls, versionFrom):
         VERSIONS = {
@@ -72,7 +78,8 @@ class Updaters:
             "2.0.2": None,
             "2.1.0": None,
             "2.2.0": cls.Update_2_2_0,
-            "2.2.1": None
+            "2.2.1": None,
+            "2.2.2": cls.Update_2_2_2
         }
         updaters = []
         versionFound = False

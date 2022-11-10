@@ -3,6 +3,7 @@ from Services.Messages import Messages
 from Search import ExternalPlaylist
 from Download.DownloadManager import DownloadManager
 from Ui.Components.Widgets.RetryDownloadButton import RetryDownloadButton
+from Ui.Components.Utils.ResolutionNameGenerator import ResolutionNameGenerator
 
 
 class Download(QtWidgets.QWidget, UiFile.download):
@@ -26,7 +27,7 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.viewCount.setText(self.videoData.viewersCount)
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.setVisible(self.downloadInfo.isOptimizeFileEnabled())
+            self.optimizeFileTag.hide()
             self.prioritizeTag.hide()
             self.downloadProgressBar.setRange(0, 0)
             self.encodingProgressBar.setRange(0, 0)
@@ -68,7 +69,7 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.currentDuration.hide()
             self.pauseButton.hide()
             self.cancelButton.setText(T("cancel"))
-        self.resolution.setText(self.downloadInfo.resolution.displayName)
+        self.resolution.setText(ResolutionNameGenerator.generateResolutionName(self.downloadInfo.resolution))
         self.file.setText(self.downloadInfo.getAbsoluteFileName())
         sizePolicy = self.skipWaitingButton.sizePolicy()
         sizePolicy.setRetainSizeWhenHidden(True)
@@ -195,8 +196,9 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.pauseButton.hide()
         elif status.isEncoding():
             encodingString = T("encoding", ellipsis=True)
-            if self.downloadInfo.isOptimizeFileEnabled():
-                encodingString = f"{encodingString} [{T('optimize-file')}]"
+            if self.downloadInfo.type.isVideo():
+                if self.downloadInfo.isOptimizeFileEnabled():
+                    encodingString = f"{encodingString} [{T('optimize-file')}]"
             self.status.setText(f"{encodingString} ({T('download-skipped')})" if status.isDownloadSkipped() else encodingString)
             self.skipWaitingButton.hide()
             self.skipDownloadButton.hide()

@@ -3,6 +3,7 @@ from Services.Messages import Messages
 from Search import ExternalPlaylist
 from Download.DownloadHistoryManager import DownloadHistoryManager
 from Ui.Components.Widgets.RetryDownloadButton import RetryDownloadButton
+from Ui.Components.Utils.ResolutionNameGenerator import ResolutionNameGenerator
 
 
 class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
@@ -22,7 +23,7 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
             self.duration.setText(T("unknown"))
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.setVisible(self.downloadInfo.isOptimizeFileEnabled())
+            self.optimizeFileTag.hide()
             self.prioritizeTag.hide()
         elif self.downloadInfo.type.isVideo():
             self.showVideoType("video")
@@ -47,7 +48,7 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
             self.updateTrackTag.hide()
             self.optimizeFileTag.hide()
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
-        self.resolution.setText(self.downloadInfo.resolution.displayName)
+        self.resolution.setText(ResolutionNameGenerator.generateResolutionName(self.downloadInfo.resolution))
         self.file.setText(self.downloadInfo.getAbsoluteFileName())
         self.retryButtonManager = RetryDownloadButton(self.downloadInfo, self.retryButton, parent=self)
         self.accountPageShowRequested = self.retryButtonManager.accountPageShowRequested

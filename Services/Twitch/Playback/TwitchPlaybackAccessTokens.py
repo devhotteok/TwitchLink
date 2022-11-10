@@ -103,47 +103,18 @@ class TwitchPlaybackAccessToken(Codable):
     def getResolutions(self):
         return list(self.resolutions.values())
 
-class ResolutionNameGenerator:
-    def generateResolutionName(self, name):
-        nameCheck = name.lower()
-        for key in [" ", "-", "_"]:
-            nameCheck = nameCheck.replace(key, "")
-        if "source" in nameCheck:
-            isSource = True
-        else:
-            isSource = False
-        if "audioonly" in nameCheck:
-            isAudioOnly = True
-            name = Config.AUDIO_ONLY_RESOLUTION_NAME
-        else:
-            isAudioOnly = False
-        return self.removeBrackets(name), isSource, isAudioOnly
 
-    def removeBrackets(self, name):
-        newName = ""
-        brackets = 0
-        for char in name:
-            if char == "(":
-                brackets += 1
-                continue
-            elif char == ")":
-                brackets -= 1
-                continue
-            if brackets == 0:
-                newName += char
-            elif brackets < 0:
-                return name
-        if brackets == 0:
-            return " ".join(newName.split())
-        else:
-            return name
-
-class TwitchStream(TwitchPlaybackAccessToken, PlaylistReader, ResolutionNameGenerator):
+class TwitchStream(TwitchPlaybackAccessToken, PlaylistReader):
     def __init__(self, CHANNEL_NAME, OAUTH_TOKEN=""):
         super(TwitchStream, self).__init__(TwitchPlaybackAccessTokenTypes.STREAM)
         self.CHANNEL_NAME = CHANNEL_NAME
         self.OAUTH_TOKEN = OAUTH_TOKEN
-        self.loadStream()
+        if self.CHANNEL_NAME != None:
+            self.loadStream()
+
+    @property
+    def PLAYLIST_HOST_URL(self):
+        return f"{Config.HLS_SERVER}/{self.CHANNEL_NAME}.m3u8"
 
     def loadStream(self):
         self.getStreamToken()
@@ -192,41 +163,43 @@ class TwitchStream(TwitchPlaybackAccessToken, PlaylistReader, ResolutionNameGene
 
     def getStreamPlaylist(self):
         try:
-            response = Network.session.get(f"{Config.HLS_SERVER}/{self.CHANNEL_NAME}.m3u8", params={"allow_source": True, "allow_audio_only": True, "sig": self.sig, "token": self.token, "fast_bread": True})
+            response = Network.session.get(self.PLAYLIST_HOST_URL, params={"allow_source": True, "allow_audio_only": True, "sig": self.sig, "token": self.token, "fast_bread": True})
         except:
             raise Exceptions.TwitchApiError
         if response.status_code == 200:
-            self.playList = response.text
+            self.playlist = response.text
         elif response.status_code == 404:
             raise Exceptions.ChannelIsOffline(self.CHANNEL_NAME)
         else:
             raise Exceptions.TwitchApiError(response)
 
     def getStreamUrl(self):
-        resolutions = {}
-        expect = False
-        for line in self.playList.split("\n"):
-            tag = self.getTag(line)
-            if tag != None:
-                if tag.name == "EXT-X-MEDIA":
-                    expect = tag.data
-                continue
-            if expect != False:
-                name, isSource, isAudioOnly = self.generateResolutionName(expect.get("NAME", ""))
-                isChunked = expect.get("GROUP-ID") == "chunked"
-                resolutions[name] = StreamUrl(self.CHANNEL_NAME, name, line, expect, isSource, isChunked, isAudioOnly)
-                expect = False
-                continue
-        if len(resolutions) == 0:
+        self.resolutions = self.getPlaylistUrl(self.playlist, host=self.PLAYLIST_HOST_URL)
+        if len(self.resolutions) == 0:
             raise Exceptions.ChannelIsOffline
-        self.resolutions = dict(sorted(resolutions.items(), key=lambda item: item[1].data.get("DEFAULT") == "NO"))
 
-class TwitchVideo(TwitchPlaybackAccessToken, PlaylistReader, ResolutionNameGenerator):
+    def generateResolution(self, data, url):
+        return StreamUrl(
+            channel=self.CHANNEL_NAME,
+            name=data.get("NAME", ""),
+            groupId=data.get("GROUP-ID", ""),
+            url=url,
+            autoSelect=data.get("AUTOSELECT", "") == "YES",
+            default=data.get("DEFAULT", "") == "YES"
+        )
+
+
+class TwitchVideo(TwitchPlaybackAccessToken, PlaylistReader):
     def __init__(self, VIDEO_ID, OAUTH_TOKEN=""):
         super(TwitchVideo, self).__init__(TwitchPlaybackAccessTokenTypes.VIDEO)
         self.VIDEO_ID = VIDEO_ID
         self.OAUTH_TOKEN = OAUTH_TOKEN
-        self.loadVideo()
+        if self.VIDEO_ID != None:
+            self.loadVideo()
+
+    @property
+    def PLAYLIST_HOST_URL(self):
+        return f"{Config.VOD_SERVER}/{self.VIDEO_ID}.m3u8"
 
     def loadVideo(self):
         self.getVideoToken()
@@ -267,11 +240,11 @@ class TwitchVideo(TwitchPlaybackAccessToken, PlaylistReader, ResolutionNameGener
 
     def getVideoPlaylist(self):
         try:
-            response = Network.session.get(f"{Config.VOD_SERVER}/{self.VIDEO_ID}.m3u8", params={"allow_source": True, "allow_audio_only": True, "sig": self.sig, "token": self.token})
+            response = Network.session.get(self.PLAYLIST_HOST_URL, params={"allow_source": True, "allow_audio_only": True, "sig": self.sig, "token": self.token})
         except:
             raise Exceptions.TwitchApiError
         if response.status_code == 200:
-            self.playList = response.text
+            self.playlist = response.text
         elif response.status_code == 403:
             raise Exceptions.VideoRestricted(self.VIDEO_ID)
         elif response.status_code == 404:
@@ -280,30 +253,27 @@ class TwitchVideo(TwitchPlaybackAccessToken, PlaylistReader, ResolutionNameGener
             raise Exceptions.TwitchApiError(response)
 
     def getVideoUrl(self):
-        resolutions = {}
-        expect = False
-        for line in self.playList.split("\n"):
-            tag = self.getTag(line)
-            if tag != None:
-                if tag.name == "EXT-X-MEDIA":
-                    expect = tag.data
-                continue
-            if expect != False:
-                name, isSource, isAudioOnly = self.generateResolutionName(expect.get("NAME", ""))
-                isChunked = expect.get("GROUP-ID") == "chunked"
-                resolutions[name] = VideoUrl(self.VIDEO_ID, name, line, expect, isSource, isChunked, isAudioOnly)
-                expect = False
-                continue
-        if len(resolutions) == 0:
+        self.resolutions = self.getPlaylistUrl(self.playlist, host=self.PLAYLIST_HOST_URL)
+        if len(self.resolutions) == 0:
             raise Exceptions.VideoNotFound
-        self.resolutions = dict(sorted(resolutions.items(), key=lambda item: item[1].data.get("DEFAULT") == "NO"))
+
+    def generateResolution(self, data, url):
+        return VideoUrl(
+            videoId=self.VIDEO_ID,
+            name=data.get("NAME", ""),
+            groupId=data.get("GROUP-ID", ""),
+            url=url,
+            autoSelect=data.get("AUTOSELECT", "") == "YES",
+            default=data.get("DEFAULT", "") == "YES"
+        )
 
 class TwitchClip(TwitchPlaybackAccessToken):
     def __init__(self, SLUG, OAUTH_TOKEN=""):
         super(TwitchClip, self).__init__(TwitchPlaybackAccessTokenTypes.CLIP)
         self.SLUG = SLUG
         self.OAUTH_TOKEN = OAUTH_TOKEN
-        self.loadClip()
+        if self.SLUG != None:
+            self.loadClip()
 
     def loadClip(self):
         self.getClipToken()
@@ -333,7 +303,7 @@ class TwitchClip(TwitchPlaybackAccessToken):
             sig = accessToken["signature"]
             token = accessToken["value"]
             self.id = clip["id"]
-            self.setResolutions(clip["videoQualities"], sig, token)
+            self.getClipUrl(clip["videoQualities"], sig, token)
             if len(self.resolutions) == 0:
                 raise Exceptions.ClipNotFound(self.SLUG)
         elif response.status_code == 401:
@@ -341,7 +311,13 @@ class TwitchClip(TwitchPlaybackAccessToken):
         else:
             raise Exceptions.TwitchApiError(response)
 
-    def setResolutions(self, qualities, sig, token):
+    def getClipUrl(self, qualities, sig, token):
+        resolutions = {}
         for quality in qualities:
-            name = f"{quality['quality']}p{quality['frameRate']}"
-            self.resolutions[name] = ClipUrl(self.SLUG, name, f"{quality['sourceURL']}?sig={sig}&token={quote(token)}")
+            resolution = ClipUrl(
+                slug=self.SLUG,
+                name=f"{quality['quality']}p{quality['frameRate']}",
+                url=f"{quality['sourceURL']}?sig={sig}&token={quote(token)}"
+            )
+            resolutions[resolution.groupId] = resolution
+        self.resolutions = dict(sorted(resolutions.items(), key=lambda item: (item[1].frameRate or 0, item[1].quality or 0), reverse=True))

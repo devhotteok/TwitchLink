@@ -1,5 +1,6 @@
 from Services.NetworkRequests import Network
 from Services.Twitch.Playback import TwitchPlaybackAccessTokens
+from Services.Twitch.Playback import PlaylistReader
 
 
 class Exceptions:
@@ -8,33 +9,39 @@ class Exceptions:
             return "Playlist Not Found"
 
 
-class ExternalPlaylist(TwitchPlaybackAccessTokens.TwitchPlaybackAccessToken, TwitchPlaybackAccessTokens.PlaylistReader):
+class ExternalPlaylistReader(PlaylistReader.PlaylistReader):
     def __init__(self, url):
-        super(ExternalPlaylist, self).__init__(TwitchPlaybackAccessTokens.TwitchPlaybackAccessTokenTypes.STREAM)
+        super(ExternalPlaylistReader, self).__init__()
         self.url = url
-        self.checkUrl()
-
-    @property
-    def totalSeconds(self):
-        return self.totalMilliSeconds / 1000
 
     def checkUrl(self):
         try:
             response = Network.session.get(self.url)
             if response.status_code != 200:
                 raise
-            self.checkPlaylist(response.text)
-            if self.type.isStream():
-                url = TwitchPlaybackAccessTokens.StreamUrl("", "Unknown", self.url, None, False, False, False)
-                audioOnlyUrl = TwitchPlaybackAccessTokens.StreamUrl("", TwitchPlaybackAccessTokens.Config.AUDIO_ONLY_RESOLUTION_NAME, self.url, None, False, False, True)
-            else:
-                url = TwitchPlaybackAccessTokens.VideoUrl(None, "Unknown", self.url, None, False, False, False)
-                audioOnlyUrl = TwitchPlaybackAccessTokens.VideoUrl(None, TwitchPlaybackAccessTokens.Config.AUDIO_ONLY_RESOLUTION_NAME, self.url, None, False, False, True)
-            self.resolutions = {url.resolutionName: url, audioOnlyUrl.resolutionName: audioOnlyUrl}
+            return self.getExternalPlaylist(response.text)
         except:
             raise Exceptions.PlaylistNotFound
 
-    def checkPlaylist(self, playlist):
+    def getExternalPlaylist(self, playlist):
+        resolutions = self.getPlaylistUrl(playlist, host=self.url)
+        if len(resolutions) == 0:
+            resolution = self.generateResolution({"NAME": "Unknown", "GROUP-ID": "Unknown"}, self.url)
+            resolutions[resolution.groupId] = resolution
+            totalMilliSeconds = self.getTotalMilliSeconds(playlist)
+        else:
+            try:
+                response = Network.session.get(list(resolutions.values())[0].url)
+                if response.status_code != 200:
+                    raise
+            except:
+                raise Exceptions.PlaylistNotFound
+            totalMilliSeconds = self.getTotalMilliSeconds(response.text)
+        externalPlaylist = ExternalStreamPlaylist() if totalMilliSeconds == None else ExternalVideoPlaylist(totalMilliSeconds)
+        externalPlaylist.resolutions = resolutions
+        return externalPlaylist
+
+    def getTotalMilliSeconds(self, playlist):
         hasRequiredTags = {
             "EXTM3U": False,
             "EXT-X-TARGETDURATION": False,
@@ -50,8 +57,24 @@ class ExternalPlaylist(TwitchPlaybackAccessTokens.TwitchPlaybackAccessToken, Twi
                     totalMilliSeconds += int(float(tag.data[0]) * 1000)
         if not all(list(hasRequiredTags.values())[0:2]):
             raise
-        if hasRequiredTags["EXT-X-ENDLIST"]:
-            self.totalMilliSeconds = totalMilliSeconds
-            self.type.setType(self.type.VIDEO)
-        else:
-            self.type.setType(self.type.STREAM)
+        return totalMilliSeconds if hasRequiredTags["EXT-X-ENDLIST"] else None
+
+
+class ExternalPlaylist(TwitchPlaybackAccessTokens.TwitchPlaybackAccessToken):
+    def __str__(self):
+        return f"<{self.__class__.__name__}>"
+
+
+class ExternalStreamPlaylist(ExternalPlaylist):
+    def __init__(self):
+        super(ExternalStreamPlaylist, self).__init__(TwitchPlaybackAccessTokens.TwitchPlaybackAccessTokenTypes.STREAM)
+
+
+class ExternalVideoPlaylist(ExternalPlaylist):
+    def __init__(self, totalMilliSeconds):
+        super(ExternalVideoPlaylist, self).__init__(TwitchPlaybackAccessTokens.TwitchPlaybackAccessTokenTypes.VIDEO)
+        self.totalMilliSeconds = totalMilliSeconds
+
+    @property
+    def totalSeconds(self):
+        return self.totalMilliSeconds / 1000

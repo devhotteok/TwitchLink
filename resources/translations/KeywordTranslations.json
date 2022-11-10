@@ -147,6 +147,14 @@
     "en": "Unknown",
     "ko": "알 수 없음"
   },
+  "audio-only": {
+    "en": "Audio Only",
+    "ko": "라디오 모드"
+  },
+  "source": {
+    "en": "Source",
+    "ko": "원본"
+  },
   "preparing": {
     "en": "Preparing",
     "ko": "준비 중"
@@ -474,6 +482,10 @@
   "view-count": {
     "en": "View Count",
     "ko": "조회수"
+  },
+  "available-resolutions": {
+    "en": "Available Resolutions",
+    "ko": "선택 가능한 해상도 목록"
   },
   "save-as": {
     "en": "Save As",

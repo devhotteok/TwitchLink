@@ -1,6 +1,6 @@
 # TwitchLink
 
-[![Platform][badge-platforms]][Releases] [![Latest Release][badge-latest-release]][Releases] [![GitHub issues][badge-issues]][issues] [![GitHub forks][badge-forks]][Forks] [![GitHub stars][badge-stars]][Stars] [![GitHub license][badge-license]][License]
+[![Platform][badge-platforms]][Releases] [![Latest Release][badge-latest-release]][Releases] [![GitHub issues][badge-issues]][Issues] [![GitHub forks][badge-forks]][Forks] [![GitHub stars][badge-stars]][Stars] [![GitHub license][badge-license]][License]
 
 ##### Twitch Stream / Video / Clip Downloader
 
@@ -63,7 +63,7 @@
 
 ### Follow the checklist below when creating a new issue!
 
-- **Take a look at the latest issues. [[Issues]][Issues]**
+- **Take a look at the latest issues.**
 - **Maybe your problem has already been reported or resolved.**
 - **Use the latest version of TwitchLink.**
 - **Provide as much information about the problem as possible.**
