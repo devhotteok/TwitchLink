@@ -64,18 +64,6 @@ class AudioFormatHistory:
         return self.SUPPORTED_AUDIO_FORMATS
 
 
-class OptimizeFileHistory:
-    def __init__(self):
-        super(OptimizeFileHistory, self).__init__()
-        self.setOptimizeFileEnabled(False)
-
-    def setOptimizeFileEnabled(self, optimizeFile):
-        self._optimizeFile = optimizeFile
-
-    def isOptimizeFileEnabled(self):
-        return self._optimizeFile
-
-
 class StreamHistory(FileHistory, AudioFormatHistory, Codable):
     SUPPORTED_FORMATS = [
         "ts",
@@ -83,7 +71,7 @@ class StreamHistory(FileHistory, AudioFormatHistory, Codable):
     ]
 
 
-class VideoHistory(FileHistory, AudioFormatHistory, OptimizeFileHistory, Codable):
+class VideoHistory(FileHistory, AudioFormatHistory, Codable):
     SUPPORTED_FORMATS = [
         "ts",
         "mp4"

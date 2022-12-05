@@ -1,7 +1,7 @@
-from Database.Database import DB
 from Services.Utils.Utils import Utils
 from Services.Twitch.Gql import TwitchGqlModels
 from Services.Translator.Translator import T
+from Database.Database import DB
 
 
 class FileNameGenerator:

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>838</width>
+    <width>849</width>
     <height>186</height>
    </rect>
   </property>
@@ -674,7 +674,7 @@ border-radius: 10px;</string>
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="optimizeFileTag" native="true">
+             <widget class="QWidget" name="clippingModeTag" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -692,7 +692,7 @@ border-radius: 10px;</string>
 background-color: rgb(145, 71, 255);
 border-radius: 10px;</string>
               </property>
-              <layout class="QVBoxLayout" name="optimizeFileTagLayout">
+              <layout class="QVBoxLayout" name="clippingModeTagLayout">
                <property name="leftMargin">
                 <number>5</number>
                </property>
@@ -706,7 +706,7 @@ border-radius: 10px;</string>
                 <number>3</number>
                </property>
                <item>
-                <widget class="QLabel" name="optimizeFileTagLabel">
+                <widget class="QLabel" name="clippingModeTagLabel">
                  <property name="font">
                   <font>
                    <pointsize>10</pointsize>
@@ -715,7 +715,7 @@ border-radius: 10px;</string>
                   </font>
                  </property>
                  <property name="text">
-                  <string>Optimize File</string>
+                  <string>Clipping Mode</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>

@@ -1,4 +1,5 @@
 from Core.Ui import *
+from Services.Messages import Messages
 from Services.Twitch.Gql import TwitchGqlModels
 from Search.Modes import SearchModes
 from Search import ExternalPlaylist
@@ -41,6 +42,9 @@ class Home(QtWidgets.QWidget, UiFile.home):
                     data = TwitchGqlModels.Video({"title": "Unknown Video", "game": {"name": "Unknown"}, "owner": {"login": "Unknown User"}, "lengthSeconds": searchResult.totalSeconds})
                 downloadInfo = Ui.DownloadMenu(DownloadInfo(data, searchResult), parent=self).exec()
                 if downloadInfo != False:
-                    DownloadManager.create(downloadInfo)
+                    try:
+                        DownloadManager.create(downloadInfo)
+                    except:
+                        self.info(*Messages.INFO.ACTION_PERFORM_ERROR)
             else:
                 self.searchResultWindowRequested.emit(searchResult)

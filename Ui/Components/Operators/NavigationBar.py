@@ -2,20 +2,13 @@ from PyQt5 import QtCore, QtGui
 
 
 class PageObject(QtCore.QObject):
-    showRequested = QtCore.pyqtSignal(object)
-    blockRequested = QtCore.pyqtSignal(object)
-    unblockRequested = QtCore.pyqtSignal(object)
-    focusRequested = QtCore.pyqtSignal(object)
-    unfocusRequested = QtCore.pyqtSignal(object)
-    buttonShowRequested = QtCore.pyqtSignal(object)
-    buttonHideRequested = QtCore.pyqtSignal(object)
-
     def __init__(self, button, widget, icon=None, parent=None):
         super(PageObject, self).__init__(parent=parent)
         self.button = button
         self.widget = widget
-        self.blocked = False
         self.hidden = False
+        self.blocked = False
+        self.focused = False
         self.button.clicked.connect(self.show)
         if icon != None:
             self.setPageIcon(icon)
@@ -32,25 +25,28 @@ class PageObject(QtCore.QObject):
             self.button.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
     def show(self):
-        self.showRequested.emit(self)
-
-    def block(self):
-        self.blockRequested.emit(self)
-
-    def unblock(self):
-        self.unblockRequested.emit(self)
-
-    def focus(self):
-        self.focusRequested.emit(self)
-
-    def unfocus(self):
-        self.unfocusRequested.emit(self)
+        self.parent().setCurrentPage(self)
 
     def showButton(self):
-        self.buttonShowRequested.emit(self)
+        self.parent().showPageButton(self)
 
     def hideButton(self):
-        self.buttonHideRequested.emit(self)
+        self.parent().hidePageButton(self)
+
+    def block(self):
+        self.parent().blockPage(self)
+
+    def unblock(self):
+        self.parent().unblockPage(self)
+
+    def focus(self):
+        self.parent().focus(self)
+
+    def unfocus(self):
+        self.parent().unfocus(self)
+
+    def isCurrentPage(self):
+        return self.parent().isCurrentPage(self)
 
 
 class NavigationBar(QtCore.QObject):
@@ -62,63 +58,83 @@ class NavigationBar(QtCore.QObject):
         self.pages = []
         self.currentPage = None
 
-    def blockPage(self, pageObject):
-        pageObject.blocked = True
-        pageObject.button.setEnabled(False)
-        if self.getCurrentPage() == pageObject:
-            for page in self.pages:
-                if not page.blocked:
-                    self.setCurrentPage(page)
-                    return
-            self.currentPage = None
-
-    def unblockPage(self, pageObject):
-        pageObject.blocked = False
-        pageObject.button.setEnabled(True)
-        if self.currentPage == None:
-            self.setCurrentPage(pageObject)
-
-    def focus(self, pageObject):
-        for page in self.pages:
-            if page != pageObject:
-                self.blockPage(page)
-        self.focusChanged.emit(True)
-
-    def unfocus(self):
-        for page in self.pages:
-            self.unblockPage(page)
-        self.focusChanged.emit(False)
-
     def showPageButton(self, pageObject):
-        pageObject.hidden = False
-        pageObject.button.show()
+        if pageObject.hidden:
+            pageObject.hidden = False
+            pageObject.button.show()
 
     def hidePageButton(self, pageObject):
-        pageObject.hidden = True
-        pageObject.button.hide()
+        if not pageObject.hidden:
+            pageObject.hidden = True
+            pageObject.button.hide()
+
+    def blockPage(self, pageObject):
+        if not pageObject.blocked:
+            pageObject.blocked = True
+            self._reload()
+
+    def unblockPage(self, pageObject):
+        if pageObject.blocked:
+            pageObject.blocked = False
+            self._reload()
+
+    def focus(self, pageObject):
+        if not pageObject.focused:
+            hadFocus = self.hasFocus()
+            pageObject.focused = True
+            self._reload()
+            if hadFocus == False:
+                self.focusChanged.emit(True)
+
+    def unfocus(self, pageObject):
+        if pageObject.focused:
+            pageObject.focused = False
+            self._reload()
+            if self.hasFocus() == False:
+                self.focusChanged.emit(False)
 
     def setCurrentPage(self, pageObject):
-        if pageObject.blocked:
-            return False
-        else:
+        if pageObject in self.getAvailablePages():
             pageObject.button.setChecked(True)
             self.stackedWidget.setCurrentWidget(pageObject.widget)
             self.currentPage = pageObject
             return True
+        else:
+            return False
 
     def getCurrentPage(self):
         return self.currentPage
 
+    def isCurrentPage(self, pageObject):
+        return pageObject == self.getCurrentPage()
+
+    def getBlockedPages(self):
+        return [pageObject for pageObject in self.pages if pageObject.blocked]
+
+    def getFocusedPages(self):
+        return [pageObject for pageObject in self.pages if pageObject.focused]
+
+    def hasFocus(self):
+        return len(self.getFocusedPages()) != 0
+
+    def getAvailablePages(self):
+        unblockedPages = [pageObject for pageObject in self.pages if not pageObject.blocked]
+        return [pageObject for pageObject in unblockedPages if pageObject.focused] or unblockedPages
+
     def addPage(self, button, widget, icon=None):
         pageObject = PageObject(button, widget, icon=icon, parent=self)
-        pageObject.showRequested.connect(self.setCurrentPage)
-        pageObject.blockRequested.connect(self.blockPage)
-        pageObject.unblockRequested.connect(self.unblockPage)
-        pageObject.focusRequested.connect(self.focus)
-        pageObject.unfocusRequested.connect(self.unfocus)
-        pageObject.buttonShowRequested.connect(self.showPageButton)
-        pageObject.buttonHideRequested.connect(self.hidePageButton)
         self.pages.append(pageObject)
-        if self.currentPage == None:
+        if self.getCurrentPage() == None:
             self.setCurrentPage(pageObject)
+        self._reload()
         return pageObject
+
+    def _reload(self):
+        availablePages = self.getAvailablePages()
+        for pageObject in self.pages:
+            pageObject.button.setEnabled(pageObject in availablePages)
+        if self.getCurrentPage() not in availablePages:
+            if len(availablePages) == 0:
+                self.currentPage = None
+            else:
+                self.setCurrentPage(availablePages[0])

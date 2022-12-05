@@ -39,7 +39,7 @@ class AccountPage(WebViewTabManager):
         self.setCurrentIndex(tabIndex)
 
     def loginCompleteHandler(self, accountData):
-        DB.account.login(username=accountData.username, token=accountData.token, expiry=accountData.expiry)
+        self.account.loginResultHandler(accountData)
         self.closeLogin()
 
     def closeLogin(self):

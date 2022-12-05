@@ -23,7 +23,7 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
             self.duration.setText(T("unknown"))
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.hide()
+            self.clippingModeTag.hide()
             self.prioritizeTag.hide()
         elif self.downloadInfo.type.isVideo():
             self.showVideoType("video")
@@ -36,7 +36,7 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
             self.showVideoDuration(start, end, totalSeconds, durationSeconds)
             self.unmuteVideoTag.setVisible(self.downloadInfo.isUnmuteVideoEnabled())
             self.updateTrackTag.setVisible(self.downloadInfo.isUpdateTrackEnabled())
-            self.optimizeFileTag.setVisible(self.downloadInfo.isOptimizeFileEnabled())
+            self.clippingModeTag.setVisible(self.downloadInfo.isClippingModeEnabled())
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
         else:
             self.showVideoType("clip")
@@ -46,7 +46,7 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
             self.duration.setText(self.videoData.durationString)
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.hide()
+            self.clippingModeTag.hide()
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
         self.resolution.setText(ResolutionNameGenerator.generateResolutionName(self.downloadInfo.resolution))
         self.file.setText(self.downloadInfo.getAbsoluteFileName())
@@ -62,7 +62,7 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
     def reloadHistoryData(self):
         self.startedAt.setText(self.downloadHistory.startedAt.toTimeZone(DB.localization.getTimezone()))
         self.completedAt.setText(T("unknown") if self.downloadHistory.completedAt == None else self.downloadHistory.completedAt.toTimeZone(DB.localization.getTimezone()))
-        self.result.setText(T(self.downloadHistory.result))
+        self.result.setText(T(self.downloadHistory.result) if self.downloadHistory.error == None else f"{T(self.downloadHistory.result)}\n({T(self.downloadHistory.error)})")
         if self.downloadHistory.result == self.downloadHistory.Result.completed or self.downloadHistory.result == self.downloadHistory.Result.skipped or self.downloadHistory.result == self.downloadHistory.Result.stopped:
             self.setCursor(QtCore.Qt.PointingHandCursor)
             self.setOpenFileButton(openFile=True)
@@ -124,11 +124,11 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
         elif downloadingFile:
             self.openFileButton.setEnabled(False)
             self.openFileButton.setIcon(QtGui.QIcon(Icons.DOWNLOADING_FILE_ICON))
-            self.openFileButton.setToolTip(f"{buttonText}({T('downloading', ellipsis=True)})")
+            self.openFileButton.setToolTip(f"{buttonText} ({T('downloading', ellipsis=True)})")
         elif fileNotFound:
             self.openFileButton.setEnabled(False)
             self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_NOT_FOUND_ICON))
-            self.openFileButton.setToolTip(f"{buttonText}({T('file-not-found')})")
+            self.openFileButton.setToolTip(f"{buttonText} ({T('file-not-found')})")
 
     def setOpenLogsButton(self, viewLogs=False, creatingFile=False):
         buttonText = T("view-logs")
@@ -139,4 +139,4 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
         elif creatingFile:
             self.openLogsButton.setEnabled(False)
             self.openLogsButton.setIcon(QtGui.QIcon(Icons.CREATING_FILE_ICON))
-            self.openLogsButton.setToolTip(f"{buttonText}({T('creating', ellipsis=True)})")
+            self.openLogsButton.setToolTip(f"{buttonText} ({T('creating', ellipsis=True)})")

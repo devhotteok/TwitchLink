@@ -1,5 +1,6 @@
 from Core.Ui import *
 from Services.Messages import Messages
+from Services import ContentManager
 from Search import ExternalPlaylist
 from Download.DownloadManager import DownloadManager
 from Ui.Components.Widgets.RetryDownloadButton import RetryDownloadButton
@@ -27,7 +28,7 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.viewCount.setText(self.videoData.viewersCount)
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.hide()
+            self.clippingModeTag.hide()
             self.prioritizeTag.hide()
             self.downloadProgressBar.setRange(0, 0)
             self.encodingProgressBar.setRange(0, 0)
@@ -46,7 +47,7 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.viewCount.setText(self.videoData.viewCount)
             self.unmuteVideoTag.setVisible(self.downloadInfo.isUnmuteVideoEnabled())
             self.updateTrackTag.setVisible(self.downloadInfo.isUpdateTrackEnabled())
-            self.optimizeFileTag.setVisible(self.downloadInfo.isOptimizeFileEnabled())
+            self.clippingModeTag.setVisible(self.downloadInfo.isClippingModeEnabled())
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
             self.skipWaitingButton.clicked.connect(self.skipWaiting)
             self.skipDownloadButton.clicked.connect(self.skipDownload)
@@ -61,7 +62,7 @@ class Download(QtWidgets.QWidget, UiFile.download):
             self.viewCount.setText(self.videoData.viewCount)
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.hide()
+            self.clippingModeTag.hide()
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
             self.encodingLabel.hide()
             self.encodingProgressBar.hide()
@@ -197,8 +198,8 @@ class Download(QtWidgets.QWidget, UiFile.download):
         elif status.isEncoding():
             encodingString = T("encoding", ellipsis=True)
             if self.downloadInfo.type.isVideo():
-                if self.downloadInfo.isOptimizeFileEnabled():
-                    encodingString = f"{encodingString} [{T('optimize-file')}]"
+                if self.downloadInfo.isClippingModeEnabled():
+                    encodingString = f"{encodingString} [{T('clipping-mode')}]"
             self.status.setText(f"{encodingString} ({T('download-skipped')})" if status.isDownloadSkipped() else encodingString)
             self.skipWaitingButton.hide()
             self.skipDownloadButton.hide()
@@ -283,7 +284,16 @@ class Download(QtWidgets.QWidget, UiFile.download):
                     self.downloadProgressBar.showWarning()
                     self.encodingProgressBar.showWarning()
             else:
-                self.status.setText(T("download-aborted"))
+                exception = self.downloader.status.getError()
+                if isinstance(exception, Exceptions.FileSystemError):
+                    reasonText = "system-error"
+                elif isinstance(exception, Exceptions.NetworkError):
+                    reasonText = "network-error"
+                elif isinstance(exception, ContentManager.Exceptions.RestrictedContent):
+                    reasonText = "restricted-content"
+                else:
+                    reasonText = "unknown-error"
+                self.status.setText(f"{T('download-aborted')} ({T(reasonText)})")
                 self.retryButton.show()
                 self.downloadProgressBar.showError()
                 self.encodingProgressBar.showError()

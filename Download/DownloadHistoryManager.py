@@ -1,3 +1,5 @@
+from Core.GlobalExceptions import Exceptions
+from Services import ContentManager
 from Database.Database import DB
 from Database.EncoderDecoder import Codable
 from Download.DownloadManager import DownloadManager
@@ -28,12 +30,14 @@ class DownloadHistory(QtCore.QObject, Codable):
         self.completedAt = None
         self.logFile = downloader.logger.getPath()
         self.result = self.Result.downloading
+        self.error = None
         downloader.finished.connect(self.handleDownloadResult)
 
     def __setup__(self):
         super(DownloadHistory, self).__init__(parent=None)
         if self.result == self.Result.downloading:
             self.result = self.Result.aborted
+            self.error = "unknown-error"
 
     def handleDownloadResult(self, downloader):
         self.completedAt = QtCore.QDateTime.currentDateTimeUtc()
@@ -45,6 +49,15 @@ class DownloadHistory(QtCore.QObject, Codable):
                     self.result = self.Result.canceled
             else:
                 self.result = self.Result.aborted
+                exception = downloader.status.getError()
+                if isinstance(exception, Exceptions.FileSystemError):
+                    self.error = "system-error"
+                elif isinstance(exception, Exceptions.NetworkError):
+                    self.error = "network-error"
+                elif isinstance(exception, ContentManager.Exceptions.RestrictedContent):
+                    self.error = "restricted-content"
+                else:
+                    self.error = "unknown-error"
         else:
             self.result = self.Result.skipped if downloader.status.isDownloadSkipped() else self.Result.completed
         self.historyChanged.emit()

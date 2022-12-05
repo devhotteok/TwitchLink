@@ -7,21 +7,26 @@ class About(QtWidgets.QWidget, UiFile.about):
         super(About, self).__init__(parent=parent)
         self.appNameLabel.setText(Config.APP_NAME)
         self.appInfoLabel.setText(T("#Twitch Stream / Video / Clip Downloader"))
-        self.versionInfoLabel.setText(f"{T('version')} {Config.VERSION}")
-        if Config.VERSION == Updater.status.version.latestVersion:
+        self.updateButton.clicked.connect(self.openUpdate)
+        self.copyrightInfoLabel.setText(Config.getCopyrightInfo())
+        self.homepageButton.clicked.connect(self.openHomepage)
+        for key, value in Config.CONTACT.items():
+            self.contactInfoArea.layout().addRow(f"{key}:", QtWidgets.QLabel(value, parent=self))
+        self.sponsorInfoLabel.setText(T("#If you like the program, please become a patron of {appName}!", appName=Config.APP_NAME))
+        self.sponsorButton.clicked.connect(self.openSponsor)
+        Updater.statusUpdated.connect(self.showVersionInfo)
+        self.showVersionInfo()
+
+    def showVersionInfo(self):
+        self.versionInfoLabel.setText(f"{T('version')} {Config.APP_VERSION}")
+        if Config.APP_VERSION == Updater.status.version.latestVersion:
             self.updateInfoLabel.setText(T("#This is the latest version."))
             self.updateInfoLabel.setStyleSheet("color: rgb(105, 105, 105);")
             self.updateButton.hide()
         else:
             self.updateInfoLabel.setText(T("#{appName} {version} has been released!", appName=Config.APP_NAME, version=Updater.status.version.latestVersion))
             self.updateInfoLabel.setStyleSheet("color: rgb(255, 0, 0);")
-            self.updateButton.clicked.connect(self.openUpdate)
-        self.copyrightInfoLabel.setText(Config.getCopyrightInfo())
-        self.homepageButton.clicked.connect(self.openHomepage)
-        self.contactInfoArea.layout().addRow(f"{T('discord')}:", QtWidgets.QLabel(Config.CONTACT.DISCORD, parent=self))
-        self.contactInfoArea.layout().addRow(f"{T('email')}:", QtWidgets.QLabel(Config.CONTACT.EMAIL, parent=self))
-        self.sponsorInfoLabel.setText(T("#If you like the program, please become a patron of {appName}!", appName=Config.APP_NAME))
-        self.sponsorButton.clicked.connect(self.openSponsor)
+            self.updateButton.show()
 
     def openHomepage(self):
         Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, params={"lang": DB.localization.getLanguage()}))

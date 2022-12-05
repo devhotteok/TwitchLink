@@ -1,4 +1,5 @@
 from Core.Ui import *
+from Services.NotificationManager import NotificationManager
 from Services.Script import Script
 
 
@@ -30,12 +31,11 @@ class DocumentView(QtWidgets.QWidget, UiFile.documentView):
 
     def __init__(self, document, parent=None):
         super(DocumentView, self).__init__(parent=parent)
-        self.contentId = document.contentId
-        self.contentVersion = document.contentVersion
+        self.document = document
         self.setTitle(document.title)
         self.setContent(document.content, document.contentType)
         self.setModal(document.modal)
-        self.setBlockExpiry(False if self.contentId == None else document.blockExpiry)
+        self.setBlockExpiry(False if document.contentId == None else document.blockExpiry)
         for button in document.buttons:
             self.addButton(button)
         self.buttonBox.accepted.connect(self.requestClose)
@@ -96,4 +96,4 @@ class DocumentView(QtWidgets.QWidget, UiFile.documentView):
 
     def checkContentBlock(self):
         if self.checkBox.isChecked():
-            DB.temp.blockContent(self.contentId, self.contentVersion, self.blockExpiry)
+            NotificationManager.block(self.document)

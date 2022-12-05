@@ -59,8 +59,19 @@ class Updaters:
 
     @staticmethod
     def Update_2_2_2(data):
-        data["temp"].pop("_downloadHistory", None)
-        data["temp"]["_downloadOptionHistory"]["stream"].pop("_optimizeFile", None)
+        if "temp" in data:
+            data["temp"].pop("_downloadHistory", None)
+            data["temp"]["_downloadOptionHistory"]["stream"].pop("_optimizeFile", None)
+        return data
+
+    @staticmethod
+    def Update_2_2_3(data):
+        if "account" in data:
+            if "_user" in data["account"]:
+                data["account"]["_account"] = data["account"].pop("_user")
+        if "temp" in data:
+            data["temp"].pop("_downloadHistory", None)
+            data["temp"]["_downloadOptionHistory"]["video"].pop("_optimizeFile", None)
         return data
 
     @classmethod
@@ -79,7 +90,8 @@ class Updaters:
             "2.1.0": None,
             "2.2.0": cls.Update_2_2_0,
             "2.2.1": None,
-            "2.2.2": cls.Update_2_2_2
+            "2.2.2": cls.Update_2_2_2,
+            "2.2.3": cls.Update_2_2_3
         }
         updaters = []
         versionFound = False

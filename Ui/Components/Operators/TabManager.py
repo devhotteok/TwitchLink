@@ -54,3 +54,7 @@ class TabManager(QtWidgets.QTabWidget):
 
     def processTabCloseRequest(self, index):
         self.closeTab(index)
+
+    def closeAllTabs(self):
+        while self.count() != 0:
+            self.closeTab(0)

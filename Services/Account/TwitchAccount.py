@@ -1,10 +1,11 @@
+from Core import GlobalExceptions
 from Database.EncoderDecoder import Codable
 from Search import Engine
 
 from PyQt5 import QtCore
 
 
-class Exceptions:
+class Exceptions(GlobalExceptions.Exceptions):
     class InvalidToken(Exception):
         def __str__(self):
             return "Invalid Token"
@@ -34,13 +35,13 @@ class TwitchAccount(QtCore.QObject, Codable):
         self.accountUpdated.emit()
 
     def clearData(self):
-        self.username = None
+        self.username = ""
         self.token = ""
         self.expiry = None
         self.data = None
 
     def isConnected(self):
-        return self.username != None
+        return self.data != None
 
     def checkToken(self):
         if self.expiry != None:
@@ -50,15 +51,19 @@ class TwitchAccount(QtCore.QObject, Codable):
 
     def updateAccount(self):
         self.checkToken()
-        self.updateAccountData()
-        self.accountUpdated.emit()
+        self._updateAccountData()
 
-    def updateAccountData(self):
-        if self.isConnected():
+    def _updateAccountData(self):
+        if self.username != "":
             try:
                 data = Engine.Search.Channel(self.username)
-                data.stream = None
-                self.data = data
             except Engine.Exceptions.ChannelNotFound:
                 self.logout()
                 raise Exceptions.UserNotFound
+            except:
+                self.logout()
+                raise Exceptions.NetworkError
+            else:
+                data.stream = None
+                self.data = data
+                self.accountUpdated.emit()

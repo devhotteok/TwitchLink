@@ -649,6 +649,42 @@
            </widget>
           </widget>
          </item>
+         <item>
+          <widget class="QWidget" name="clippingModeArea" native="true">
+           <layout class="QHBoxLayout" name="clippingModeAreaLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="clippingModeCheckBox">
+              <property name="text">
+               <string>Clipping Mode</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="clippingModeInfo">
+              <property name="toolTip">
+               <string>Help</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -737,42 +773,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="optimizeFileArea" native="true">
-           <layout class="QHBoxLayout" name="optimizeFileAreaLayout">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QCheckBox" name="optimizeFileCheckBox">
-              <property name="text">
-               <string>Optimize File</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="optimizeFileInfo">
-              <property name="toolTip">
-               <string>Help</string>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
           <widget class="QWidget" name="prioritizeArea" native="true">
            <layout class="QHBoxLayout" name="prioritizeAreaLayout">
             <property name="leftMargin">
@@ -821,9 +821,6 @@
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-     <property name="centerButtons">
-      <bool>false</bool>
      </property>
     </widget>
    </item>

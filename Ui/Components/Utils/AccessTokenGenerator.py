@@ -1,5 +1,5 @@
 from Core.Ui import *
-from Services import ContentManager
+from Services.ContentManager import ContentManager
 from Search import Engine
 
 
@@ -16,49 +16,49 @@ class AccessTokenGenerator(QtCore.QObject):
         DB.account.checkAuthToken()
         return DB.account.getAuthToken()
 
-    def generateStreamAccessToken(self):
+    def _generateAccessToken(self, process, resultHandler):
         thread = self.getAccessTokenThread()
         thread.setup(
-            target=self.streamAccessTokenProcess,
+            target=process,
             disconnect=True
         )
-        thread.resultSignal.connect(self.processStreamAccessTokenResult)
+        thread.resultSignal.connect(resultHandler)
         thread.start()
 
+    def generateStreamAccessToken(self):
+        self._generateAccessToken(
+            self.streamAccessTokenProcess,
+            self.processStreamAccessTokenResult
+        )
+
     def streamAccessTokenProcess(self):
-        ContentManager.ContentManager.checkRestrictions(self.videoData.broadcaster, self.videoData)
+        ContentManager.checkRestrictions(self.videoData, user=DB.account.user, fetch=True)
         return Engine.Search.StreamAccessToken(self.videoData.broadcaster.login, self.getAuthToken())
 
     def processStreamAccessTokenResult(self, result):
         pass
 
     def generateVideoAccessToken(self):
-        thread = self.getAccessTokenThread()
-        thread.setup(
-            target=self.videoAccessTokenProcess,
-            disconnect=True
+        self._generateAccessToken(
+            self.videoAccessTokenProcess,
+            self.processVideoAccessTokenResult
         )
-        thread.resultSignal.connect(self.processVideoAccessTokenResult)
-        thread.start()
 
     def videoAccessTokenProcess(self):
-        ContentManager.ContentManager.checkRestrictions(self.videoData.owner, self.videoData)
+        ContentManager.checkRestrictions(self.videoData, user=DB.account.user, fetch=True)
         return Engine.Search.VideoAccessToken(self.videoData.id, self.getAuthToken())
 
     def processVideoAccessTokenResult(self, result):
         pass
 
     def generateClipAccessToken(self):
-        thread = self.getAccessTokenThread()
-        thread.setup(
-            target=self.clipAccessTokenProcess,
-            disconnect=True
+        self._generateAccessToken(
+            self.clipAccessTokenProcess,
+            self.processClipAccessTokenResult
         )
-        thread.resultSignal.connect(self.processClipAccessTokenResult)
-        thread.start()
 
     def clipAccessTokenProcess(self):
-        ContentManager.ContentManager.checkRestrictions(self.videoData.broadcaster, self.videoData)
+        ContentManager.checkRestrictions(self.videoData, user=DB.account.user, fetch=True)
         return Engine.Search.ClipAccessToken(self.videoData.slug, self.getAuthToken())
 
     def processClipAccessTokenResult(self, result):

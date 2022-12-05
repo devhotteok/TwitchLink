@@ -1,5 +1,6 @@
 from Core.Ui import *
 from Services.Messages import Messages
+from Services import ContentManager
 from Search import ExternalPlaylist
 from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
 from Download.DownloadManager import DownloadManager
@@ -45,7 +46,7 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.date.setText(self.videoData.createdAt.toTimeZone(DB.localization.getTimezone()))
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.hide()
+            self.clippingModeTag.hide()
             self.prioritizeTag.hide()
             self.progressBar.setRange(0, 0)
             self.pauseButton.hide()
@@ -61,7 +62,7 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.showVideoDuration(start, end, totalSeconds, durationSeconds)
             self.unmuteVideoTag.setVisible(self.downloadInfo.isUnmuteVideoEnabled())
             self.updateTrackTag.setVisible(self.downloadInfo.isUpdateTrackEnabled())
-            self.optimizeFileTag.setVisible(self.downloadInfo.isOptimizeFileEnabled())
+            self.clippingModeTag.setVisible(self.downloadInfo.isClippingModeEnabled())
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
             self.pauseButton.clicked.connect(self.pauseResume)
             self.cancelButton.setText(T("cancel"))
@@ -73,7 +74,7 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.duration.setText(self.videoData.durationString)
             self.unmuteVideoTag.hide()
             self.updateTrackTag.hide()
-            self.optimizeFileTag.hide()
+            self.clippingModeTag.hide()
             self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
             self.pauseButton.hide()
             self.cancelButton.setText(T("cancel"))
@@ -191,8 +192,8 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         elif status.isEncoding():
             encodingString = T("encoding", ellipsis=True)
             if self.downloadInfo.type.isVideo():
-                if self.downloadInfo.isOptimizeFileEnabled():
-                    encodingString = f"{encodingString} [{T('optimize-file')}]"
+                if self.downloadInfo.isClippingModeEnabled():
+                    encodingString = f"{encodingString} [{T('clipping-mode')}]"
             self.status.setText(f"{encodingString} ({T('download-skipped')})" if status.isDownloadSkipped() else encodingString)
             self.progressBar.setRange(0, 100)
             self.progressBar.setValue(self.downloader.progress.timeProgress)
@@ -258,9 +259,18 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
                     self.alertIcon.show()
                     self.progressBar.showWarning()
             else:
+                exception = self.downloader.status.getError()
+                if isinstance(exception, Exceptions.FileSystemError):
+                    reasonText = "system-error"
+                elif isinstance(exception, Exceptions.NetworkError):
+                    reasonText = "network-error"
+                elif isinstance(exception, ContentManager.Exceptions.RestrictedContent):
+                    reasonText = "restricted-content"
+                else:
+                    reasonText = "unknown-error"
                 self.retryButton.show()
                 self.setOpenFileButton(fileNotFound=True)
-                self.status.setText(T("download-aborted"))
+                self.status.setText(f"{T('download-aborted')} ({T(reasonText)})")
                 self.alertIcon.show()
                 self.progressBar.showError()
         else:
@@ -295,19 +305,16 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         if self.control.isRemoveRegistered():
             self.removeDownloader()
         if self.downloader.status.terminateState.isTrue():
-            error = self.downloader.status.getError()
-            if error != None:
-                if error == Exceptions.FileSystemError:
+            exception = self.downloader.status.getError()
+            if exception != None:
+                if isinstance(exception, Exceptions.FileSystemError):
                     self.info(*Messages.INFO.FILE_SYSTEM_ERROR)
-                elif error == Exceptions.NetworkError:
+                elif isinstance(exception, Exceptions.NetworkError):
                     self.info(*Messages.INFO.NETWORK_ERROR)
+                elif isinstance(exception, ContentManager.Exceptions.RestrictedContent):
+                    self.handleRestrictedContent(exception)
                 else:
-                    infoString = T("#An error occurred while downloading.")
-                    if self.downloadInfo.type.isVideo():
-                        if self.downloadInfo.isOptimizeFileEnabled():
-                            advice = T("#If the error persists, try disabling the '{menuName}' option.", menuName=T("optimize-file"))
-                            infoString = f"{infoString}\n\n{advice}"
-                    self.info("error", infoString, contentTranslate=False)
+                    self.info("error", "#An error occurred while downloading.")
         elif DB.general.isNotifyEnabled():
             fileName = self.downloader.setup.downloadInfo.getAbsoluteFileName()
             if self.ask(
@@ -324,6 +331,17 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         if showContributeInfo:
             if self.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=downloadStats["totalFiles"], totalSize=Utils.formatByteSize(downloadStats["totalByteSize"]), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True):
                 Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": DB.localization.getLanguage()}))
+
+    def handleRestrictedContent(self, restriction):
+        if restriction.restrictionType == ContentManager.RestrictionType.CONTENT_TYPE:
+            restrictionType = T("#Downloading {contentType} from this channel has been restricted by the streamer({channel})'s request or by the administrator.", channel=restriction.channel.displayName, contentType=T(restriction.contentType))
+        else:
+            restrictionType = T("#This content has been restricted by the streamer({channel})'s request or by the administrator.", channel=restriction.channel.displayName)
+        restrictionInfo = T("#To protect the rights of streamers, {appName} restricts downloads when a content restriction request is received.", appName=Config.APP_NAME)
+        message = f"{T('#Your download has been terminated due to content restrictions.')}\n\n{T('file-type')}: {T(self.downloadInfo.type.toString())}\n{T('title')}: {self.downloadInfo.videoData.title}\n\n{restrictionType}\n\n{restrictionInfo}"
+        if restriction.reason != None:
+            message = f"{message}\n\n[{T('reason')}]\n{restriction.reason}"
+        self.info("restricted-content", message, contentTranslate=False)
 
     def setOpenFileButton(self, openFile=False, downloadingFile=False, fileNotFound=False):
         buttonText = T("open-file")

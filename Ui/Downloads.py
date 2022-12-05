@@ -1,4 +1,5 @@
 from Core.Ui import *
+from Services import ContentManager
 from Download.DownloadManager import DownloadManager
 
 
@@ -32,6 +33,7 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
         self.showPreviewCount()
         self.downloadHistoryButton.clicked.connect(self.downloadHistoryRequested)
         self.downloadCompleteActionInfo.clicked.connect(self.showDownloadCompleteActionInfo)
+        ContentManager.ContentManager.restrictionsUpdated.connect(self.restrictionsUpdated)
 
     def downloaderCreated(self, downloaderId):
         item = PreviewWidgetItem(downloaderId=downloaderId)
@@ -61,8 +63,11 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
     def setPreviewHidden(self, downloaderId, hidden):
         self.previewItems[downloaderId].setHidden(hidden)
 
+    def getPreviewCount(self):
+        return len(self.previewItems)
+
     def showPreviewCount(self):
-        self.totalCount.setText(len(self.previewItems))
+        self.totalCount.setText(self.getPreviewCount())
         previewCount = self.getFilteredPreviewCount()
         self.filteredCount.setText(previewCount)
         if previewCount == 0:
@@ -115,3 +120,26 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
 
     def showDownloadCompleteActionInfo(self):
         self.info("information", "#When all downloads are complete, it will perform the selected action.\nA warning notification will be displayed for a period of time so that the operation can be canceled.\nWhen the time expires, the action will be performed.")
+
+    def restrictionsUpdated(self):
+        restrictionsFound = []
+        for downloader in DownloadManager.getRunningDownloaders():
+            downloadInfo = downloader.setup.downloadInfo
+            try:
+                ContentManager.ContentManager.checkRestrictions(downloadInfo.videoData, user=DB.account.user)
+            except ContentManager.Exceptions.RestrictedContent as e:
+                downloader.abort(e)
+                restrictionsFound.append(downloadInfo)
+        if len(restrictionsFound) != 0:
+            infoText = T("#Some content has been restricted.\nTerminating restricted downloads.")
+            contentInfo = "\n".join(self.getContentInfoString(string) for string in restrictionsFound)
+            self.info("warning", f"{infoText}\n\n{contentInfo}")
+
+    def getContentInfoString(self, downloadInfo):
+        if downloadInfo.type.isStream():
+            channel = downloadInfo.videoData.broadcaster
+        elif downloadInfo.type.isVideo():
+            channel = downloadInfo.videoData.owner
+        else:
+            channel = downloadInfo.videoData.broadcaster
+        return f"[{channel.displayName}] [{T(downloadInfo.type.toString())}] {downloadInfo.videoData.title}"

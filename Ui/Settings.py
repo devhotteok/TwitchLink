@@ -220,12 +220,10 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
 
     def setLanguage(self, index):
         DB.localization.setLanguage(Translator.getLanguageCode(index))
-        self.info("restart", "#Restart due to language change.")
         self.requestRestart()
 
     def setTimezone(self, timezone):
         DB.localization.setTimezone(bytes(timezone, encoding="utf-8"))
-        self.info("restart", "#Restart due to time zone change.")
         self.requestRestart()
 
     def setDownloadSpeed(self, speed):
@@ -235,8 +233,8 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
 
     def resetSettings(self):
         if self.ask("warning", "#This will reset all settings.\nProceed?"):
-            self.requestRestart()
             DB.reset()
+            self.requestRestart()
 
     def requestRestart(self):
         self.restartRequired.emit()

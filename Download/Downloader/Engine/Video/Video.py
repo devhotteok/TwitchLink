@@ -41,7 +41,7 @@ class VideoDownloader(EngineSetup):
         self.playlistManager = OnlinePlaylistManager(
             url=self.setup.downloadInfo.getUrl(),
             filePath=Utils.joinPath(self.tempDirectory.name, f"{Config.PLAYLIST_FILE_NAME}.m3u8"),
-            strictMode=self.setup.downloadInfo.isOptimizeFileEnabled()
+            strictMode=self.setup.downloadInfo.isClippingModeEnabled()
         )
         self.playlistManager.setRange(*self.setup.downloadInfo.range)
         self.syncPlaylistProgress()
@@ -67,14 +67,15 @@ class VideoDownloader(EngineSetup):
             for segment in self.playlistManager.getSegments():
                 if segment.fileName not in processedFiles:
                     processedFiles.append(segment.fileName)
-                    segmentDownloader = SegmentDownloader(
-                        url=url,
-                        segment=segment,
-                        unmute=self.setup.unmuteVideo,
-                        saveAs=Utils.joinPath(self.tempDirectory.name, segment.fileName),
-                        priority=self.setup.priority + 1 if self.status.isUpdateFound() else self.setup.priority
+                    self.taskManager.add(
+                        SegmentDownloader(
+                            url=url,
+                            segment=segment,
+                            unmute=self.setup.unmuteVideo,
+                            saveAs=Utils.joinPath(self.tempDirectory.name, segment.fileName),
+                            priority=self.setup.priority + 1 if self.status.isUpdateFound() else self.setup.priority
+                        )
                     )
-                    self.taskManager.add(task=segmentDownloader)
             self.taskManager.waitForDone()
             if not (self.setup.updateTrack and self.setup.downloadInfo.range[1] == None):
                 break
@@ -134,8 +135,7 @@ class VideoDownloader(EngineSetup):
             urls = "\n".join(segmentUrl.url for segmentUrl in task.segmentUrls)
             self.logger.warning(f"Failed to download segment: {task.segment.fileName} [{task.result.error}]\n{urls}")
             if isinstance(task.result.error, Exceptions.FileSystemError):
-                self.cancel()
-                self.status.raiseError(Exceptions.FileSystemError)
+                self.abort(task.result.error)
                 return
         self.progress.file += 1
         self.syncProgress()
@@ -153,7 +153,7 @@ class VideoDownloader(EngineSetup):
                 saveAs=self.setup.downloadInfo.getAbsoluteFileName(),
                 trimFrom=None if trimFrom == None else trimFrom / 1000,
                 trimTo=None if trimTo == None else trimTo / 1000,
-                remux=not self.setup.downloadInfo.isOptimizeFileEnabled()
+                remux=not self.setup.downloadInfo.isClippingModeEnabled()
             )
         processingFile = None
         for progress in self.FFmpeg.output(logger=self.logger):

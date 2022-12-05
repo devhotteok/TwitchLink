@@ -9,14 +9,13 @@ class Loading(QtWidgets.QDialog, UiFile.loading):
         self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
         self.appLogo.setMargin(10)
         self.appName.setText(Config.APP_NAME)
-        self.version.setText(f"{Config.APP_NAME} {Config.VERSION}")
+        self.version.setText(f"{Config.APP_NAME} {Config.APP_VERSION}")
         self.copyright.setText(Config.getCopyrightInfo())
         self.setStatus(T("loading", ellipsis=True))
         self.closeEnabled = False
         Updater.updateProgress.connect(self.updateProgress)
-        self.loadingThread = Utils.WorkerThread(target=Updater.update, parent=self)
-        self.loadingThread.finished.connect(self.close)
-        self.loadingThread.start()
+        Updater.updateComplete.connect(self.close)
+        Updater.update()
 
     def updateProgress(self, progress):
         if progress == 0:

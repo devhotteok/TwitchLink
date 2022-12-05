@@ -38,9 +38,6 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
             self.updateTrackCheckBox.setChecked(self.downloadInfo.isUpdateTrackEnabled())
             self.updateTrackCheckBox.toggled.connect(self.setUpdateTrack)
             self.updateTrackInfo.clicked.connect(self.showUpdateTrackInfo)
-            self.optimizeFileCheckBox.setChecked(self.downloadInfo.isOptimizeFileEnabled())
-            self.optimizeFileCheckBox.toggled.connect(self.setOptimizeFile)
-            self.optimizeFileInfo.clicked.connect(self.showOptimizeFileInfo)
             self.prioritizeCheckBox.setChecked(self.downloadInfo.isPrioritizeEnabled())
             self.prioritizeCheckBox.toggled.connect(self.downloadInfo.setPrioritizeEnabled)
             self.prioritizeInfo.clicked.connect(self.showPrioritizeInfo)
@@ -49,7 +46,6 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
             self.cropArea.hide()
             self.unmuteVideoArea.hide()
             self.updateTrackArea.hide()
-            self.optimizeFileArea.hide()
             self.prioritizeCheckBox.setChecked(self.downloadInfo.isPrioritizeEnabled())
             self.prioritizeCheckBox.toggled.connect(self.downloadInfo.setPrioritizeEnabled)
             self.prioritizeInfo.clicked.connect(self.showPrioritizeInfo)
@@ -105,6 +101,9 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         if range[1] != None:
             self.cropToSelectRadioButton.setChecked(True)
             self.setToSpin(*Utils.toTime(range[1]))
+        self.clippingModeCheckBox.setChecked(self.downloadInfo.isClippingModeEnabled())
+        self.clippingModeCheckBox.toggled.connect(self.setClippingMode)
+        self.clippingModeInfo.clicked.connect(self.showClippingModeInfo)
 
     def startRangeChanged(self):
         self.setFromSpin(*self.checkCropRange(*self.getFromSpin(), maximum=self.downloadInfo.videoData.lengthSeconds - 1))
@@ -167,10 +166,14 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.reloadCropInfoArea()
 
     def reloadCropInfoArea(self):
-        showSettingsInfo = (self.cropFromSelectRadioButton.isChecked() or self.cropToSelectRadioButton.isChecked()) and not self.optimizeFileCheckBox.isChecked()
+        hasCropRange = self.cropFromSelectRadioButton.isChecked() or self.cropToSelectRadioButton.isChecked()
+        showSettingsInfo = hasCropRange and not self.clippingModeCheckBox.isChecked()
         showRangeInfo = self.isCropRangeInvalid()
         self.cropInfoArea.setCurrentIndex(1 if showRangeInfo else 0)
         self.cropInfoArea.setVisible(showRangeInfo or showSettingsInfo)
+        if not hasCropRange:
+            self.clippingModeCheckBox.setChecked(False)
+        self.clippingModeArea.setVisible(hasCropRange)
 
     def checkUpdateTrack(self):
         self.reloadCropArea()
@@ -181,7 +184,18 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
                 self.cropToEndRadioButton.setChecked(True)
 
     def showCropInfo(self):
-        self.info("information", T("#This will crop the video at a point near this range that requires less computation.\nThis may result in an error of seconds.\nActivate '{menuName}' for accurate processing.", menuName=T("optimize-file")), contentTranslate=False)
+        self.info("information", T("#This will crop the video at a point near this range that requires less computation.\nThis may result in an error of seconds.\nActivate '{menuName}' for accurate processing.", menuName=T("clipping-mode")), contentTranslate=False)
+
+    def showClippingModeInfo(self):
+        infoString = T("#Re-encodes the file to produce a video of the specified range.\nThis increases the computation of the encoding process and consumes a lot of time.")
+        warningString = T("#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the video has corrupted parts, this may cause errors.")
+        self.info("information", f"{infoString}\n\n{warningString}", contentTranslate=False)
+
+    def setClippingMode(self, clippingMode):
+        self.downloadInfo.setClippingModeEnabled(clippingMode)
+        self.reloadCropInfoArea()
+        if clippingMode:
+            self.info("warning", "#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the video has corrupted parts, this may cause errors.")
 
     def askSaveDirectory(self):
         directory = self.downloadInfo.getAbsoluteFileName()
@@ -198,12 +212,6 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
     def showUpdateTrackInfo(self):
         self.info("information", "#Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.")
 
-    def showOptimizeFileInfo(self):
-        infoString = T("#Reduces file size while maintaining {videoType} quality without any visual differences.\nThis increases the computation of the encoding process and consumes a lot of time.", videoType=T(self.downloadInfo.type.toString()))
-        warningString = T("#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.", videoType=T(self.downloadInfo.type.toString()))
-        optionInfoString = T("#Depending on the streamer's broadcast settings, this option may not have any effect." if self.downloadInfo.type.isStream() else "#Depending on the video properties, this option may not have any effect.")
-        self.info("information", f"{infoString}\n\n{warningString}\n\n{optionInfoString}", contentTranslate=False)
-
     def showPrioritizeInfo(self):
         self.info("information", "#This download will be prioritized. Downloads with this option take precedence over those without.")
 
@@ -214,13 +222,6 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
                 self.cropToEndRadioButton.setChecked(True)
             else:
                 self.updateTrackCheckBox.setCheckState(QtCore.Qt.Unchecked)
-
-    def setOptimizeFile(self, optimizeFile):
-        self.downloadInfo.setOptimizeFileEnabled(optimizeFile)
-        if self.downloadInfo.type.isVideo():
-            self.reloadCropInfoArea()
-        if optimizeFile:
-            self.info("warning", T("#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the {videoType} file has corrupted parts, this may cause errors.", videoType=T(self.downloadInfo.type.toString())), contentTranslate=False)
 
     def accept(self):
         downloadAvailableState = DownloadChecker.isDownloadAvailable(self.downloadInfo, parent=self)

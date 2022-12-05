@@ -38,28 +38,29 @@ class Setup(Codable):
 
 class Account(Codable):
     def __init__(self):
-        self._user = TwitchAccount()
+        self._account = TwitchAccount()
 
     def login(self, username, token, expiry):
-        self._user.login(username, token, expiry)
+        self._account.login(username, token, expiry)
 
     def logout(self):
-        self._user.logout()
+        self._account.logout()
 
     def updateAccount(self):
-        self._user.updateAccount()
+        self._account.updateAccount()
 
     def isUserLoggedIn(self):
-        return self._user.isConnected()
+        return self._account.isConnected()
 
-    def getAccountData(self):
-        return self._user.data
+    @property
+    def user(self):
+        return self._account.data
 
     def checkAuthToken(self):
-        self._user.checkToken()
+        self._account.checkToken()
 
     def getAuthToken(self):
-        return self._user.token
+        return self._account.token
 
 class General(Codable):
     def __init__(self):
@@ -245,7 +246,7 @@ class Download(Codable):
 
 class Database:
     def __init__(self):
-        self.version = Config.VERSION
+        self.version = Config.APP_VERSION
         self.reset()
         App.aboutToQuit.connect(self.save)
 

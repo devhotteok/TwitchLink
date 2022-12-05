@@ -26,13 +26,13 @@ class DocumentViewer(TabManager):
         if not self.isModal():
             super().setCurrentWidget(widget)
 
-    def showDocument(self, documentView, icon=None, uniqueValue=None):
+    def showDocument(self, documentView, icon=None, uniqueValue=None, important=False):
         if documentView.isModal():
             self.setModal(True)
-            self.setCurrentIndex(self.addTab(documentView, index=len(self.modals), icon=icon or Icons.ANNOUNCEMENT_ICON, closable=False, uniqueValue=uniqueValue))
+            self.setCurrentIndex(self.addTab(documentView, index=0 if important else len(self.modals), icon=icon or Icons.ANNOUNCEMENT_ICON, closable=False, uniqueValue=uniqueValue))
             self.modals.append(documentView)
         else:
-            self.setCurrentIndex(self.addTab(documentView, icon=icon or Icons.TEXT_FILE_ICON, uniqueValue=uniqueValue))
+            self.setCurrentIndex(self.addTab(documentView, index=len(self.modals) if important else -1, icon=icon or Icons.TEXT_FILE_ICON, uniqueValue=uniqueValue))
         documentView.closeRequested.connect(self.closeDocument)
 
     def closeDocument(self, documentView):
@@ -40,14 +40,14 @@ class DocumentViewer(TabManager):
             self.modals.remove(documentView)
             if len(self.modals) == 0:
                 self.setModal(False)
-        self.closeTab(self.indexOf(documentView))
+        super().closeTab(self.indexOf(documentView))
 
-    def processTabCloseRequest(self, index):
+    def closeTab(self, index):
         widget = self.widget(index)
         if isinstance(widget, Ui.DocumentView):
             widget.reject()
         else:
-            super().processTabCloseRequest(index)
+            super().closeTab(index)
 
     def setModal(self, modal):
         self.modal = modal

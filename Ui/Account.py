@@ -19,25 +19,34 @@ class Account(QtWidgets.QWidget, UiFile.account):
         self.logoutButton.clicked.connect(self.logout)
         self.refreshAccountButton.clicked.connect(self.refreshAccount)
         self.profileImage.imageChanged.connect(self.updateAccountImage)
-        self.updateAccountThread = Utils.WorkerThread(target=DB.account.updateAccount, parent=self)
+        self.updateAccountThread = Utils.WorkerThread(parent=self)
         self.updateAccountThread.resultSignal.connect(self.accountUpdateResult)
-        DB.account._user.accountUpdated.connect(self.showAccount)
+        DB.account._account.accountUpdated.connect(self.showAccount)
 
     def refreshAccount(self):
-        self.accountMenu.setCurrentIndex(0)
-        self.updateAccountImage()
+        self.showLoading()
+        self.updateAccountThread.setup(
+            target=DB.account.updateAccount
+        )
         self.updateAccountThread.start()
 
+    def showLoading(self):
+        self.accountMenu.setCurrentIndex(0)
+        self.updateAccountImage()
+
     def accountUpdateResult(self, result):
+        self.showAccount()
         if not result.success:
-            if isinstance(result.error, TwitchAccount.Exceptions.InvalidToken) or isinstance(result.error, TwitchAccount.Exceptions.UserNotFound):
+            if isinstance(result.error, Exceptions.NetworkError):
+                self.info("network-error", "#A network error occurred while loading your account data.")
+            elif isinstance(result.error, TwitchAccount.Exceptions.InvalidToken) or isinstance(result.error, TwitchAccount.Exceptions.UserNotFound):
                 self.info(*Messages.INFO.LOGIN_EXPIRED)
 
     def showAccount(self):
         if DB.account.isUserLoggedIn():
             self.accountMenu.setCurrentIndex(2)
-            self.profileImage.loadImage(filePath=Images.PROFILE_IMAGE, url=DB.account.getAccountData().profileImageURL, urlFormatSize=ImageSize.USER_PROFILE, refresh=True)
-            self.account.setText(DB.account.getAccountData().displayName)
+            self.profileImage.loadImage(filePath=Images.PROFILE_IMAGE, url=DB.account.user.profileImageURL, urlFormatSize=ImageSize.USER_PROFILE, refresh=True)
+            self.account.setText(DB.account.user.displayName)
         else:
             self.accountMenu.setCurrentIndex(1)
             self.infoArea.hide()
@@ -52,6 +61,18 @@ class Account(QtWidgets.QWidget, UiFile.account):
         self.infoArea.show()
         self.buttonArea.setCurrentIndex(1)
         self.startLoginRequested.emit()
+
+    def loginResultHandler(self, accountData):
+        self.showLoading()
+        self.updateAccountThread.setup(
+            target=DB.account.login,
+            kwargs={
+                "username": accountData.username,
+                "token": accountData.token,
+                "expiry": accountData.expiry
+            }
+        )
+        self.updateAccountThread.start()
 
     def cancelLogin(self):
         if self.ask("cancel-login", "#Are you sure you want to cancel the login operation in progress?"):

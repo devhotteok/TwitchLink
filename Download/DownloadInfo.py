@@ -1,6 +1,6 @@
+from Services.Utils.Utils import Utils
 from Database.Database import DB
 from Database.EncoderDecoder import Codable
-from Services.Utils.Utils import Utils
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
 import os
@@ -21,7 +21,7 @@ class DownloadInfo(Codable):
             self.range = [None, None]
             self.unmuteVideo = self.optionHistory.isUnmuteVideoEnabled()
             self.updateTrack = self.optionHistory.isUpdateTrackEnabled()
-            self.optimizeFile = self.optionHistory.isOptimizeFileEnabled()
+            self.clippingMode = False
             self.prioritize = False
         else:
             self.clip = videoData
@@ -94,8 +94,8 @@ class DownloadInfo(Codable):
     def setUpdateTrackEnabled(self, updateTrack):
         self.updateTrack = updateTrack
 
-    def setOptimizeFileEnabled(self, optimizeFile):
-        self.optimizeFile = optimizeFile
+    def setClippingModeEnabled(self, clippingMode):
+        self.clippingMode = clippingMode
 
     def setPrioritizeEnabled(self, prioritize):
         self.prioritize = prioritize
@@ -106,8 +106,8 @@ class DownloadInfo(Codable):
     def isUpdateTrackEnabled(self):
         return self.updateTrack
 
-    def isOptimizeFileEnabled(self):
-        return self.optimizeFile
+    def isClippingModeEnabled(self):
+        return self.clippingMode
 
     def isPrioritizeEnabled(self):
         return self.prioritize
@@ -121,7 +121,6 @@ class DownloadInfo(Codable):
         if self.type.isVideo():
             self.optionHistory.setUnmuteVideoEnabled(self.unmuteVideo)
             self.optionHistory.setUpdateTrackEnabled(self.updateTrack)
-            self.optionHistory.setOptimizeFileEnabled(self.optimizeFile)
 
     def getUrl(self):
         return self.resolution.url

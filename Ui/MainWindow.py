@@ -5,6 +5,7 @@ from Services.Messages import Messages
 from Services.Image.Loader import ImageLoader
 from Services.Document import DocumentData, DocumentButtonData
 from Services.Logging.ErrorDetector import ErrorDetector, ErrorHandlers
+from Services.NotificationManager import NotificationManager
 from Download.DownloadManager import DownloadManager
 from Ui.Components.Operators.NavigationBar import NavigationBar
 from Ui.Components.Pages.SearchPage import SearchPage
@@ -63,60 +64,114 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.informationPage.layout().addWidget(self.information)
 
     def setup(self):
+        self.statusUpdated(isInSetup=True)
+        if Updater.status.isOperational():
+            if DB.setup.getTermsOfServiceAgreement() == None:
+                self.openTermsOfService()
+            else:
+                self.account.refreshAccount()
+            Updater.statusUpdated.connect(self.statusUpdated)
+            Updater.startAutoUpdate()
+        self.show()
+        self.showErrorHistory()
+
+    def statusUpdated(self, isInSetup=False):
+        isOperational = Updater.status.isOperational()
+        hasDownloaders = self.downloads.downloads.getPreviewCount() != 0
+        self.menuBar().setEnabled(isOperational or hasDownloaders)
+        if not isOperational and hasDownloaders:
+            self.downloadsPageObject.focus()
+            self.settingsPageObject.focus()
+        else:
+            self.downloadsPageObject.unfocus()
+            self.settingsPageObject.unfocus()
+        DownloadManager.setDownloaderCreationEnabled(isOperational)
+        contentId = f"APP_STATUS"
+        self.information.removeAppInfo(contentId)
         status = Updater.status.getStatus()
         if status == Updater.status.CONNECTION_FAILURE:
-            self.show()
-            self.info(*Messages.INFO.SERVER_CONNECTION_FAILED)
-            self.shutdown()
-            return
-        elif status == Updater.status.UNEXPECTED_ERROR:
-            self.show()
-            self.info(*Messages.INFO.UNEXPECTED_ERROR)
-            self.shutdown()
-            return
-        elif status == Updater.status.UNAVAILABLE:
-            self.information.showDocument(
+            if isInSetup:
+                content = T("#Please try again later.")
+                buttons = [
+                    DocumentButtonData(text="ok", action=self.shutdown, role="action", default=True)
+                ]
+            else:
+                content = T("#Some features will be temporarily disabled.\nPlease wait.\nWhen the connection is restored, those features will be activated.")
+                buttons = []
+            self.information.showAppInfo(
                 DocumentData(
-                    title=T("warning"),
-                    content=Updater.status.operationalInfo or T("#{appName} is currently unavailable.", appName=Config.APP_NAME),
-                    contentType=Updater.status.operationalInfoType if Updater.status.operationalInfo else "text",
+                    contentId=contentId,
+                    title=T("network-error"),
+                    content=f"{T('#A network error occurred while connecting to the server.')}\n{content}",
+                    contentType="text",
                     modal=True,
-                    buttons=[
-                        DocumentButtonData(text="ok", action=self.shutdown, default=True)
-                    ]
+                    buttons=buttons
                 )
             )
-        elif status != Updater.status.AVAILABLE:
-            updateInfo = self.information.showDocument(
+        elif status == Updater.status.UNEXPECTED_ERROR:
+            Updater.stopAutoUpdate()
+            if isInSetup:
+                content = T("#Please try again later.")
+                buttons = [
+                    DocumentButtonData(text="ok", action=self.shutdown, role="action", default=True)
+                ]
+            else:
+                content = f"{T('#Some features will be disabled.')}\n{T('#Please restart the app.')}"
+                buttons = []
+            self.information.showAppInfo(
                 DocumentData(
+                    contentId=contentId,
+                    title=T("error"),
+                    content=f"{T('#An unexpected error occurred while connecting to the server.')}\n{content}",
+                    contentType="text",
+                    modal=True,
+                    buttons=buttons
+                )
+            )
+        elif status == Updater.status.SESSION_EXPIRED:
+            Updater.stopAutoUpdate()
+            self.information.showAppInfo(
+                DocumentData(
+                    contentId=contentId,
+                    title=T("session-expired"),
+                    content=f"{T('#Your session has expired.')}\n{T('#Some features will be disabled.')}\n{T('#Please restart the app.')}",
+                    contentType="text",
+                    modal=True,
+                    buttons=[]
+                )
+            )
+        elif status == Updater.status.UNAVAILABLE:
+            self.information.showAppInfo(
+                DocumentData(
+                    contentId=contentId,
+                    title=T("service-unavailable"),
+                    content=Updater.status.operationalInfo or T("#{appName} is currently unavailable.", appName=Config.APP_NAME),
+                    contentType=Updater.status.operationalInfoType or "text",
+                    modal=True,
+                    buttons=[DocumentButtonData(text="ok", action=self.shutdown, role="action", default=True)] if isInSetup else []
+                )
+            )
+            if not isInSetup:
+                self.restart()
+        elif status == Updater.status.UPDATE_REQUIRED or status == Updater.status.UPDATE_FOUND:
+            if status == Updater.status.UPDATE_REQUIRED:
+                Updater.stopAutoUpdate()
+            self.information.showAppInfo(
+                DocumentData(
+                    contentId=contentId,
                     title=T("recommended-update" if status == Updater.status.UPDATE_FOUND else "required-update"),
                     content=Updater.status.version.updateNote or f"{T('#A new version of {appName} has been released!', appName=Config.APP_NAME)}\n\n[{Config.APP_NAME} {Updater.status.version.latestVersion}]",
                     contentType=Updater.status.version.updateNoteType if Updater.status.version.updateNote else "text",
                     modal=status == Updater.status.UPDATE_REQUIRED,
                     buttons=[
-                        DocumentButtonData(text=T("update"), action=f"open:{Utils.joinUrl(Updater.status.version.updateUrl, params={'lang': DB.localization.getLanguage()})}", role="accept", default=True),
-                        DocumentButtonData(text=T("cancel"), role="reject", default=False)
+                        DocumentButtonData(text=T("update"), action=self.confirmUpdateShutdown, role="action", default=True),
+                        DocumentButtonData(text=T("cancel"), action=(self.shutdown if isInSetup else self.confirmShutdown) if status == Updater.status.UPDATE_REQUIRED else None, role="reject", default=False)
                     ]
                 ),
                 icon=Icons.UPDATE_FOUND_ICON
             )
-            if status == Updater.status.UPDATE_REQUIRED:
-                updateInfo.closeRequested.connect(self.information.appShutdownRequested)
-            else:
-                updateInfo.buttonBox.accepted.connect(self.information.appShutdownRequested)
-        if Updater.status.isOperational():
-            for notification in Updater.status.notifications:
-                if notification.blockExpiry == False or not DB.temp.isContentBlocked(notification.contentId, notification.contentVersion):
-                    self.information.showDocument(notification, icon=None if notification.modal else Icons.NOTICE_ICON)
-            if DB.setup.getTermsOfServiceAgreement() == None:
-                self.openTermsOfService()
-            else:
-                self.account.refreshAccount()
-        else:
-            self.menuBar().setEnabled(False)
-        if self.information.count() != 0:
-            self.information.setCurrentIndex(0)
-        self.show()
+
+    def showErrorHistory(self):
         for key in ErrorHandlers.getHandlerDict():
             if ErrorDetector.hasHistory(key):
                 if ErrorDetector.getHistory(key) > ErrorDetector.MAX_IGNORE_COUNT:
@@ -132,20 +187,27 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.actionAbout.setEnabled(enabled)
         self.actionTermsOfService.setEnabled(enabled)
 
-    def closeEvent(self, event):
-        super().closeEvent(event)
+    def confirmShutdown(self):
         if DownloadManager.isDownloaderRunning() and not DownloadManager.isShuttingDown():
-            if self.ask(*Messages.ASK.APP_EXIT_WHILE_DOWNLOADING):
+            if self.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS):
                 self.shutdown()
-            else:
-                event.ignore()
         elif DB.general.isConfirmExitEnabled():
-            if self.ask(*Messages.ASK.APP_EXIT):
+            if self.ask("notification", "#Are you sure you want to exit?"):
                 self.shutdown()
-            else:
-                event.ignore()
         else:
             self.shutdown()
+
+    def confirmUpdateShutdown(self):
+        if DownloadManager.isDownloaderRunning() and not DownloadManager.isShuttingDown():
+            if not Utils.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS):
+                return
+        Utils.openUrl(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": DB.localization.getLanguage()}))
+        self.shutdown()
+
+    def closeEvent(self, event):
+        super().closeEvent(event)
+        event.ignore()
+        self.confirmShutdown()
 
     def gettingStarted(self):
         Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": DB.localization.getLanguage()}))
@@ -177,6 +239,9 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.shutdown(restart=True)
 
     def shutdown(self, restart=False):
+        Updater.stopAutoUpdate()
+        NotificationManager.clearAll()
+        self.downloads.setDownloadCompleteAction(None)
         self.waitForCleanup()
         self.saveWindowGeometry()
         if restart:
@@ -186,4 +251,4 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
 
     def shutdownSystem(self):
         self.shutdown()
-        Utils.shutdownSystem(message=T("#Shutdown by {appName}'s scheduled download completion task.", appName=Config.APP_NAME))
+        Utils.shutdownSystem(message=T("#Shutdown by {appName}'s scheduled task.", appName=Config.APP_NAME))

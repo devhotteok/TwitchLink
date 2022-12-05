@@ -11,7 +11,10 @@ class Script:
     @classmethod
     def run(cls, script, ignoreExceptions=True):
         try:
-            if isinstance(script, str):
+            if isinstance(script, list):
+                for line in script:
+                    cls.run(line, ignoreExceptions=False)
+            elif isinstance(script, str):
                 try:
                     actionType, actionData = script.split(":", 1)
                     if actionType == "open":

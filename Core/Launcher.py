@@ -21,6 +21,9 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
 
     def __init__(self, guid, argv):
         super(SingleApplicationLauncher, self).__init__(argv)
+        self.setApplicationName(Config.APP_NAME)
+        self.setApplicationVersion(Config.APP_VERSION)
+        self.setApplicationDisplayName("")
         self.logger = Logger(fileName=f"{Config.APP_NAME}_{Logger.getFormattedTime()}#{uuid.uuid4()}.log")
         self.logger.info(f"\n\n{Config.getProjectInfo()}\n")
         self.logger.info(OSUtils.getOSInfo())

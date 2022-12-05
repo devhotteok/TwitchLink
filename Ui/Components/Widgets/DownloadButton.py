@@ -114,17 +114,20 @@ class DownloadButton(AccessTokenGenerator):
             else:
                 self.info(*Messages.INFO.TEMPORARY_ERROR)
         elif isinstance(exception, ContentManager.Exceptions.RestrictedContent):
-            if exception.restrictionType == ContentManager.RestrictionType.CONTENT_TYPE:
-                restrictionType = T("#{content} downloads for this channel have been restricted either by the streamer({channel})'s request or by the administrator.", channel=exception.channel.displayName, content=T(exception.contentType))
-            else:
-                restrictionType = T("#This content has been restricted by the request of the streamer({channel}) or by the administrator.", channel=exception.channel.displayName)
-            restrictionInfo = T("#To protect the rights of streamers, {appName} restricts downloads when a content restriction request is received.", appName=Config.APP_NAME)
-            message = f"{restrictionType}\n\n{restrictionInfo}"
-            if exception.reason != None:
-                message = f"{message}\n\n[{T('reason')}]\n{exception.reason}"
-            self.info("content-restricted", message, contentTranslate=False)
+            self.handleRestrictedContent(exception)
         else:
             self.info(*Messages.INFO.NETWORK_ERROR)
+
+    def handleRestrictedContent(self, restriction):
+        if restriction.restrictionType == ContentManager.RestrictionType.CONTENT_TYPE:
+            restrictionType = T("#Downloading {contentType} from this channel has been restricted by the streamer({channel})'s request or by the administrator.", channel=restriction.channel.displayName, contentType=T(restriction.contentType))
+        else:
+            restrictionType = T("#This content has been restricted by the streamer({channel})'s request or by the administrator.", channel=restriction.channel.displayName)
+        restrictionInfo = T("#To protect the rights of streamers, {appName} restricts downloads when a content restriction request is received.", appName=Config.APP_NAME)
+        message = f"{restrictionType}\n\n{restrictionInfo}"
+        if restriction.reason != None:
+            message = f"{message}\n\n[{T('reason')}]\n{restriction.reason}"
+        self.info("restricted-content", message, contentTranslate=False)
 
     def generateDownloadInfo(self, accessToken):
         return DownloadInfo(self.videoData, accessToken)
@@ -135,4 +138,10 @@ class DownloadButton(AccessTokenGenerator):
             self.startDownload(downloadInfo)
 
     def startDownload(self, downloadInfo):
-        DownloadManager.create(downloadInfo)
+        try:
+            ContentManager.ContentManager.checkRestrictions(self.videoData, user=DB.account.user)
+            DownloadManager.create(downloadInfo)
+        except ContentManager.Exceptions.RestrictedContent as e:
+            self.handleRestrictedContent(e)
+        except:
+            self.info(*Messages.INFO.ACTION_PERFORM_ERROR)

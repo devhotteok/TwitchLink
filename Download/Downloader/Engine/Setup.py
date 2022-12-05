@@ -44,7 +44,7 @@ class EngineSetup(QtCore.QThread):
             name=f"Downloader_{self.getId()}",
             fileName=f"{Config.APP_NAME}_Download_{Logger.getFormattedTime()}#{self.getId()}.log"
         )
-        self.logger.debug(f"{Config.APP_NAME} {Config.VERSION}\n\n[Download Info]\n{ObjectLogger.generateObjectLog(self.setup.downloadInfo)}")
+        self.logger.debug(f"{Config.APP_NAME} {Config.APP_VERSION}\n\n[Download Info]\n{ObjectLogger.generateObjectLog(self.setup.downloadInfo)}")
 
     def run(self):
         self.logger.info("Download Started")
@@ -52,7 +52,7 @@ class EngineSetup(QtCore.QThread):
             self.download()
         except Exception as e:
             self.logger.exception(e)
-            self.status.raiseError(type(e))
+            self.status.raiseError(e)
         with self.actionLock:
             if self.status.terminateState.isProcessing():
                 if not self.setup.downloadInfo.type.isStream() and self.status.getError() == None:
@@ -71,6 +71,8 @@ class EngineSetup(QtCore.QThread):
                     self.logger.info("Download Canceled")
             else:
                 self.logger.info("Download Failed")
+                self.logger.warning("Download failed for the following reason.")
+                self.logger.exception(self.status.getError())
         else:
             self.logger.info("Download Completed")
 
@@ -79,6 +81,12 @@ class EngineSetup(QtCore.QThread):
 
     def cancel(self):
         pass
+
+    def abort(self, exception):
+        self.logger.warning("Abort requested with the following exception.")
+        self.logger.warning(exception)
+        self.cancel()
+        self.status.raiseError(exception)
 
     def syncStatus(self):
         self.statusUpdate.emit(self.status)

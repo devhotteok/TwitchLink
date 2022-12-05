@@ -6,7 +6,7 @@ import json
 import requests
 
 
-def default_user_agent(name=f"{Config.APP_NAME}/{Config.VERSION} ({OSUtils.getOSInfo()})"):
+def default_user_agent(name=f"{Config.APP_NAME}/{Config.APP_VERSION} ({OSUtils.getOSInfo()})"):
     return name
 requests.utils.default_user_agent = default_user_agent
 

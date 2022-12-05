@@ -1,5 +1,6 @@
 from Services.Twitch.Gql import TwitchGqlModels
-from Services.Translator.Translator import Translator, T
+
+from PyQt5 import QtCore
 
 
 class RestrictionType:
@@ -9,11 +10,11 @@ class RestrictionType:
 
 class Exceptions:
     class RestrictedContent(Exception):
-        def __init__(self, channel, contentType, contentId, reason, restrictionType):
+        def __init__(self, channel, contentType, content, reason, restrictionType):
             self.channel = channel
             self.contentType = contentType
-            self.contentId = contentId
-            self.reason = reason.get(Translator.getLanguage())
+            self.content = content
+            self.reason = reason
             self.restrictionType = restrictionType
 
         def __str__(self):
@@ -23,25 +24,51 @@ class Exceptions:
             return self.__str__()
 
 
-class ContentManager:
-    restrictions = {}
+class _ContentManager(QtCore.QObject):
+    restrictionsUpdated = QtCore.pyqtSignal()
 
-    @classmethod
-    def setRestrictions(cls, restrictions):
-        cls.restrictions = restrictions
+    def __init__(self, parent=None):
+        super(_ContentManager, self).__init__(parent=parent)
+        self.restrictions = {}
 
-    @classmethod
-    def checkRestrictions(cls, channel, content):
-        channelId = str(channel.id)
-        contentId = str(content.id)
+    def setRestrictions(self, restrictions):
+        self.restrictions = restrictions
+        self.restrictionsUpdated.emit()
+
+    def checkRestrictions(self, content, user=None, fetch=False):
         if type(content) == TwitchGqlModels.Stream:
             contentType = "stream"
+            channel = content.broadcaster
         elif type(content) == TwitchGqlModels.Video:
             contentType = "video"
+            channel = content.owner
         else:
             contentType = "clip"
-        if channelId in cls.restrictions["channel"]:
-            if contentType in cls.restrictions["channel"][channelId]:
-                raise Exceptions.RestrictedContent(channel, contentType, contentId, cls.restrictions["channel"][channelId][contentType], RestrictionType.CONTENT_TYPE)
-        if contentId in cls.restrictions[contentType]:
-            raise Exceptions.RestrictedContent(channel, contentType, contentId, cls.restrictions[contentType][contentId], RestrictionType.CONTENT_ID)
+            channel = content.broadcaster
+        channelData = self.restrictions.get(str(channel.id))
+        if channelData == None:
+            return
+        if user != None:
+            if str(user.id) in channelData.get("whitelist", []):
+                return
+        contentTypeData = channelData.get(contentType)
+        if contentTypeData == None:
+            return
+        if str(content.id) in contentTypeData:
+            raise Exceptions.RestrictedContent(
+                channel,
+                contentType,
+                content,
+                contentTypeData[str(content.id)],
+                RestrictionType.CONTENT_ID
+            )
+        elif "*" in contentTypeData:
+            raise Exceptions.RestrictedContent(
+                channel,
+                contentType,
+                content,
+                contentTypeData["*"],
+                RestrictionType.CONTENT_TYPE
+            )
+
+ContentManager = _ContentManager()

@@ -46,9 +46,9 @@ class Resolution(TwitchPlaybackObject):
         self.url = url
         self.autoSelect = autoSelect
         self.default = default
-        self.parseResolution()
+        self._parseResolution()
 
-    def parseResolution(self):
+    def _parseResolution(self):
         for parseString in [self.groupId, self.name]:
             try:
                 parsed = parseString.split("p", 1)
@@ -68,6 +68,26 @@ class Resolution(TwitchPlaybackObject):
 
     def isAudioOnly(self):
         return self.groupId == "audio_only"
+
+    @property
+    def displayName(self):
+        newString = ""
+        brackets = 0
+        for char in self.name:
+            if char == "(":
+                brackets += 1
+                continue
+            elif char == ")":
+                brackets -= 1
+                continue
+            if brackets == 0:
+                newString += char
+            elif brackets < 0:
+                return self.name
+        if brackets == 0:
+            return " ".join(newString.split())
+        else:
+            return self.name
 
 
 class StreamUrl(Resolution):

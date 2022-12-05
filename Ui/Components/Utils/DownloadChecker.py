@@ -39,10 +39,10 @@ class DownloadChecker:
             Utils.info("error", "#There is another download in progress with the same file name.", parent=parent)
             return cls.State.NEED_NEW_FILE_NAME
         elif Utils.isFile(downloadInfo.getAbsoluteFileName()):
-            if not Utils.ask(*Messages.ASK.FILE_OVERWRITE, parent=parent):
+            if not Utils.ask("overwrite", "#A file with the same name already exists.\nOverwrite?", parent=parent):
                 return cls.State.USER_REJECTED
         elif not Utils.isDirectory(downloadInfo.directory) or Utils.isDirectory(downloadInfo.getAbsoluteFileName()):
-            Utils.info(*Messages.INFO.UNAVAILABLE_FILENAME_OR_DIRECTORY, parent=parent)
+            Utils.info("error", "#The target directory or filename is unavailable.", parent=parent)
             return cls.State.NEED_NEW_FILE_NAME
         if not cls.checkNetworkInstability(downloadInfo, parent=parent):
             return cls.State.USER_REJECTED

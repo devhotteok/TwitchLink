@@ -4,6 +4,12 @@ from Download.Downloader.Engine.Engine import TwitchDownloader
 from PyQt5 import QtCore
 
 
+class Exceptions:
+    class DownloaderCreationDisabled(Exception):
+        def __str__(self):
+            return "Downloader Creation Disabled"
+
+
 class _DownloadManager(QtCore.QObject):
     createdSignal = QtCore.pyqtSignal(object)
     destroyedSignal = QtCore.pyqtSignal(object)
@@ -15,7 +21,11 @@ class _DownloadManager(QtCore.QObject):
         super(_DownloadManager, self).__init__(parent=parent)
         self.downloaders = {}
         self.runningDownloaders = []
-        self.singleDownloader = None
+        self._downloaderCreationEnabled = False
+        self._representativeDownloader = None
+
+    def setDownloaderCreationEnabled(self, enabled):
+        self._downloaderCreationEnabled = enabled
 
     def onStart(self, downloader):
         if len(self.runningDownloaders) == 0:
@@ -36,27 +46,30 @@ class _DownloadManager(QtCore.QObject):
         self.completedSignal.emit(downloader.getId())
 
     def showDownloaderProgress(self, downloader):
-        self.singleDownloader = downloader
-        self.singleDownloader.hasUpdate.connect(self.handleSingleDownloader)
-        App.taskbar.show(indeterminate=self.singleDownloader.setup.downloadInfo.type.isStream())
-        self.singleDownloader.hasUpdate.emit()
+        self._representativeDownloader = downloader
+        self._representativeDownloader.hasUpdate.connect(self.handleRepresentativeDownloader)
+        App.taskbar.show(indeterminate=self._representativeDownloader.setup.downloadInfo.type.isStream())
+        self._representativeDownloader.hasUpdate.emit()
 
     def hideDownloaderProgress(self, complete):
-        self.singleDownloader.hasUpdate.disconnect(self.handleSingleDownloader)
-        self.singleDownloader = None
+        self._representativeDownloader.hasUpdate.disconnect(self.handleRepresentativeDownloader)
+        self._representativeDownloader = None
         if complete:
             App.taskbar.complete()
         else:
             App.taskbar.hide()
 
     def create(self, downloadInfo):
-        downloader = TwitchDownloader(downloadInfo, parent=self)
-        downloader.started.connect(self.onStart)
-        downloader.finished.connect(self.onFinish)
-        downloaderId = downloader.getId()
-        self.downloaders[downloaderId] = downloader
-        self.createdSignal.emit(downloaderId)
-        return downloaderId
+        if self._downloaderCreationEnabled:
+            downloader = TwitchDownloader(downloadInfo, parent=self)
+            downloader.started.connect(self.onStart)
+            downloader.finished.connect(self.onFinish)
+            downloaderId = downloader.getId()
+            self.downloaders[downloaderId] = downloader
+            self.createdSignal.emit(downloaderId)
+            return downloaderId
+        else:
+            raise Exceptions.DownloaderCreationDisabled
 
     def get(self, downloaderId):
         return self.downloaders[downloaderId]
@@ -84,13 +97,13 @@ class _DownloadManager(QtCore.QObject):
     def isShuttingDown(self):
         return not any(downloader.status.terminateState.isFalse() for downloader in self.runningDownloaders)
 
-    def handleSingleDownloader(self):
-        if self.singleDownloader.setup.downloadInfo.type.isStream():
-            self.handleStreamProgress(self.singleDownloader)
-        elif self.singleDownloader.setup.downloadInfo.type.isVideo():
-            self.handleVideoProgress(self.singleDownloader)
+    def handleRepresentativeDownloader(self):
+        if self._representativeDownloader.setup.downloadInfo.type.isStream():
+            self.handleStreamProgress(self._representativeDownloader)
+        elif self._representativeDownloader.setup.downloadInfo.type.isVideo():
+            self.handleVideoProgress(self._representativeDownloader)
         else:
-            self.handleClipProgress(self.singleDownloader)
+            self.handleClipProgress(self._representativeDownloader)
 
     def handleStreamProgress(self, downloader):
         status = downloader.status

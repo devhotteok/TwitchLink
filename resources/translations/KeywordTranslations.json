@@ -7,6 +7,14 @@
     "en": "Warning",
     "ko": "경고"
   },
+  "session-expired": {
+    "en": "Session Expired",
+    "ko": "세션 만료"
+  },
+  "service-unavailable": {
+    "en": "Service Unavailable",
+    "ko": "서비스 불가"
+  },
   "update": {
     "en": "Update",
     "ko": "업데이트"
@@ -71,14 +79,6 @@
     "en": "Version",
     "ko": "버전"
   },
-  "discord": {
-    "en": "Discord",
-    "ko": "디스코드"
-  },
-  "email": {
-    "en": "Email",
-    "ko": "이메일"
-  },
   "login-expired": {
     "en": "Login Expired",
     "ko": "로그인 만료"
@@ -135,9 +135,9 @@
     "en": "Crop",
     "ko": "자르기"
   },
-  "optimize-file": {
-    "en": "Optimize File",
-    "ko": "파일 최적화"
+  "clipping-mode": {
+    "en": "Clipping Mode",
+    "ko": "클립 생성 모드"
   },
   "overwrite": {
     "en": "Overwrite",
@@ -255,16 +255,16 @@
     "en": "Network Error",
     "ko": "네트워크 오류"
   },
+  "unknown-error": {
+    "en": "Unknown Error",
+    "ko": "알 수 없는 오류"
+  },
   "contribute": {
     "en": "Contribute",
     "ko": "기여"
   },
-  "restart": {
-    "en": "Restart",
-    "ko": "재시작"
-  },
-  "content-restricted": {
-    "en": "Content Restricted",
+  "restricted-content": {
+    "en": "Restricted Content",
     "ko": "제한된 콘텐츠"
   },
   "reason": {

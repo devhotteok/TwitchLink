@@ -11,7 +11,7 @@ class _QWebEngineProfile(QtWebEngineWidgets.QWebEngineProfile):
         self.setupProfile()
 
     def setupProfile(self):
-        self.setHttpUserAgent(re.sub("QtWebEngine/\S* Chrome/\S*", f"{Config.APP_NAME}/{Config.VERSION}", self.httpUserAgent()))
+        self.setHttpUserAgent(re.sub("QtWebEngine/\S* Chrome/\S*", f"{Config.APP_NAME}/{Config.APP_VERSION}", self.httpUserAgent()))
 
     @classmethod
     def setup(cls):

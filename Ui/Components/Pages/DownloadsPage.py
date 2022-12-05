@@ -72,10 +72,16 @@ class DownloadsPage(TabManager):
     def changePageText(self, downloadersCount):
         self.pageObject.setPageName("" if downloadersCount == 0 else str(downloadersCount))
 
+    def setDownloadCompleteAction(self, action=None):
+        self.downloads.downloadCompleteAction.setCurrentIndex(action or DownloadCompleteAction.NONE)
+
+    def getDownloadCompleteAction(self):
+        return self.downloads.downloadCompleteAction.currentIndex()
+
     def performDownloadCompleteAction(self):
         if DownloadManager.isDownloaderRunning():
             return
-        if self.downloads.downloadCompleteAction.currentIndex() == DownloadCompleteAction.SHUTDOWN_APP:
+        if self.getDownloadCompleteAction() == DownloadCompleteAction.SHUTDOWN_APP:
             if TimedMessageBox(
                 T("warning"),
                 T("#{appName} will shut down soon.", appName=Config.APP_NAME),
@@ -85,7 +91,7 @@ class DownloadsPage(TabManager):
                 parent=self
             ).exec() == TimedMessageBox.StandardButton.Ok:
                 self.appShutdownRequested.emit()
-        elif self.downloads.downloadCompleteAction.currentIndex() == DownloadCompleteAction.SHUTDOWN_SYSTEM:
+        elif self.getDownloadCompleteAction() == DownloadCompleteAction.SHUTDOWN_SYSTEM:
             dialog = TimedCancelDialog(
                 T("warning"),
                 T("#The system will shut down after {seconds} seconds."),

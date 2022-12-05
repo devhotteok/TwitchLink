@@ -9,7 +9,7 @@ class TermsOfService(DocumentView):
 
     def __init__(self, parent=None):
         super(TermsOfService, self).__init__(DocumentData(title=T("terms-of-service"), content=Utils.getDoc("TermsOfService.txt", DB.localization.getLanguage(), appName=Config.APP_NAME)), parent=parent)
-        if DB.setup.getTermsOfServiceAgreement() == None:
+        if self.isEssential():
             self.setModal(True)
             okButton = self.addButton(
                 DocumentButtonData(
@@ -43,3 +43,6 @@ class TermsOfService(DocumentView):
                 )
             )
         self.checkBox.show()
+
+    def isEssential(self):
+        return DB.setup.getTermsOfServiceAgreement() == None
