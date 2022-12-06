@@ -1,0 +1,14 @@
+{appName}
+[Twitch Yayını / Video / Klip İndirme Aracı]
+
+{appName}, Twitch'in API'sine dayalı olarak oluşturulmuştur.
+{appName}, yalnızca kullanıcı isteklerini Twitch API'ye proxy olarak göndererek hareket eder.
+Tüm istekler yalnızca kullanıcı tarafından yapılır ve program, Twitch sunucusu ile kullanıcı arasındaki iletişimde yalnızca bir tarayıcı görevi görür.
+
+Bu programın kullanımından doğan veya doğabilecek her türlü avantaj ve dezavantajlardan kullanıcı sorumludur, programın geliştiricisi sorumlu değildir.
+
+Kullanıcılar, bu program aracılığıyla indirilen tüm içeriği yalnızca kişisel kullanım için kullanmalıdır ve başka herhangi bir amaçla kullanmak için telif hakkı sahibinin izni gerekir.
+İçeriğin telif hakkı sahibinin izni olmadan yetkisiz kullanımı, yeniden dağıtılması veya ticari kullanımı kanunen yasaktır.
+Bunun herhangi bir ihlalinden doğacak tüm sorumluluğu geliştirici değil, kullanıcı üstlenir.
+
+* Bu yazılımı kullanarak hizmet şartlarımızı kabul etmiş olursunuz.
