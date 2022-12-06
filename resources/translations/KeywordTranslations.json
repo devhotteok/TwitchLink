@@ -161,366 +161,457 @@
   },
   "filename-change": {
     "en": "Filename Change",
+    "tr": "Dosya Adı Değiştirme",
     "ko": "파일명 변경"
   },
   "crop": {
     "en": "Crop",
+    "tr": "Kırp",
     "ko": "자르기"
   },
   "clipping-mode": {
     "en": "Clipping Mode",
+    "tr": "Klip modu",
     "ko": "클립 생성 모드"
   },
   "overwrite": {
     "en": "Overwrite",
+    "tr": "Üzerine Yaz",
     "ko": "덮어쓰기"
   },
   "unknown": {
     "en": "Unknown",
+    "tr": "Bilinmeyen",
     "ko": "알 수 없음"
   },
   "audio-only": {
     "en": "Audio Only",
+    "tr": "Sadece ses",
     "ko": "라디오 모드"
   },
   "source": {
     "en": "Source",
+    "tr": "Kaynak",
     "ko": "원본"
   },
   "preparing": {
     "en": "Preparing",
+    "tr": "Hazırlanıyor",
     "ko": "준비 중"
   },
   "live-downloading": {
     "en": "Live Downloading",
+    "tr": "Canlı İndiriliyor",
     "ko": "실시간 다운로드 중"
   },
   "encoding": {
     "en": "Encoding",
+    "tr": "Yazılıyor",
     "ko": "인코딩 중"
   },
   "download-skipped": {
     "en": "Download Skipped",
+    "tr": "İndirme Atlandı",
     "ko": "다운로드 건너뜀"
   },
   "downloading-updated-files": {
     "en": "Downloading Updated Files",
+    "tr": "Güncellenen Dosyalar Yükleniyor",
     "ko": "추가파일 다운로드 중"
   },
   "stopping": {
     "en": "Stopping",
+    "tr": "Durduruluyor",
     "ko": "중지하는 중"
   },
   "canceling": {
     "en": "Canceling",
+    "tr": "İptal ediliyor",
     "ko": "취소하는 중"
   },
   "pausing": {
     "en": "Pausing",
+    "tr": "Duraklatılıyor",
     "ko": "일시정지 중"
   },
   "stop": {
     "en": "Stop",
+    "tr": "Durdur",
     "ko": "중지"
   },
   "pause": {
     "en": "Pause",
+    "tr": "Duraklat",
     "ko": "일시정지"
   },
   "resume": {
     "en": "Resume",
+    "tr": "Sürdür",
     "ko": "재개"
   },
   "paused": {
     "en": "Paused",
+    "tr": "Duraklatıldı",
     "ko": "일시정지됨"
   },
   "stop-download": {
     "en": "Stop Download",
+    "tr": "İndirmeyi durdur",
     "ko": "다운로드 중지"
   },
   "cancel-download": {
     "en": "Cancel Download",
+    "tr": "İndirmeyi İptal Et",
     "ko": "다운로드 취소"
   },
   "save-complete": {
     "en": "Save Complete",
+    "tr": "Kaydetme Tamamlandı",
     "ko": "저장 완료"
   },
   "download-complete": {
     "en": "Download Complete",
+    "tr": "İndirme Tamamlandı",
     "ko": "다운로드 완료"
   },
   "download-aborted": {
     "en": "Download Aborted",
+    "tr": "İndirmeden Vazgeçildi",
     "ko": "다운로드 중단됨"
   },
   "download-stopped": {
     "en": "Download Stopped",
+    "tr": "İndirme Durduruldu",
     "ko": "다운로드 중지됨"
   },
   "download-canceled": {
     "en": "Download Canceled",
+    "tr": "İndirme İptal Edildi",
     "ko": "다운로드 취소됨"
   },
   "creating": {
     "en": "Creating",
+    "tr": "Oluşturuluyor",
     "ko": "생성 중"
   },
   "file-not-found": {
     "en": "File Not Found",
+    "tr": "Dosya bulunamadı",
     "ko": "파일을 찾을 수 없음"
   },
   "open-file": {
     "en": "Open File",
+    "tr": "Dosyayı Aç",
     "ko": "파일 열기"
   },
   "view-logs": {
     "en": "View Logs",
+    "tr": "Kayıtları Görüntüle",
     "ko": "로그 보기"
   },
   "system-error": {
     "en": "System Error",
+    "tr": "Sistem Hatası",
     "ko": "시스템 오류"
   },
   "network-error": {
     "en": "Network Error",
+    "tr": "İnternet Hatası",
     "ko": "네트워크 오류"
   },
   "unknown-error": {
     "en": "Unknown Error",
+    "tr": "Bilinmeyen Hata",
     "ko": "알 수 없는 오류"
   },
   "contribute": {
     "en": "Contribute",
+    "tr": "Katkıda bulun",
     "ko": "기여"
   },
   "restricted-content": {
     "en": "Restricted Content",
+    "tr": "Restricted Content",
     "ko": "제한된 콘텐츠"
   },
   "reason": {
     "en": "Reason",
+    "tr": "Neden",
     "ko": "사유"
   },
   "stream": {
     "en": "Stream",
+    "tr": "Yayın",
     "ko": "생방송"
   },
   "video": {
     "en": "Video",
+    "tr": "Video",
     "ko": "비디오"
   },
   "clip": {
     "en": "Clip",
+    "tr": "Klip",
     "ko": "클립"
   },
   "external-content": {
     "en": "External Content",
+    "tr": "Harici İçerik",
     "ko": "외부 콘텐츠"
   },
   "channel-offline-image": {
     "en": "Channel Offline Image",
+    "tr": "Kanal Çevrimdışı Resmi",
     "ko": "채널 오프라인 이미지"
   },
   "preview": {
     "en": "Preview",
+    "tr": "Ön izleme",
     "ko": "미리보기"
   },
   "download": {
     "en": "Download",
+    "tr": "İndirmek",
     "ko": "다운로드"
   },
   "live-download": {
     "en": "Live Download",
+    "tr": "Canlı İndirme",
     "ko": "실시간 다운로드"
   },
   "past-broadcasts": {
     "en": "Past Broadcasts",
+    "tr": "Geçmiş Yayınlar",
     "ko": "지난 방송"
   },
   "highlights": {
     "en": "Highlights",
+    "tr": "Öne Çıkanlar",
     "ko": "하이라이트"
   },
   "clips": {
     "en": "Clips",
+    "tr": "Klipler",
     "ko": "클립"
   },
   "uploads": {
     "en": "Uploads",
+    "tr": "Yüklemeler",
     "ko": "업로드"
   },
   "past-premiers": {
     "en": "Past Premiers",
+    "tr": "Geçmiş Premierler",
     "ko": "지난 최초 공개"
   },
   "all-videos": {
     "en": "All Videos",
+    "tr": "Tüm videolar",
     "ko": "모든 동영상"
   },
   "date": {
     "en": "Date",
+    "tr": "Tarih",
     "ko": "날짜"
   },
   "popular": {
     "en": "Polular",
+    "tr": "Popülerlik",
     "ko": "인기"
   },
   "24h": {
     "en": "24H",
+    "tr": "24S",
     "ko": "24시간"
   },
   "7d": {
     "en": "7D",
+    "tr": "7G",
     "ko": "7일"
   },
   "30d": {
     "en": "30D",
+    "tr": "30G",
     "ko": "30일"
   },
   "all": {
     "en": "ALL",
+    "tr": "HEPSİ",
     "ko": "전체"
   },
   "information": {
     "en": "Information",
+    "tr": "Bilgi",
     "ko": "정보"
   },
   "view-file-properties": {
     "en": "View File Properties",
+    "tr": "Dosya Özelliklerini Görüntüle",
     "ko": "파일 속성 보기"
   },
   "view-image-properties": {
     "en": "View Image Properties",
+    "tr": "Resim Özelliklerini Görüntüle",
     "ko": "이미지 속성 보기"
   },
   "save-image": {
     "en": "Save Image",
+    "tr": "Resmi Kaydet",
     "ko": "이미지 저장"
   },
   "file-type": {
     "en": "File Type",
+    "tr": "Dosya Tipi",
     "ko": "파일 유형"
   },
   "id": {
     "en": "ID",
+    "tr": "ID",
     "ko": "아이디"
   },
   "title": {
     "en": "Title",
+    "tr": "Başlık",
     "ko": "제목"
   },
   "category": {
     "en": "Category",
+    "tr": "Kategori",
     "ko": "카테고리"
   },
   "slug": {
     "en": "Slug",
+    "tr": "Slug",
     "ko": "간편 URL"
   },
   "channel": {
     "en": "Channel",
+    "tr": "Kanal",
     "ko": "채널"
   },
   "creator": {
     "en": "Creator",
+    "tr": "Yaratıcı",
     "ko": "제작자"
   },
   "username": {
     "en": "Username",
+    "tr": "Kullanıcı Adı",
     "ko": "사용자 아이디"
   },
   "displayname": {
     "en": "Displayname",
+    "tr": "Görüntülenen Ad",
     "ko": "사용자 닉네임"
   },
   "duration": {
     "en": "Duration",
+    "tr": "Süre",
     "ko": "길이"
   },
   "started-at": {
     "en": "Started At",
+    "tr": "Başlangıç",
     "ko": "시작날짜/시간"
   },
   "started-date": {
     "en": "Started Date",
+    "tr": "Başlangıç Tarihi",
     "ko": "시작날짜"
   },
   "started-time": {
     "en": "Started Time",
+    "tr": "Başlangıç Zamanı",
     "ko": "시작시간"
   },
   "published-at": {
     "en": "Published At",
+    "tr": "Yayın Tarihi",
     "ko": "게시날짜/시간"
   },
   "published-date": {
     "en": "Published Date",
+    "tr": "Yayınlanma Tarihi",
     "ko": "게시날짜"
   },
   "published-time": {
     "en": "Published Time",
+    "tr": "Yayınlanma Zamanı",
     "ko": "게시시간"
   },
   "created-at": {
     "en": "Created At",
+    "tr": "Oluşturuldu",
     "ko": "생성날짜/시간"
   },
   "created-date": {
     "en": "Created Date",
+    "tr": "Oluşturulma Tarihi",
     "ko": "생성날짜"
   },
   "created-time": {
     "en": "Created Time",
+    "tr": "Oluşturma Zamanı",
     "ko": "생성시간"
   },
   "year": {
     "en": "Year",
+    "tr": "Yıl",
     "ko": "년"
   },
   "month": {
     "en": "Month",
+    "tr": "Ay",
     "ko": "월"
   },
   "day": {
     "en": "Day",
+    "tr": "Gün",
     "ko": "일"
   },
   "hour": {
     "en": "Hour",
+    "tr": "Saat",
     "ko": "시"
   },
   "minute": {
     "en": "Minute",
+    "tr": "Dakika",
     "ko": "분"
   },
   "second": {
     "en": "Second",
+    "tr": "Saniye",
     "ko": "초"
   },
   "views": {
     "en": "Views",
+    "tr": "Görüntüleme",
     "ko": "조회수"
   },
   "file-resolution": {
     "en": "File Resolution",
+    "tr": "Dosya Çözünürlüğü",
     "ko": "파일 해상도"
   },
   "viewer-count": {
     "en": "Viewer Count",
+    "tr": "İzleyici Sayısı",
     "ko": "시청자수"
   },
   "view-count": {
     "en": "View Count",
+    "tr": "Görüntüleme Sayısı",
     "ko": "조회수"
   },
   "available-resolutions": {
     "en": "Available Resolutions",
+    "tr": "Mevcut Çözünürlükler",
     "ko": "선택 가능한 해상도 목록"
   },
   "save-as": {
     "en": "Save As",
+    "tr": "Farklı kaydet",
     "ko": "다른 이름으로 저장"
   }
 }
