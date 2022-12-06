@@ -1,142 +1,177 @@
 {
   "#Checking for updates": {
     "en": "Checking for updates",
+    "tr": "Güncellemeler kontrol ediliyor",
     "ko": "업데이트 확인 중"
   },
   "#Loading Data": {
     "en": "Loading Data",
+    "tr": "Veri yükleniyor",
     "ko": "데이터 불러오는 중"
   },
   "#A network error occurred while connecting to the server.": {
     "en": "A network error occurred while connecting to the server.",
+    "tr": "Sunucuya bağlanırken bir ağ hatası oluştu.",
     "ko": "서버와 연결 중 네트워크 오류가 발생하였습니다."
   },
   "#An unexpected error occurred while connecting to the server.": {
     "en": "An unexpected error occurred while connecting to the server.",
+    "tr": "Sunucuya bağlanırken beklenmeyen bir hata oluştu.",
     "ko": "서버와 연결 중 예기치 못한 오류가 발생하였습니다."
   },
   "#An unexpected error has occurred.": {
     "en": "An unexpected error has occurred.",
+    "tr": "Beklenmeyen bir hata oluştu.",
     "ko": "예기치 못한 오류가 발생하였습니다"
   },
   "#{appName} is currently unavailable.": {
     "en": "{appName} is currently unavailable.",
+    "tr": "{appName} şu anda kullanılamıyor.",
     "ko": "현재 {appName} 서비스를 이용할 수 없습니다."
   },
   "#A new version of {appName} has been released!": {
     "en": "A new version of {appName} has been released!",
+    "tr": "{appName} uygulamasının yeni bir sürümü yayınlandı!",
     "ko": "{appName}의 새로운 버전이 출시되었습니다!"
   },
   "#Please try again later.": {
     "en": "Please try again later.",
+    "tr": "Lütfen daha sonra tekrar deneyiniz.",
     "ko": "잠시 후 다시 시도하세요."
   },
   "#Some features will be temporarily disabled.\nPlease wait.\nWhen the connection is restored, those features will be activated.": {
     "en": "Some features will be temporarily disabled.\nPlease wait.\nWhen the connection is restored, those features will be activated.",
+    "tr": "Bazı özellikler geçici olarak devre dışı.\nLütfen bekleyiniz.\nBağlantı geri yüklendiğinde, bu özellikler etkinleştirilecektir.",
     "ko": "일부 기능이 일시적으로 비활성화됩니다.\n잠시 기다리세요.\n서버와의 연결이 복구되면 기능이 다시 활성화됩니다."
   },
   "#Some features will be disabled.": {
     "en": "Some features will be disabled.",
+    "tr": "Bazı özellikler devre dışı.",
     "ko": "일부 기능이 비활성화됩니다."
   },
   "#Your session has expired.": {
     "en": "Your session has expired.",
+    "tr": "Oturumunuz sona erdi.",
     "ko": "세션이 만료되었습니다."
   },
   "#Please restart the app.": {
     "en": "Please restart the app.",
+    "tr": "Lütfen uygulamayı yeniden başlatın.",
     "ko": "앱을 재시작하세요."
   },
   "#We detected an error and disabled some features.\nClick '{buttonText}' to try again.": {
     "en": "We detected an error and disabled some features.\nClick '{buttonText}' to try again.",
+    "tr": "Bir hata tespit ettik ve bazı özellikleri devre dışı bıraktık.\nTekrar denemek için \"{buttonText}\" düğmesini tıklayın.",
     "ko": "오류를 감지하여 일부 기능을 비활성화하였습니다.\n다시 시도하려면 '{buttonText}' 버튼을 누르세요."
   },
   "#Some features may not be activated until the app is restarted.": {
     "en": "Some features may not be activated until the app is restarted.",
+    "tr": "Uygulama yeniden başlatılana kadar bazı özellikler etkinleştirilmeyebilir.",
     "ko": "일부 기능은 기록 삭제 후 앱을 다시 실행해야 활성화될 수도 있습니다."
   },
   "#If the error persists, contact the developer.": {
     "en": "If the error persists, contact the developer.",
+    "tr": "Hata devam ederse geliştiriciyle iletişime geçin.",
     "ko": "오류가 지속된다면 개발자에게 문의하세요."
   },
   "#This module cannot be loaded.": {
     "en": "This module cannot be loaded.",
+    "tr": "Bu modül yüklenemedi.",
     "ko": "해당 모듈을 불러올 수 없습니다."
   },
   "#It seems that some features are not compatible with your PC.": {
     "en": "It seems that some features are not compatible with your PC.",
+    "tr": "Görünüşe göre bazı özellikler PC'nizle uyumlu değil.",
     "ko": "사용자의 PC에서 일부 기능이 호환되지 않는 것 같습니다."
   },
   "#Try updating your graphics driver to the latest version.": {
     "en": "Try updating your graphics driver to the latest version.",
+    "tr": "Grafik sürücünüzü en son sürüme güncellemeyi deneyin.",
     "ko": "그래픽 드라이버를 최신 버전으로 업데이트하세요."
   },
   "#Do not show this again.": {
     "en": "Do not show this again.",
+    "tr": "Bunu tekrar gösterme.",
     "ko": "다시 보지 않기"
   },
   "#Do not show this again for {blockExpiry} days.": {
     "en": "Do not show this again for {blockExpiry} days.",
+    "tr": "Bunu {blockExpiry} gün boyunca bir daha gösterme.",
     "ko": "{blockExpiry}일 동안 다시 보지 않기"
   },
   "#There are one or more downloads in progress.\nAre you sure you want to stop/cancel them all?": {
     "en": "There are one or more downloads in progress.\nAre you sure you want to stop/cancel them all?",
+    "tr": "Sürmekte olan bir veya daha fazla indirme işlemi var.\nHepsini durdurmak/iptal etmek istediğinizden emin misiniz?",
     "ko": "하나 이상의 진행 중인 다운로드가 있습니다.\n모두 중지/취소하시겠습니까?"
   },
   "#Shutting down all downloads": {
     "en": "Shutting down all downloads",
+    "tr": "Tüm indirmeleri durduruluyor",
     "ko": "모든 다운로드를 중지하는 중"
   },
   "#{appName} will shut down soon.": {
     "en": "{appName} will shut down soon.",
+    "tr": "{appName} birazdan kapanacak.",
     "ko": "{appName}이/가 곧 종료됩니다."
   },
   "#The system will shut down after {seconds} seconds.": {
     "en": "The system will shut down after {seconds} seconds.",
+    "tr": "Sistem {seconds} saniye sonra kapanacak.",
     "ko": "시스템이 {seconds}초 후에 종료됩니다."
   },
   "#Shutdown by {appName}'s scheduled task.": {
     "en": "Shutdown by {appName}'s scheduled task.",
+    "tr": "{appName} uygulamasının planlanmış görevi nedeniyle kapatıldı.",
     "ko": "{appName}의 예약된 다운로드 완료 작업에 의해 시스템이 종료됩니다."
   },
   "#Are you sure you want to exit?": {
     "en": "Are you sure you want to exit?",
+    "tr": "Çıkmak istediğine emin misin?",
     "ko": "정말 종료하시겠습니까?"
   },
   "#Checking channel info": {
     "en": "Checking channel info",
+    "tr": "Kanal bilgisi kontrol ediliyor",
     "ko": "채널 정보 확인 중"
   },
   "#Channel not found.": {
     "en": "Channel not found.",
+    "tr": "Kanal bulunamadı.",
     "ko": "해당 채널을 찾을 수 없습니다."
   },
   "#Checking video info": {
     "en": "Checking video info",
+    "tr": "Video bilgisi kontrol ediliyor",
     "ko": "비디오 정보 확인 중"
   },
   "#Video not found.": {
     "en": "Video not found.",
+    "tr": "Video bulunamadı.",
     "ko": "해당 비디오를 찾을 수 없습니다."
   },
   "#Checking clip info": {
     "en": "Checking clip info",
+    "tr": "Klip bilgisi kontrol ediliyor",
     "ko": "클립 정보 확인 중"
   },
   "#Clip not found.": {
     "en": "Clip not found.",
+    "tr": "Klip bulunamadı.",
     "ko": "해당 클립을 찾을 수 없습니다."
   },
   "#Checking URL": {
     "en": "Checking URL",
+    "tr": "URL kontrol ediliyor",
     "ko": "URL 정보 확인 중"
   },
   "#This URL is invalid.": {
     "en": "This URL is invalid.",
+    "tr": "Bu URL geçersiz.",
     "ko": "URL이 유효하지 않습니다."
   },
   "#Searching": {
     "en": "Searching",
+    "tr": "Aranıyor",
     "ko": "검색 중"
   },
   "#No Results Found.": {
