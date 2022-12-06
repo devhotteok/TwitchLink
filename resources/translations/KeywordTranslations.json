@@ -1,130 +1,162 @@
 {
   "error": {
     "en": "Error",
+    "tr": "Hata",
     "ko": "오류"
   },
   "warning": {
     "en": "Warning",
+    "tr": "Uyarı",
     "ko": "경고"
   },
   "session-expired": {
     "en": "Session Expired",
+    "tr": "Oturum süresi doldu",
     "ko": "세션 만료"
   },
   "service-unavailable": {
     "en": "Service Unavailable",
+    "tr": "Hizmet Kullanılamıyor",
     "ko": "서비스 불가"
   },
   "update": {
     "en": "Update",
+    "tr": "Güncelleme",
     "ko": "업데이트"
   },
   "open": {
     "en": "Open",
+    "tr": "Açık",
     "ko": "열기"
   },
   "ok": {
     "en": "OK",
+    "tr": "Onayla",
     "ko": "확인"
   },
   "cancel": {
     "en": "Cancel",
+    "tr": "İptal",
     "ko": "취소"
   },
   "notification": {
     "en": "Notification",
+    "tr": "Bildirim",
     "ko": "알림"
   },
   "delete-error-history": {
     "en": "Delete Error History",
+    "tr": "Hata Geçmişini Sil",
     "ko": "오류 기록 삭제"
   },
   "shutting-down": {
     "en": "Shutting Down",
+    "tr": "Kapatılıyor",
     "ko": "종료하는 중"
   },
   "terms-of-service": {
     "en": "Terms of Service",
+    "tr": "Hizmet Kullanım Şartları",
     "ko": "이용약관"
   },
   "recommended-update": {
     "en": "Recommended update",
+    "tr": "Önerilen güncelleme",
     "ko": "권장 업데이트"
   },
   "required-update": {
     "en": "Required update",
+    "tr": "Gerekli güncelleme",
     "ko": "필수 업데이트"
   },
   "no-results-found": {
     "en": "No Results Found",
+    "tr": "Sonuç bulunamadı",
     "ko": "검색 결과 없음"
   },
   "developer-tools": {
     "en": "Developer Tools",
+    "tr": "Geliştirici Araçları",
     "ko": "개발자 도구"
   },
   "login": {
     "en": "Login",
+    "tr": "Giriş",
     "ko": "로그인"
   },
   "cancel-login": {
     "en": "Cancel Login",
+    "tr": "Girişi İptal Et",
     "ko": "로그인 취소"
   },
   "logout": {
     "en": "Logout",
+    "tr": "Çıkış Yap",
     "ko": "로그아웃"
   },
   "version": {
     "en": "Version",
+    "tr": "Sürüm",
     "ko": "버전"
   },
   "login-expired": {
     "en": "Login Expired",
+    "tr": "Giriş Süresi Doldu",
     "ko": "로그인 만료"
   },
   "authentication-error": {
     "en": "Authentication Error",
+    "tr": "Doğrulama hatası",
     "ko": "인증 오류"
   },
   "unable-to-download": {
     "en": "Unable to download",
+    "tr": "İndirme yapılamıyor",
     "ko": "다운로드 불가"
   },
   "change-account": {
     "en": "Change account",
+    "tr": "Hesabı değiştir",
     "ko": "계정 변경"
   },
   "offline": {
     "en": "Offline",
+    "tr": "Çevrimdışı",
     "ko": "오프라인"
   },
   "live": {
     "en": "Live",
+    "tr": "Canlı",
     "ko": "실시간"
   },
   "rerun": {
     "en": "Rerun",
+    "tr": "Yeniden Gösterim",
     "ko": "재방송"
   },
   "partner-streamer": {
     "en": "Partner Streamer",
+    "tr": "Partner Yayıncı",
     "ko": "파트너 스트리머"
   },
   "affiliate-streamer": {
     "en": "Affiliate Streamer",
+    "tr": "Kuruma Bağlı Yayıncı",
     "ko": "제휴 스트리머"
   },
   "streamer": {
     "en": "Streamer",
+    "tr": "Yayıncı",
     "ko": "일반 스트리머"
   },
   "loading": {
     "en": "Loading",
+    "tr": "Yükleniyor",
     "ko": "불러오는 중"
   },
   "downloading": {
     "en": "Downloading",
+    "tr": "İndiriliyor",
     "ko": "다운로드 중"
   },
   "filename-change": {
