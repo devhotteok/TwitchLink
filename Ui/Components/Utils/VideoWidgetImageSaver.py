@@ -1,18 +1,18 @@
 from Core.Ui import *
 from Services.Messages import Messages
-from Services.Image.Config import Config as ImageConfig
 from Services.Twitch.Gql import TwitchGqlModels
+from Download import DownloadOptionHistory
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
 
 class VideoWidgetImageSaver:
     @classmethod
     def saveImage(cls, widget, videoWidget):
-        history = DB.temp.getDownloadOptionHistory(ImageConfig.DATA_TYPE)
+        history = DB.temp.getDownloadOptionHistory(DownloadOptionHistory.ThumbnailHistory)
         directory = history.getUpdatedDirectory()
         filters = history.getAvailableFormats()
         initialFilter = history.getFormat()
-        fileName = Utils.askSaveDirectory(Utils.joinPath(directory, cls.generateFileName(videoWidget.data)), filters, initialFilter, parent=widget)
+        fileName = Utils.askSaveAs(Utils.joinPath(directory, cls.generateFileName(videoWidget.data)), filters, initialFilter, parent=widget)
         if fileName != None:
             try:
                 videoWidget.thumbnailImage.pixmap().save(fileName)

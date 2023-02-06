@@ -39,7 +39,7 @@ class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
         self.verifiedIcon = Utils.setSvgIcon(self.verifiedIcon, Icons.VERIFIED_ICON)
         self.infoIcon = Utils.setSvgIcon(self.infoIcon, Icons.INFO_ICON)
         self.setup()
-        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.Window).name()};}}")
+        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.Normal, QtGui.QPalette.Window).name()};}}")
         self.videoArea.setStyleSheet("#videoArea {background-color: transparent;}")
         self.videoArea.verticalScrollBar().setSingleStep(30)
         self.videoArea.verticalScrollBar().valueChanged.connect(self.searchMoreVideos)
@@ -100,7 +100,9 @@ class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
         self.refreshChannelButton.setEnabled(False)
         self.refreshChannelThread.setup(
             target=Engine.Search.Channel,
-            args=(self.channel.login,)
+            kwargs={
+                "login": self.channel.login
+            }
         )
         self.refreshChannelThread.start()
 

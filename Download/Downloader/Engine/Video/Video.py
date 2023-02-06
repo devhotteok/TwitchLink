@@ -2,7 +2,7 @@ from Download.Downloader.Engine.Video.Playlist.OnlinePlaylistManager import Onli
 from .SegmentDownloader import SegmentDownloader
 
 from Download.Downloader.Engine.Setup import EngineSetup
-from Download.Downloader.Engine.ThreadPool import ThreadPool
+from Download.Downloader.Engine.ThreadPool import DownloadThreadPool
 from Download.Downloader.Engine.Config import Config
 
 from Core.GlobalExceptions import Exceptions
@@ -19,7 +19,7 @@ class VideoDownloader(EngineSetup):
     def __init__(self, downloadInfo, parent=None):
         super(VideoDownloader, self).__init__(downloadInfo, parent=parent)
         self.FFmpeg = FFmpeg(parent=self)
-        self.taskManager = TaskManager(ThreadPool, parent=self)
+        self.taskManager = TaskManager(DownloadThreadPool, parent=self)
 
     def download(self):
         try:

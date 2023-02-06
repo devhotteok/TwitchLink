@@ -319,6 +319,26 @@
     "en": "This content is not available in your region.",
     "ko": "해당 지역에서 시청할 수 없는 콘텐츠입니다."
   },
+  "#If enabled, the download will not be performed until a matching resolution is found.\nIf disabled, it automatically selects a different resolution.": {
+    "en": "If enabled, the download will not be performed until a matching resolution is found.\nIf disabled, it automatically selects a different resolution.",
+    "ko": "이 옵션을 활성화하면 일치하는 해상도를 찾을 때까지 다운로드를 하지 않습니다.\n이 옵션을 비활성화하면 자동으로 다른 해상도를 선택합니다."
+  },
+  "#Some fields are empty.": {
+    "en": "Some fields are empty.",
+    "ko": "일부 필드가 비어있습니다."
+  },
+  "#The preferred resolution was not found.\nYou have disabled the download until a matching resolution is found.": {
+    "en": "The preferred resolution was not found.\nYou have disabled the download until a matching resolution is found.",
+    "ko": "선호하는 해상도를 찾을 수 없습니다.\n일치하는 해상도를 찾을 때까지 다운로드를 하지 않도록 설정하셨습니다."
+  },
+  "#Unable to start a new download.\nThis feature has been disabled.": {
+    "en": "Unable to start a new download.\nThis feature has been disabled.",
+    "ko": "새 다운로드를 시작할 수 없습니다.\n기능이 비활성화되었습니다."
+  },
+  "#This stream may contain ads.\nTo block ads, you must log in with a subscribed account.\nChanges will take effect from the next download.": {
+    "en": "This stream may contain ads.\nTo block ads, you must log in with a subscribed account.\nChanges will take effect from the next download.",
+    "ko": "이 생방송에서 광고가 송출될 수 있습니다.\n광고 차단을 위해서는 구독된 계정의 로그인이 필요합니다.\n변경사항은 다음 다운로드부터 적용됩니다."
+  },
   "#Download {type}": {
     "en": "Download {type}",
     "ko": "{type} 다운로드"
@@ -390,6 +410,10 @@
   "#Save completed.": {
     "en": "Save completed.",
     "ko": "저장이 완료되었습니다."
+  },
+  "#This disables all scheduled downloads and disconnects from the channel.\nProceed?": {
+    "en": "This disables all scheduled downloads and disconnects from the channel.\nProceed?",
+    "ko": "모든 예약 다운로드가 비활성화되며 채널과의 연결이 끊어집니다.\n진행하시겠습니까?"
   },
   "#Waiting for download": {
     "en": "Waiting for download",

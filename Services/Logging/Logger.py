@@ -23,7 +23,10 @@ class Logger:
         if fileName == "":
             self.filePath = ""
         else:
-            OSUtils.createDirectory(directory)
+            try:
+                OSUtils.createDirectory(directory)
+            except:
+                pass
             self.filePath = OSUtils.joinPath(directory, fileName)
         if not self.logger.handlers:
             self.logger.propagate = propagate

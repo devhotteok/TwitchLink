@@ -1,8 +1,6 @@
 class Config:
-    DATA_TYPE = "image"
-
     IMAGE_FORCED_SIZE_POLICY = [
-        ("vod-secure.twitch.tv/_404/", (640, 360))
+        ("vod-secure.twitch.tv/_404/", (320, 180))
     ]
 
     CACHE_SIZE = 200

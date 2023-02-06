@@ -5,14 +5,6 @@ from Core.App import App
 from Core.Config import Config
 from Services.Utils.OSUtils import OSUtils
 from Services.Utils.SystemUtils import SystemUtils
-from Services.Image.Loader import ImageLoader
-from Services.Image.Config import Config as ImageConfig
-from Services.Account.TwitchAccount import TwitchAccount
-from Services.Twitch.Playback.TwitchPlaybackAccessTokens import TwitchPlaybackAccessTokenTypes
-from Services.Translator.Translator import Translator
-from Download import DownloadOptionHistory
-from Download.Downloader.Engine.ThreadPool import ThreadPool as DownloadThreadPool
-from Download.Downloader.Engine.Config import Config as EngineConfig
 
 from PyQt5 import QtCore
 
@@ -38,6 +30,7 @@ class Setup(Codable):
 
 class Account(Codable):
     def __init__(self):
+        from Services.Account.TwitchAccount import TwitchAccount
         self._account = TwitchAccount()
 
     def login(self, username, token, expiry):
@@ -60,6 +53,7 @@ class Account(Codable):
         self._account.checkToken()
 
     def getAuthToken(self):
+        self.checkAuthToken()
         return self._account.token
 
 class General(Codable):
@@ -120,47 +114,42 @@ class Templates(Codable):
 class Advanced(Codable):
     def __init__(self):
         self._searchExternalContent = True
-        self.setCachingEnabled(False)
+        self._caching = False
 
     def __setup__(self):
-        self.reloadCaching()
+        from Services.Image.Loader import ImageLoader
+        ImageLoader.setCachingEnabled(self._caching)
+        del self._caching
+
+    def __save__(self):
+        from Services.Image.Loader import ImageLoader
+        self._caching = ImageLoader.isCachingEnabled()
+        return super().__save__()
 
     def setSearchExternalContentEnabled(self, enabled):
         self._searchExternalContent = enabled
 
-    def setCachingEnabled(self, enabled):
-        self._caching = enabled
-        self.reloadCaching()
-
-    def reloadCaching(self):
-        ImageLoader.setCachingEnabled(self._caching)
-
     def isSearchExternalContentEnabled(self):
         return self._searchExternalContent
 
-    def isCachingEnabled(self):
-        return self._caching
-
 class Localization(Codable):
     def __init__(self):
-        self.setLanguage(Translator.getDefaultLanguage())
+        from Services.Translator.Translator import Translator
+        self._language = Translator.getDefaultLanguage()
         self._timezone = SystemUtils.getLocalTimezone()
 
     def __setup__(self):
-        self.reloadTranslator()
+        from Services.Translator.Translator import Translator
+        Translator.setLanguage(self._language)
+        del self._language
 
-    def setLanguage(self, language):
-        self._language = language
-        self.reloadTranslator()
+    def __save__(self):
+        from Services.Translator.Translator import Translator
+        self._language = Translator.getLanguage()
+        return super().__save__()
 
     def setTimezone(self, timezone):
         self._timezone = SystemUtils.getTimezone(timezone)
-
-    def reloadTranslator(self):
-        Translator.setLanguage(self._language)
-
-    def getLanguage(self):
-        return self._language
 
     def getTimezone(self):
         return self._timezone
@@ -170,12 +159,16 @@ class Localization(Codable):
 
 class Temp(Codable):
     def __init__(self):
+        from Download import DownloadOptionHistory
         self._downloadHistory = []
         self._downloadOptionHistory = {
-            TwitchPlaybackAccessTokenTypes.STREAM: DownloadOptionHistory.StreamHistory(),
-            TwitchPlaybackAccessTokenTypes.VIDEO: DownloadOptionHistory.VideoHistory(),
-            TwitchPlaybackAccessTokenTypes.CLIP: DownloadOptionHistory.ClipHistory(),
-            ImageConfig.DATA_TYPE: DownloadOptionHistory.ThumbnailHistory()
+            history.getId(): history() for history in [
+                DownloadOptionHistory.StreamHistory,
+                DownloadOptionHistory.VideoHistory,
+                DownloadOptionHistory.ClipHistory,
+                DownloadOptionHistory.ThumbnailHistory,
+                DownloadOptionHistory.ScheduledDownloadHistory
+            ]
         }
         self._downloadStats = {
             "totalFiles": 0,
@@ -184,17 +177,18 @@ class Temp(Codable):
         self._windowGeometry = {}
         self._blockedContent = {}
 
-    def getDownloadHistory(self):
-        return self._downloadHistory
+    def __setup__(self):
+        from Download.DownloadHistoryManager import DownloadHistoryManager
+        DownloadHistoryManager.setHistoryList(self._downloadHistory)
+        del self._downloadHistory
 
-    def addDownloadHistory(self, downloadHistory):
-        self._downloadHistory.append(downloadHistory)
+    def __save__(self):
+        from Download.DownloadHistoryManager import DownloadHistoryManager
+        self._downloadHistory = DownloadHistoryManager.getHistoryList()
+        return super().__save__()
 
-    def removeDownloadHistory(self, downloadHistory):
-        self._downloadHistory.remove(downloadHistory)
-
-    def getDownloadOptionHistory(self, contentType):
-        return self._downloadOptionHistory[contentType]
+    def getDownloadOptionHistory(self, historyType):
+        return self._downloadOptionHistory[historyType.getId()]
 
     def updateDownloadStats(self, fileSize):
         self._downloadStats["totalFiles"] += 1
@@ -228,30 +222,46 @@ class Temp(Codable):
 
 class Download(Codable):
     def __init__(self):
-        self.setDownloadSpeed(EngineConfig.RECOMMENDED_THREAD_LIMIT)
+        from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
+        self._downloadSpeed = DownloadEngineConfig.RECOMMENDED_THREAD_LIMIT
 
     def __setup__(self):
-        self.reloadDownloadSpeed()
-
-    def setDownloadSpeed(self, downloadSpeed):
-        self._downloadSpeed = downloadSpeed
-        self.reloadDownloadSpeed()
-
-    def reloadDownloadSpeed(self):
+        from Download.Downloader.Engine.ThreadPool import DownloadThreadPool
         DownloadThreadPool.setMaxThreadCount(self._downloadSpeed)
+        del self._downloadSpeed
 
-    def getDownloadSpeed(self):
-        return self._downloadSpeed
+    def __save__(self):
+        from Download.Downloader.Engine.ThreadPool import DownloadThreadPool
+        self._downloadSpeed = DownloadThreadPool.maxThreadCount()
+        return super().__save__()
+
+class ScheduledDownloads(Codable):
+    def __init__(self):
+        self._enabled = False
+        self._scheduledDownloadPresets = []
+
+    def __setup__(self):
+        from Download.ScheduledDownloadManager import ScheduledDownloadManager
+        ScheduledDownloadManager.setEnabled(self._enabled)
+        ScheduledDownloadManager.setPresets(self._scheduledDownloadPresets)
+        del self._enabled
+        del self._scheduledDownloadPresets
+
+    def __save__(self):
+        from Download.ScheduledDownloadManager import ScheduledDownloadManager
+        self._enabled = ScheduledDownloadManager.isEnabled()
+        self._scheduledDownloadPresets = ScheduledDownloadManager.getPresets()
+        return super().__save__()
 
 
 class Database:
     def __init__(self):
         self.version = Config.APP_VERSION
-        self.reset()
+        self._resetData()
         App.aboutToQuit.connect(self.save)
 
     def load(self):
-        self.reset()
+        self._resetData()
         try:
             with open(Config.DB_FILE, "r", encoding="utf-8") as file:
                 for key, value in Decoder.decode(Updaters.update(json.load(file))).items():
@@ -271,7 +281,7 @@ class Database:
             App.logger.error("Unable to save data.")
             App.logger.exception(e)
 
-    def reset(self):
+    def _resetData(self):
         self.setup = Setup()
         self.account = Account()
         self.general = General()
@@ -280,6 +290,19 @@ class Database:
         self.localization = Localization()
         self.temp = Temp()
         self.download = Download()
+        self.scheduledDownloads = ScheduledDownloads()
+
+    def reset(self):
+        self._resetData()
+        self.setup.__setup__()
+        self.account.__setup__()
+        self.general.__setup__()
+        self.templates.__setup__()
+        self.advanced.__setup__()
+        self.localization.__setup__()
+        self.temp.__setup__()
+        self.download.__setup__()
+        self.scheduledDownloads.__setup__()
 
 
 DB = Database()

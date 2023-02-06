@@ -74,6 +74,14 @@ class Updaters:
             data["temp"]["_downloadOptionHistory"]["video"].pop("_optimizeFile", None)
         return data
 
+    @staticmethod
+    def Update_2_3_0(data):
+        if "setup" in data:
+            data["setup"]["_termsOfServiceAgreement"] = None
+        if "temp" in data:
+            data["temp"].pop("_downloadOptionHistory", None)
+        return data
+
     @classmethod
     def getUpdaters(cls, versionFrom):
         VERSIONS = {
@@ -91,7 +99,8 @@ class Updaters:
             "2.2.0": cls.Update_2_2_0,
             "2.2.1": None,
             "2.2.2": cls.Update_2_2_2,
-            "2.2.3": cls.Update_2_2_3
+            "2.2.3": cls.Update_2_2_3,
+            "2.3.0": cls.Update_2_3_0
         }
         updaters = []
         versionFound = False

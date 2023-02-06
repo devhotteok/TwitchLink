@@ -52,16 +52,16 @@ class Resolution(TwitchPlaybackObject):
         for parseString in [self.groupId, self.name]:
             try:
                 parsed = parseString.split("p", 1)
-                self.frameRate = int(parsed[0])
+                self.quality = int(parsed[0])
                 try:
-                    self.quality = int(parsed[1])
+                    self.frameRate = int(parsed[1])
                 except:
-                    self.quality = None
+                    self.frameRate = None
                 return
             except:
                 pass
-        self.frameRate = None
         self.quality = None
+        self.frameRate = None
 
     def isSource(self):
         return self.groupId == "chunked"

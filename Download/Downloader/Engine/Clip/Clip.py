@@ -1,7 +1,7 @@
 from .FileDownloader import FileDownloader
 
 from Download.Downloader.Engine.Setup import EngineSetup
-from Download.Downloader.Engine.ThreadPool import ThreadPool
+from Download.Downloader.Engine.ThreadPool import DownloadThreadPool
 
 from Services.Threading.WaitCondition import WaitCondition
 
@@ -21,7 +21,7 @@ class ClipDownloader(EngineSetup):
         self.task.signals.downloadStarted.connect(self.downloadStarted)
         self.task.signals.downloadProgress.connect(self.downloadProgressHandler)
         self.task.signals.finished.connect(self.downloadFinished)
-        ThreadPool.start(self.task, priority=self.task.priority)
+        DownloadThreadPool.start(self.task, priority=self.task.priority)
         self._doneCondition.wait()
         if self.status.terminateState.isProcessing():
             return
@@ -47,7 +47,7 @@ class ClipDownloader(EngineSetup):
                 self.logger.warning("[ACTION] Cancel")
                 self.status.terminateState.setProcessing()
                 self.syncStatus()
-                if ThreadPool.tryTake(self.task):
+                if DownloadThreadPool.tryTake(self.task):
                     self._doneCondition.makeTrue()
                 else:
                     self.task.cancel()

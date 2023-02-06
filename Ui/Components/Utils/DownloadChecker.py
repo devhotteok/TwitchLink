@@ -1,7 +1,6 @@
-from Services.Messages import Messages
 from Services.Utils.Utils import Utils
 from Services.Translator.Translator import T
-from Download.DownloadManager import DownloadManager
+from Download.GlobalDownloadManager import GlobalDownloadManager
 
 
 class DownloadChecker:
@@ -13,7 +12,7 @@ class DownloadChecker:
 
     @staticmethod
     def isFileNameDuplicate(fileName):
-        for downloader in DownloadManager.getRunningDownloaders():
+        for downloader in GlobalDownloadManager.getRunningDownloaders():
             if downloader.setup.downloadInfo.getAbsoluteFileName() == fileName:
                 return True
         return False
@@ -21,10 +20,10 @@ class DownloadChecker:
     @classmethod
     def checkNetworkInstability(cls, downloadInfo, parent=None):
         if downloadInfo.type.isStream():
-            if DownloadManager.isDownloaderRunning():
+            if GlobalDownloadManager.isDownloaderRunning():
                 return cls.warnNetworkInstability("download", "live", parent=parent)
         else:
-            for downloader in DownloadManager.getRunningDownloaders():
+            for downloader in GlobalDownloadManager.getRunningDownloaders():
                 if downloader.setup.downloadInfo.type.isStream():
                     return cls.warnNetworkInstability("live-download", downloadInfo.type.toString(), parent=parent)
         return True

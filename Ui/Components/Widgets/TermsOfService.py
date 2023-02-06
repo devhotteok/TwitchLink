@@ -8,7 +8,7 @@ class TermsOfService(DocumentView):
     appShutdownRequested = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
-        super(TermsOfService, self).__init__(DocumentData(title=T("terms-of-service"), content=Utils.getDoc("TermsOfService.txt", DB.localization.getLanguage(), appName=Config.APP_NAME)), parent=parent)
+        super(TermsOfService, self).__init__(DocumentData(title=T("terms-of-service"), content=Utils.getDoc("TermsOfService.txt", Translator.getLanguage(), appName=Config.APP_NAME)), parent=parent)
         if self.isEssential():
             self.setModal(True)
             okButton = self.addButton(

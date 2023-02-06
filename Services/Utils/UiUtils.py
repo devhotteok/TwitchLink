@@ -47,7 +47,18 @@ class UiUtils:
         return msg.exec() == QtWidgets.QMessageBox.Ok
 
     @staticmethod
-    def askSaveDirectory(directory, filters, initialFilter=None, parent=None):
+    def askDirectory(directory, parent=None):
+        fileDialog = QtWidgets.QFileDialog(parent=parent)
+        fileDialog.setWindowIcon(QtGui.QIcon(Images.APP_LOGO_IMAGE))
+        result = fileDialog.getExistingDirectory(
+            parent=parent,
+            caption=T("select-folder"),
+            directory=directory
+        )
+        return result or None
+
+    @staticmethod
+    def askSaveAs(directory, filters, initialFilter=None, parent=None):
         mappedFilters = dict((T("#{fileFormat} file (*.{fileFormat})", fileFormat=key), key) for key in filters)
         fileDialog = QtWidgets.QFileDialog(parent=parent)
         fileDialog.setWindowIcon(QtGui.QIcon(Images.APP_LOGO_IMAGE))

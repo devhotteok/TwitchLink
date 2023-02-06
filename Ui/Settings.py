@@ -1,7 +1,9 @@
 from Core.Ui import *
 from Services.Image.Loader import ImageLoader
-from Download.Downloader.Engine.Config import Config as EngineConfig
-from Download.DownloadManager import DownloadManager
+from Download.Downloader.Engine.ThreadPool import DownloadThreadPool
+from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
+from Download.GlobalDownloadManager import GlobalDownloadManager
+from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
 
 class Settings(QtWidgets.QWidget, UiFile.settings):
@@ -37,29 +39,29 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.searchExternalContent.setChecked(DB.advanced.isSearchExternalContentEnabled())
         self.searchExternalContent.toggled.connect(DB.advanced.setSearchExternalContentEnabled)
         self.searchExternalContentInfo.clicked.connect(self.showSearchExternalContentInfo)
-        self.useCaching.setChecked(DB.advanced.isCachingEnabled())
-        self.useCaching.toggled.connect(DB.advanced.setCachingEnabled)
+        self.useCaching.setChecked(ImageLoader.isCachingEnabled())
+        self.useCaching.toggled.connect(ImageLoader.setCachingEnabled)
         self.useCachingInfo.clicked.connect(self.showCachingInfo)
         self.language.addItems(Translator.getLanguageList())
-        self.language.setCurrentIndex(Translator.getLanguageKeyList().index(DB.localization.getLanguage()))
+        self.language.setCurrentIndex(Translator.getLanguageKeyList().index(Translator.getLanguage()))
         self.language.currentIndexChanged.connect(self.setLanguage)
         self.timezone.addItems(DB.localization.getTimezoneNameList())
         self.timezone.setCurrentText(DB.localization.getTimezone().name())
         self.timezone.currentTextChanged.connect(self.setTimezone)
-        self.recommendedSpeed.setText(EngineConfig.RECOMMENDED_THREAD_LIMIT)
-        self.downloadSpeed.setRange(1, EngineConfig.MAX_THREAD_LIMIT)
+        self.recommendedSpeed.setText(DownloadEngineConfig.RECOMMENDED_THREAD_LIMIT)
+        self.downloadSpeed.setRange(1, DownloadEngineConfig.MAX_THREAD_LIMIT)
         self.downloadSpeed.valueChanged.connect(self.setDownloadSpeed)
-        self.speedSpinBox.setRange(1, EngineConfig.MAX_THREAD_LIMIT)
+        self.speedSpinBox.setRange(1, DownloadEngineConfig.MAX_THREAD_LIMIT)
         self.speedSpinBox.valueChanged.connect(self.setDownloadSpeed)
-        self.setDownloadSpeed(DB.download.getDownloadSpeed())
+        self.setDownloadSpeed(DownloadThreadPool.maxThreadCount())
         self.downloadSpeedStreamInfoIcon = Utils.setSvgIcon(self.downloadSpeedStreamInfoIcon, Icons.INFO_ICON)
         self.resetButton.clicked.connect(self.resetSettings)
         self.reloadBookmarkArea()
-        DownloadManager.runningCountChangedSignal.connect(self.reload)
+        GlobalDownloadManager.runningCountChangedSignal.connect(self.reload)
         self.reload()
 
     def reload(self):
-        if DownloadManager.isDownloaderRunning():
+        if GlobalDownloadManager.isDownloaderRunning():
             self.languageArea.setEnabled(False)
             self.timezoneArea.setEnabled(False)
             self.resetArea.setEnabled(False)
@@ -81,60 +83,11 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
     def setClipFilename(self):
         DB.templates.setClipFilename(self.clipFilename.text())
 
-    def getFormData(self, *args):
-        formData = {}
-        for data in args:
-            formData.update(data)
-        return formData
-
-    def getInfoTitle(self, dataType):
-        return f"{T(dataType)} {T('#Filename Template Variables')}"
-
-    def getBaseInfo(self, dataType):
-        dataType = T(dataType)
-        return {
-            "{type}": f"{T('file-type')} ({dataType})",
-            "{id}": f"{dataType} {T('id')} (XXXXXXXXXX)",
-            "{title}": "title",
-            "{game}": "category"
-        }
-
-    def getNameInfo(self, nameType):
-        translated = T(nameType)
-        return {
-            f"{{{nameType}}}": f"{translated} {T('username')}",
-            f"{{{nameType}_name}}": f"{translated} {T('displayname')}",
-            f"{{{nameType}_formatted_name}}": T("#'displayname' if {nameType} Displayname is English, otherwise 'displayname(username)'", nameType=translated)
-        }
-
-    def getTimeInfo(self, timeType):
-        return {
-            f"{{{timeType}_at}}": f"{T(f'{timeType}-at')} (XXXX-XX-XX XX:XX:XX)",
-            "{date}": f"{T(f'{timeType}-date')} (XXXX-XX-XX)",
-            "{year}": f"{T(f'{timeType}-date')} - {T('year')}",
-            "{month}": f"{T(f'{timeType}-date')} - {T('month')}",
-            "{day}": f"{T(f'{timeType}-date')} - {T('day')}",
-            "{time}": f"{T(f'{timeType}-time')} (XX:XX:XX)",
-            "{hour}": f"{T(f'{timeType}-time')} - {T('hour')}",
-            "{minute}": f"{T(f'{timeType}-time')} - {T('minute')}",
-            "{second}": f"{T(f'{timeType}-time')} - {T('second')}"
-        }
-
-    def getResolutionInfo(self):
-        return {
-            "{resolution}": "file-resolution"
-        }
-
     def showStreamTemplateInfo(self):
         Ui.PropertyView(
-            self.getInfoTitle("stream"),
+            FileNameGenerator.getInfoTitle("stream"),
             None,
-            self.getFormData(
-                self.getBaseInfo("stream"),
-                self.getNameInfo("channel"),
-                self.getTimeInfo("started"),
-                self.getResolutionInfo()
-            ),
+            FileNameGenerator.getStreamFileNameTemplateFormData(),
             enableLabelSelection=True,
             enableFieldTranslation=True,
             parent=self
@@ -142,20 +95,9 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
 
     def showVideoTemplateInfo(self):
         Ui.PropertyView(
-            self.getInfoTitle("video"),
+            FileNameGenerator.getInfoTitle("video"),
             None,
-            self.getFormData(
-                self.getBaseInfo("video"),
-                self.getNameInfo("channel"),
-                {
-                    "{duration}": "duration"
-                },
-                self.getTimeInfo("published"),
-                {
-                    "{views}": "views"
-                },
-                self.getResolutionInfo()
-            ),
+            FileNameGenerator.getVideoFileNameTemplateFormData(),
             enableLabelSelection=True,
             enableFieldTranslation=True,
             parent=self
@@ -163,24 +105,9 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
 
     def showClipTemplateInfo(self):
         Ui.PropertyView(
-            self.getInfoTitle("clip"),
+            FileNameGenerator.getInfoTitle("clip"),
             None,
-            self.getFormData(
-                self.getBaseInfo("clip"),
-                {
-                    "{slug}": f"{T('slug')} (SlugExampleHelloTwitch)"
-                },
-                self.getNameInfo("channel"),
-                self.getNameInfo("creator"),
-                {
-                    "{duration}": "duration"
-                },
-                self.getTimeInfo("created"),
-                {
-                    "{views}": "views"
-                },
-                self.getResolutionInfo()
-            ),
+            FileNameGenerator.getClipFileNameTemplateFormData(),
             enableLabelSelection=True,
             enableFieldTranslation=True,
             parent=self
@@ -219,7 +146,7 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.info("information", "#Caches images for faster retrieval next time, but consumes a lot of memory(RAM).")
 
     def setLanguage(self, index):
-        DB.localization.setLanguage(Translator.getLanguageCode(index))
+        Translator.setLanguage(Translator.getLanguageCode(index))
         self.requestRestart()
 
     def setTimezone(self, timezone):
@@ -227,7 +154,7 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.requestRestart()
 
     def setDownloadSpeed(self, speed):
-        DB.download.setDownloadSpeed(speed)
+        DownloadThreadPool.setMaxThreadCount(speed)
         self.downloadSpeed.setValueSilent(speed)
         self.speedSpinBox.setValueSilent(speed)
 

@@ -1,4 +1,6 @@
+from .Config import Config
+
 from Services.Threading.ThreadPool import ThreadPool
 
 
-ThreadPool = ThreadPool()
+DownloadThreadPool = ThreadPool(Config.RECOMMENDED_THREAD_LIMIT)

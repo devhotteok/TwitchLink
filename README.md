@@ -56,7 +56,7 @@
 **TwitchLink** is a Free & Open Source Project.
 
 - Email: twitchlinkhelp@gmail.com
-- Discord: [DevHotteok](https://discord.gg/4p8ytb2rkt)
+- Discord: DevHotteok#6437
 - Donate: [Become a Sponsor][Donate]
 
 ***

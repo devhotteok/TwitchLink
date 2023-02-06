@@ -43,6 +43,9 @@ class Config:
         "downloads",
         "downloadPreview",
         "download",
+        "scheduledDownloads",
+        "scheduledDownloadPreview",
+        "scheduledDownloadSettings",
         "downloadHistory",
         "downloadHistoryView",
         "webViewWidget"

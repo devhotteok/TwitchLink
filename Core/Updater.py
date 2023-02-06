@@ -148,7 +148,7 @@ class _Updater(QtCore.QObject):
             self.statusUpdated.emit()
 
     def getData(self, url):
-        for requestCount in range(self.MAX_REDIRECT_COUNT + 1):
+        for _ in range(self.MAX_REDIRECT_COUNT + 1):
             try:
                 response = Network.session.get(Utils.joinUrl(url, params={"version": Config.APP_VERSION}))
                 if response.status_code == 200:
@@ -201,6 +201,7 @@ class _Updater(QtCore.QObject):
             from Services.Logging.Config import Config as LogConfig
             from Services.Twitch.Gql.TwitchGqlConfig import Config as GqlConfig
             from Services.Twitch.Playback.TwitchPlaybackConfig import Config as PlaybackConfig
+            from Services.Twitch.PubSub.TwitchPubSubConfig import Config as PubSubConfig
             from Search.Config import Config as SearchConfig
             from Search.Helper.Config import Config as SearchHelperConfig
             from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
@@ -215,6 +216,7 @@ class _Updater(QtCore.QObject):
                 "LOG": LogConfig,
                 "API": GqlConfig,
                 "PLAYBACK": PlaybackConfig,
+                "PUBSUB": PubSubConfig,
                 "SEARCH": SearchConfig,
                 "SEARCH_HELPER": SearchHelperConfig,
                 "DOWNLOAD_ENGINE": DownloadEngineConfig,

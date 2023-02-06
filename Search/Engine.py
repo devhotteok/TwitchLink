@@ -73,9 +73,9 @@ class Search:
             raise Exceptions.InvalidURL
 
     @classmethod
-    def Channel(cls, username):
+    def Channel(cls, id="", login=""):
         try:
-            return cls.API.getChannel(login=username)
+            return cls.API.getChannel(id, login)
         except TwitchGqlAPI.Exceptions.DataNotFound:
             raise Exceptions.ChannelNotFound
 

@@ -29,6 +29,7 @@ class Icons:
 
     SEARCH_ICON = _P(ICON_ROOT, "search.svg")
     DOWNLOAD_ICON = _P(ICON_ROOT, "download.svg")
+    SCHEDULED_ICON = _P(ICON_ROOT, "scheduled.svg")
     ACCOUNT_ICON = _P(ICON_ROOT, "account.svg")
     SETTINGS_ICON = _P(ICON_ROOT, "settings.svg")
     INFO_ICON = _P(ICON_ROOT, "info.svg")
@@ -49,6 +50,8 @@ class Icons:
     TEXT_FILE_ICON = _P(ICON_ROOT, "text_file.svg")
     IMAGE_ICON = _P(ICON_ROOT, "image.svg")
     ALERT_RED_ICON = _P(ICON_ROOT, "alert_red.svg")
+    TOGGLE_OFF_ICON = _P(ICON_ROOT, "toggle_off.svg")
+    TOGGLE_ON_ICON = _P(ICON_ROOT, "toggle_on.svg")
     WEB_ICON = _P(ICON_ROOT, "web.svg")
     VIEWER_ICON = _P(ICON_ROOT, "viewer.svg")
     VERIFIED_ICON = _P(ICON_ROOT, "verified.svg")

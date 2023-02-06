@@ -4,18 +4,19 @@ from Services import ContentManager
 from Services.Account import TwitchAccount
 from Services.Twitch.Gql import TwitchGqlModels
 from Services.Twitch.Playback import TwitchPlaybackAccessTokens
+from Services.AccessTokenGenerator import AccessTokenGenerator
 from Download.DownloadInfo import DownloadInfo
 from Download.DownloadManager import DownloadManager
-from Ui.Components.Utils.AccessTokenGenerator import AccessTokenGenerator
 
 
-class DownloadButton(AccessTokenGenerator):
+class DownloadButton(QtCore.QObject):
     accountPageShowRequested = QtCore.pyqtSignal()
 
     def __init__(self, videoData, button, buttonText=None, parent=None):
-        super(DownloadButton, self).__init__(videoData, parent=parent)
+        super(DownloadButton, self).__init__(parent=parent)
         self.button = button
         self.buttonText = buttonText
+        self.videoData = videoData
         self.videoType = type(self.videoData)
         self.showLoading(False)
         if self.videoType == TwitchGqlModels.Channel:
@@ -26,6 +27,22 @@ class DownloadButton(AccessTokenGenerator):
             self.button.clicked.connect(self.downloadVideo)
         elif self.videoType == TwitchGqlModels.Clip:
             self.button.clicked.connect(self.downloadClip)
+        self.accessTokenThread = None
+
+    def getAccessTokenThread(self):
+        if self.accessTokenThread == None:
+            self.accessTokenThread = Utils.WorkerThread(parent=self)
+        return self.accessTokenThread
+
+    def generateAccessToken(self, process, resultHandler):
+        thread = self.getAccessTokenThread()
+        thread.setup(
+            target=process,
+            args=(self.videoData,),
+            disconnect=True
+        )
+        thread.resultSignal.connect(resultHandler)
+        thread.start()
 
     def info(self, title, content, titleTranslate=True, contentTranslate=True, buttonText=None):
         Utils.info(title, content, titleTranslate, contentTranslate, buttonText, parent=self.button)
@@ -40,7 +57,10 @@ class DownloadButton(AccessTokenGenerator):
 
     def downloadStream(self):
         self.showLoading(True)
-        super().generateStreamAccessToken()
+        self.generateAccessToken(
+            AccessTokenGenerator.generateStreamAccessToken,
+            self.processStreamAccessTokenResult
+        )
 
     def processStreamAccessTokenResult(self, result):
         self.showLoading(False)
@@ -70,7 +90,10 @@ class DownloadButton(AccessTokenGenerator):
 
     def downloadVideo(self):
         self.showLoading(True)
-        super().generateVideoAccessToken()
+        self.generateAccessToken(
+            AccessTokenGenerator.generateVideoAccessToken,
+            self.processVideoAccessTokenResult
+        )
 
     def processVideoAccessTokenResult(self, result):
         self.showLoading(False)
@@ -93,7 +116,10 @@ class DownloadButton(AccessTokenGenerator):
 
     def downloadClip(self):
         self.showLoading(True)
-        super().generateClipAccessToken()
+        self.generateAccessToken(
+            AccessTokenGenerator.generateClipAccessToken,
+            self.processClipAccessTokenResult
+        )
 
     def processClipAccessTokenResult(self, result):
         self.showLoading(False)

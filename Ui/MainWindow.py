@@ -6,10 +6,14 @@ from Services.Image.Loader import ImageLoader
 from Services.Document import DocumentData, DocumentButtonData
 from Services.Logging.ErrorDetector import ErrorDetector, ErrorHandlers
 from Services.NotificationManager import NotificationManager
-from Download.DownloadManager import DownloadManager
+from Services import ContentManager
+from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
+from Download.GlobalDownloadManager import GlobalDownloadManager
+from Download.ScheduledDownloadManager import ScheduledDownloadManager
 from Ui.Components.Operators.NavigationBar import NavigationBar
 from Ui.Components.Pages.SearchPage import SearchPage
 from Ui.Components.Pages.DownloadsPage import DownloadsPage
+from Ui.Components.Pages.ScheduledDownloadsPage import ScheduledDownloadsPage
 from Ui.Components.Pages.AccountPage import AccountPage
 from Ui.Components.Pages.InformationPage import InformationPage
 from Ui.Components.Widgets.ProgressDialog import ProgressDialog
@@ -42,6 +46,7 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.navigationBar.focusChanged.connect(self.onFocusChange)
         self.searchPageObject = self.navigationBar.addPage(self.searchPageButton, self.searchPage, icon=Icons.SEARCH_ICON)
         self.downloadsPageObject = self.navigationBar.addPage(self.downloadsPageButton, self.downloadsPage, icon=Icons.DOWNLOAD_ICON)
+        self.scheduledDownloadsPageObject = self.navigationBar.addPage(self.scheduledDownloadsPageButton, self.scheduledDownloadsPage, icon=Icons.SCHEDULED_ICON)
         self.accountPageObject = self.navigationBar.addPage(self.accountPageButton, self.accountPage, icon=Icons.ACCOUNT_ICON)
         self.settingsPageObject = self.navigationBar.addPage(self.settingsPageButton, self.settingsPage, icon=Icons.SETTINGS_ICON)
         self.informationPageObject = self.navigationBar.addPage(self.informationPageButton, self.informationPage, icon=Icons.INFO_ICON)
@@ -53,6 +58,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.downloads.appShutdownRequested.connect(self.shutdown)
         self.downloads.systemShutdownRequested.connect(self.shutdownSystem)
         self.downloadsPage.layout().addWidget(self.downloads)
+        self.scheduledDownloads = ScheduledDownloadsPage(self.scheduledDownloadsPageObject, parent=self)
+        self.scheduledDownloadsPage.layout().addWidget(self.scheduledDownloads)
         self.account = AccountPage(self.accountPageObject, parent=self)
         self.accountPage.layout().addWidget(self.account)
         self.settings = Ui.Settings(parent=self)
@@ -72,6 +79,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
                 self.account.refreshAccount()
             Updater.statusUpdated.connect(self.statusUpdated)
             Updater.startAutoUpdate()
+            ContentManager.ContentManager.restrictionsUpdated.connect(self.restrictionsUpdated)
+            GlobalDownloadManager.statsUpdated.connect(self.showContributeInfo, QtCore.Qt.QueuedConnection)
         self.show()
         self.showErrorHistory()
 
@@ -81,11 +90,13 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.menuBar().setEnabled(isOperational or hasDownloaders)
         if not isOperational and hasDownloaders:
             self.downloadsPageObject.focus()
+            self.scheduledDownloadsPageObject.focus()
             self.settingsPageObject.focus()
         else:
             self.downloadsPageObject.unfocus()
+            self.scheduledDownloadsPageObject.unfocus()
             self.settingsPageObject.unfocus()
-        DownloadManager.setDownloaderCreationEnabled(isOperational)
+        GlobalDownloadManager.setDownloaderCreationEnabled(isOperational)
         contentId = f"APP_STATUS"
         self.information.removeAppInfo(contentId)
         status = Updater.status.getStatus()
@@ -93,7 +104,7 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             if isInSetup:
                 content = T("#Please try again later.")
                 buttons = [
-                    DocumentButtonData(text="ok", action=self.shutdown, role="action", default=True)
+                    DocumentButtonData(text=T("ok"), action=self.shutdown, role="action", default=True)
                 ]
             else:
                 content = T("#Some features will be temporarily disabled.\nPlease wait.\nWhen the connection is restored, those features will be activated.")
@@ -113,7 +124,7 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             if isInSetup:
                 content = T("#Please try again later.")
                 buttons = [
-                    DocumentButtonData(text="ok", action=self.shutdown, role="action", default=True)
+                    DocumentButtonData(text=T("ok"), action=self.shutdown, role="action", default=True)
                 ]
             else:
                 content = f"{T('#Some features will be disabled.')}\n{T('#Please restart the app.')}"
@@ -148,7 +159,7 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
                     content=Updater.status.operationalInfo or T("#{appName} is currently unavailable.", appName=Config.APP_NAME),
                     contentType=Updater.status.operationalInfoType or "text",
                     modal=True,
-                    buttons=[DocumentButtonData(text="ok", action=self.shutdown, role="action", default=True)] if isInSetup else []
+                    buttons=[DocumentButtonData(text=T("ok"), action=self.shutdown, role="action", default=True)] if isInSetup else []
                 )
             )
             if not isInSetup:
@@ -187,8 +198,41 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.actionAbout.setEnabled(enabled)
         self.actionTermsOfService.setEnabled(enabled)
 
+    def restrictionsUpdated(self):
+        restrictionsFound = []
+        for downloader in GlobalDownloadManager.getRunningDownloaders():
+            if downloader.status.terminateState.isFalse():
+                downloadInfo = downloader.setup.downloadInfo
+                try:
+                    ContentManager.ContentManager.checkRestrictions(downloadInfo.videoData, user=DB.account.user)
+                except ContentManager.Exceptions.RestrictedContent as e:
+                    downloader.abort(e)
+                    restrictionsFound.append(downloadInfo)
+        if len(restrictionsFound) != 0:
+            infoText = T("#Some content has been restricted.\nTerminating restricted downloads.")
+            contentInfo = "\n".join(self.getContentInfoString(string) for string in restrictionsFound)
+            self.info("warning", f"{infoText}\n\n{contentInfo}")
+
+    def getContentInfoString(self, downloadInfo):
+        if downloadInfo.type.isStream():
+            channel = downloadInfo.videoData.broadcaster
+        elif downloadInfo.type.isVideo():
+            channel = downloadInfo.videoData.owner
+        else:
+            channel = downloadInfo.videoData.broadcaster
+        return f"[{channel.displayName}] [{T(downloadInfo.type.toString())}] {downloadInfo.videoData.title}"
+
+    def showContributeInfo(self, downloadStats):
+        if downloadStats["totalFiles"] < DownloadEngineConfig.SHOW_STATS[0]:
+            showContributeInfo = downloadStats["totalFiles"] in DownloadEngineConfig.SHOW_STATS[1]
+        else:
+            showContributeInfo = downloadStats["totalFiles"] % DownloadEngineConfig.SHOW_STATS[0] == 0
+        if showContributeInfo:
+            if self.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=downloadStats["totalFiles"], totalSize=Utils.formatByteSize(downloadStats["totalByteSize"]), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True):
+                Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": Translator.getLanguage()}))
+
     def confirmShutdown(self):
-        if DownloadManager.isDownloaderRunning() and not DownloadManager.isShuttingDown():
+        if GlobalDownloadManager.isDownloaderRunning() and not GlobalDownloadManager.isShuttingDown():
             if self.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS):
                 self.shutdown()
         elif DB.general.isConfirmExitEnabled():
@@ -198,10 +242,10 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             self.shutdown()
 
     def confirmUpdateShutdown(self):
-        if DownloadManager.isDownloaderRunning() and not DownloadManager.isShuttingDown():
+        if GlobalDownloadManager.isDownloaderRunning() and not GlobalDownloadManager.isShuttingDown():
             if not Utils.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS):
                 return
-        Utils.openUrl(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": DB.localization.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": Translator.getLanguage()}))
         self.shutdown()
 
     def closeEvent(self, event):
@@ -210,7 +254,7 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.confirmShutdown()
 
     def gettingStarted(self):
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": DB.localization.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": Translator.getLanguage()}))
 
     def openAbout(self):
         self.information.openAbout()
@@ -219,19 +263,19 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.information.openTermsOfService()
 
     def sponsor(self):
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": DB.localization.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": Translator.getLanguage()}))
 
     def cleanup(self):
-        DownloadManager.cancelAll()
+        GlobalDownloadManager.cancelAll()
         ImageLoader.threadPool.clear()
-        DownloadManager.waitAll()
+        GlobalDownloadManager.waitAll()
         ImageLoader.threadPool.waitForDone()
 
     def waitForCleanup(self):
-        if DownloadManager.isDownloaderRunning() or ImageLoader.threadPool.activeThreadCount() != 0:
+        if GlobalDownloadManager.isDownloaderRunning() or ImageLoader.threadPool.activeThreadCount() != 0:
             msg = ProgressDialog(cancelAllowed=False, parent=self)
             msg.setWindowTitle(T("shutting-down"))
-            msg.setLabelText(T("#Shutting down all downloads" if DownloadManager.isDownloaderRunning() else "shutting-down", ellipsis=True))
+            msg.setLabelText(T("#Shutting down all downloads" if GlobalDownloadManager.isDownloaderRunning() else "shutting-down", ellipsis=True))
             msg.setRange(0, 0)
             msg.exec(target=self.cleanup)
 
@@ -241,6 +285,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
     def shutdown(self, restart=False):
         Updater.stopAutoUpdate()
         NotificationManager.clearAll()
+        GlobalDownloadManager.setDownloaderCreationEnabled(False)
+        ScheduledDownloadManager.cleanup()
         self.downloads.setDownloadCompleteAction(None)
         self.waitForCleanup()
         self.saveWindowGeometry()

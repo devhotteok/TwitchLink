@@ -90,6 +90,9 @@ class UiFile:
     downloads = loadUi("downloads")
     downloadPreview = loadUi("downloadPreview")
     download = loadUi("download")
+    scheduledDownloads = loadUi("scheduledDownloads")
+    scheduledDownloadPreview = loadUi("scheduledDownloadPreview")
+    scheduledDownloadSettings = loadUi("scheduledDownloadSettings")
     downloadHistory = loadUi("downloadHistory")
     downloadHistoryView = loadUi("downloadHistoryView")
     webViewWidget = loadUi("webViewWidget")
@@ -113,12 +116,15 @@ class Ui:
     Downloads = None
     DownloadPreview = None
     Download = None
+    ScheduledDownloads = None
+    ScheduledDownloadPreview = None
+    ScheduledDownloadSettings = None
     DownloadHistory = None
     DownloadHistoryView = None
     WebViewWidget = None
 
 
-from Ui import MainWindow, Loading, Setup, Settings, PropertyView, Account, About, DocumentView, Home, Search, VideoWidget, VideoDownloadWidget, SearchResult, DownloadMenu, Downloads, DownloadPreview, Download, DownloadHistory, DownloadHistoryView, WebViewWidget
+from Ui import MainWindow, Loading, Setup, Settings, PropertyView, Account, About, DocumentView, Home, Search, VideoWidget, VideoDownloadWidget, SearchResult, DownloadMenu, Downloads, DownloadPreview, Download, ScheduledDownloads, ScheduledDownloadPreview, ScheduledDownloadSettings, DownloadHistory, DownloadHistoryView, WebViewWidget
 
 
 Ui.MainWindow = MainWindow.MainWindow
@@ -138,6 +144,9 @@ Ui.DownloadMenu = DownloadMenu.DownloadMenu
 Ui.Downloads = Downloads.Downloads
 Ui.DownloadPreview = DownloadPreview.DownloadPreview
 Ui.Download = Download.Download
+Ui.ScheduledDownloads = ScheduledDownloads.ScheduledDownloads
+Ui.ScheduledDownloadPreview = ScheduledDownloadPreview.ScheduledDownloadPreview
+Ui.ScheduledDownloadSettings = ScheduledDownloadSettings.ScheduledDownloadSettings
 Ui.DownloadHistory = DownloadHistory.DownloadHistory
 Ui.DownloadHistoryView = DownloadHistoryView.DownloadHistoryView
 Ui.WebViewWidget = WebViewWidget.WebViewWidget

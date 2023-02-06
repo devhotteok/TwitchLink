@@ -1,8 +1,6 @@
 from Core.GlobalExceptions import Exceptions
 from Services import ContentManager
-from Database.Database import DB
 from Database.EncoderDecoder import Codable
-from Download.DownloadManager import DownloadManager
 
 from PyQt5 import QtCore
 
@@ -22,9 +20,8 @@ class DownloadHistory(QtCore.QObject, Codable):
         canceled = "download-canceled"
         aborted = "download-aborted"
 
-    def __init__(self, downloaderId, parent=None):
+    def __init__(self, downloader, parent=None):
         super(DownloadHistory, self).__init__(parent=parent)
-        downloader = DownloadManager.get(downloaderId)
         self.downloadInfo = downloader.setup.downloadInfo
         self.startedAt = QtCore.QDateTime.currentDateTimeUtc()
         self.completedAt = None
@@ -69,18 +66,21 @@ class _DownloadHistoryManager(QtCore.QObject):
 
     def __init__(self, parent=None):
         super(_DownloadHistoryManager, self).__init__(parent=parent)
-        DownloadManager.createdSignal.connect(self.downloaderCreated)
+        self.downloadHistory = []
+
+    def setHistoryList(self, historyList):
+        self.downloadHistory = historyList
 
     def getHistoryList(self):
-        return DB.temp.getDownloadHistory()
+        return self.downloadHistory
 
-    def downloaderCreated(self, downloaderId):
-        downloadHistory = DownloadHistory(downloaderId)
-        DB.temp.addDownloadHistory(downloadHistory)
+    def createHistory(self, downloader):
+        downloadHistory = DownloadHistory(downloader)
+        self.downloadHistory.append(downloadHistory)
         self.historyCreated.emit(downloadHistory)
 
     def removeHistory(self, downloadHistory):
-        DB.temp.removeDownloadHistory(downloadHistory)
+        self.downloadHistory.remove(downloadHistory)
         self.historyRemoved.emit(downloadHistory)
 
 DownloadHistoryManager = _DownloadHistoryManager()

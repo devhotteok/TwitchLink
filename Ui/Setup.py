@@ -10,7 +10,7 @@ class Setup(QtWidgets.QDialog, UiFile.setup):
         self.continueButton.clicked.connect(self.proceed)
         self.launchButton.clicked.connect(self.launch)
         self.language.addItems(Translator.getLanguageList())
-        self.language.setCurrentIndex(Translator.getLanguageKeyList().index(DB.localization.getLanguage()))
+        self.language.setCurrentIndex(Translator.getLanguageKeyList().index(Translator.getLanguage()))
         self.language.currentIndexChanged.connect(self.setLanguage)
         self.timezone.addItems(DB.localization.getTimezoneNameList())
         self.timezone.setCurrentText(DB.localization.getTimezone().name())
@@ -22,7 +22,7 @@ class Setup(QtWidgets.QDialog, UiFile.setup):
         self.timer.start()
 
     def setLanguage(self, index):
-        DB.localization.setLanguage(Translator.getLanguageCode(index))
+        Translator.setLanguage(Translator.getLanguageCode(index))
 
     def setTimezone(self, timezone):
         DB.localization.setTimezone(bytes(timezone, encoding="utf-8"))

@@ -96,7 +96,7 @@ class PlaylistReader(PlaylistTagReader):
                 resolutions[resolution.groupId] = resolution
                 expect = False
                 continue
-        return dict(sorted(resolutions.items(), key=lambda item: (item[1].isSource(), item[1].frameRate or 0, item[1].quality or 0), reverse=True))
+        return dict(sorted(resolutions.items(), key=lambda item: (item[1].isSource(), item[1].quality or 0, item[1].frameRate or 0), reverse=True))
 
     def generateResolution(self, data, url):
         return TwitchPlaybackModels.Resolution(

@@ -15,10 +15,11 @@ class _QLabel(QtWidgets.QLabel):
         self._keepImageRatio = False
         self._imageSynced = False
 
-    def loadImage(self, filePath, url="", urlFormatSize=None, refresh=False):
+    def loadImage(self, filePath, url="", urlFormatSize=None, refresh=False, clearImage=True):
         self.cancelImageRequest()
-        pixmap = QtGui.QPixmap(filePath)
-        self.setPixmap(pixmap)
+        if url == "" or self._imageUrl == "" or clearImage:
+            pixmap = QtGui.QPixmap(filePath)
+            self.setPixmap(pixmap)
         self._imageUrl = ImageUrlFormatter.formatUrl(url) if urlFormatSize == None else ImageUrlFormatter.formatUrl(url, *urlFormatSize)
         if self._imageUrl != "":
             self._imageLoading = True

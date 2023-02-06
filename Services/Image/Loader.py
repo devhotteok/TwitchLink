@@ -12,7 +12,7 @@ class _ImageLoader(QtCore.QObject):
         super(_ImageLoader, self).__init__(parent=parent)
         self.cache = {}
         self.cachingEnabled = False
-        self.threadPool = ThreadPool(parent=self)
+        self.threadPool = ThreadPool(Config.MAX_THREAD_COUNT, parent=self)
         self._actionLock = MutexLocker()
         self.throttle(False)
 

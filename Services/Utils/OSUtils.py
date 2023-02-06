@@ -1,3 +1,5 @@
+from Core.GlobalExceptions import Exceptions
+
 import os
 import platform
 import shutil
@@ -37,8 +39,11 @@ class OSUtils:
 
     @staticmethod
     def createDirectory(directory):
-        if not OSUtils.isDirectory(directory):
-            os.makedirs(directory)
+        try:
+            if not OSUtils.isDirectory(directory):
+                os.makedirs(directory)
+        except:
+            raise Exceptions.FileSystemError
 
     @staticmethod
     def getValidFileName(name):
@@ -58,6 +63,23 @@ class OSUtils:
         for key, value in characters.items():
             name = name.replace(key, value)
         return name.strip()
+
+    @staticmethod
+    def createUniqueFile(path, preferredFileName, fileFormat, maxScan=1000):
+        absoluteFileName = OSUtils.joinPath(path, f"{preferredFileName}.{fileFormat}")
+        try:
+            with open(absoluteFileName, "x"):
+                return absoluteFileName
+        except:
+            pass
+        for i in range(maxScan):
+            absoluteFileName = OSUtils.joinPath(path, f"{preferredFileName} ({i}).{fileFormat}")
+            try:
+                with open(absoluteFileName, "x"):
+                    return absoluteFileName
+            except:
+                pass
+        raise Exceptions.FileSystemError
 
     @staticmethod
     def getOSInfo():

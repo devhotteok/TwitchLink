@@ -22,7 +22,7 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.windowTitleLabel.setText(T("#Download {type}", type=T(self.downloadInfo.type.toString())))
         self.reloadFileDirectory()
         self.fileFormat.currentTextChanged.connect(self.setFormat)
-        self.searchDirectory.clicked.connect(self.askSaveDirectory)
+        self.searchDirectory.clicked.connect(self.askSaveAs)
         for resolution in self.downloadInfo.accessToken.getResolutions():
             self.resolution.addItem(ResolutionNameGenerator.generateResolutionName(resolution))
         self.resolution.setCurrentIndex(self.downloadInfo.selectedResolutionIndex)
@@ -173,7 +173,7 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.cropInfoArea.setVisible(showRangeInfo or showSettingsInfo)
         if not hasCropRange:
             self.clippingModeCheckBox.setChecked(False)
-        self.clippingModeArea.setVisible(hasCropRange)
+        self.clippingModeArea.setEnabled(hasCropRange)
 
     def checkUpdateTrack(self):
         self.reloadCropArea()
@@ -197,11 +197,11 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         if clippingMode:
             self.info("warning", "#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the video has corrupted parts, this may cause errors.")
 
-    def askSaveDirectory(self):
+    def askSaveAs(self):
         directory = self.downloadInfo.getAbsoluteFileName()
         filters = self.downloadInfo.getAvailableFormats()
         initialFilter = self.downloadInfo.fileFormat
-        newDirectory = Utils.askSaveDirectory(directory, filters, initialFilter, parent=self)
+        newDirectory = Utils.askSaveAs(directory, filters, initialFilter, parent=self)
         if newDirectory != None:
             self.downloadInfo.setAbsoluteFileName(newDirectory)
             self.reloadFileDirectory()
@@ -223,6 +223,12 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
             else:
                 self.updateTrackCheckBox.setCheckState(QtCore.Qt.Unchecked)
 
+    def saveCropRange(self):
+        self.downloadInfo.setCropRange(
+            None if self.cropFromStartRadioButton.isChecked() else Utils.toSeconds(*self.getFromSpin()) * 1000,
+            None if self.cropToEndRadioButton.isChecked() else Utils.toSeconds(*self.getToSpin()) * 1000
+        )
+
     def accept(self):
         downloadAvailableState = DownloadChecker.isDownloadAvailable(self.downloadInfo, parent=self)
         if downloadAvailableState == DownloadChecker.State.AVAILABLE:
@@ -231,15 +237,4 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
             self.downloadInfo.saveOptionHistory()
             super().accept(self.downloadInfo)
         elif downloadAvailableState == DownloadChecker.State.NEED_NEW_FILE_NAME:
-            self.askSaveDirectory()
-
-    def saveCropRange(self):
-        if self.cropFromStartRadioButton.isChecked():
-            start = None
-        else:
-            start = Utils.toSeconds(*self.getFromSpin()) * 1000
-        if self.cropToEndRadioButton.isChecked():
-            end = None
-        else:
-            end = Utils.toSeconds(*self.getToSpin()) * 1000
-        self.downloadInfo.setCropRange(start, end)
+            self.askSaveAs()

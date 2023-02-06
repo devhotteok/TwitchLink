@@ -15,6 +15,10 @@ class FileHistory:
         self.setDirectory(Config.DEFAULT_DIRECTORY)
         self.setFormat(self.getAvailableFormats()[0])
 
+    @classmethod
+    def getId(cls):
+        return cls.__name__
+
     def setAbsoluteFileName(self, absoluteFileName):
         self.setDirectory(os.path.dirname(absoluteFileName))
         self.setFormat(os.path.basename(absoluteFileName).rsplit(".", 1)[1])
@@ -106,3 +110,20 @@ class ThumbnailHistory(FileHistory, Codable):
         "jpg",
         "png"
     ]
+
+
+class ScheduledDownloadHistory(FileHistory, AudioFormatHistory, Codable):
+    SUPPORTED_FORMATS = [
+        "ts",
+        "mp4"
+    ]
+
+    def __init__(self):
+        super(ScheduledDownloadHistory, self).__init__()
+        self.setFilenameTemplate("[{type}] [{channel_name}] [{date}] {title} {resolution}")
+
+    def setFilenameTemplate(self, filenameTemplate):
+        self._filenameTemplate = filenameTemplate
+
+    def getFilenameTemplate(self):
+        return self._filenameTemplate

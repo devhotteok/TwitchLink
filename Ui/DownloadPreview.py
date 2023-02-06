@@ -2,28 +2,10 @@ from Core.Ui import *
 from Services.Messages import Messages
 from Services import ContentManager
 from Search import ExternalPlaylist
-from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
 from Download.DownloadManager import DownloadManager
 from Ui.Components.Widgets.RetryDownloadButton import RetryDownloadButton
+from Ui.Components.Widgets.WidgetRemoveController import WidgetRemoveController
 from Ui.Components.Utils.ResolutionNameGenerator import ResolutionNameGenerator
-
-
-class DownloaderControl:
-    def __init__(self):
-        self._removeEnabled = False
-        self._removeRegistered = False
-
-    def enableRemove(self):
-        self._removeEnabled = True
-
-    def isRemoveEnabled(self):
-        return self._removeEnabled
-
-    def registerRemove(self):
-        self._removeRegistered = True
-
-    def isRemoveRegistered(self):
-        return self._removeRegistered
 
 
 class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
@@ -33,7 +15,8 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         super(DownloadPreview, self).__init__(parent=parent)
         self.downloaderId = downloaderId
         self.downloader = DownloadManager.get(self.downloaderId)
-        self.control = DownloaderControl()
+        self.widgetRemoveController = WidgetRemoveController(parent=self)
+        self.widgetRemoveController.performRemove.connect(self.removeDownloader)
         self.downloadInfo = self.downloader.setup.downloadInfo
         self.videoData = self.downloadInfo.videoData
         self.categoryImage.loadImage(filePath=Images.CATEGORY_IMAGE, url=self.videoData.game.boxArtURL, urlFormatSize=ImageSize.CATEGORY)
@@ -92,6 +75,10 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         self.cancelButton.clicked.connect(self.cancel)
         self.connectDownloader()
 
+    def showEvent(self, event):
+        self.resizedSignal.emit()
+        super().showEvent(event)
+
     def connectDownloader(self):
         self.downloader.finished.connect(self.handleDownloadResult)
         if self.downloadInfo.type.isStream():
@@ -112,6 +99,7 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.downloader.progressUpdate.connect(self.handleClipProgress)
             self.handleClipStatus(self.downloader.status)
             self.handleClipProgress(self.downloader.progress)
+        self.widgetRemoveController.setRemoveEnabled(False)
 
     def openFolder(self):
         try:
@@ -126,19 +114,13 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
             self.info(*Messages.INFO.FILE_NOT_FOUND)
 
     def tryRemoveDownloader(self):
-        if self.control.isRemoveEnabled():
-            self.removeDownloader()
-        else:
-            if self.downloader.status.terminateState.isFalse():
-                if self.ask(*(Messages.ASK.STOP_DOWNLOAD if self.downloadInfo.type.isStream() else Messages.ASK.CANCEL_DOWNLOAD)):
-                    self.downloader.cancel()
-                else:
-                    return
-            if self.control.isRemoveEnabled():
-                self.removeDownloader()
+        if self.downloader.status.terminateState.isFalse():
+            if self.ask(*(
+            Messages.ASK.STOP_DOWNLOAD if self.downloadInfo.type.isStream() else Messages.ASK.CANCEL_DOWNLOAD)):
+                self.downloader.cancel()
             else:
-                self.setEnabled(False)
-                self.control.registerRemove()
+                return
+        self.widgetRemoveController.registerRemove()
 
     def removeDownloader(self):
         DownloadManager.remove(self.downloaderId)
@@ -279,31 +261,10 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
         self.buttonArea.hide()
-        self.updateGeometry()
         self.resizedSignal.emit()
 
-    def needStatsUpdate(self):
-        if self.downloader.status.terminateState.isTrue():
-            if self.downloader.status.getError() == None:
-                if self.downloadInfo.type.isStream():
-                    return True
-            return False
-        else:
-            return True
-
     def processCompleteEvent(self):
-        if self.needStatsUpdate():
-            DB.temp.updateDownloadStats(self.downloader.progress.totalByteSize)
-            downloadStats = DB.temp.getDownloadStats()
-            if downloadStats["totalFiles"] < DownloadEngineConfig.SHOW_STATS[0]:
-                showContributeInfo = downloadStats["totalFiles"] in DownloadEngineConfig.SHOW_STATS[1]
-            else:
-                showContributeInfo = downloadStats["totalFiles"] % DownloadEngineConfig.SHOW_STATS[0] == 0
-        else:
-            showContributeInfo = False
-        self.control.enableRemove()
-        if self.control.isRemoveRegistered():
-            self.removeDownloader()
+        self.widgetRemoveController.setRemoveEnabled(True)
         if self.downloader.status.terminateState.isTrue():
             exception = self.downloader.status.getError()
             if exception != None:
@@ -328,9 +289,6 @@ class DownloadPreview(QtWidgets.QWidget, UiFile.downloadPreview):
                     Utils.openFile(fileName)
                 except:
                     self.info(*Messages.INFO.FILE_NOT_FOUND)
-        if showContributeInfo:
-            if self.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=downloadStats["totalFiles"], totalSize=Utils.formatByteSize(downloadStats["totalByteSize"]), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True):
-                Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": DB.localization.getLanguage()}))
 
     def handleRestrictedContent(self, restriction):
         if restriction.restrictionType == ContentManager.RestrictionType.CONTENT_TYPE:

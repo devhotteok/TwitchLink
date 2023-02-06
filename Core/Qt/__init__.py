@@ -1,1 +1,1 @@
-from . import QtCore, QtWidgets, QtWebEngineWidgets
+from . import QtCore, QtNetwork, QtWebEngineWidgets, QtWidgets

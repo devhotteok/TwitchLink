@@ -1,5 +1,6 @@
 from Core.Ui import *
 from Download.DownloadManager import DownloadManager
+from Download.ScheduledDownloadManager import ScheduledDownloadManager
 from Ui.Components.Operators.TabManager import TabManager
 from Ui.Components.Widgets.TimedMessageBox import TimedMessageBox
 from Ui.Components.Widgets.TimedCancelDialog import TimedCancelDialog
@@ -30,6 +31,8 @@ class DownloadsPage(TabManager):
         DownloadManager.completedSignal.connect(self.processCompleteEvent, QtCore.Qt.QueuedConnection)
         DownloadManager.completedSignal.connect(self.performDownloadCompleteAction, QtCore.Qt.QueuedConnection)
         DownloadManager.runningCountChangedSignal.connect(self.changePageText)
+        ScheduledDownloadManager.enabledChangedSignal.connect(self.scheduledDownloadEnabledChanged)
+        self.scheduledDownloadEnabledChanged(ScheduledDownloadManager.isEnabled())
 
     def openDownloadTab(self, downloaderId):
         tabIndex = self.getUniqueTabIndex(downloaderId)
@@ -101,3 +104,9 @@ class DownloadsPage(TabManager):
             dialog.exec()
             if not dialog.wasCanceled():
                 self.systemShutdownRequested.emit()
+
+    def scheduledDownloadEnabledChanged(self, enabled):
+        if enabled:
+            self.setDownloadCompleteAction(None)
+        self.downloads.restrictedLabel.setVisible(enabled)
+        self.downloads.downloadCompleteActionArea.setEnabled(not enabled)

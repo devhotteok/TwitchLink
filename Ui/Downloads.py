@@ -1,5 +1,4 @@
 from Core.Ui import *
-from Services import ContentManager
 from Download.DownloadManager import DownloadManager
 
 
@@ -8,7 +7,7 @@ class PreviewWidgetItem(QtWidgets.QListWidgetItem):
         super(PreviewWidgetItem, self).__init__(parent=parent)
         self.widget = Ui.DownloadPreview(downloaderId, parent=parent)
         self.widget.setContentsMargins(10, 10, 10, 10)
-        self.widget.resizedSignal.connect(self.resize)
+        self.widget.resizedSignal.connect(self.resize, QtCore.Qt.QueuedConnection)
         self.resize()
 
     def resize(self):
@@ -26,14 +25,13 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
         self.statusFilter.currentIndexChanged.connect(self.updateFilter)
         self.updateFilter()
         self.infoIcon = Utils.setSvgIcon(self.infoIcon, Icons.STORAGE_ICON)
-        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.Base).name()};}}")
+        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.Normal, QtGui.QPalette.Base).name()};}}")
         self.previewWidgetView.itemSelectionChanged.connect(self.previewWidgetView.clearSelection)
         self.previewWidgetView.itemClicked.connect(self.openProgressWindow)
         self.previewWidgetView.verticalScrollBar().setSingleStep(30)
-        self.showPreviewCount()
+        self.showStats()
         self.downloadHistoryButton.clicked.connect(self.downloadHistoryRequested)
         self.downloadCompleteActionInfo.clicked.connect(self.showDownloadCompleteActionInfo)
-        ContentManager.ContentManager.restrictionsUpdated.connect(self.restrictionsUpdated)
 
     def downloaderCreated(self, downloaderId):
         item = PreviewWidgetItem(downloaderId=downloaderId)
@@ -45,7 +43,7 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
 
     def downloaderDestroyed(self, downloaderId):
         self.previewWidgetView.takeItem(self.previewWidgetView.row(self.previewItems.pop(downloaderId)))
-        self.showPreviewCount()
+        self.showStats()
 
     def downloadStarted(self, downloaderId):
         self.processPreview(downloaderId)
@@ -58,7 +56,7 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
 
     def processPreview(self, downloaderId):
         self.setPreviewHidden(downloaderId, not self.filterPreview(downloaderId))
-        self.showPreviewCount()
+        self.showStats()
 
     def setPreviewHidden(self, downloaderId, hidden):
         self.previewItems[downloaderId].setHidden(hidden)
@@ -66,7 +64,7 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
     def getPreviewCount(self):
         return len(self.previewItems)
 
-    def showPreviewCount(self):
+    def showStats(self):
         self.totalCount.setText(self.getPreviewCount())
         previewCount = self.getFilteredPreviewCount()
         self.filteredCount.setText(previewCount)
@@ -81,7 +79,7 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
         self.downloaderStatus = self.statusFilter.currentIndex()
         for downloaderId in self.previewItems:
             self.setPreviewHidden(downloaderId, not self.filterPreview(downloaderId))
-        self.showPreviewCount()
+        self.showStats()
 
     def getFilteredPreviewCount(self):
         return sum(0 if item.isHidden() else 1 for item in self.previewItems.values())
@@ -120,26 +118,3 @@ class Downloads(QtWidgets.QWidget, UiFile.downloads):
 
     def showDownloadCompleteActionInfo(self):
         self.info("information", "#When all downloads are complete, it will perform the selected action.\nA warning notification will be displayed for a period of time so that the operation can be canceled.\nWhen the time expires, the action will be performed.")
-
-    def restrictionsUpdated(self):
-        restrictionsFound = []
-        for downloader in DownloadManager.getRunningDownloaders():
-            downloadInfo = downloader.setup.downloadInfo
-            try:
-                ContentManager.ContentManager.checkRestrictions(downloadInfo.videoData, user=DB.account.user)
-            except ContentManager.Exceptions.RestrictedContent as e:
-                downloader.abort(e)
-                restrictionsFound.append(downloadInfo)
-        if len(restrictionsFound) != 0:
-            infoText = T("#Some content has been restricted.\nTerminating restricted downloads.")
-            contentInfo = "\n".join(self.getContentInfoString(string) for string in restrictionsFound)
-            self.info("warning", f"{infoText}\n\n{contentInfo}")
-
-    def getContentInfoString(self, downloadInfo):
-        if downloadInfo.type.isStream():
-            channel = downloadInfo.videoData.broadcaster
-        elif downloadInfo.type.isVideo():
-            channel = downloadInfo.videoData.owner
-        else:
-            channel = downloadInfo.videoData.broadcaster
-        return f"[{channel.displayName}] [{T(downloadInfo.type.toString())}] {downloadInfo.videoData.title}"

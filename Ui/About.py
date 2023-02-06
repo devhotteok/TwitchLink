@@ -29,10 +29,10 @@ class About(QtWidgets.QWidget, UiFile.about):
             self.updateButton.show()
 
     def openHomepage(self):
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, params={"lang": DB.localization.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, params={"lang": Translator.getLanguage()}))
 
     def openSponsor(self):
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": DB.localization.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": Translator.getLanguage()}))
 
     def openUpdate(self):
-        Utils.openUrl(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": DB.localization.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": Translator.getLanguage()}))

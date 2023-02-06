@@ -56,7 +56,7 @@ class TwitchAccount(QtCore.QObject, Codable):
     def _updateAccountData(self):
         if self.username != "":
             try:
-                data = Engine.Search.Channel(self.username)
+                data = Engine.Search.Channel(login=self.username)
             except Engine.Exceptions.ChannelNotFound:
                 self.logout()
                 raise Exceptions.UserNotFound

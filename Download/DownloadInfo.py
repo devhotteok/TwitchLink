@@ -1,6 +1,7 @@
 from Services.Utils.Utils import Utils
 from Database.Database import DB
 from Database.EncoderDecoder import Codable
+from Download import DownloadOptionHistory
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
 import os
@@ -45,7 +46,13 @@ class DownloadInfo(Codable):
 
     @property
     def optionHistory(self):
-        return DB.temp.getDownloadOptionHistory(self.type.getType())
+        if self.type.isStream():
+            historyType = DownloadOptionHistory.StreamHistory
+        elif self.type.isVideo():
+            historyType = DownloadOptionHistory.VideoHistory
+        else:
+            historyType = DownloadOptionHistory.ClipHistory
+        return DB.temp.getDownloadOptionHistory(historyType)
 
     def generateFileName(self):
         return FileNameGenerator.generateFileName(self.videoData, self.resolution)

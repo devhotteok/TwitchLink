@@ -37,7 +37,7 @@
       <property name="bottomMargin">
        <number>10</number>
       </property>
-      <item>
+      <item alignment="Qt::AlignVCenter">
        <widget class="QWidget" name="downloadsCountArea" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -458,7 +458,7 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QHBoxLayout" name="downloadCompleteActionAreaLayout">
+        <layout class="QVBoxLayout" name="downloadCompleteActionAreaLayout">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -471,40 +471,87 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QLabel" name="downloadCompleteActionLabel">
+         <item alignment="Qt::AlignRight">
+          <widget class="QWidget" name="downloadCompleteActionControlArea" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <layout class="QHBoxLayout" name="downloadCompleteActionControlAreaLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="downloadCompleteActionLabel">
+              <property name="text">
+               <string>Action to perform after all downloads:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="downloadCompleteAction">
+              <item>
+               <property name="text">
+                <string>None</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Shutdown App</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Shutdown System</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="downloadCompleteActionInfo">
+              <property name="toolTip">
+               <string>Help</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignRight">
+          <widget class="QLabel" name="restrictedLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(255, 0, 0);</string>
+           </property>
            <property name="text">
-            <string>Action to perform after all downloads:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="downloadCompleteAction">
-           <item>
-            <property name="text">
-             <string>None</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Shutdown App</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Shutdown System</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="downloadCompleteActionInfo">
-           <property name="toolTip">
-            <string>Help</string>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+            <string>Unavailable when Scheduled Downloads are enabled.</string>
            </property>
           </widget>
          </item>

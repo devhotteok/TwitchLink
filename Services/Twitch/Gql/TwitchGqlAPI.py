@@ -31,13 +31,7 @@ class Exceptions:
 
 class GqlEngine:
     def loadOperations(self, operation, variables):
-        return {"query": operation.query, "variables": self.loadVariables(operation.variableList, variables)}
-
-    def loadVariables(self, variableList, variables):
-        variablesDict = {}
-        for variable in variableList:
-            variablesDict[variable] = variables.get(variable)
-        return variablesDict
+        return {"query": operation.query, "variables": {variable: variables.get(variable) for variable in operation.variableList}}
 
     def api(self, operation, variables, headers=None):
         payload = self.loadOperations(operation, variables)

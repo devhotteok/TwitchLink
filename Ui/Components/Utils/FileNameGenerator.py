@@ -108,7 +108,7 @@ class FileNameGenerator:
         return DB.templates.getClipFilename()
 
     @classmethod
-    def generateFileName(cls, videoData, resolution):
+    def generateFileName(cls, videoData, resolution, customTemplate=None):
         if resolution == None:
             resolutionText = T("unknown")
         elif resolution.isAudioOnly():
@@ -124,4 +124,97 @@ class FileNameGenerator:
         else:
             template = cls.getClipFileNameTemplate()
             variables = cls.getClipFileNameTemplateVariables(videoData, resolutionText)
-        return Utils.getValidFileName(Utils.injectionSafeFormat(template, **variables))
+        return Utils.getValidFileName(Utils.injectionSafeFormat(customTemplate or template, **variables))
+
+    @staticmethod
+    def getFormData(*args):
+        formData = {}
+        for data in args:
+            formData.update(data)
+        return formData
+
+    @staticmethod
+    def getInfoTitle(dataType):
+        return f"{T(dataType)} {T('#Filename Template Variables')}"
+
+    @staticmethod
+    def getBaseInfo(dataType):
+        dataType = T(dataType)
+        return {
+            "{type}": f"{T('file-type')} ({dataType})",
+            "{id}": f"{dataType} {T('id')} (XXXXXXXXXX)",
+            "{title}": "title",
+            "{game}": "category"
+        }
+
+    @staticmethod
+    def getNameInfo(nameType):
+        translated = T(nameType)
+        return {
+            f"{{{nameType}}}": f"{translated} {T('username')}",
+            f"{{{nameType}_name}}": f"{translated} {T('displayname')}",
+            f"{{{nameType}_formatted_name}}": T("#'displayname' if {nameType} Displayname is English, otherwise 'displayname(username)'", nameType=translated)
+        }
+
+    @staticmethod
+    def getTimeInfo(timeType):
+        return {
+            f"{{{timeType}_at}}": f"{T(f'{timeType}-at')} (XXXX-XX-XX XX:XX:XX)",
+            "{date}": f"{T(f'{timeType}-date')} (XXXX-XX-XX)",
+            "{year}": f"{T(f'{timeType}-date')} - {T('year')}",
+            "{month}": f"{T(f'{timeType}-date')} - {T('month')}",
+            "{day}": f"{T(f'{timeType}-date')} - {T('day')}",
+            "{time}": f"{T(f'{timeType}-time')} (XX:XX:XX)",
+            "{hour}": f"{T(f'{timeType}-time')} - {T('hour')}",
+            "{minute}": f"{T(f'{timeType}-time')} - {T('minute')}",
+            "{second}": f"{T(f'{timeType}-time')} - {T('second')}"
+        }
+
+    @staticmethod
+    def getResolutionInfo():
+        return {
+            "{resolution}": "file-resolution"
+        }
+
+    @classmethod
+    def getStreamFileNameTemplateFormData(cls):
+        return cls.getFormData(
+            cls.getBaseInfo("stream"),
+            cls.getNameInfo("channel"),
+            cls.getTimeInfo("started"),
+            cls.getResolutionInfo()
+        )
+
+    @classmethod
+    def getVideoFileNameTemplateFormData(cls):
+        return cls.getFormData(
+            cls.getBaseInfo("video"),
+            cls.getNameInfo("channel"),
+            {
+                "{duration}": "duration"
+            },
+            cls.getTimeInfo("published"),
+            {
+                "{views}": "views"
+            },
+            cls.getResolutionInfo()
+        )
+
+    @classmethod
+    def getClipFileNameTemplateFormData(cls):
+        return cls.getFormData(
+            cls.getBaseInfo("clip"),
+            {
+                "{slug}": f"{T('slug')} (SlugExampleHelloTwitch)"
+            },
+            cls.getNameInfo("channel"),
+            cls.getNameInfo("creator"),
+            {
+                "{duration}": "duration"
+            },
+            cls.getTimeInfo("created"),
+            {
+                "{views}": "views"
+            },
+            cls.getResolutionInfo()
+        )

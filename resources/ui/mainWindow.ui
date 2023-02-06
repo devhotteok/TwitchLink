@@ -166,6 +166,58 @@ QToolButton:checked {
         </widget>
        </item>
        <item>
+        <widget class="QToolButton" name="scheduledDownloadsPageButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Scheduled Downloads</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QToolButton {
+	background: rgba(255, 255, 255, 150);
+	border: none;
+}
+
+QToolButton:hover {
+	background: rgba(200, 200, 200, 255);
+}
+
+QToolButton:checked {
+	background: rgba(255, 255, 255, 255);
+}</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../icons/scheduled.svg</normaloff>../icons/scheduled.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_1">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -339,9 +391,6 @@ QToolButton:checked {
     </item>
     <item>
      <widget class="QStackedWidget" name="navigationArea">
-      <property name="currentIndex">
-       <number>4</number>
-      </property>
       <widget class="QWidget" name="searchPage">
        <layout class="QVBoxLayout" name="searchPageLayout">
         <property name="leftMargin">
@@ -360,6 +409,22 @@ QToolButton:checked {
       </widget>
       <widget class="QWidget" name="downloadsPage">
        <layout class="QVBoxLayout" name="downloadsPageLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="scheduledDownloadsPage">
+       <layout class="QVBoxLayout" name="scheduledDownloadsPageLayout">
         <property name="leftMargin">
          <number>0</number>
         </property>

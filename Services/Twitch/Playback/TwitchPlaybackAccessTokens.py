@@ -15,13 +15,13 @@ class Exceptions:
         def __init__(self, response=None):
             if response == None:
                 self.status_code = None
-                self.data = "Unable to connect to server"
+                self.data = None
             else:
                 self.status_code = response.status_code
                 self.data = response.getData()
 
         def __str__(self):
-            return f"Twitch API Error\nstatus_code: {self.status_code}\n{self.data}"
+            return f"Twitch API Error\n{self.__dict__}"
 
     class TokenError(Exception):
         def __str__(self):
@@ -320,4 +320,4 @@ class TwitchClip(TwitchPlaybackAccessToken):
                 url=f"{quality['sourceURL']}?sig={sig}&token={quote(token)}"
             )
             resolutions[resolution.groupId] = resolution
-        self.resolutions = dict(sorted(resolutions.items(), key=lambda item: (item[1].frameRate or 0, item[1].quality or 0), reverse=True))
+        self.resolutions = dict(sorted(resolutions.items(), key=lambda item: (item[1].quality or 0, item[1].frameRate or 0), reverse=True))
