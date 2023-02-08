@@ -1,8 +1,10 @@
+from Core.Updater import Updater
 from Services.Utils.Utils import Utils
 from Services.Twitch.Gql import TwitchGqlModels
 from Services.Twitch.Playback import TwitchPlaybackAccessTokens
 from Services.Twitch.PubSub import TwitchPubSubEvents
 from Services.AccessTokenGenerator import AccessTokenGenerator
+from Services.FileNameManager import FileNameManager
 from Search import Engine
 from Download.DownloadInfo import DownloadInfo
 from Download.Downloader.Engine.Engine import TwitchDownloader
@@ -185,7 +187,8 @@ class ScheduledDownload(QtCore.QObject):
                 "previewImageURL": "" if self.channel.login == "" else self.STREAM_PREVIEW_IMAGE_URL_FORMAT.format(login=self.channel.login),
                 "broadcaster": {
                     "id": self.channel.id,
-                    "login": self.channel.login
+                    "login": self.channel.login,
+                    "displayName": self.channel.displayName
                 }
             })
             self.channel.stream.game = self.channel.lastBroadcast.game
@@ -273,7 +276,7 @@ class ScheduledDownload(QtCore.QObject):
         downloadInfo.setDirectory(self.preset.directory)
         selectedResolution = self.preset.selectResolution(accessToken.getResolutions())
         downloadInfo.setResolution(accessToken.getResolutions().index(selectedResolution))
-        downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(stream, selectedResolution, customTemplate=self.preset.filenameTemplate), self.preset.fileFormat))
+        downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(stream, selectedResolution, customTemplate=self.preset.filenameTemplate), self.preset.fileFormat, exclude=FileNameManager.getLockedFileNames()))
         self.downloader = TwitchDownloader.create(downloadInfo, parent=self)
         self.downloader.finished.connect(self.downloadResultHandler)
         self.downloaderCreated.emit(self, self.downloader)
@@ -311,6 +314,7 @@ class _ScheduledDownloadManager(QtCore.QObject):
         self._enabled = False
         self.scheduledDownloads = {}
         self.runningScheduledDownloads = []
+        Updater.statusUpdated.connect(self._updatePubSubState)
         self._updatePubSubState()
 
     def setEnabled(self, enabled):
@@ -322,7 +326,7 @@ class _ScheduledDownloadManager(QtCore.QObject):
         return self._enabled
 
     def _updatePubSubState(self):
-        if self.isEnabled() and len(self.scheduledDownloads) != 0:
+        if Updater.status.isOperational() and self.isEnabled() and len(self.scheduledDownloads) != 0:
             if not ScheduledDownloadPubSub.isOpened():
                 ScheduledDownloadPubSub.open()
         else:
@@ -348,6 +352,7 @@ class _ScheduledDownloadManager(QtCore.QObject):
         return scheduledDownloadId
 
     def downloaderCreated(self, scheduledDownload, downloader):
+        FileNameManager.lock(downloader.setup.downloadInfo.getAbsoluteFileName())
         self.runningScheduledDownloads.append(scheduledDownload)
         self.downloaderCountChangedSignal.emit(len(self.getRunningDownloaders()))
         self.downloaderCreatedSignal.emit(scheduledDownload, downloader)
@@ -355,6 +360,7 @@ class _ScheduledDownloadManager(QtCore.QObject):
     def downloaderDestroyed(self, scheduledDownload, downloader):
         self.runningScheduledDownloads.remove(scheduledDownload)
         self.downloaderCountChangedSignal.emit(len(self.getRunningDownloaders()))
+        FileNameManager.unlock(downloader.setup.downloadInfo.getAbsoluteFileName())
         self.downloaderDestroyedSignal.emit(scheduledDownload, downloader)
 
     def get(self, scheduledDownloadId):

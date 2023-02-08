@@ -65,20 +65,23 @@ class OSUtils:
         return name.strip()
 
     @staticmethod
-    def createUniqueFile(path, preferredFileName, fileFormat, maxScan=1000):
+    def createUniqueFile(path, preferredFileName, fileFormat, exclude=None, maxScan=1000):
+        exclude = exclude or []
         absoluteFileName = OSUtils.joinPath(path, f"{preferredFileName}.{fileFormat}")
-        try:
-            with open(absoluteFileName, "x"):
-                return absoluteFileName
-        except:
-            pass
-        for i in range(maxScan):
-            absoluteFileName = OSUtils.joinPath(path, f"{preferredFileName} ({i}).{fileFormat}")
+        if absoluteFileName not in exclude:
             try:
                 with open(absoluteFileName, "x"):
                     return absoluteFileName
             except:
                 pass
+        for i in range(maxScan):
+            absoluteFileName = OSUtils.joinPath(path, f"{preferredFileName} ({i}).{fileFormat}")
+            if absoluteFileName not in exclude:
+                try:
+                    with open(absoluteFileName, "x"):
+                        return absoluteFileName
+                except:
+                    pass
         raise Exceptions.FileSystemError
 
     @staticmethod

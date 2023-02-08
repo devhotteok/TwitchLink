@@ -8,7 +8,7 @@ import sys
 def TwitchLink():
     exitCode = App.start(Ui.MainWindow())
     if exitCode == App.EXIT_CODE.RESTART:
-        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+        os.execl(sys.executable, *sys.argv)
     return exitCode
 
 if __name__ == "__main__":

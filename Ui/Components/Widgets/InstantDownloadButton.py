@@ -1,5 +1,6 @@
+from Services.Utils.Utils import Utils
+from Services.FileNameManager import FileNameManager
 from Ui.Components.Widgets.DownloadButton import DownloadButton
-from Ui.Components.Utils.DownloadChecker import DownloadChecker
 
 
 class InstantDownloadButton(DownloadButton):
@@ -7,9 +8,11 @@ class InstantDownloadButton(DownloadButton):
         super(InstantDownloadButton, self).__init__(videoData, button, buttonText, parent=parent)
 
     def askDownload(self, downloadInfo):
-        downloadAvailableState = DownloadChecker.isDownloadAvailable(downloadInfo, parent=self.button)
-        if downloadAvailableState == DownloadChecker.State.AVAILABLE:
+        try:
+            downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, downloadInfo.fileName, downloadInfo.fileFormat, exclude=FileNameManager.getLockedFileNames()))
+        except:
+            self.info("error", "#An error occurred while generating the file name.")
+            super().askDownload(downloadInfo)
+        else:
             downloadInfo.saveOptionHistory()
             self.startDownload(downloadInfo)
-        elif downloadAvailableState == DownloadChecker.State.NEED_NEW_FILE_NAME:
-            super().askDownload(downloadInfo)

@@ -1,4 +1,5 @@
 from Services.Utils.Utils import Utils
+from Services.FileNameManager import FileNameManager
 from Services.Translator.Translator import T
 from Download.GlobalDownloadManager import GlobalDownloadManager
 
@@ -9,13 +10,6 @@ class DownloadChecker:
         NEED_NEW_FILE_NAME = 1
         USER_REJECTED = 2
 
-
-    @staticmethod
-    def isFileNameDuplicate(fileName):
-        for downloader in GlobalDownloadManager.getRunningDownloaders():
-            if downloader.setup.downloadInfo.getAbsoluteFileName() == fileName:
-                return True
-        return False
 
     @classmethod
     def checkNetworkInstability(cls, downloadInfo, parent=None):
@@ -34,7 +28,7 @@ class DownloadChecker:
 
     @classmethod
     def isDownloadAvailable(cls, downloadInfo, parent=None):
-        if cls.isFileNameDuplicate(downloadInfo.getAbsoluteFileName()):
+        if not FileNameManager.isAvailable(downloadInfo.getAbsoluteFileName()):
             Utils.info("error", "#There is another download in progress with the same file name.", parent=parent)
             return cls.State.NEED_NEW_FILE_NAME
         elif Utils.isFile(downloadInfo.getAbsoluteFileName()):

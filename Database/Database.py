@@ -237,7 +237,7 @@ class Download(Codable):
 
 class ScheduledDownloads(Codable):
     def __init__(self):
-        self._enabled = False
+        self._enabled = True
         self._scheduledDownloadPresets = []
 
     def __setup__(self):

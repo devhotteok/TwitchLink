@@ -35,6 +35,7 @@ class Exceptions:
 
 
 class _Status:
+    NONE = -1
     CONNECTION_FAILURE = 0
     UNEXPECTED_ERROR = 1
     SESSION_EXPIRED = 2
@@ -53,7 +54,8 @@ class _Status:
             self.updateUrl = data.get("updateUrl", Config.HOMEPAGE_URL)
 
     def __init__(self):
-        self.setStatus(self.UNAVAILABLE)
+        self.appStatus = self.NONE
+        self.networkErrorCount = 0
         self.update({})
 
     def update(self, data):
@@ -66,6 +68,10 @@ class _Status:
         self.version = self.Version(data.get("version", {}))
 
     def setStatus(self, appStatus):
+        if appStatus == self.CONNECTION_FAILURE and self.getStatus() != self.NONE and self.networkErrorCount < Config.STATUS_UPDATE_NETWORK_ERROR_MAX_IGNORE_COUNT:
+            self.networkErrorCount += 1
+            return
+        self.networkErrorCount = 0
         self.appStatus = appStatus
 
     def getStatus(self):

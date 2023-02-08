@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>850</width>
-    <height>474</height>
+    <width>800</width>
+    <height>484</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -62,7 +62,7 @@
       <item>
        <widget class="QLabel" name="channelLabel">
         <property name="text">
-         <string>Channel</string>
+         <string>Channel ID</string>
         </property>
        </widget>
       </item>
@@ -145,22 +145,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="filenamePreview">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgb(128, 128, 128);</string>
-        </property>
-        <property name="text">
-         <string>Filename Preview</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QWidget" name="filenameTemplateEditArea" native="true">
         <layout class="QHBoxLayout" name="filenameTemplateEditAreaLayout">
@@ -181,6 +165,51 @@
          </item>
          <item>
           <widget class="QToolButton" name="filenameTemplateInfo">
+           <property name="toolTip">
+            <string>Help</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QWidget" name="filenamePreviewArea" native="true">
+        <layout class="QHBoxLayout" name="filenamePreviewAreaLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="filenamePreview">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(128, 128, 128);</string>
+           </property>
+           <property name="text">
+            <string>Filename Preview</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="filenamePreviewInfo">
            <property name="toolTip">
             <string>Help</string>
            </property>

@@ -319,6 +319,10 @@
     "en": "This content is not available in your region.",
     "ko": "해당 지역에서 시청할 수 없는 콘텐츠입니다."
   },
+  "#This is just a preview.\nSome values may be different from the actual ones. ({properties}, etc.)": {
+    "en": "This is just a preview.\nSome values may be different from the actual ones. ({properties}, etc.)",
+    "ko": "임시 미리보기입니다.\n일부 값이 실제와 다를 수 있습니다. ({properties} 등)"
+  },
   "#If enabled, the download will not be performed until a matching resolution is found.\nIf disabled, it automatically selects a different resolution.": {
     "en": "If enabled, the download will not be performed until a matching resolution is found.\nIf disabled, it automatically selects a different resolution.",
     "ko": "이 옵션을 활성화하면 일치하는 해상도를 찾을 때까지 다운로드를 하지 않습니다.\n이 옵션을 비활성화하면 자동으로 다른 해상도를 선택합니다."
@@ -326,6 +330,10 @@
   "#Some fields are empty.": {
     "en": "Some fields are empty.",
     "ko": "일부 필드가 비어있습니다."
+  },
+  "#Channel ID is invalid.": {
+    "en": "Channel ID is invalid.",
+    "ko": "채널 아이디가 유효하지 않습니다."
   },
   "#The preferred resolution was not found.\nYou have disabled the download until a matching resolution is found.": {
     "en": "The preferred resolution was not found.\nYou have disabled the download until a matching resolution is found.",
@@ -382,6 +390,10 @@
   "#The target directory or filename is unavailable.": {
     "en": "The target directory or filename is unavailable.",
     "ko": "대상 디렉토리 또는 파일명을 사용할 수 없습니다."
+  },
+  "#An error occurred while generating the file name.": {
+    "en": "An error occurred while generating the file name.",
+    "ko": "파일명을 자동으로 생성할 수 없습니다."
   },
   "#Failed to unmute {mutedFiles} segments ({mutedSeconds})": {
     "en": "Failed to unmute {mutedFiles} segments ({mutedSeconds})",

@@ -1,6 +1,7 @@
 from Core.Ui import *
 from Services.Twitch.Gql.TwitchGqlModels import Stream
 from Services.Twitch.Playback.TwitchPlaybackModels import StreamUrl
+from Search.QueryParser import TwitchQueryParser
 from Download.ScheduledDownloadPreset import ScheduledDownloadPreset
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
@@ -26,6 +27,7 @@ class ScheduledDownloadSettings(QtWidgets.QDialog, UiFile.scheduledDownloadSetti
         self.filenameTemplateInfo.clicked.connect(self.showStreamTemplateInfo)
         self.reloadFileFormat()
         self.fileFormat.currentTextChanged.connect(self.fileFormatChanged)
+        self.filenamePreviewInfo.clicked.connect(self.showFilenamePreviewInfo)
         for quality in self.virtualPreset.getQualityList():
             self.preferredQuality.addItem(quality.toString() if quality.isValid() else T(quality.toString()))
         self.preferredQuality.setCurrentIndex(self.virtualPreset.preferredQualityIndex)
@@ -80,6 +82,9 @@ class ScheduledDownloadSettings(QtWidgets.QDialog, UiFile.scheduledDownloadSetti
         self.fileFormat.setCurrentText(self.virtualPreset.fileFormat)
         self.fileFormat.blockSignals(False)
 
+    def showFilenamePreviewInfo(self):
+        self.info("information", T("#This is just a preview.\nSome values may be different from the actual ones. ({properties}, etc.)", properties=", ".join((f"{T('stream')} {T('id')}", T("title"), f"{T('channel')} {T('displayname')}"))), contentTranslate=False)
+
     def preferredQualityChanged(self, index):
         self.virtualPreset.setPreferredQuality(index)
         self.reloadFileFormat()
@@ -131,16 +136,30 @@ class ScheduledDownloadSettings(QtWidgets.QDialog, UiFile.scheduledDownloadSetti
         self.scheduledDownloadPreset.preferredFrameRateIndex = self.virtualPreset.preferredFrameRateIndex
         self.scheduledDownloadPreset.preferredResolutionOnly = self.virtualPreset.preferredResolutionOnly
 
+    def getChannelFromText(self, text):
+        parsedData = TwitchQueryParser.parseQuery(text)
+        for mode, query in parsedData:
+            if mode.isChannel():
+                return query
+        return None
+
     def accept(self):
         formCheck = []
         if self.virtualPreset.channel == "":
             formCheck.append(T("channel"))
         if self.virtualPreset.filenameTemplate == "":
             formCheck.append(T("filename-template"))
-        if len(formCheck) == 0:
-            self.savePreset()
-            self.scheduledDownloadPreset.saveOptionHistory()
-            super().accept(self.scheduledDownloadPreset)
-        else:
+        if len(formCheck) != 0:
             formInfo = "\n".join(formCheck)
             self.info("warning", f"{T('#Some fields are empty.')}\n\n{formInfo}", contentTranslate=False)
+            return
+        if not self.isEditMode:
+            channel = self.getChannelFromText(self.virtualPreset.channel)
+            if channel == None:
+                self.info("error", "#Channel ID is invalid.")
+                return
+            else:
+                self.virtualPreset.channel = channel
+        self.savePreset()
+        self.scheduledDownloadPreset.saveOptionHistory()
+        super().accept(self.scheduledDownloadPreset)

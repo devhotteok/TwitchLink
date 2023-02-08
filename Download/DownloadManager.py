@@ -1,3 +1,4 @@
+from Services.FileNameManager import FileNameManager
 from Download.Downloader.Engine.Engine import TwitchDownloader
 
 from PyQt5 import QtCore
@@ -23,9 +24,11 @@ class _DownloadManager(QtCore.QObject):
     def onFinish(self, downloader):
         self.runningDownloaders.remove(downloader)
         self.runningCountChangedSignal.emit(len(self.runningDownloaders))
+        FileNameManager.unlock(downloader.setup.downloadInfo.getAbsoluteFileName())
         self.completedSignal.emit(downloader.getId())
 
     def create(self, downloadInfo):
+        FileNameManager.lock(downloadInfo.getAbsoluteFileName())
         downloader = TwitchDownloader.create(downloadInfo, parent=self)
         downloader.started.connect(self.onStart)
         downloader.finished.connect(self.onFinish)

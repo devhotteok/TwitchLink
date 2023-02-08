@@ -86,9 +86,9 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
 
     def statusUpdated(self, isInSetup=False):
         isOperational = Updater.status.isOperational()
-        hasDownloaders = self.downloads.downloads.getPreviewCount() != 0
-        self.menuBar().setEnabled(isOperational or hasDownloaders)
-        if not isOperational and hasDownloaders:
+        allowPageView = not isInSetup
+        self.menuBar().setEnabled(isOperational or allowPageView)
+        if not isOperational and allowPageView:
             self.downloadsPageObject.focus()
             self.scheduledDownloadsPageObject.focus()
             self.settingsPageObject.focus()
