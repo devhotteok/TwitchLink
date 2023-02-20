@@ -5,8 +5,6 @@ from Search.QueryParser import TwitchQueryParser
 from Download.ScheduledDownloadPreset import ScheduledDownloadPreset
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
-from datetime import datetime
-
 
 class ScheduledDownloadSettings(QtWidgets.QDialog, UiFile.scheduledDownloadSettings, WindowGeometryManager):
     def __init__(self, scheduledDownloadPreset=None, parent=None):
@@ -108,7 +106,7 @@ class ScheduledDownloadSettings(QtWidgets.QDialog, UiFile.scheduledDownloadSetti
                 "login": self.virtualPreset.channel,
                 "displayName": self.virtualPreset.channel
             },
-            "createdAt": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "createdAt": QtCore.QDateTime.currentDateTimeUtc().toString("yyyy-MM-ddTHH:mm:ssZ"),
             "viewersCount": 0
         })
 

@@ -199,19 +199,12 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.actionTermsOfService.setEnabled(enabled)
 
     def restrictionsUpdated(self):
-        restrictionsFound = []
         for downloader in GlobalDownloadManager.getRunningDownloaders():
             if downloader.status.terminateState.isFalse():
-                downloadInfo = downloader.setup.downloadInfo
                 try:
-                    ContentManager.ContentManager.checkRestrictions(downloadInfo.videoData, user=DB.account.user)
+                    ContentManager.ContentManager.checkRestrictions(downloader.setup.downloadInfo.videoData, user=DB.account.user)
                 except ContentManager.Exceptions.RestrictedContent as e:
                     downloader.abort(e)
-                    restrictionsFound.append(downloadInfo)
-        if len(restrictionsFound) != 0:
-            infoText = T("#Some content has been restricted.\nTerminating restricted downloads.")
-            contentInfo = "\n".join(self.getContentInfoString(string) for string in restrictionsFound)
-            self.info("warning", f"{infoText}\n\n{contentInfo}")
 
     def getContentInfoString(self, downloadInfo):
         if downloadInfo.type.isStream():

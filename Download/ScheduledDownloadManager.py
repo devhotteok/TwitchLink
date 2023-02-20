@@ -192,6 +192,7 @@ class ScheduledDownload(QtCore.QObject):
                 }
             })
             self.channel.stream.game = self.channel.lastBroadcast.game
+            self.channel.stream.createdAt = QtCore.QDateTime.currentDateTimeUtc()
             self.channelDataUpdated.emit()
 
     def setOffline(self):
@@ -216,9 +217,12 @@ class ScheduledDownload(QtCore.QObject):
                 self.channel.stream.createdAt = QtCore.QDateTime.fromSecsSinceEpoch(data["server_time"], QtCore.Qt.UTC)
             elif data["type"] == "stream-down":
                 self.setOffline()
+                self.channel.lastBroadcast.startedAt = QtCore.QDateTime.fromSecsSinceEpoch(data["server_time"], QtCore.Qt.UTC)
             elif data["type"] == "viewcount":
-                self.setOnline()
-                self.channel.stream.viewersCount = data["viewers"]
+                if self.isOnline() and self.channel.stream.id != None:
+                    self.channel.stream.viewersCount = data["viewers"]
+                else:
+                    self.updateChannelData()
             elif data["type"] == "commercial":
                 pass
         elif topic.eventType == TwitchPubSubEvents.EventTypes.BroadcastSettingsUpdate:
@@ -292,6 +296,8 @@ class ScheduledDownload(QtCore.QObject):
         downloader.setParent(None)
         self.downloader = None
         self.downloaderDestroyed.emit(self, downloader)
+        if error == None:
+            self.startDownloadIfOnline()
 
     def getId(self):
         return self.uuid

@@ -4,7 +4,7 @@ from PyQt5 import QtCore
 class Meta:
     APP_NAME = "TwitchLink"
 
-    APP_VERSION = "2.3.1"
+    APP_VERSION = "2.3.2"
 
     AUTHOR = "DevHotteok"
 

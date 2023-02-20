@@ -511,10 +511,6 @@
     "en": "To protect the rights of streamers, {appName} restricts downloads when a content restriction request is received.",
     "ko": "{appName}은/는 스트리머의 권리를 보호하기 위해 콘텐츠 제한 요청이 접수되면 해당 콘텐츠의 다운로드를 제한합니다."
   },
-  "#Some content has been restricted.\nTerminating restricted downloads.": {
-    "en": "Some content has been restricted.\nTerminating restricted downloads.",
-    "ko": "일부 콘텐츠가 제한되었습니다.\n제한된 다운로드를 중단합니다."
-  },
   "#Your download has been terminated due to content restrictions.": {
     "en": "Your download has been terminated due to content restrictions.",
     "ko": "콘텐츠가 제한되어 다운로드가 중단되었습니다."
