@@ -8,7 +8,7 @@ class PreviewWidgetItem(QtWidgets.QListWidgetItem):
         super(PreviewWidgetItem, self).__init__(parent=parent)
         self.widget = Ui.ScheduledDownloadPreview(scheduledDownloadId, parent=parent)
         self.widget.setContentsMargins(10, 10, 10, 10)
-        self.widget.resizedSignal.connect(self.resize, QtCore.Qt.QueuedConnection)
+        self.widget.resizedSignal.connect(self.resize, QtCore.Qt.ConnectionType.QueuedConnection)
         self.resize()
 
     def resize(self):
@@ -22,7 +22,7 @@ class ScheduledDownloads(QtWidgets.QWidget, UiFile.scheduledDownloads):
         self.showEnableState()
         self.enableButton.clicked.connect(self.enableButtonClicked)
         self.infoIcon = Utils.setSvgIcon(self.infoIcon, Icons.SCHEDULED_ICON)
-        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.Normal, QtGui.QPalette.Base).name()};}}")
+        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Base).name()};}}")
         self.previewWidgetView.itemSelectionChanged.connect(self.previewWidgetView.clearSelection)
         self.showStats()
         self.addScheduledDownloadButton.clicked.connect(self.addScheduledDownload)

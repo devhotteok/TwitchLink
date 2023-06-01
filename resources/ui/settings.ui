@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>424</width>
-    <height>448</height>
+    <height>452</height>
    </rect>
   </property>
   <property name="font">
@@ -73,15 +73,59 @@
           <item>
            <widget class="QCheckBox" name="notify">
             <property name="text">
-             <string>Notify when download is finished</string>
+             <string>Notify on download start/end</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="confirmExit">
-            <property name="text">
-             <string>Show exit confirmation dialog</string>
-            </property>
+           <widget class="QWidget" name="windowCloseArea" native="true">
+            <layout class="QHBoxLayout" name="windowCloseAreaLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="windowCloseLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>When closing window</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="windowClose">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Exit completely</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Minimize to system tray</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>

@@ -23,6 +23,10 @@ class Exceptions:
         def __str__(self):
             return f"Twitch API Error\n{self.__dict__}"
 
+    class IntegrityError(Exception):
+        def __str__(self):
+            return f"Integrity Error"
+
     class TokenError(Exception):
         def __str__(self):
             return "Token Error - Invalid token"
@@ -91,6 +95,23 @@ class TwitchPlaybackAccessToken(Codable):
         self.type = TwitchPlaybackAccessTokenTypes(tokenType)
         self.resolutions = {}
 
+    def _getAccessToken(self, headers, payload):
+        try:
+            response = Network.session.post(Config.GQL_SERVER, headers=headers, json=payload)
+        except:
+            raise Exceptions.TwitchApiError
+        if response.status_code == 200:
+            data = response.json()
+            if "errors" in data:
+                for error in data["errors"]:
+                    if error.get("message") == "failed integrity check":
+                        raise Exceptions.IntegrityError
+            return data
+        elif response.status_code == 401:
+            raise Exceptions.TokenError
+        else:
+            raise Exceptions.TwitchApiError(response)
+
     def resolution(self, resolution):
         if resolution in self.resolutions:
             return self.resolutions[resolution]
@@ -105,10 +126,12 @@ class TwitchPlaybackAccessToken(Codable):
 
 
 class TwitchStream(TwitchPlaybackAccessToken, PlaylistReader):
-    def __init__(self, CHANNEL_NAME, OAUTH_TOKEN=""):
+    def __init__(self, CHANNEL_NAME, OAUTH_TOKEN="", headers=None):
         super(TwitchStream, self).__init__(TwitchPlaybackAccessTokenTypes.STREAM)
         self.CHANNEL_NAME = CHANNEL_NAME
         self.OAUTH_TOKEN = OAUTH_TOKEN
+        self.headers = {"Client-ID": Config.GQL_CLIENT_ID, "Authorization": f"OAuth {self.OAUTH_TOKEN}"}
+        self.headers.update(headers)
         if self.CHANNEL_NAME != None:
             self.loadStream()
 
@@ -138,28 +161,22 @@ class TwitchStream(TwitchPlaybackAccessToken, PlaylistReader):
                 "playerType": "embed"
             }
         }
-        try:
-            response = Network.session.post(Config.GQL_SERVER, headers={"Client-ID": Config.GQL_CLIENT_ID, "Authorization": f"OAuth {self.OAUTH_TOKEN}"}, json=payload)
-        except:
-            raise Exceptions.TwitchApiError
-        if response.status_code == 200:
-            accessToken = response.json()["data"]["streamPlaybackAccessToken"]
-            if accessToken == None:
-                raise Exceptions.ChannelNotFound(self.CHANNEL_NAME)
-            self.sig = accessToken["signature"]
-            self.token = accessToken["value"]
-            tokenData = json.loads(self.token)
-            self.hideAds = tokenData["hide_ads"]
-            self.forbidden = tokenData["authorization"]["reason"] if tokenData["authorization"]["forbidden"] else False
-            self.geoBlock = tokenData["geoblock_reason"] if tokenData["ci_gb"] else False
-            if self.forbidden:
-                raise Exceptions.Forbidden(self.forbidden)
-            if self.geoBlock:
-                raise Exceptions.GeoBlock(self.geoBlock)
-        elif response.status_code == 401:
-            raise Exceptions.TokenError
-        else:
-            raise Exceptions.TwitchApiError(response)
+        accessToken = self._getAccessToken(
+            headers=self.headers,
+            payload=payload
+        )["data"]["streamPlaybackAccessToken"]
+        if accessToken == None:
+            raise Exceptions.ChannelNotFound(self.CHANNEL_NAME)
+        self.sig = accessToken["signature"]
+        self.token = accessToken["value"]
+        tokenData = json.loads(self.token)
+        self.hideAds = tokenData["hide_ads"]
+        self.forbidden = tokenData["authorization"]["reason"] if tokenData["authorization"]["forbidden"] else False
+        self.geoBlock = tokenData["geoblock_reason"] if tokenData["ci_gb"] else False
+        if self.forbidden:
+            raise Exceptions.Forbidden(self.forbidden)
+        if self.geoBlock:
+            raise Exceptions.GeoBlock(self.geoBlock)
 
     def getStreamPlaylist(self):
         try:
@@ -190,10 +207,12 @@ class TwitchStream(TwitchPlaybackAccessToken, PlaylistReader):
 
 
 class TwitchVideo(TwitchPlaybackAccessToken, PlaylistReader):
-    def __init__(self, VIDEO_ID, OAUTH_TOKEN=""):
+    def __init__(self, VIDEO_ID, OAUTH_TOKEN="", headers=None):
         super(TwitchVideo, self).__init__(TwitchPlaybackAccessTokenTypes.VIDEO)
         self.VIDEO_ID = VIDEO_ID
         self.OAUTH_TOKEN = OAUTH_TOKEN
+        self.headers = {"Client-ID": Config.GQL_CLIENT_ID, "Authorization": f"OAuth {self.OAUTH_TOKEN}"}
+        self.headers.update(headers)
         if self.VIDEO_ID != None:
             self.loadVideo()
 
@@ -223,20 +242,14 @@ class TwitchVideo(TwitchPlaybackAccessToken, PlaylistReader):
                 "playerType": "embed"
             }
         }
-        try:
-            response = Network.session.post(Config.GQL_SERVER, headers={"Client-ID": Config.GQL_CLIENT_ID, "Authorization": f"OAuth {self.OAUTH_TOKEN}"}, json=payload)
-        except:
-            raise Exceptions.TwitchApiError
-        if response.status_code == 200:
-            accessToken = response.json()["data"]["videoPlaybackAccessToken"]
-            if accessToken == None:
-                raise Exceptions.VideoNotFound(self.VIDEO_ID)
-            self.sig = accessToken["signature"]
-            self.token = accessToken["value"]
-        elif response.status_code == 401:
-            raise Exceptions.TokenError
-        else:
-            raise Exceptions.TwitchApiError(response)
+        accessToken = self._getAccessToken(
+            headers=self.headers,
+            payload=payload
+        )["data"]["videoPlaybackAccessToken"]
+        if accessToken == None:
+            raise Exceptions.VideoNotFound(self.VIDEO_ID)
+        self.sig = accessToken["signature"]
+        self.token = accessToken["value"]
 
     def getVideoPlaylist(self):
         try:
@@ -268,10 +281,12 @@ class TwitchVideo(TwitchPlaybackAccessToken, PlaylistReader):
         )
 
 class TwitchClip(TwitchPlaybackAccessToken):
-    def __init__(self, SLUG, OAUTH_TOKEN=""):
+    def __init__(self, SLUG, OAUTH_TOKEN="", headers=None):
         super(TwitchClip, self).__init__(TwitchPlaybackAccessTokenTypes.CLIP)
         self.SLUG = SLUG
         self.OAUTH_TOKEN = OAUTH_TOKEN
+        self.headers = {"Client-ID": Config.GQL_CLIENT_ID, "Authorization": f"OAuth {self.OAUTH_TOKEN}"}
+        self.headers.update(headers)
         if self.SLUG != None:
             self.loadClip()
 
@@ -291,25 +306,19 @@ class TwitchClip(TwitchPlaybackAccessToken):
                 "slug": self.SLUG
             }
         }
-        try:
-            response = Network.session.post(Config.GQL_SERVER, headers={"Client-ID": Config.GQL_CLIENT_ID, "Authorization": f"OAuth {self.OAUTH_TOKEN}"}, json=payload)
-        except:
-            raise Exceptions.TwitchApiError
-        if response.status_code == 200:
-            clip = response.json()["data"]["clip"]
-            if clip == None:
-                raise Exceptions.ClipNotFound(self.SLUG)
-            accessToken = clip["playbackAccessToken"]
-            sig = accessToken["signature"]
-            token = accessToken["value"]
-            self.id = clip["id"]
-            self.getClipUrl(clip["videoQualities"], sig, token)
-            if len(self.resolutions) == 0:
-                raise Exceptions.ClipNotFound(self.SLUG)
-        elif response.status_code == 401:
-            raise Exceptions.TokenError
-        else:
-            raise Exceptions.TwitchApiError(response)
+        clip = self._getAccessToken(
+            headers=self.headers,
+            payload=payload
+        )["data"]["clip"]
+        if clip == None:
+            raise Exceptions.ClipNotFound(self.SLUG)
+        accessToken = clip["playbackAccessToken"]
+        sig = accessToken["signature"]
+        token = accessToken["value"]
+        self.id = clip["id"]
+        self.getClipUrl(clip["videoQualities"], sig, token)
+        if len(self.resolutions) == 0:
+            raise Exceptions.ClipNotFound(self.SLUG)
 
     def getClipUrl(self, qualities, sig, token):
         resolutions = {}

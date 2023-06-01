@@ -4,8 +4,6 @@ from Core.Config import Config as CoreConfig, _P
 class Images:
     IMAGE_ROOT = _P(CoreConfig.RESOURCE_ROOT, "img")
 
-    APP_LOGO_IMAGE = _P(IMAGE_ROOT, "logo.png")
-
     OFFLINE_IMAGE = _P(IMAGE_ROOT, "channel_offline.png")
     PROFILE_IMAGE = _P(IMAGE_ROOT, "profile_image.png")
     PREVIEW_IMAGE = _P(IMAGE_ROOT, "preview.png")

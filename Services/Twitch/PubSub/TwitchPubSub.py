@@ -1,6 +1,6 @@
 from .TwitchPubSubConfig import Config
 
-from PyQt5 import QtCore, QtNetwork, QtWebSockets
+from PyQt6 import QtCore, QtNetwork, QtWebSockets
 
 import json
 import secrets

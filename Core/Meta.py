@@ -1,10 +1,10 @@
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class Meta:
     APP_NAME = "TwitchLink"
 
-    APP_VERSION = "2.3.2"
+    APP_VERSION = "2.4.0"
 
     AUTHOR = "DevHotteok"
 

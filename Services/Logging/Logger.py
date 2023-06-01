@@ -3,7 +3,7 @@ from .Config import Config
 
 from Services.Utils.OSUtils import OSUtils
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 import logging
 import time

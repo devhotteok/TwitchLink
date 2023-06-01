@@ -17,7 +17,7 @@ class PropertyView(QtWidgets.QDialog, UiFile.propertyView, WindowGeometryManager
             self.videoWidget.hide()
             self.line_1.hide()
         else:
-            self.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint)
+            self.setWindowFlag(QtCore.Qt.WindowType.WindowMaximizeButtonHint)
             self.loadWindowGeometry()
             self.finished.connect(self.saveWindowGeometry)
             self.videoWidget = Utils.setPlaceholder(self.videoWidget, Ui.VideoWidget(self.targetVideoWidget.data, resizable=True, viewOnly=True, thumbnailSync=self.targetVideoWidget.thumbnailImage, categorySync=self.targetVideoWidget.categoryImage, parent=self))
@@ -43,11 +43,11 @@ class PropertyView(QtWidgets.QDialog, UiFile.propertyView, WindowGeometryManager
                 label.setText(value)
                 value = label
                 if self.targetVideoWidget != None:
-                    value.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+                    value.setSizePolicy(QtWidgets.QSizePolicy.Policy.Ignored, QtWidgets.QSizePolicy.Policy.Preferred)
             if self.enableLabelSelection and type(key) == QtWidgets.QLabel:
-                key.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse | QtCore.Qt.TextSelectableByKeyboard)
+                key.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse | QtCore.Qt.TextInteractionFlag.TextSelectableByKeyboard)
             if self.enableFieldSelection and type(value) == QtWidgets.QLabel:
-                value.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse | QtCore.Qt.TextSelectableByKeyboard)
+                value.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse | QtCore.Qt.TextInteractionFlag.TextSelectableByKeyboard)
             self.propertyViewArea.layout().addRow(key, value)
         self.propertyViewArea.adjustSize()
 

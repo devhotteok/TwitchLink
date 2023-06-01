@@ -23,6 +23,10 @@
     "en": "Open",
     "ko": "열기"
   },
+  "exit": {
+    "en": "Exit",
+    "ko": "종료"
+  },
   "ok": {
     "en": "OK",
     "ko": "확인"
@@ -126,6 +130,10 @@
   "downloading": {
     "en": "Downloading",
     "ko": "다운로드 중"
+  },
+  "file": {
+    "en": "File",
+    "ko": "파일"
   },
   "filename-change": {
     "en": "Filename Change",
@@ -235,6 +243,10 @@
     "en": "Download Complete",
     "ko": "다운로드 완료"
   },
+  "download-started": {
+    "en": "Download Started",
+    "ko": "다운로드 시작됨"
+  },
   "download-aborted": {
     "en": "Download Aborted",
     "ko": "다운로드 중단됨"
@@ -258,6 +270,10 @@
   "open-file": {
     "en": "Open File",
     "ko": "파일 열기"
+  },
+  "open-folder": {
+    "en": "Open Folder",
+    "ko": "폴더 열기"
   },
   "view-logs": {
     "en": "View Logs",

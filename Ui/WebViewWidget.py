@@ -1,5 +1,6 @@
 from Core.Ui import *
 
+from PyQt6 import QtWebEngineCore
 
 class WebViewWidget(QtWidgets.QWidget, UiFile.webViewWidget):
     iconChanged = QtCore.pyqtSignal(object, QtGui.QIcon)
@@ -31,15 +32,15 @@ class WebViewWidget(QtWidgets.QWidget, UiFile.webViewWidget):
         self.setupShortcuts()
 
     def setupShortcuts(self):
-        self.backShortcut = QtWidgets.QShortcut(QtGui.QKeySequence.Back, self)
+        self.backShortcut = QtGui.QShortcut(QtGui.QKeySequence.StandardKey.Back, self)
         self.backShortcut.activated.connect(self.webView.back)
-        self.forwardShortcut = QtWidgets.QShortcut(QtGui.QKeySequence.Forward, self)
+        self.forwardShortcut = QtGui.QShortcut(QtGui.QKeySequence.StandardKey.Forward, self)
         self.forwardShortcut.activated.connect(self.webView.forward)
-        self.refreshShortcut = QtWidgets.QShortcut(QtGui.QKeySequence.Refresh, self)
+        self.refreshShortcut = QtGui.QShortcut(QtGui.QKeySequence.StandardKey.Refresh, self)
         self.refreshShortcut.activated.connect(self.webView.reload)
-        self.stopShortcut = QtWidgets.QShortcut(QtGui.QKeySequence.Cancel, self)
+        self.stopShortcut = QtGui.QShortcut(QtGui.QKeySequence.StandardKey.Cancel, self)
         self.stopShortcut.activated.connect(self.webView.stop)
-        self.devToolsShortcut = QtWidgets.QShortcut(QtGui.QKeySequence("F12"), self)
+        self.devToolsShortcut = QtGui.QShortcut(QtGui.QKeySequence("F12"), self)
         self.devToolsShortcut.activated.connect(self.webView.toggleDevTools)
 
     def setInspectedMode(self, page):
@@ -123,7 +124,7 @@ class WebView(QtWebEngineWidgets.QWebEngineView):
 
     def __init__(self, parent=None):
         super(WebView, self).__init__(parent=parent)
-        self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.DefaultContextMenu)
         self._connectPageSignals()
 
     def setPage(self, page):
@@ -134,7 +135,7 @@ class WebView(QtWebEngineWidgets.QWebEngineView):
         self.page().windowCloseRequested.connect(self.tabCloseRequested)
 
     def setProfile(self, profile):
-        self.setPage(QtWebEngineWidgets.QWebEnginePage(profile, self))
+        self.setPage(QtWebEngineCore.QWebEnginePage(profile, self))
 
     def createWindow(self, type):
         webViewWidget = WebViewWidget()

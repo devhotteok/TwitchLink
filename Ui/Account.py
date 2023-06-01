@@ -1,6 +1,7 @@
 from Core.Ui import *
 from Services.Messages import Messages
 from Services.Account import TwitchAccount
+from Services.Twitch.Integrity.TwitchIntegrityGenerator import TwitchIntegrityGenerator
 
 
 class Account(QtWidgets.QWidget, UiFile.account):
@@ -21,7 +22,11 @@ class Account(QtWidgets.QWidget, UiFile.account):
         self.profileImage.imageChanged.connect(self.updateAccountImage)
         self.updateAccountThread = Utils.WorkerThread(parent=self)
         self.updateAccountThread.resultSignal.connect(self.accountUpdateResult)
-        DB.account._account.accountUpdated.connect(self.showAccount)
+        DB.account._account.accountUpdated.connect(self.accountUpdated)
+
+    def accountUpdated(self):
+        TwitchIntegrityGenerator.updateIntegrity(forceUpdate=True)
+        self.showAccount()
 
     def refreshAccount(self):
         self.showLoading()
@@ -41,6 +46,8 @@ class Account(QtWidgets.QWidget, UiFile.account):
                 self.info("network-error", "#A network error occurred while loading your account data.")
             elif isinstance(result.error, TwitchAccount.Exceptions.InvalidToken) or isinstance(result.error, TwitchAccount.Exceptions.UserNotFound):
                 self.info(*Messages.INFO.LOGIN_EXPIRED)
+        if not TwitchIntegrityGenerator.hasValidIntegrity():
+            TwitchIntegrityGenerator.updateIntegrity()
 
     def showAccount(self):
         if DB.account.isUserLoggedIn():

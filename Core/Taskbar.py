@@ -1,61 +1,43 @@
-from PyQt5 import QtCore, QtWinExtras
+from PyQt6 import QtCore
 
 
+#Not Implemented
 class Taskbar(QtCore.QObject):
-    def __init__(self, app, parent=None):
+    def __init__(self, parent=None):
         super(Taskbar, self).__init__(parent=parent)
-        self.app = app
-        self.taskbarButton = None
-        self.taskbarProgress = None
 
     def reset(self):
-        self.taskbarButton = QtWinExtras.QWinTaskbarButton(parent=self)
-        self.taskbarButton.setWindow(self.app.mainWindow().windowHandle())
-        self.taskbarProgress = self.taskbarButton.progress()
+        pass
 
     def show(self, indeterminate=False):
-        self.reset()
-        if indeterminate:
-            self.taskbarProgress.setMaximum(0)
-        else:
-            self.taskbarProgress.setMaximum(100)
-        self.taskbarProgress.show()
+        pass
 
     def hide(self):
-        self.taskbarProgress.hide()
+        pass
 
     def isVisible(self):
-        return self.taskbarProgress.isVisible()
+        return False
 
     def pause(self):
-        if self.taskbarProgress.maximum() == 0:
-            self.taskbarProgress.setMaximum(100)
-            self.taskbarProgress.setValue(100)
-        self.taskbarProgress.pause()
+        pass
 
     def isPaused(self):
-        return self.taskbarProgress.isPaused()
+        return False
 
     def stop(self):
-        if self.taskbarProgress.maximum() == 0:
-            self.taskbarProgress.setMaximum(100)
-            self.taskbarProgress.setValue(100)
-        self.taskbarProgress.stop()
+        pass
 
     def isStopped(self):
-        return self.taskbarProgress.isStopped()
+        return False
 
     def resume(self):
-        self.taskbarProgress.resume()
+        pass
 
     def setValue(self, value):
-        if self.isPaused() or self.isStopped():
-            self.resume()
-        self.taskbarProgress.setValue(value)
+        pass
 
     def complete(self):
-        self.hide()
-        self.alert()
+        pass
 
     def alert(self):
-        self.app.alert(self.app.mainWindow())
+        pass

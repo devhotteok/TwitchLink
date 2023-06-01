@@ -3,6 +3,12 @@ from Services.Utils.OSUtils import OSUtils
 from Services.Logging.ErrorDetector import ErrorDetector
 
 
+class Exceptions:
+    class UnknownVersion(Exception):
+        def __str__(self):
+            return "Unknown Version"
+
+
 class Updaters:
     @staticmethod
     def CleanUnknownVersion(data):
@@ -10,7 +16,7 @@ class Updaters:
             OSUtils.removeDirectory(Config.TEMP_PATH)
         except:
             pass
-        return {}
+        raise Exceptions.UnknownVersion
 
     @staticmethod
     def Update_2_0_0(data):
@@ -82,6 +88,12 @@ class Updaters:
             data["temp"].pop("_downloadOptionHistory", None)
         return data
 
+    @staticmethod
+    def Update_2_4_0(data):
+        if "general" in data:
+            data["general"].pop("_confirmExit")
+        return data
+
     @classmethod
     def getUpdaters(cls, versionFrom):
         VERSIONS = {
@@ -102,7 +114,8 @@ class Updaters:
             "2.2.3": cls.Update_2_2_3,
             "2.3.0": cls.Update_2_3_0,
             "2.3.1": None,
-            "2.3.2": None
+            "2.3.2": None,
+            "2.4.0": cls.Update_2_4_0
         }
         updaters = []
         versionFound = False
@@ -118,9 +131,9 @@ class Updaters:
     def update(cls, data):
         updaters = cls.getUpdaters(cls.detectVersion(data))
         if len(updaters) != 0:
+            ErrorDetector.clearAll()
             for updater in updaters:
                 data = updater(data)
-            ErrorDetector.clearAll()
         return data
 
     @classmethod
@@ -128,4 +141,4 @@ class Updaters:
         try:
             return data.pop("version").split(":", 1)[1]
         except:
-            return ""
+            return None

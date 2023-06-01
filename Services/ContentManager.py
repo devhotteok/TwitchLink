@@ -1,6 +1,6 @@
 from Services.Twitch.Gql import TwitchGqlModels
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class RestrictionType:

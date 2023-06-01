@@ -11,7 +11,7 @@ class ScheduledDownloadSettings(QtWidgets.QDialog, UiFile.scheduledDownloadSetti
         super(ScheduledDownloadSettings, self).__init__(parent=parent)
         self.isEditMode = scheduledDownloadPreset != None
         self.finished.connect(self.saveWindowGeometry)
-        self.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint)
+        self.setWindowFlag(QtCore.Qt.WindowType.WindowMaximizeButtonHint)
         self.loadWindowGeometry()
         self.scheduledDownloadPreset = scheduledDownloadPreset if self.isEditMode else ScheduledDownloadPreset()
         self.virtualPreset = scheduledDownloadPreset.copy() if self.isEditMode else self.scheduledDownloadPreset

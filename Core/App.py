@@ -1,8 +1,10 @@
 from Core.Launcher import SingleApplicationLauncher
 from Core.Taskbar import Taskbar
+from Core.SystemTrayIcon import SystemTrayIcon
+from Core.Notification import Notification
 from Core.Config import Config
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 import sys
 
@@ -12,37 +14,18 @@ class _App(SingleApplicationLauncher):
 
     def __init__(self, guid, argv):
         super(_App, self).__init__(guid, argv)
-        self.newInstanceStarted.connect(self.activate)
-        self._mainWindow = None
-        self.taskbar = None
-        self.aboutToQuit.connect(self.cleanup)
+        self.taskbar = Taskbar(parent=self)
+        self.systemTray = SystemTrayIcon(parent=self)
+        self.notification = Notification(parent=self)
 
-    def start(self, window):
-        self.setMainWindow(window)
+    def start(self, mainWindow):
         self.appStarted.emit()
         return self.exec()
-
-    def setMainWindow(self, window):
-        self._mainWindow = window
-        self.taskbar = Taskbar(self, parent=self)
-
-    def mainWindow(self):
-        return self._mainWindow
-
-    def cleanup(self):
-        self._mainWindow = None
-        self.taskbar = None
 
     def exit(self, exitCode=0):
         super().exit(exitCode)
 
     def restart(self):
         self.exit(self.EXIT_CODE.RESTART)
-
-    def activate(self):
-        window = self.mainWindow()
-        if window != None:
-            window.setWindowState((window.windowState() & ~QtCore.Qt.WindowMinimized) | QtCore.Qt.WindowActive)
-            window.activateWindow()
 
 App = _App(Config.APP_ROOT, sys.argv)

@@ -1,9 +1,10 @@
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 
 class _QTabBar(QtWidgets.QTabBar):
     def isTabBarHorizontal(self):
-        return self.parent().tabPosition() < 2
+        tabPosition = self.parent().tabPosition()
+        return tabPosition == QtWidgets.QTabWidget.TabPosition.North or tabPosition == QtWidgets.QTabWidget.TabPosition.South
 
     def tabSizeHint(self, index):
         if self.isTabBarHorizontal():

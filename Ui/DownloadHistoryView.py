@@ -64,11 +64,11 @@ class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
         self.completedAt.setText(T("unknown") if self.downloadHistory.completedAt == None else self.downloadHistory.completedAt.toTimeZone(DB.localization.getTimezone()))
         self.result.setText(T(self.downloadHistory.result) if self.downloadHistory.error == None else f"{T(self.downloadHistory.result)}\n({T(self.downloadHistory.error)})")
         if self.downloadHistory.result == self.downloadHistory.Result.completed or self.downloadHistory.result == self.downloadHistory.Result.skipped or self.downloadHistory.result == self.downloadHistory.Result.stopped:
-            self.setCursor(QtCore.Qt.PointingHandCursor)
+            self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
             self.setOpenFileButton(openFile=True)
             self.setOpenLogsButton(viewLogs=True)
         else:
-            self.setCursor(QtCore.Qt.ArrowCursor)
+            self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
             if self.downloadHistory.result == self.downloadHistory.Result.downloading:
                 self.setOpenFileButton(downloadingFile=True)
                 self.setOpenLogsButton(creatingFile=True)

@@ -1,4 +1,3 @@
-from Core.Updater import Updater
 from Services.Utils.Utils import Utils
 from Services.Twitch.Gql import TwitchGqlModels
 from Services.Twitch.Playback import TwitchPlaybackAccessTokens
@@ -11,7 +10,7 @@ from Download.Downloader.Engine.Engine import TwitchDownloader
 from Download.ScheduledDownloadPubSub import ScheduledDownloadPubSub
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 import uuid
 
@@ -81,7 +80,7 @@ class ScheduledDownloadStatus(QtCore.QObject):
 
 
 class ScheduledDownload(QtCore.QObject):
-    enableChanged = QtCore.pyqtSignal()
+    enabledChanged = QtCore.pyqtSignal()
     channelDataUpdateStarted = QtCore.pyqtSignal()
     channelDataUpdateFinished = QtCore.pyqtSignal()
     channelDataUpdated = QtCore.pyqtSignal()
@@ -110,28 +109,29 @@ class ScheduledDownload(QtCore.QObject):
         self.downloader = None
         self.status = ScheduledDownloadStatus(parent=self)
         self.updateChannelData()
+        self.parent().blockedChangedSignal.connect(self.parentBlockedChanged)
         self.parent().enabledChangedSignal.connect(self.parentEnabledChanged)
 
     def setEnabled(self, enabled):
         self.preset.setEnabled(enabled)
         self.status.cleanup()
         self._syncEnabledState()
-        self.enableChanged.emit()
+        self.enabledChanged.emit()
 
     def isEnabled(self):
         return self.preset.isEnabled()
 
-    def isParentEnabled(self):
-        return self.parent().isEnabled()
-
     def isGloballyEnabled(self):
-        return self.isParentEnabled() and self.isEnabled()
+        return not self.parent().isBlocked() and self.parent().isEnabled() and self.isEnabled()
+
+    def parentBlockedChanged(self, blocked):
+        self.parentEnabledChanged(self.parent().isEnabled())
 
     def parentEnabledChanged(self, enabled):
         self._syncEnabledState()
         if enabled:
             self.updateChannelData()
-        self.enableChanged.emit()
+        self.enabledChanged.emit()
 
     def _syncEnabledState(self):
         if self.isChannelConnected():
@@ -214,10 +214,10 @@ class ScheduledDownload(QtCore.QObject):
         if topic.eventType == TwitchPubSubEvents.EventTypes.VideoPlaybackById:
             if data["type"] == "stream-up":
                 self.setOnline()
-                self.channel.stream.createdAt = QtCore.QDateTime.fromSecsSinceEpoch(data["server_time"], QtCore.Qt.UTC)
+                self.channel.stream.createdAt = QtCore.QDateTime.fromSecsSinceEpoch(data["server_time"], QtCore.Qt.TimeSpec.UTC)
             elif data["type"] == "stream-down":
                 self.setOffline()
-                self.channel.lastBroadcast.startedAt = QtCore.QDateTime.fromSecsSinceEpoch(data["server_time"], QtCore.Qt.UTC)
+                self.channel.lastBroadcast.startedAt = QtCore.QDateTime.fromSecsSinceEpoch(data["server_time"], QtCore.Qt.TimeSpec.UTC)
             elif data["type"] == "viewcount":
                 if self.isOnline() and self.channel.stream.id != None:
                     self.channel.stream.viewersCount = data["viewers"]
@@ -249,11 +249,16 @@ class ScheduledDownload(QtCore.QObject):
 
     def generateStreamAccessToken(self):
         self.status.setGeneratingAccessToken()
-        self.accessTokenThread.setup(
-            target=AccessTokenGenerator.generateStreamAccessToken,
-            args=(self.getStreamInfo(),)
-        )
-        self.accessTokenThread.start()
+        try:
+            from Services.Twitch.Integrity.TwitchIntegrityGenerator import TwitchIntegrityGenerator
+            TwitchIntegrityGenerator.updateIntegrity()
+            self.accessTokenThread.setup(
+                target=AccessTokenGenerator.generateStreamAccessToken,
+                args=(self.getStreamInfo(), TwitchIntegrityGenerator.getIntegrity)
+            )
+            self.accessTokenThread.start()
+        except Exception as e:
+            self.status.setError(e)
 
     def processStreamAccessTokenResult(self, result):
         if result.success:
@@ -308,6 +313,7 @@ class ScheduledDownload(QtCore.QObject):
 
 
 class _ScheduledDownloadManager(QtCore.QObject):
+    blockedChangedSignal = QtCore.pyqtSignal(bool)
     enabledChangedSignal = QtCore.pyqtSignal(bool)
     createdSignal = QtCore.pyqtSignal(object)
     destroyedSignal = QtCore.pyqtSignal(object)
@@ -317,11 +323,19 @@ class _ScheduledDownloadManager(QtCore.QObject):
 
     def __init__(self, parent=None):
         super(_ScheduledDownloadManager, self).__init__(parent=parent)
+        self._blocked = True
         self._enabled = False
         self.scheduledDownloads = {}
         self.runningScheduledDownloads = []
-        Updater.statusUpdated.connect(self._updatePubSubState)
         self._updatePubSubState()
+
+    def setBlocked(self, blocked):
+        self._blocked = blocked
+        self._updatePubSubState()
+        self.blockedChangedSignal.emit(self._blocked)
+
+    def isBlocked(self):
+        return self._blocked
 
     def setEnabled(self, enabled):
         self._enabled = enabled
@@ -332,7 +346,7 @@ class _ScheduledDownloadManager(QtCore.QObject):
         return self._enabled
 
     def _updatePubSubState(self):
-        if Updater.status.isOperational() and self.isEnabled() and len(self.scheduledDownloads) != 0:
+        if not self.isBlocked() and self.isEnabled() and len(self.scheduledDownloads) != 0:
             if not ScheduledDownloadPubSub.isOpened():
                 ScheduledDownloadPubSub.open()
         else:
@@ -358,7 +372,6 @@ class _ScheduledDownloadManager(QtCore.QObject):
         return scheduledDownloadId
 
     def downloaderCreated(self, scheduledDownload, downloader):
-        FileNameManager.lock(downloader.setup.downloadInfo.getAbsoluteFileName())
         self.runningScheduledDownloads.append(scheduledDownload)
         self.downloaderCountChangedSignal.emit(len(self.getRunningDownloaders()))
         self.downloaderCreatedSignal.emit(scheduledDownload, downloader)
@@ -366,7 +379,6 @@ class _ScheduledDownloadManager(QtCore.QObject):
     def downloaderDestroyed(self, scheduledDownload, downloader):
         self.runningScheduledDownloads.remove(scheduledDownload)
         self.downloaderCountChangedSignal.emit(len(self.getRunningDownloaders()))
-        FileNameManager.unlock(downloader.setup.downloadInfo.getAbsoluteFileName())
         self.downloaderDestroyedSignal.emit(scheduledDownload, downloader)
 
     def get(self, scheduledDownloadId):
@@ -405,9 +417,5 @@ class _ScheduledDownloadManager(QtCore.QObject):
 
     def isDownloaderRunning(self):
         return len(self.getRunningDownloaders()) != 0
-
-    def cleanup(self):
-        if ScheduledDownloadPubSub.isOpened():
-            ScheduledDownloadPubSub.close()
 
 ScheduledDownloadManager = _ScheduledDownloadManager()

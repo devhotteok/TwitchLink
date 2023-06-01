@@ -3,7 +3,7 @@ from Services.NetworkRequests import Network
 from Services.Threading.MutexLocker import MutexLocker
 from Services.Task.PrioritizedTask import PrioritizedTask, TaskSignals
 
-from PyQt5 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui
 
 
 class ImageDownloaderSignals(TaskSignals):

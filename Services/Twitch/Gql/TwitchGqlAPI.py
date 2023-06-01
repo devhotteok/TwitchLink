@@ -25,6 +25,10 @@ class Exceptions:
         def __str__(self):
             return f"Twitch API Error\nresponse: {self.data}"
 
+    class IntegrityError(Exception):
+        def __str__(self):
+            return f"Integrity Error"
+
     class DataNotFound(Exception):
         def __str__(self):
             return "Twitch API Error\ndata not found"
@@ -45,6 +49,9 @@ class GqlEngine:
             except:
                 raise Exceptions.ApiError(response.getData())
             if "errors" in json:
+                for error in json["errors"]:
+                    if error.get("message") == "failed integrity check":
+                        raise Exceptions.IntegrityError
                 raise Exceptions.ApiError(json)
             return json
         else:

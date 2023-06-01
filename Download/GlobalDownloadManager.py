@@ -1,11 +1,14 @@
 from Core.App import App
+from Services.Messages import Messages
+from Services.Utils.Utils import Utils
+from Services.Translator.Translator import T
 from Database.Database import DB
 from Download.Downloader.Engine.Engine import TwitchDownloader
 from Download.DownloadManager import DownloadManager
 from Download.ScheduledDownloadManager import ScheduledDownloadManager
 from Download.DownloadHistoryManager import DownloadHistoryManager
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class _GlobalDownloadManager(QtCore.QObject):
@@ -30,9 +33,30 @@ class _GlobalDownloadManager(QtCore.QObject):
     def _scheduledDownloaderCreated(self, scheduledDownload, downloader):
         DownloadHistoryManager.createHistory(downloader)
         self.downloadStarted(downloader)
+        if DB.general.isNotifyEnabled():
+            App.notification.toastMessage(
+                title=T("download-started"),
+                message=f"{T('title')}: {downloader.setup.downloadInfo.videoData.title}\n{T('file')}: {downloader.setup.downloadInfo.getAbsoluteFileName()}"
+            )
 
     def _scheduledDownloaderDestroyed(self, scheduledDownload, downloader):
         self.downloadFinished(downloader)
+        if DB.general.isNotifyEnabled():
+            if downloader.status.terminateState.isTrue():
+                if downloader.status.getError() == None:
+                    title = "download-stopped"
+                else:
+                    title = "download-aborted"
+            else:
+                title = "download-complete"
+            App.notification.toastMessage(
+                title=T(title),
+                message=f"{T('title')}: {downloader.setup.downloadInfo.videoData.title}\n{T('file')}: {downloader.setup.downloadInfo.getAbsoluteFileName()}",
+                actions={
+                    T("open-file"): lambda: _GlobalDownloadManager.openFile(downloader.setup.downloadInfo.getAbsoluteFileName()),
+                    T("open-folder"): lambda: _GlobalDownloadManager.openFolder(downloader.setup.downloadInfo.directory)
+                } if downloader.status.getError() == None else None
+            )
 
     def _downloadManagerDownloadStarted(self, downloaderId):
         self.downloadStarted(DownloadManager.get(downloaderId))
@@ -138,5 +162,19 @@ class _GlobalDownloadManager(QtCore.QObject):
     def handleClipProgress(self, downloader):
         progress = downloader.progress
         App.taskbar.setValue(progress.sizeProgress)
+
+    @staticmethod
+    def openFile(fileName):
+        try:
+            Utils.openFile(fileName)
+        except:
+            Utils.info(*Messages.INFO.FILE_NOT_FOUND)
+
+    @staticmethod
+    def openFolder(directory):
+        try:
+            Utils.openFile(directory)
+        except:
+            Utils.info(*Messages.INFO.FOLDER_NOT_FOUND)
 
 GlobalDownloadManager = _GlobalDownloadManager()

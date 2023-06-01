@@ -18,11 +18,14 @@ from Ui.Components.Pages.AccountPage import AccountPage
 from Ui.Components.Pages.InformationPage import InformationPage
 from Ui.Components.Widgets.ProgressDialog import ProgressDialog
 
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+
 
 class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent=parent)
-        App.appStarted.connect(self.start, QtCore.Qt.QueuedConnection)
+        App.appStarted.connect(self.start, QtCore.Qt.ConnectionType.QueuedConnection)
+        App.newInstanceStarted.connect(self.activate)
 
     def start(self):
         if DB.setup.needSetup():
@@ -34,6 +37,7 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             Ui.Loading().exec()
             self.loadWindowGeometry()
             self.loadComponents()
+            self.setupSystemTray()
             self.setup()
 
     def loadComponents(self):
@@ -70,6 +74,16 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         self.information.appShutdownRequested.connect(self.shutdown)
         self.informationPage.layout().addWidget(self.information)
 
+    def setupSystemTray(self):
+        contextMenu = App.systemTray.contextMenu()
+        self.openAppAction = QtGui.QAction(T("open"), parent=contextMenu)
+        self.closeAppAction = QtGui.QAction(T("exit"), parent=contextMenu)
+        self.openAppAction.triggered.connect(self.activate)
+        self.closeAppAction.triggered.connect(self.close)
+        contextMenu.addAction(self.openAppAction)
+        contextMenu.addAction(self.closeAppAction)
+        App.systemTray.clicked.connect(self.activate)
+
     def setup(self):
         self.statusUpdated(isInSetup=True)
         if Updater.status.isOperational():
@@ -80,9 +94,18 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             Updater.statusUpdated.connect(self.statusUpdated)
             Updater.startAutoUpdate()
             ContentManager.ContentManager.restrictionsUpdated.connect(self.restrictionsUpdated)
-            GlobalDownloadManager.statsUpdated.connect(self.showContributeInfo, QtCore.Qt.QueuedConnection)
-        self.show()
+            GlobalDownloadManager.statsUpdated.connect(self.showContributeInfo, QtCore.Qt.ConnectionType.QueuedConnection)
+        self.show(webViewRenderingEnabled=True)
         self.showErrorHistory()
+
+    def show(self, webViewRenderingEnabled=False):
+        if webViewRenderingEnabled:
+            webView = QWebEngineView(parent=self)
+            webView.load(QtCore.QUrl(""))
+            super().show()
+            webView.setParent(None)
+        else:
+            super().show()
 
     def statusUpdated(self, isInSetup=False):
         isOperational = Updater.status.isOperational()
@@ -97,7 +120,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             self.scheduledDownloadsPageObject.unfocus()
             self.settingsPageObject.unfocus()
         GlobalDownloadManager.setDownloaderCreationEnabled(isOperational)
-        contentId = f"APP_STATUS"
+        ScheduledDownloadManager.setBlocked(not isOperational)
+        contentId = "APP_STATUS"
         self.information.removeAppInfo(contentId)
         status = Updater.status.getStatus()
         if status == Updater.status.CONNECTION_FAILURE:
@@ -197,6 +221,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         enabled = not focus
         self.actionAbout.setEnabled(enabled)
         self.actionTermsOfService.setEnabled(enabled)
+        if focus:
+            self.activate()
 
     def restrictionsUpdated(self):
         for downloader in GlobalDownloadManager.getRunningDownloaders():
@@ -228,9 +254,6 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         if GlobalDownloadManager.isDownloaderRunning() and not GlobalDownloadManager.isShuttingDown():
             if self.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS):
                 self.shutdown()
-        elif DB.general.isConfirmExitEnabled():
-            if self.ask("notification", "#Are you sure you want to exit?"):
-                self.shutdown()
         else:
             self.shutdown()
 
@@ -244,7 +267,11 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
     def closeEvent(self, event):
         super().closeEvent(event)
         event.ignore()
-        self.confirmShutdown()
+        if Updater.status.isOperational() and self.isVisible() and DB.general.isSystemTrayEnabled() and event.spontaneous():
+            self.hide()
+            App.notification.toastMessage(T("#Minimized to system tray"), T("#{appName} is running in the background.", appName=Config.APP_NAME), icon=App.notification.Icons.Information)
+        else:
+            self.confirmShutdown()
 
     def gettingStarted(self):
         Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": Translator.getLanguage()}))
@@ -279,7 +306,7 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
         Updater.stopAutoUpdate()
         NotificationManager.clearAll()
         GlobalDownloadManager.setDownloaderCreationEnabled(False)
-        ScheduledDownloadManager.cleanup()
+        ScheduledDownloadManager.setBlocked(True)
         self.downloads.setDownloadCompleteAction(None)
         self.waitForCleanup()
         self.saveWindowGeometry()
@@ -291,3 +318,9 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
     def shutdownSystem(self):
         self.shutdown()
         Utils.shutdownSystem(message=T("#Shutdown by {appName}'s scheduled task.", appName=Config.APP_NAME))
+
+    def activate(self):
+        if self.isHidden():
+            self.show()
+        self.setWindowState((self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized) | QtCore.Qt.WindowState.WindowActive)
+        self.activateWindow()

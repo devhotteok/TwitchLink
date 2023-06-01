@@ -1,6 +1,6 @@
 from .AdView import AdView
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class CachedAd(QtCore.QObject):

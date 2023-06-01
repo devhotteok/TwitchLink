@@ -4,6 +4,7 @@ from Services import ContentManager
 from Services.Account import TwitchAccount
 from Services.Twitch.Gql import TwitchGqlModels
 from Services.Twitch.Playback import TwitchPlaybackAccessTokens
+from Services.Twitch.Integrity.TwitchIntegrityGenerator import TwitchIntegrityGenerator
 from Services.AccessTokenGenerator import AccessTokenGenerator
 from Download.DownloadInfo import DownloadInfo
 from Download.DownloadManager import DownloadManager
@@ -35,10 +36,11 @@ class DownloadButton(QtCore.QObject):
         return self.accessTokenThread
 
     def generateAccessToken(self, process, resultHandler):
+        TwitchIntegrityGenerator.updateIntegrity()
         thread = self.getAccessTokenThread()
         thread.setup(
             target=process,
-            args=(self.videoData,),
+            args=(self.videoData, TwitchIntegrityGenerator.getIntegrity),
             disconnect=True
         )
         thread.resultSignal.connect(resultHandler)
@@ -142,6 +144,8 @@ class DownloadButton(QtCore.QObject):
         elif isinstance(exception, ContentManager.Exceptions.RestrictedContent):
             self.handleRestrictedContent(exception)
         else:
+            if isinstance(exception, TwitchPlaybackAccessTokens.Exceptions.IntegrityError):
+                TwitchIntegrityGenerator.updateIntegrity(forceUpdate=True)
             self.info(*Messages.INFO.NETWORK_ERROR)
 
     def handleRestrictedContent(self, restriction):

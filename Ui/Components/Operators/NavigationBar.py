@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui
 
 
 class PageObject(QtCore.QObject):
@@ -20,9 +20,9 @@ class PageObject(QtCore.QObject):
     def setPageName(self, name):
         self.button.setText(name)
         if name == "":
-            self.button.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
+            self.button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly)
         else:
-            self.button.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+            self.button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
 
     def show(self):
         self.parent().setCurrentPage(self)

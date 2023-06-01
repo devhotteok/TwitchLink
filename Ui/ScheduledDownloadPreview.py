@@ -18,7 +18,7 @@ class ScheduledDownloadPreview(QtWidgets.QWidget, UiFile.scheduledDownloadPrevie
         super(ScheduledDownloadPreview, self).__init__(parent=parent)
         self.scheduledDownloadId = scheduledDownloadId
         self.scheduledDownload = ScheduledDownloadManager.get(self.scheduledDownloadId)
-        self.scheduledDownload.enableChanged.connect(self.showEnableState)
+        self.scheduledDownload.enabledChanged.connect(self.showEnableState)
         self.scheduledDownload.channelDataUpdateStarted.connect(self.channelDataUpdateStarted)
         self.scheduledDownload.channelDataUpdateFinished.connect(self.channelDataUpdateFinished)
         self.scheduledDownload.channelDataUpdated.connect(self.showChannel)
@@ -69,7 +69,7 @@ class ScheduledDownloadPreview(QtWidgets.QWidget, UiFile.scheduledDownloadPrevie
         if self.scheduledDownload.status.isNone():
             self.showStatus(False)
         elif self.scheduledDownload.status.isGeneratingAccessToken():
-            self.showStatus(False)
+            self.showStatus(True, customMessage=T("preparing", ellipsis=True))
         elif self.scheduledDownload.status.isDownloading():
             self.connectDownloader(self.scheduledDownload.downloader)
             self.showStatus(True)
@@ -79,12 +79,17 @@ class ScheduledDownloadPreview(QtWidgets.QWidget, UiFile.scheduledDownloadPrevie
             self.showStatus(True, error=self.scheduledDownload.status.getError(), isDownloadAborted=True)
         self.resizedSignal.emit()
 
-    def showStatus(self, show, error=None, isDownloadAborted=False):
+    def showStatus(self, show, error=None, isDownloadAborted=False, customMessage=None):
         self._hideError()
         if show:
             self.statusArea.show()
+            self.progressBar.setVisible(customMessage == None)
             if error != None:
                 self._showError(error, isDownloadAborted=isDownloadAborted)
+            elif customMessage != None:
+                self.status.setText(customMessage)
+                self.alertIcon.show()
+                self.progressBar.hide()
         else:
             self.statusArea.hide()
 

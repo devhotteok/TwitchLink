@@ -99,9 +99,13 @@
     "en": "Shutdown by {appName}'s scheduled task.",
     "ko": "{appName}의 예약된 다운로드 완료 작업에 의해 시스템이 종료됩니다."
   },
-  "#Are you sure you want to exit?": {
-    "en": "Are you sure you want to exit?",
-    "ko": "정말 종료하시겠습니까?"
+  "#Minimized to system tray": {
+    "en": "Minimized to system tray",
+    "ko": "시스템 트레이에 최소화됨"
+  },
+  "#{appName} is running in the background.": {
+    "en": "{appName} is running in the background.",
+    "ko": "{appName}이/가 백그라운드에서 실행 중입니다."
   },
   "#Checking channel info": {
     "en": "Checking channel info",

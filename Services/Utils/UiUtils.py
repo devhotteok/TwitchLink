@@ -1,7 +1,7 @@
-from Services.Image.Presets import Images
+from Services.Image.Presets import Icons
 from Services.Translator.Translator import T
 
-from PyQt5 import QtGui, QtWidgets, QtSvg
+from PyQt6 import QtGui, QtWidgets, QtSvgWidgets
 
 
 class UiUtils:
@@ -13,7 +13,7 @@ class UiUtils:
 
     @classmethod
     def setSvgIcon(cls, placeholder, path):
-        svgWidget = QtSvg.QSvgWidget(path, parent=placeholder.parent())
+        svgWidget = QtSvgWidgets.QSvgWidget(path, parent=placeholder.parent())
         svgWidget.setSizePolicy(placeholder.sizePolicy())
         svgWidget.setMinimumSize(placeholder.minimumSize())
         svgWidget.setMaximumSize(placeholder.maximumSize())
@@ -26,9 +26,9 @@ class UiUtils:
             T(content) if contentTranslate else content,
             parent=parent
         )
-        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         if buttonText != None:
-            msg.button(QtWidgets.QMessageBox.Ok).setText(T(buttonText))
+            msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(T(buttonText))
         msg.exec()
 
     @staticmethod
@@ -38,18 +38,18 @@ class UiUtils:
             T(content) if contentTranslate else content,
             parent=parent
         )
-        msg.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
+        msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel)
         if okText != None:
-            msg.button(QtWidgets.QMessageBox.Ok).setText(T(okText))
+            msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(T(okText))
         if cancelText != None:
-            msg.button(QtWidgets.QMessageBox.Cancel).setText(T(cancelText))
-        msg.setDefaultButton(QtWidgets.QMessageBox.Ok if defaultOk else QtWidgets.QMessageBox.Cancel)
-        return msg.exec() == QtWidgets.QMessageBox.Ok
+            msg.button(QtWidgets.QMessageBox.StandardButton.Cancel).setText(T(cancelText))
+        msg.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Ok if defaultOk else QtWidgets.QMessageBox.StandardButton.Cancel)
+        return msg.exec() == QtWidgets.QMessageBox.StandardButton.Ok
 
     @staticmethod
     def askDirectory(directory, parent=None):
         fileDialog = QtWidgets.QFileDialog(parent=parent)
-        fileDialog.setWindowIcon(QtGui.QIcon(Images.APP_LOGO_IMAGE))
+        fileDialog.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
         result = fileDialog.getExistingDirectory(
             parent=parent,
             caption=T("select-folder"),
@@ -61,7 +61,7 @@ class UiUtils:
     def askSaveAs(directory, filters, initialFilter=None, parent=None):
         mappedFilters = dict((T("#{fileFormat} file (*.{fileFormat})", fileFormat=key), key) for key in filters)
         fileDialog = QtWidgets.QFileDialog(parent=parent)
-        fileDialog.setWindowIcon(QtGui.QIcon(Images.APP_LOGO_IMAGE))
+        fileDialog.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
         result = fileDialog.getSaveFileName(
             parent=parent,
             caption=T("save-as"),

@@ -1,7 +1,7 @@
 from Core.Config import Config as CoreConfig
 from Services.Utils.OSUtils import OSUtils
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 _P = OSUtils.joinPath
@@ -14,14 +14,14 @@ class Config:
 
     LANGUAGES = {
         "en": {
-            "languageId": QtCore.QLocale.English,
+            "languageId": QtCore.QLocale.Language.English,
             "name": "English",
-            "font": "Arial, Open Sans, 나눔고딕"
+            "font": ["Arial", "Open Sans", "나눔고딕"]
         },
         "ko": {
-            "languageId": QtCore.QLocale.Korean,
+            "languageId": QtCore.QLocale.Language.Korean,
             "name": "한국어",
-            "font": "나눔고딕"
+            "font": ["나눔고딕"]
         }
     }
 

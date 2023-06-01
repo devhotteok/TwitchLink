@@ -2,7 +2,7 @@ from Core.Ui import *
 from Services.Account.Config import Config
 from Ui.WebViewWidget import WebViewWidget
 
-from PyQt5 import QtCore
+from PyQt6 import QtWebEngineCore
 
 
 class AccountData:
@@ -18,7 +18,7 @@ class LoginWidget(WebViewWidget):
     def __init__(self, parent=None):
         super(LoginWidget, self).__init__(parent=parent)
         self.accountData = AccountData()
-        self.profile = QtWebEngineWidgets.QWebEngineProfile(parent=self)
+        self.profile = QtWebEngineCore.QWebEngineProfile(parent=self)
         self.profile.cookieStore().cookieAdded.connect(self.getAuthToken)
         self.setProfile(self.profile)
         self.showLoginPage()

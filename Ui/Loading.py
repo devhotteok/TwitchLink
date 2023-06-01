@@ -5,7 +5,7 @@ from Core.Ui import *
 class Loading(QtWidgets.QDialog, UiFile.loading):
     def __init__(self, parent=None):
         super(Loading, self).__init__(parent=parent)
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
         self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
         self.appLogo.setMargin(10)
         self.appName.setText(Config.APP_NAME)

@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 
 class _QProgressBar(QtWidgets.QProgressBar):
@@ -6,6 +6,9 @@ class _QProgressBar(QtWidgets.QProgressBar):
         super(_QProgressBar, self).__init__(parent=parent)
         self.customState = False
         self.checkRange()
+
+    def setValue(self, value):
+        super().setValue(int(value))
 
     def setMaximum(self, maximum):
         super().setMaximum(maximum)

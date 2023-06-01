@@ -1,6 +1,6 @@
 from .AdManager import AdManager
 
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 
 class AdWidget(QtWidgets.QWidget):

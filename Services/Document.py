@@ -1,11 +1,11 @@
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 
 class DocumentButtonData:
     BUTTON_ROLES = {
-        "accept": QtWidgets.QDialogButtonBox.AcceptRole,
-        "reject": QtWidgets.QDialogButtonBox.RejectRole,
-        "action": QtWidgets.QDialogButtonBox.ActionRole
+        "accept": QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole,
+        "reject": QtWidgets.QDialogButtonBox.ButtonRole.RejectRole,
+        "action": QtWidgets.QDialogButtonBox.ButtonRole.ActionRole
     }
 
     def __init__(self, text="", action=None, role="accept", default=False):

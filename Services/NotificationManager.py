@@ -3,7 +3,7 @@ from Services.Translator.Translator import Translator
 from Services.Document import DocumentData, DocumentButtonData
 from Database.Database import DB
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class _NotificationManager(QtCore.QObject):

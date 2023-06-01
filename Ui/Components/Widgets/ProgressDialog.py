@@ -1,12 +1,12 @@
 from Services.Threading.WorkerThread import WorkerThread
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 
 class ProgressDialog(QtWidgets.QProgressDialog):
     def __init__(self, cancelAllowed=True, parent=None):
         super(ProgressDialog, self).__init__(parent=parent)
-        self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
+        self.setWindowFlag(QtCore.Qt.WindowType.WindowCloseButtonHint, False)
         self.setAutoReset(False)
         self.cancelAllowed = cancelAllowed
         if not self.cancelAllowed:

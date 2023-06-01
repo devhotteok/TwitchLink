@@ -8,8 +8,8 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
     def __init__(self, downloadInfo, parent=None):
         super(DownloadMenu, self).__init__(parent=parent)
         self.finished.connect(self.saveWindowGeometry)
-        self.ignoreKey(QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter)
-        self.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint)
+        self.ignoreKey(QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter)
+        self.setWindowFlag(QtCore.Qt.WindowType.WindowMaximizeButtonHint)
         self.downloadInfo = downloadInfo
         self.setWindowGeometryKey(f"{self.getWindowGeometryKey()}/{self.downloadInfo.type.toString()}")
         self.loadWindowGeometry()
@@ -122,7 +122,7 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.fromTimeBar.setStyleSheet(styleSheet)
         self.toTimeBar.setStyleSheet(styleSheet)
         self.reloadCropInfoArea()
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(not invalid)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(not invalid)
 
     def getFromSpin(self):
         return self.fromSpinH.value(), self.fromSpinM.value(), self.fromSpinS.value()
@@ -179,7 +179,7 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
         self.reloadCropArea()
         if self.updateTrackCheckBox.isChecked() and not self.cropToEndRadioButton.isChecked():
             if self.ask("warning", "#Update track mode is currently enabled.\nSetting the end of the crop range will not track updates.\nProceed?", defaultOk=True):
-                self.updateTrackCheckBox.setCheckState(QtCore.Qt.Unchecked)
+                self.updateTrackCheckBox.setCheckState(QtCore.Qt.CheckState.Unchecked)
             else:
                 self.cropToEndRadioButton.setChecked(True)
 
@@ -221,7 +221,7 @@ class DownloadMenu(QtWidgets.QDialog, UiFile.downloadMenu, WindowGeometryManager
             if self.ask("warning", "#The end of the crop range is currently set.\nEnabling update track mode will ignore the end of the crop range and continue downloading.\nProceed?", defaultOk=True):
                 self.cropToEndRadioButton.setChecked(True)
             else:
-                self.updateTrackCheckBox.setCheckState(QtCore.Qt.Unchecked)
+                self.updateTrackCheckBox.setCheckState(QtCore.Qt.CheckState.Unchecked)
 
     def saveCropRange(self):
         self.downloadInfo.setCropRange(

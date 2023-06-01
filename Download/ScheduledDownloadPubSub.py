@@ -2,7 +2,7 @@ from Core.App import App
 from Services.Twitch.PubSub import TwitchPubSub
 from Services.Twitch.PubSub import TwitchPubSubEvents
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class ScheduledDownloadPubSubSubscriber(QtCore.QObject):

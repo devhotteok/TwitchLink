@@ -2,11 +2,12 @@ from . import Modules
 
 from Core.Config import Config
 from Services.Utils.Utils import Utils
+from Services.FileNameManager import FileNameManager
 from Services.Threading.MutexLocker import MutexLocker
 from Services.Logging.Logger import Logger
 from Services.Logging.ObjectLogger import ObjectLogger
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 import uuid
 
@@ -49,7 +50,8 @@ class EngineSetup(QtCore.QThread):
     def run(self):
         self.logger.info("Download Started")
         try:
-            self.download()
+            with FileNameManager.lock(self.setup.downloadInfo.getAbsoluteFileName()):
+                self.download()
         except Exception as e:
             self.logger.exception(e)
             self.status.raiseError(e)

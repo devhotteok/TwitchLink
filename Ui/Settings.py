@@ -6,6 +6,42 @@ from Download.GlobalDownloadManager import GlobalDownloadManager
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
 
 
+class TemplateInfoWindow(QtCore.QObject):
+    class TYPE:
+        STREAM = "stream"
+        VIDEO = "video"
+        CLIP = "clip"
+
+    FORM_DATA = {
+        TYPE.STREAM: FileNameGenerator.getStreamFileNameTemplateFormData,
+        TYPE.VIDEO: FileNameGenerator.getVideoFileNameTemplateFormData,
+        TYPE.CLIP: FileNameGenerator.getClipFileNameTemplateFormData
+    }
+
+    def __init__(self, templateType, parent=None):
+        super(TemplateInfoWindow, self).__init__(parent=parent)
+        self.templateType = templateType
+        self.window = None
+
+    def show(self):
+        if self.window == None:
+            self.window = Ui.PropertyView(
+                FileNameGenerator.getInfoTitle(self.templateType),
+                None,
+                self.FORM_DATA[self.templateType](),
+                enableLabelSelection=True,
+                enableFieldTranslation=True,
+                parent=self.parent()
+            )
+            self.window.destroyed.connect(self.closed)
+            self.window.show()
+        else:
+            self.window.activateWindow()
+
+    def closed(self):
+        self.window = None
+
+
 class Settings(QtWidgets.QWidget, UiFile.settings):
     restartRequired = QtCore.pyqtSignal()
 
@@ -15,17 +51,20 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
         self.openProgressWindow.toggled.connect(DB.general.setOpenProgressWindowEnabled)
         self.notify.setChecked(DB.general.isNotifyEnabled())
         self.notify.toggled.connect(DB.general.setNotifyEnabled)
-        self.confirmExit.setChecked(DB.general.isConfirmExitEnabled())
-        self.confirmExit.toggled.connect(DB.general.setConfirmExitEnabled)
+        self.windowClose.setCurrentIndex(1 if DB.general.isSystemTrayEnabled() else 0)
+        self.windowClose.currentIndexChanged.connect(self.windowCloseChanged)
+        self.streamTemplateInfoWindow = TemplateInfoWindow(TemplateInfoWindow.TYPE.STREAM, parent=self)
         self.streamFilename.setText(DB.templates.getStreamFilename())
         self.streamFilename.editingFinished.connect(self.setStreamFilename)
-        self.streamTemplateInfo.clicked.connect(self.showStreamTemplateInfo)
+        self.streamTemplateInfo.clicked.connect(self.streamTemplateInfoWindow.show)
+        self.videoTemplateInfoWindow = TemplateInfoWindow(TemplateInfoWindow.TYPE.VIDEO, parent=self)
         self.videoFilename.setText(DB.templates.getVideoFilename())
         self.videoFilename.editingFinished.connect(self.setVideoFilename)
-        self.videoTemplateInfo.clicked.connect(self.showVideoTemplateInfo)
+        self.videoTemplateInfo.clicked.connect(self.videoTemplateInfoWindow.show)
+        self.clipTemplateInfoWindow = TemplateInfoWindow(TemplateInfoWindow.TYPE.CLIP, parent=self)
         self.clipFilename.setText(DB.templates.getClipFilename())
         self.clipFilename.editingFinished.connect(self.setClipFilename)
-        self.clipTemplateInfo.clicked.connect(self.showClipTemplateInfo)
+        self.clipTemplateInfo.clicked.connect(self.clipTemplateInfoWindow.show)
         for bookmark in DB.general.getBookmarks():
             self.addBookmark(bookmark)
         self.bookmarkList.model().rowsInserted.connect(self.saveBookmark)
@@ -74,6 +113,9 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
             self.restrictedLabel.hide()
             ImageLoader.throttle(False)
 
+    def windowCloseChanged(self, index):
+        DB.general.setSystemTrayEnabled(False if index == 0 else True)
+
     def setStreamFilename(self):
         DB.templates.setStreamFilename(self.streamFilename.text())
 
@@ -83,40 +125,10 @@ class Settings(QtWidgets.QWidget, UiFile.settings):
     def setClipFilename(self):
         DB.templates.setClipFilename(self.clipFilename.text())
 
-    def showStreamTemplateInfo(self):
-        Ui.PropertyView(
-            FileNameGenerator.getInfoTitle("stream"),
-            None,
-            FileNameGenerator.getStreamFileNameTemplateFormData(),
-            enableLabelSelection=True,
-            enableFieldTranslation=True,
-            parent=self
-        ).exec()
-
-    def showVideoTemplateInfo(self):
-        Ui.PropertyView(
-            FileNameGenerator.getInfoTitle("video"),
-            None,
-            FileNameGenerator.getVideoFileNameTemplateFormData(),
-            enableLabelSelection=True,
-            enableFieldTranslation=True,
-            parent=self
-        ).exec()
-
-    def showClipTemplateInfo(self):
-        Ui.PropertyView(
-            FileNameGenerator.getInfoTitle("clip"),
-            None,
-            FileNameGenerator.getClipFileNameTemplateFormData(),
-            enableLabelSelection=True,
-            enableFieldTranslation=True,
-            parent=self
-        ).exec()
-
     def reloadBookmarkArea(self):
         selected = self.bookmarkList.currentRow() != -1
         text = self.newBookmark.text().strip().lower()
-        textNotEmptyOrDuplicate = text != "" and len(self.bookmarkList.findItems(text, QtCore.Qt.MatchFixedString)) == 0
+        textNotEmptyOrDuplicate = text != "" and len(self.bookmarkList.findItems(text, QtCore.Qt.MatchFlag.MatchFixedString)) == 0
         self.addBookmarkButton.setEnabled(textNotEmptyOrDuplicate)
         self.removeBookmarkButton.setEnabled(selected)
 

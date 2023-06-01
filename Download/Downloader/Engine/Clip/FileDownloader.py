@@ -2,7 +2,7 @@ from Core.GlobalExceptions import Exceptions
 from Services.NetworkRequests import Network
 from Services.Task.PrioritizedTask import PrioritizedTask, TaskSignals
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class FileDownloaderSignals(TaskSignals):

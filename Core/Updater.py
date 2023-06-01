@@ -5,7 +5,7 @@ from Services.NotificationManager import NotificationManager
 from Services.ContentManager import ContentManager
 from Services.Translator.Translator import Translator
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class Exceptions:
@@ -208,6 +208,7 @@ class _Updater(QtCore.QObject):
             from Services.Twitch.Gql.TwitchGqlConfig import Config as GqlConfig
             from Services.Twitch.Playback.TwitchPlaybackConfig import Config as PlaybackConfig
             from Services.Twitch.PubSub.TwitchPubSubConfig import Config as PubSubConfig
+            from Services.Twitch.Integrity.TwitchIntegrityConfig import Config as IntegrityConfig
             from Search.Config import Config as SearchConfig
             from Search.Helper.Config import Config as SearchHelperConfig
             from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
@@ -223,6 +224,7 @@ class _Updater(QtCore.QObject):
                 "API": GqlConfig,
                 "PLAYBACK": PlaybackConfig,
                 "PUBSUB": PubSubConfig,
+                "INTEGRITY": IntegrityConfig,
                 "SEARCH": SearchConfig,
                 "SEARCH_HELPER": SearchHelperConfig,
                 "DOWNLOAD_ENGINE": DownloadEngineConfig,

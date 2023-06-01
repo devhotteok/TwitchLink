@@ -2,7 +2,7 @@ from .Config import Config
 
 from Core.Config import Config as CoreConfig
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 import json
 
@@ -19,7 +19,7 @@ class ObjectLogger:
         elif isinstance(target, list):
             return [cls.getObjectData(data) for data in target]
         elif isinstance(target, QtCore.QDateTime):
-            return target.toString(QtCore.Qt.ISODateWithMs)
+            return target.toString(QtCore.Qt.DateFormat.ISODateWithMs)
         elif hasattr(target, "__dict__"):
             return cls.getObjectData(target.__dict__)
         else:

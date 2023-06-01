@@ -1,6 +1,6 @@
 from .Config import Config
 
-from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets, QtWebEngineCore, QtWebEngineWidgets
 
 
 class AdView(QtWebEngineWidgets.QWebEngineView):
@@ -35,13 +35,13 @@ class AdView(QtWebEngineWidgets.QWebEngineView):
         self.load(QtCore.QUrl(f"{Config.SERVER}?{Config.URL_QUERY.format(width=size[0], height=size[1])}"))
 
 
-class AdPage(QtWebEngineWidgets.QWebEnginePage):
+class AdPage(QtWebEngineCore.QWebEnginePage):
     def __init__(self, parent=None):
         super(AdPage, self).__init__(parent=parent)
         settings = self.settings()
-        settings.setAttribute(QtWebEngineWidgets.QWebEngineSettings.ShowScrollBars, False)
-        settings.setAttribute(QtWebEngineWidgets.QWebEngineSettings.ErrorPageEnabled, False)
-        self.setBackgroundColor(QtCore.Qt.transparent)
+        settings.setAttribute(QtWebEngineCore.QWebEngineSettings.WebAttribute.ShowScrollBars, False)
+        settings.setAttribute(QtWebEngineCore.QWebEngineSettings.WebAttribute.ErrorPageEnabled, False)
+        self.setBackgroundColor(QtCore.Qt.GlobalColor.transparent)
         self.loadFinished.connect(self.setup)
 
     def setup(self, success):
@@ -52,7 +52,7 @@ class AdPage(QtWebEngineWidgets.QWebEnginePage):
         return PageClickHandler(parent=self)
 
 
-class PageClickHandler(QtWebEngineWidgets.QWebEnginePage):
+class PageClickHandler(QtWebEngineCore.QWebEnginePage):
     def __init__(self, parent=None):
         super(PageClickHandler, self).__init__(parent=parent)
         self.urlChanged.connect(self.urlChangeHandler)

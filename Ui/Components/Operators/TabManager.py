@@ -22,7 +22,7 @@ class TabManager(QtWidgets.QTabWidget):
         tabIndex = self.insertTab(index, widget, icon if isinstance(icon, QtGui.QIcon) else QtGui.QIcon(icon), self.getInjectionSafeText(widget.windowTitle()))
         self.setTabToolTip(tabIndex, widget.windowTitle())
         if not closable:
-            self.tabBar().setTabButton(tabIndex, 1, None)
+            self.tabBar().setTabButton(tabIndex, QtWidgets.QTabBar.ButtonPosition.RightSide, None)
         self.tabCountChanged.emit(self.count())
         return tabIndex
 

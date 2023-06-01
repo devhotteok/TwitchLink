@@ -2,7 +2,7 @@ from Core.GlobalExceptions import Exceptions
 from Services import ContentManager
 from Database.EncoderDecoder import Codable
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class DownloadHistory(QtCore.QObject, Codable):

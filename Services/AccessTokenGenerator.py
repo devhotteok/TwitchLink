@@ -5,16 +5,16 @@ from Search import Engine
 
 class AccessTokenGenerator:
     @classmethod
-    def generateStreamAccessToken(cls, videoData):
+    def generateStreamAccessToken(cls, videoData, integrityGenerator):
         ContentManager.checkRestrictions(videoData, user=DB.account.user, fetch=True)
-        return Engine.Search.StreamAccessToken(videoData.broadcaster.login, DB.account.getAuthToken())
+        return Engine.Search.StreamAccessToken(videoData.broadcaster.login, DB.account.getAuthToken(), integrityGenerator)
 
     @classmethod
-    def generateVideoAccessToken(cls, videoData):
+    def generateVideoAccessToken(cls, videoData, integrityGenerator):
         ContentManager.checkRestrictions(videoData, user=DB.account.user, fetch=True)
-        return Engine.Search.VideoAccessToken(videoData.id, DB.account.getAuthToken())
+        return Engine.Search.VideoAccessToken(videoData.id, DB.account.getAuthToken(), integrityGenerator)
 
     @classmethod
-    def generateClipAccessToken(cls, videoData):
+    def generateClipAccessToken(cls, videoData, integrityGenerator):
         ContentManager.checkRestrictions(videoData, user=DB.account.user, fetch=True)
-        return Engine.Search.ClipAccessToken(videoData.slug, DB.account.getAuthToken())
+        return Engine.Search.ClipAccessToken(videoData.slug, DB.account.getAuthToken(), integrityGenerator)

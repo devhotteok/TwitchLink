@@ -6,7 +6,7 @@ from Core.Config import Config
 from Services.Utils.OSUtils import OSUtils
 from Services.Utils.SystemUtils import SystemUtils
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 import json
 
@@ -60,7 +60,7 @@ class General(Codable):
     def __init__(self):
         self._openProgressWindow = True
         self._notify = True
-        self._confirmExit = True
+        self._useSystemTray = False
         self._bookmarks = []
 
     def setOpenProgressWindowEnabled(self, openProgressWindow):
@@ -69,8 +69,8 @@ class General(Codable):
     def setNotifyEnabled(self, notify):
         self._notify = notify
 
-    def setConfirmExitEnabled(self, confirmExit):
-        self._confirmExit = confirmExit
+    def setSystemTrayEnabled(self, useSystemTray):
+        self._useSystemTray = useSystemTray
 
     def setBookmarks(self, bookmarks):
         self._bookmarks = bookmarks
@@ -81,8 +81,8 @@ class General(Codable):
     def isNotifyEnabled(self):
         return self._notify
 
-    def isConfirmExitEnabled(self):
-        return self._confirmExit
+    def isSystemTrayEnabled(self):
+        return self._useSystemTray
 
     def getBookmarks(self):
         return self._bookmarks
@@ -237,7 +237,7 @@ class Download(Codable):
 
 class ScheduledDownloads(Codable):
     def __init__(self):
-        self._enabled = True
+        self._enabled = False
         self._scheduledDownloadPresets = []
 
     def __setup__(self):

@@ -1,6 +1,8 @@
 from Core.Ui import *
 from Services.Messages import Messages
+from Services.Twitch.Gql import TwitchGqlAPI
 from Services.Twitch.Gql import TwitchGqlModels
+from Services.Twitch.Integrity.TwitchIntegrityGenerator import TwitchIntegrityGenerator
 from Search import Engine
 
 
@@ -39,7 +41,7 @@ class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
         self.verifiedIcon = Utils.setSvgIcon(self.verifiedIcon, Icons.VERIFIED_ICON)
         self.infoIcon = Utils.setSvgIcon(self.infoIcon, Icons.INFO_ICON)
         self.setup()
-        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.Normal, QtGui.QPalette.Window).name()};}}")
+        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Window).name()};}}")
         self.videoArea.setStyleSheet("#videoArea {background-color: transparent;}")
         self.videoArea.verticalScrollBar().setSingleStep(30)
         self.videoArea.verticalScrollBar().valueChanged.connect(self.searchMoreVideos)
@@ -179,18 +181,19 @@ class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
         if cursor == "":
             self.clearVideoList()
         self.setLoading(True)
+        TwitchIntegrityGenerator.updateIntegrity()
         if self.SEARCH_TYPES[self.searchType.currentIndex()][0] == "clips":
             filter = self.FILTER_LIST[self.sortOrFilter.currentIndex()][1]
             self.searchThread.setup(
                 target=Engine.Search.ChannelClips,
-                args=(self.channel.login, filter, cursor)
+                args=(self.channel.login, filter, cursor, TwitchIntegrityGenerator.getIntegrity)
             )
         else:
             videoType = self.SEARCH_TYPES[self.searchType.currentIndex()][1]
             sort = self.SORT_LIST[self.sortOrFilter.currentIndex()][1]
             self.searchThread.setup(
                 target=Engine.Search.ChannelVideos,
-                args=(self.channel.login, videoType, sort, cursor)
+                args=(self.channel.login, videoType, sort, cursor, TwitchIntegrityGenerator.getIntegrity)
             )
         self.searchThread.start()
 
@@ -204,6 +207,8 @@ class SearchResult(QtWidgets.QWidget, UiFile.searchResult):
             if isinstance(result.error, Engine.Exceptions.ChannelNotFound):
                 self.info("error", "#Channel not found. Deleted or temporary error.")
             else:
+                if isinstance(result.error, TwitchGqlAPI.Exceptions.IntegrityError):
+                    TwitchIntegrityGenerator.updateIntegrity(forceUpdate=True)
                 self.info(*Messages.INFO.NETWORK_ERROR)
 
     def searchMoreVideos(self, value):

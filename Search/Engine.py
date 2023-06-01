@@ -80,27 +80,42 @@ class Search:
             raise Exceptions.ChannelNotFound
 
     @classmethod
-    def ChannelVideos(cls, channel, videoType, sort, cursor):
+    def ChannelVideos(cls, channel, videoType, sort, cursor, integrityGenerator):
         try:
-            return cls.API.getChannelVideos(channel, videoType, sort, cursor=cursor)
+            integrity = integrityGenerator()
+            if integrity == None:
+                raise Exceptions.NetworkError
+            return cls.API.getChannelVideos(channel, videoType, sort, cursor=cursor, headers=integrity.getHeaders())
         except TwitchGqlAPI.Exceptions.DataNotFound:
             raise Exceptions.ChannelNotFound
 
     @classmethod
-    def ChannelClips(cls, channel, filter, cursor):
+    def ChannelClips(cls, channel, filter, cursor, integrityGenerator):
         try:
-            return cls.API.getChannelClips(channel, filter, cursor=cursor)
+            integrity = integrityGenerator()
+            if integrity == None:
+                raise Exceptions.NetworkError
+            return cls.API.getChannelClips(channel, filter, cursor=cursor, headers=integrity.getHeaders())
         except TwitchGqlAPI.Exceptions.DataNotFound:
             raise Exceptions.ChannelNotFound
 
     @classmethod
-    def StreamAccessToken(cls, login, oAuthToken):
-        return TwitchPlaybackAccessTokens.TwitchStream(login, oAuthToken)
+    def StreamAccessToken(cls, login, oAuthToken, integrityGenerator):
+        integrity = integrityGenerator()
+        if integrity == None:
+            raise Exceptions.NetworkError
+        return TwitchPlaybackAccessTokens.TwitchStream(login, oAuthToken, headers=integrity.getHeaders())
 
     @classmethod
-    def VideoAccessToken(cls, videoId, oAuthToken):
-        return TwitchPlaybackAccessTokens.TwitchVideo(videoId, oAuthToken)
+    def VideoAccessToken(cls, videoId, oAuthToken, integrityGenerator):
+        integrity = integrityGenerator()
+        if integrity == None:
+            raise Exceptions.NetworkError
+        return TwitchPlaybackAccessTokens.TwitchVideo(videoId, oAuthToken, headers=integrity.getHeaders())
 
     @classmethod
-    def ClipAccessToken(cls, slug, oAuthToken):
-        return TwitchPlaybackAccessTokens.TwitchClip(slug, oAuthToken)
+    def ClipAccessToken(cls, slug, oAuthToken, integrityGenerator):
+        integrity = integrityGenerator()
+        if integrity == None:
+            raise Exceptions.NetworkError
+        return TwitchPlaybackAccessTokens.TwitchClip(slug, oAuthToken, headers=integrity.getHeaders())

@@ -4,7 +4,7 @@ from Core.App import App
 from Services.Utils.OSUtils import OSUtils
 from Services.Utils.SystemUtils import SystemUtils
 
-from PyQt5 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui
 
 import os
 import json
@@ -35,7 +35,7 @@ class _Translator:
 
     def load(self):
         language = self.getLanguage()
-        directory = QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.TranslationsPath)
+        directory = QtCore.QLibraryInfo.path(QtCore.QLibraryInfo.LibraryPath.TranslationsPath)
         for fileName in os.listdir(directory):
             if os.path.isfile(os.path.join(directory, fileName)):
                 if fileName.endswith(f"_{language}.qm"):
@@ -83,7 +83,7 @@ class _Translator:
         return self.language
 
     def getFont(self, font=QtGui.QFont()):
-        font.setFamily(Config.LANGUAGES[self.getLanguage()]["font"])
+        font.setFamilies(Config.LANGUAGES[self.getLanguage()]["font"])
         return font
 
     def translate(self, string, ellipsis=False, **kwargs):

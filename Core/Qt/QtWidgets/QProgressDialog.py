@@ -1,13 +1,13 @@
-from Services.Image.Presets import Images
+from Services.Image.Presets import Icons
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class _QProgressDialog(QtWidgets.QProgressDialog):
     def __init__(self, parent=None):
         super(_QProgressDialog, self).__init__(parent=parent)
-        self.setWindowFlag(QtCore.Qt.WindowContextHelpButtonHint, False)
-        self.setWindowIcon(QtGui.QIcon(Images.APP_LOGO_IMAGE))
+        self.setWindowFlag(QtCore.Qt.WindowType.WindowContextHelpButtonHint, False)
+        self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
         self.progressBar = QtWidgets.QProgressBar(parent=self)
         self.setMaximum = self.progressBar.setMaximum
         self.setMinimum = self.progressBar.setMinimum

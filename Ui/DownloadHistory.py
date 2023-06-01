@@ -17,7 +17,7 @@ class DownloadHistory(QtWidgets.QWidget, UiFile.downloadHistory):
         super(DownloadHistory, self).__init__(parent=parent)
         self.previewItems = {}
         self.infoIcon = Utils.setSvgIcon(self.infoIcon, Icons.HISTORY_ICON)
-        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.Normal, QtGui.QPalette.Base).name()};}}")
+        self.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self.stackedWidget.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Base).name()};}}")
         self.previewWidgetView.itemSelectionChanged.connect(self.previewWidgetView.clearSelection)
         self.previewWidgetView.itemClicked.connect(self.openFile)
         self.previewWidgetView.verticalScrollBar().setSingleStep(30)

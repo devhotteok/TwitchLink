@@ -35,9 +35,9 @@ class VideoWidget(QtWidgets.QWidget, UiFile.videoWidget):
     def generateContextMenu(self):
         if self.contextMenu == None:
             self.contextMenu = QtWidgets.QMenu(parent=self.thumbnailImage)
-            self.filePropertyAction = QtWidgets.QAction(QtGui.QIcon(Icons.FILE_ICON), T("view-file-properties"), parent=self.contextMenu)
-            self.imagePropertyAction = QtWidgets.QAction(QtGui.QIcon(Icons.IMAGE_ICON), T("view-image-properties"), parent=self.contextMenu)
-            self.saveImageAction = QtWidgets.QAction(QtGui.QIcon(Icons.SAVE_ICON), T("save-image"), parent=self.contextMenu)
+            self.filePropertyAction = QtGui.QAction(QtGui.QIcon(Icons.FILE_ICON), T("view-file-properties"), parent=self.contextMenu)
+            self.imagePropertyAction = QtGui.QAction(QtGui.QIcon(Icons.IMAGE_ICON), T("view-image-properties"), parent=self.contextMenu)
+            self.saveImageAction = QtGui.QAction(QtGui.QIcon(Icons.SAVE_ICON), T("save-image"), parent=self.contextMenu)
             self.filePropertyAction.triggered.connect(self.showFileProperty)
             self.imagePropertyAction.triggered.connect(self.showImageProperty)
             self.saveImageAction.triggered.connect(self.saveImage)

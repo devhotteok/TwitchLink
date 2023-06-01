@@ -4,7 +4,7 @@ from Services.Utils.OSUtils import OSUtils
 from Services.Logging.Logger import Logger
 from Services.Logging.ErrorDetector import ErrorDetector
 
-from PyQt5 import QtCore, QtWidgets, QtNetwork
+from PyQt6 import QtCore, QtWidgets, QtNetwork
 
 import sys
 import uuid
@@ -28,7 +28,7 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
         self.logger.info(f"\n\n{Config.getProjectInfo()}\n")
         self.logger.info(OSUtils.getOSInfo())
         self.shared = QtCore.QSharedMemory(guid, parent=self)
-        if self.shared.create(512, QtCore.QSharedMemory.ReadWrite):
+        if self.shared.create(512, QtCore.QSharedMemory.AccessMode.ReadWrite):
             self.logger.info("Application started successfully.")
             self._server = QtNetwork.QLocalServer(parent=self)
             self.newInstanceStarted = self._server.newConnection

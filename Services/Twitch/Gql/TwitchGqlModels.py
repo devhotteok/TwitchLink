@@ -1,6 +1,6 @@
 from Database.EncoderDecoder import Codable
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class DataUtils:
@@ -19,11 +19,11 @@ class TimeUtils:
     @classmethod
     def Datetime(cls, string):
         try:
-            datetime = QtCore.QDateTime.fromString(string or cls.DEFAULT_DATETIME, QtCore.Qt.ISODateWithMs)
-            datetime.setTimeSpec(QtCore.Qt.UTC)
+            datetime = QtCore.QDateTime.fromString(string or cls.DEFAULT_DATETIME, QtCore.Qt.DateFormat.ISODateWithMs)
+            datetime.setTimeSpec(QtCore.Qt.TimeSpec.UTC)
             return datetime
         except:
-            return QtCore.QDateTime.fromString(cls.DEFAULT_DATETIME, QtCore.Qt.ISODateWithMs)
+            return QtCore.QDateTime.fromString(cls.DEFAULT_DATETIME, QtCore.Qt.DateFormat.ISODateWithMs)
 
 
 class TwitchGqlObject(Codable):

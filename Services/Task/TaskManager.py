@@ -1,7 +1,7 @@
-from Services.Threading.MutexLocker import MutexLocker
+from Services.Threading.MutexLocker import RecursiveMutexLocker
 from Services.Threading.WaitCondition import WaitCondition
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class TaskStatus:
@@ -40,7 +40,7 @@ class TaskManager(QtCore.QObject):
         self.threadPool = threadPool
         self.tasks = []
         self.runningTasks = []
-        self._actionLock = MutexLocker(MutexLocker.Recursive)
+        self._actionLock = RecursiveMutexLocker()
         self._pausedCondition = WaitCondition(parent=self)
         self._doneCondition = WaitCondition(parent=self)
 

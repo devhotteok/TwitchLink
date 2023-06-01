@@ -168,10 +168,10 @@ class VideoDownloader(EngineSetup):
                 self.progress.missingMilliseconds += self.playlistManager.getSegments()[missing].durationMilliseconds
             time = progress.get("time")
             if time != None:
-                self.progress.milliseconds = Utils.toSeconds(*time.split(".")[0].split(":")) * 1000 + int(time.split(".")[1][:3])
+                self.progress.milliseconds = max(0, Utils.toSeconds(*time.split(".")[0].split(":")) * 1000 + int(time.split(".")[1][:3]))
             size = progress.get("size") or progress.get("Lsize")
             if size != None:
-                self.progress.totalByteSize = Utils.getByteSize(size)
+                self.progress.totalByteSize = max(0, Utils.getByteSize(size))
                 self.progress.byteSize = self.progress.totalByteSize
             self.syncProgress()
 

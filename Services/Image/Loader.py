@@ -4,7 +4,7 @@ from .Config import Config
 from Services.Threading.MutexLocker import MutexLocker
 from Services.Threading.ThreadPool import ThreadPool
 
-from PyQt5 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui
 
 
 class _ImageLoader(QtCore.QObject):

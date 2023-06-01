@@ -2,7 +2,7 @@ from Core import GlobalExceptions
 from Database.EncoderDecoder import Codable
 from Search import Engine
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class Exceptions(GlobalExceptions.Exceptions):

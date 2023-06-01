@@ -72,10 +72,10 @@ class Search(QtWidgets.QDialog, UiFile.search):
         return self.currentText().replace(" ", "")
 
     def checkText(self):
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(self.getCurrentQuery() != "")
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(self.getCurrentQuery() != "")
 
     def accept(self):
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(False)
         query = self.getCurrentQuery()
         if self.mode.isVideo() or self.mode.isClip():
             self.mode.setMode(SearchModes.VIDEO if query.isnumeric() else SearchModes.CLIP)
@@ -92,7 +92,7 @@ class Search(QtWidgets.QDialog, UiFile.search):
         if result.success:
             super().accept(result.data)
         else:
-            self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
+            self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True)
             self.showInputPage()
             if isinstance(result.error, Engine.Exceptions.ChannelNotFound):
                 self.info("no-results-found", "#Channel not found.")

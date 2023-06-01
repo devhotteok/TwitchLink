@@ -1,7 +1,7 @@
 from Services.Image.UrlFormatter import ImageUrlFormatter
 from Services.Image.Loader import ImageLoader
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class _QLabel(QtWidgets.QLabel):
@@ -28,9 +28,9 @@ class _QLabel(QtWidgets.QLabel):
     def getImageUrl(self):
         return self._imageUrl
 
-    def _imageLoaded(self, pixmap):
-        if pixmap != None:
-            self.setPixmap(pixmap)
+    def _imageLoaded(self, result):
+        if result != None:
+            self.setPixmap(result)
         self._imageLoading = False
 
     def setPixmap(self, pixmap):
@@ -41,7 +41,7 @@ class _QLabel(QtWidgets.QLabel):
         self._imageSynced = True
         target.imageChanged.connect(self.setPixmap)
         pixmap = target.pixmap()
-        if pixmap != None:
+        if not pixmap.isNull():
             self.setPixmap(pixmap)
 
     def isImageSynced(self):
@@ -74,25 +74,25 @@ class _QLabel(QtWidgets.QLabel):
             self._useAutoToolTip = True
 
     def paintEvent(self, event):
-        if self.pixmap() == None:
+        if self.pixmap().isNull():
             if self.hasSelectedText():
                 super().paintEvent(event)
             else:
                 painter = QtGui.QPainter(self)
                 metrics = QtGui.QFontMetrics(self.font())
-                text = "\n".join([metrics.elidedText(text, QtCore.Qt.ElideRight, self.width()) for text in self.text().split("\n")])
+                text = "\n".join([metrics.elidedText(text, QtCore.Qt.TextElideMode.ElideRight, self.width()) for text in self.text().split("\n")])
                 painter.drawText(self.rect(), self.alignment(), text)
                 if self._useAutoToolTip:
                     self.setToolTip("" if text == self.text() else self.text())
         else:
             if self._keepImageRatio:
-                margins = self.getContentsMargins()
-                size = self.size() - QtCore.QSize(margins[0] + margins[2], margins[1] + margins[3])
+                margins = self.contentsMargins()
+                size = self.size() - QtCore.QSize(margins.left() + margins.right(), margins.top() + margins.bottom())
                 painter = QtGui.QPainter(self)
                 point = QtCore.QPoint(0, 0)
-                scaledPix = self.pixmap().scaled(size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                point.setX(int((size.width() - scaledPix.width()) / 2) + margins[0])
-                point.setY(int((size.height() - scaledPix.height()) / 2) + margins[1])
+                scaledPix = self.pixmap().scaled(size, QtCore.Qt.AspectRatioMode.KeepAspectRatio, QtCore.Qt.TransformationMode.SmoothTransformation)
+                point.setX(int((size.width() - scaledPix.width()) / 2) + margins.left())
+                point.setY(int((size.height() - scaledPix.height()) / 2) + margins.top())
                 painter.drawPixmap(point, scaledPix)
             else:
                 super().paintEvent(event)

@@ -6,7 +6,7 @@ from Services.Translator.Translator import Translator, T
 from Services import Ad
 from Database.Database import DB
 
-from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets, uic
+from PyQt6 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets, uic
 
 
 class WindowGeometryManager:
@@ -37,9 +37,9 @@ def loadUi(name):
         def __init__(self):
             super(UiWidget, self).__init__()
             self.setupUi(self)
-            self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             if widgetType == QtWidgets.QMainWindow or widgetType == QtWidgets.QDialog:
-                self.setWindowFlag(QtCore.Qt.WindowContextHelpButtonHint, False)
+                self.setWindowFlag(QtCore.Qt.WindowType.WindowContextHelpButtonHint, False)
                 self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
                 self.setWindowTitle(self.windowTitle() or Config.APP_NAME)
             self.ignoreKeys = []
@@ -52,8 +52,8 @@ def loadUi(name):
             return Utils.ask(title, content, titleTranslate, contentTranslate, okText, cancelText, defaultOk, parent=self)
 
         def setAds(self):
-            adArea = self.findChildren(QtWidgets.QWidget, QtCore.QRegExp("^adArea_\d+$"))
-            adGroup = self.findChildren(QtWidgets.QWidget, QtCore.QRegExp("^adGroup_\d+$"))
+            adArea = self.findChildren(QtWidgets.QWidget, QtCore.QRegularExpression("^adArea_\d+$"))
+            adGroup = self.findChildren(QtWidgets.QWidget, QtCore.QRegularExpression("^adGroup_\d+$"))
             if Ad.Config.SHOW:
                 for widget in adArea:
                     Utils.setPlaceholder(widget, Ad.AdWidget(adId=f"{self.__class__.__name__}.{widget.objectName()}", adSize=widget.minimumSize(), responsive=True, parent=self))

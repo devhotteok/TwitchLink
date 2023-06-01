@@ -1,4 +1,4 @@
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 import importlib
 
@@ -84,7 +84,7 @@ class Encoder:
         if isinstance(obj, str):
             return f"str:{obj}"
         elif isinstance(obj, QtCore.QDateTime):
-            return f"datetime:{obj.toString(QtCore.Qt.ISODateWithMs)}"
+            return f"datetime:{obj.toString(QtCore.Qt.DateFormat.ISODateWithMs)}"
         elif isinstance(obj, QtCore.QTimeZone):
             return f"timezone:{obj.id().data().decode()}"
         elif isinstance(obj, bytes):
@@ -169,7 +169,7 @@ class Decoder:
         if key == "str":
             return data
         elif key == "datetime":
-            return QtCore.QDateTime.fromString(data, QtCore.Qt.ISODateWithMs)
+            return QtCore.QDateTime.fromString(data, QtCore.Qt.DateFormat.ISODateWithMs)
         elif key == "timezone":
             return QtCore.QTimeZone(data.encode())
         elif key == "bytes":
