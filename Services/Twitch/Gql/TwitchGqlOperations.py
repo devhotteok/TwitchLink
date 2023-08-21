@@ -1,4 +1,13 @@
-class getChannel:
+class TwitchGQLOperation:
+    query = ""
+    variableList = []
+
+    @classmethod
+    def load(cls, variables: dict) -> dict:
+        return {"query": cls.query, "variables": {variable: variables.get(variable) for variable in cls.variableList}}
+
+
+class GetChannel(TwitchGQLOperation):
     query = """
         query($id: ID $login: String) {
           user(id: $id login: $login) {
@@ -60,7 +69,8 @@ class getChannel:
         "login"
     ]
 
-class getChannelVideos:
+
+class GetChannelVideos(TwitchGQLOperation):
     query = """
         query($login: String!, $type: BroadcastType, $sort: VideoSort!, $limit: Int!, $cursor: Cursor!) {
           user(login: $login) {
@@ -113,7 +123,8 @@ class getChannelVideos:
         "cursor"
     ]
 
-class getChannelClips:
+
+class GetChannelClips(TwitchGQLOperation):
     query = """
         query($login: String!, $filter: ClipsFilter!, $limit: Int!, $cursor: Cursor!) {
           user(login: $login) {
@@ -166,7 +177,8 @@ class getChannelClips:
         "cursor"
     ]
 
-class getVideo:
+
+class GetVideo(TwitchGQLOperation):
     query = """
         query($id: ID!) {
           video(id: $id) {
@@ -205,7 +217,8 @@ class getVideo:
         "id"
     ]
 
-class getClip:
+
+class GetClip(TwitchGQLOperation):
     query = """
         query($slug: ID!) {
           clip(slug: $slug) {

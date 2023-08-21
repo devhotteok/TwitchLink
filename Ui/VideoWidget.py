@@ -1,190 +1,156 @@
 from Core.Ui import *
-from Services.Twitch.Gql import TwitchGqlModels
-from Ui.Components.Utils.VideoWidgetImageSaver import VideoWidgetImageSaver
+from Services.Twitch.GQL.TwitchGQLModels import Channel, Stream, Video, Clip
 
 
-class VideoWidget(QtWidgets.QWidget, UiFile.videoWidget):
-    def __init__(self, data, resizable=True, viewOnly=False, thumbnailSync=None, categorySync=None, parent=None):
-        super(VideoWidget, self).__init__(parent=parent)
-        self.data = data
-        self.videoType = type(self.data)
-        self.thumbnailImage.setImageSizePolicy((384, 216), (1920, 1080) if resizable else (384, 216))
-        self.viewOnly = viewOnly
+class VideoWidget(QtWidgets.QWidget):
+    def __init__(self, content: Channel | Stream | Video | Clip, resizable: bool = True, showMore: bool = False, thumbnailSync: QtWidgets.QLabel | None = None, categorySync: QtWidgets.QLabel | None = None, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
+        self.content = content
+        self._ui = UiLoader.load("videoWidget", self)
+        self._ui.thumbnailImage.setImageSizePolicy(QtCore.QSize(384, 216), QtCore.QSize(1920, 1080) if resizable else QtCore.QSize(384, 216))
         if thumbnailSync != None:
-            self.thumbnailImage.syncImage(thumbnailSync)
+            self._ui.thumbnailImage.syncImage(thumbnailSync)
         if categorySync != None:
-            self.categoryImage.syncImage(categorySync)
-        self.contextMenu = None
-        self.customContextMenuRequested.connect(self.contextMenuRequested)
-        self.thumbnailImage.customContextMenuRequested.connect(self.thumbnailImageContextMenuRequested)
-        if self.videoType == TwitchGqlModels.Channel:
+            self._ui.categoryImage.syncImage(categorySync)
+        if isinstance(self.content, Channel):
             self.setBroadcastInfo()
-            if self.data.lastBroadcast.id == None:
-                self.infoArea.hide()
-        elif self.videoType == TwitchGqlModels.Stream:
+            if self.content.lastBroadcast.id == None:
+                self._ui.infoArea.hide()
+        elif isinstance(self.content, Stream):
             self.setStreamInfo()
-        elif self.videoType == TwitchGqlModels.Video:
+        elif isinstance(self.content, Video):
             self.setVideoInfo()
-        elif self.videoType == TwitchGqlModels.Clip:
+        elif isinstance(self.content, Clip):
             self.setClipInfo()
-        if self.videoType == TwitchGqlModels.Channel or self.viewOnly:
-            self.more.hide()
+        if isinstance(self.content, Channel) or showMore:
+            self._ui.more.hide()
         else:
-            self.more.clicked.connect(self.showFileProperty)
+            self._ui.more.clicked.connect(self.moreClicked)
 
-    def generateContextMenu(self):
-        if self.contextMenu == None:
-            self.contextMenu = QtWidgets.QMenu(parent=self.thumbnailImage)
-            self.filePropertyAction = QtGui.QAction(QtGui.QIcon(Icons.FILE_ICON), T("view-file-properties"), parent=self.contextMenu)
-            self.imagePropertyAction = QtGui.QAction(QtGui.QIcon(Icons.IMAGE_ICON), T("view-image-properties"), parent=self.contextMenu)
-            self.saveImageAction = QtGui.QAction(QtGui.QIcon(Icons.SAVE_ICON), T("save-image"), parent=self.contextMenu)
-            self.filePropertyAction.triggered.connect(self.showFileProperty)
-            self.imagePropertyAction.triggered.connect(self.showImageProperty)
-            self.saveImageAction.triggered.connect(self.saveImage)
-            if self.videoType == TwitchGqlModels.Channel or self.viewOnly:
-                self.filePropertyAction.setVisible(False)
-                self.imagePropertyAction.setVisible(False)
-            if self.thumbnailImage.getImageUrl() == "" or self.viewOnly:
-                self.saveImageAction.setVisible(False)
+    @property
+    def thumbnailImage(self) -> QtWidgets.QLabel:
+        return self._ui.thumbnailImage
 
-    def contextMenuRequested(self, position):
-        self.generateContextMenu()
-        self.showContextMenu((self.filePropertyAction,), position)
-
-    def thumbnailImageContextMenuRequested(self, position):
-        self.generateContextMenu()
-        self.showContextMenu((self.filePropertyAction, self.imagePropertyAction, self.saveImageAction), position)
-
-    def showContextMenu(self, actions, position):
-        if any(action.isVisible() for action in actions):
-            self.contextMenu.exec(actions, self.mapToGlobal(position))
-
-    def setBroadcastInfo(self):
-        infoData = {
-            "title": self.data.lastBroadcast.title,
-            "info_1": self.data.lastBroadcast.game.displayName,
-            "info_2": self.data.lastBroadcast.startedAt.toTimeZone(DB.localization.getTimezone()),
-            "thumbnailImage": (Images.OFFLINE_IMAGE, self.data.offlineImageURL, ImageSize.CHANNEL_OFFLINE),
-            "categoryImage": (Images.CATEGORY_IMAGE, self.data.lastBroadcast.game.boxArtURL)
+    def setBroadcastInfo(self) -> None:
+        data = {
+            "title": self.content.lastBroadcast.title,
+            "info_1": self.content.lastBroadcast.game.displayName,
+            "info_2": self.content.lastBroadcast.startedAt,
+            "thumbnailImage": (Images.OFFLINE_IMAGE, self.content.offlineImageURL, ImageSize.CHANNEL_OFFLINE),
+            "categoryImage": (Images.CATEGORY_IMAGE, self.content.lastBroadcast.game.boxArtURL)
         }
-        self.setInfo(infoData)
+        self.setInfo(data)
 
-    def setStreamInfo(self):
-        infoData = {
-            "title": self.data.title,
-            "info_1": self.data.game.displayName,
-            "info_2": self.data.createdAt.toTimeZone(DB.localization.getTimezone()),
-            "thumbnailImage": (Images.PREVIEW_IMAGE, self.data.previewImageURL, ImageSize.STREAM_PREVIEW),
-            "categoryImage": (Images.CATEGORY_IMAGE, self.data.game.boxArtURL)
+    def setStreamInfo(self) -> None:
+        data = {
+            "title": self.content.title,
+            "info_1": self.content.game.displayName,
+            "info_2": self.content.createdAt,
+            "thumbnailImage": (Images.PREVIEW_IMAGE, self.content.previewImageURL, ImageSize.STREAM_PREVIEW),
+            "categoryImage": (Images.CATEGORY_IMAGE, self.content.game.boxArtURL)
         }
-        self.setInfo(infoData)
+        self.setInfo(data)
 
-    def setVideoInfo(self):
-        infoData = {
-            "title": self.data.title,
-            "info_1": self.data.publishedAt.toTimeZone(DB.localization.getTimezone()),
-            "info_2": self.data.durationString,
-            "thumbnailImage": (Images.THUMBNAIL_IMAGE, self.data.previewThumbnailURL, ImageSize.VIDEO_THUMBNAIL),
-            "categoryImage": (Images.CATEGORY_IMAGE, self.data.game.boxArtURL)
+    def setVideoInfo(self) -> None:
+        data = {
+            "title": self.content.title,
+            "info_1": self.content.publishedAt,
+            "info_2": self.content.durationString,
+            "thumbnailImage": (Images.THUMBNAIL_IMAGE, self.content.previewThumbnailURL, ImageSize.VIDEO_THUMBNAIL),
+            "categoryImage": (Images.CATEGORY_IMAGE, self.content.game.boxArtURL)
         }
-        self.setInfo(infoData)
+        self.setInfo(data)
 
-    def setClipInfo(self):
-        infoData = {
-            "title": self.data.title,
-            "info_1": self.data.createdAt.toTimeZone(DB.localization.getTimezone()),
-            "info_2": self.data.durationString,
-            "thumbnailImage": (Images.THUMBNAIL_IMAGE, self.data.thumbnailURL, ImageSize.CLIP_THUMBNAIL),
-            "categoryImage": (Images.CATEGORY_IMAGE, self.data.game.boxArtURL)
+    def setClipInfo(self) -> None:
+        data = {
+            "title": self.content.title,
+            "info_1": self.content.createdAt,
+            "info_2": self.content.durationString,
+            "thumbnailImage": (Images.THUMBNAIL_IMAGE, self.content.thumbnailURL, ImageSize.CLIP_THUMBNAIL),
+            "categoryImage": (Images.CATEGORY_IMAGE, self.content.game.boxArtURL)
         }
-        self.setInfo(infoData)
+        self.setInfo(data)
 
-    def setInfo(self, infoData):
-        self.title.setText(infoData["title"])
-        self.info_1.setText(infoData["info_1"])
-        self.info_2.setText(infoData["info_2"])
-        if not self.thumbnailImage.isImageSynced():
-            self.thumbnailImage.loadImage(*infoData["thumbnailImage"], refresh=self.videoType == TwitchGqlModels.Channel or self.videoType == TwitchGqlModels.Stream)
-        if not self.categoryImage.isImageSynced():
-            self.categoryImage.loadImage(*infoData["categoryImage"], urlFormatSize=ImageSize.CATEGORY)
+    def setInfo(self, data: dict) -> None:
+        self._ui.title.setText(data["title"])
+        self._ui.info_1.setText(data["info_1"])
+        self._ui.info_2.setText(data["info_2"])
+        if not self._ui.thumbnailImage.isImageSynced():
+            self._ui.thumbnailImage.loadImage(*data["thumbnailImage"], refresh=isinstance(self.content, Channel) or isinstance(self.content, Stream))
+        if not self._ui.categoryImage.isImageSynced():
+            self._ui.categoryImage.loadImage(*data["categoryImage"], urlFormatSize=ImageSize.CATEGORY)
 
-    def showFileProperty(self):
-        self.showProperty(page=0)
+    def moreClicked(self) -> None:
+        self.showProperty()
 
-    def showImageProperty(self):
-        self.showProperty(page=1)
+    def showProperty(self, index: int = 0) -> None:
+        if isinstance(self.content, Stream):
+            self.showStreamInfo(index=index)
+        elif isinstance(self.content, Video):
+            self.showVideoInfo(index=index)
+        elif isinstance(self.content, Clip):
+            self.showClipInfo(index=index)
 
-    def saveImage(self):
-        VideoWidgetImageSaver.saveImage(self, self)
-
-    def showProperty(self, page=0):
-        if self.videoType == TwitchGqlModels.Stream:
-            self.showStreamInfo(page=page)
-        elif self.videoType == TwitchGqlModels.Video:
-            self.showVideoInfo(page=page)
-        elif self.videoType == TwitchGqlModels.Clip:
-            self.showClipInfo(page=page)
-
-    def showStreamInfo(self, page):
+    def showStreamInfo(self, index: int) -> None:
         dataType = T("stream")
         self.showInfo(
             dataType,
             {
                 "file-type": dataType,
-                f"{dataType} {T('id')}": self.data.id,
-                "channel": self.data.broadcaster.formattedName,
-                "title": self.data.title,
-                "category": self.data.game.displayName,
-                "started-at": self.data.createdAt.toTimeZone(DB.localization.getTimezone()),
-                "viewer-count": self.data.viewersCount
+                f"{dataType} {T('id')}": self.content.id,
+                "channel": self.content.broadcaster.formattedName,
+                "title": self.content.title,
+                "category": self.content.game.displayName,
+                "started-at": self.content.createdAt,
+                "viewer-count": self.content.viewersCount
             },
-            page=page
+            index=index
         )
 
-    def showVideoInfo(self, page):
+    def showVideoInfo(self, index: int) -> None:
         dataType = T("video")
         self.showInfo(
             dataType,
             {
                 "file-type": dataType,
-                f"{dataType} {T('id')}": self.data.id,
-                "channel": self.data.owner.formattedName,
-                "title": self.data.title,
-                "category": self.data.game.displayName,
-                "duration": self.data.durationString,
-                "published-at": self.data.publishedAt.toTimeZone(DB.localization.getTimezone()),
-                "view-count": self.data.viewCount
+                f"{dataType} {T('id')}": self.content.id,
+                "channel": self.content.owner.formattedName,
+                "title": self.content.title,
+                "category": self.content.game.displayName,
+                "duration": self.content.durationString,
+                "published-at": self.content.publishedAt,
+                "view-count": self.content.viewCount
             },
-            page=page
+            index=index
         )
 
-    def showClipInfo(self, page):
+    def showClipInfo(self, index: int) -> None:
         dataType = T("clip")
         self.showInfo(
             dataType,
             {
                 "file-type": dataType,
-                f"{dataType} {T('id')}": self.data.id,
-                "slug": self.data.slug,
-                "channel": self.data.broadcaster.formattedName,
-                "title": self.data.title,
-                "category": self.data.game.displayName,
-                "creator": self.data.curator.formattedName,
-                "duration": self.data.durationString,
-                "created-at": self.data.createdAt.toTimeZone(DB.localization.getTimezone()),
-                "view-count": self.data.viewCount
+                f"{dataType} {T('id')}": self.content.id,
+                "slug": self.content.slug,
+                "channel": self.content.broadcaster.formattedName,
+                "title": self.content.title,
+                "category": self.content.game.displayName,
+                "creator": self.content.curator.formattedName,
+                "duration": self.content.durationString,
+                "created-at": self.content.createdAt,
+                "view-count": self.content.viewCount
             },
-            page=page
+            index=index
         )
 
-    def showInfo(self, dataType, formData, page):
+    def showInfo(self, type: str, formData: dict, index: int) -> None:
         propertyView = Ui.PropertyView(
-            f"{dataType} {T('information')}",
+            f"{type} {T('information')}",
             self,
             formData,
             enableLabelTranslation=True,
             enableFieldSelection=True,
+            pageIndex=index,
             parent=self
         )
-        propertyView.tabWidget.setCurrentIndex(page)
         propertyView.exec()

@@ -1,80 +1,64 @@
-from .Downloader import ImageDownloader
-from .Config import Config
+from Core import App
 
-from Services.Threading.MutexLocker import MutexLocker
-from Services.Threading.ThreadPool import ThreadPool
+from PyQt6 import QtCore, QtGui, QtNetwork
 
-from PyQt6 import QtCore, QtGui
+import typing
 
 
-class _ImageLoader(QtCore.QObject):
-    def __init__(self, parent=None):
-        super(_ImageLoader, self).__init__(parent=parent)
-        self.cache = {}
-        self.cachingEnabled = False
-        self.threadPool = ThreadPool(Config.MAX_THREAD_COUNT, parent=self)
-        self._actionLock = MutexLocker()
-        self.throttle(False)
+class ImageRequest(QtCore.QObject):
+    urlLoaded = QtCore.pyqtSignal(QtCore.QUrl)
+    imageLoaded = QtCore.pyqtSignal(QtGui.QPixmap)
 
-    def throttle(self, throttle):
-        self.threadPool.setMaxThreadCount(Config.THROTTLED_THREAD_COUNT if throttle else Config.MAX_THREAD_COUNT)
+    def __init__(self, reply: QtNetwork.QNetworkReply, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        self._clients = 0
+        self._reply = reply
+        self._reply.finished.connect(self._requestDone)
 
-    def setCachingEnabled(self, enabled):
-        self.cachingEnabled = enabled
-        self._keepCacheSize()
+    def connect(self, callback: typing.Callable) -> None:
+        self.imageLoaded.connect(callback)
+        self._clients += 1
 
-    def isCachingEnabled(self):
-        return self.cachingEnabled
+    def disconnect(self, callback: typing.Callable) -> None:
+        self.imageLoaded.disconnect(callback)
+        self._clients -= 1
+        if self._clients == 0:
+            self._reply.abort()
 
-    def request(self, url, callback, refresh=False):
-        with self._actionLock:
-            if self.cache.get(url) == None:
-                self._load(url)
-            elif type(self.cache[url]) == QtGui.QPixmap:
-                if refresh:
-                    self._load(url)
-                else:
-                    callback(self.cache[url])
-                    return
-            self.cache[url].reserve(callback)
+    def _requestDone(self) -> None:
+        pixmap = QtGui.QPixmap()
+        if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
+            pixmap.loadFromData(self._reply.readAll().data())
+        self.urlLoaded.emit(self._reply.request().url())
+        self.imageLoaded.emit(pixmap)
+        self.deleteLater()
 
-    def cancelRequest(self, url, callback):
-        with self._actionLock:
-            if url in self.cache:
-                if type(self.cache[url]) == ImageDownloader:
-                    self.cache[url].unreserve(callback)
-                    if self.cache[url].getReservationCount() == 0:
-                        if self.threadPool.tryTake(self.cache[url]):
-                            del self.cache[url]
 
-    def _load(self, url):
-        task = ImageDownloader(url)
-        task.signals.finished.connect(self._loaded)
-        self.cache[url] = task
-        self.threadPool.start(task, priority=task.priority)
+class ImageLoader(QtCore.QObject):
+    def __init__(self, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        self._requests = {}
 
-    def _loaded(self, task):
-        with self._actionLock:
-            self.cache[task.url] = task.result.data
-            self._keepCacheSize()
-        task.processReservedEvents()
+    def request(self, url: QtCore.QUrl, callback: typing.Callable, refresh: bool = False) -> None:
+        if not self._hasRequest(url):
+            networkRequest = QtNetwork.QNetworkRequest(url)
+            networkRequest.setPriority(QtNetwork.QNetworkRequest.Priority.LowPriority)
+            if refresh:
+                networkRequest.setAttribute(QtNetwork.QNetworkRequest.Attribute.CacheLoadControlAttribute, QtNetwork.QNetworkRequest.CacheLoadControl.AlwaysNetwork)
+            request = ImageRequest(reply=App.NetworkAccessManager.get(networkRequest), parent=self)
+            request.urlLoaded.connect(self._urlLoaded)
+            self._requests[url] = request
+        self._getRequest(url).connect(callback)
 
-    def _keepCacheSize(self):
-        overflowedCacheSize = len(self.cache)
-        if self.isCachingEnabled():
-            overflowedCacheSize -= Config.CACHE_SIZE
-        if overflowedCacheSize > 0:
-            invalidCacheList = []
-            for cache in self._findInvalidCache():
-                invalidCacheList.append(cache)
-                if len(invalidCacheList) == overflowedCacheSize:
-                    break
-            for key in invalidCacheList:
-                del self.cache[key]
+    def cancelRequest(self, url: QtCore.QUrl, callback: typing.Callable) -> None:
+        if self._hasRequest(url):
+            self._getRequest(url).disconnect(callback)
 
-    def _findInvalidCache(self):
-        for key, value in self.cache.items():
-            if type(value) == QtGui.QPixmap:
-                yield key
+    def _urlLoaded(self, url: QtCore.QUrl) -> None:
+        self._requests.pop(url)
 
-ImageLoader = _ImageLoader()
+    def _hasRequest(self, url: QtCore.QUrl) -> bool:
+        return url in self._requests
+
+    def _getRequest(self, url: QtCore.QUrl) -> ImageRequest:
+        return self._requests[url]

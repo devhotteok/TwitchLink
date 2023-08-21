@@ -1,5 +1,7 @@
 from PyQt6 import QtWidgets
 
+import typing
+
 
 class DocumentButtonData:
     BUTTON_ROLES = {
@@ -8,20 +10,20 @@ class DocumentButtonData:
         "action": QtWidgets.QDialogButtonBox.ButtonRole.ActionRole
     }
 
-    def __init__(self, text="", action=None, role="accept", default=False):
+    def __init__(self, text: str = "", action: str | typing.Callable | None = None, role: str = "accept", default: bool = False):
         self.text = text
         self.action = action
-        self.role = self.BUTTON_ROLES[role]
+        self.role = self.BUTTON_ROLES.get(role, QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
         self.default = default
 
 
 class DocumentData:
-    def __init__(self, contentId=None, contentVersion=0, title="", content="", contentType="text", modal=False, blockExpiry=False, buttons=None):
+    def __init__(self, contentId: str | None = None, contentVersion: int | str = 0, title: str = "", content: str = "", contentType: str = "text", modal: bool = False, blockExpiration: bool | int | None = False, buttons: list[DocumentButtonData] | None = None):
         self.contentId = contentId
         self.contentVersion = contentVersion
         self.title = title
         self.content = content
         self.contentType = contentType
         self.modal = modal
-        self.blockExpiry = blockExpiry
+        self.blockExpiration = blockExpiration
         self.buttons = buttons or []

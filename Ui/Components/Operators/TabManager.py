@@ -4,8 +4,8 @@ from Core.Ui import *
 class TabManager(QtWidgets.QTabWidget):
     tabCountChanged = QtCore.pyqtSignal(int)
 
-    def __init__(self, parent=None):
-        super(TabManager, self).__init__(parent=parent)
+    def __init__(self, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
         self.setElideMode(QtCore.Qt.TextElideMode.ElideRight)
         self.setDocumentMode(True)
         self.setTabsClosable(True)
@@ -13,7 +13,7 @@ class TabManager(QtWidgets.QTabWidget):
         self.uniqueTabs = {}
         self.tabCloseRequested.connect(self.processTabCloseRequest)
 
-    def addTab(self, widget, index=-1, icon=QtGui.QIcon(), closable=True, uniqueValue=None):
+    def addTab(self, widget: QtWidgets.QWidget, index: int = -1, icon: str | QtGui.QIcon = "", closable: bool = True, uniqueValue: typing.Any = None) -> int:
         if uniqueValue != None:
             tabIndex = self.getUniqueTabIndex(uniqueValue)
             if tabIndex != None:
@@ -26,23 +26,23 @@ class TabManager(QtWidgets.QTabWidget):
         self.tabCountChanged.emit(self.count())
         return tabIndex
 
-    def setTabIcon(self, index, icon=QtGui.QIcon()):
-        return super().setTabIcon(index, icon if isinstance(icon, QtGui.QIcon) else QtGui.QIcon(icon))
+    def setTabIcon(self, index: int, icon: str | QtGui.QIcon) -> None:
+        super().setTabIcon(index, icon if isinstance(icon, QtGui.QIcon) else QtGui.QIcon(icon))
 
-    def setTabText(self, index, text):
+    def setTabText(self, index: int, text: str) -> None:
         super().setTabText(index, self.getInjectionSafeText(text))
         self.setTabToolTip(index, text)
 
-    def getInjectionSafeText(self, text):
+    def getInjectionSafeText(self, text: str) -> str:
         return text.replace("&", "&&")
 
-    def getUniqueTabIndex(self, uniqueValue):
+    def getUniqueTabIndex(self, uniqueValue: typing.Any) -> int | None:
         if uniqueValue in self.uniqueTabs:
             return self.indexOf(self.uniqueTabs[uniqueValue])
         else:
             return None
 
-    def closeTab(self, index):
+    def closeTab(self, index: int) -> None:
         widget = self.widget(index)
         self.removeTab(index)
         for key, value in self.uniqueTabs.items():
@@ -52,9 +52,9 @@ class TabManager(QtWidgets.QTabWidget):
         widget.close()
         self.tabCountChanged.emit(self.count())
 
-    def processTabCloseRequest(self, index):
+    def processTabCloseRequest(self, index: int) -> None:
         self.closeTab(index)
 
-    def closeAllTabs(self):
+    def closeAllTabs(self) -> None:
         while self.count() != 0:
             self.closeTab(0)

@@ -2,12 +2,11 @@ from Core.Config import Config
 from Services.Utils.OSUtils import OSUtils
 from Services.Utils.SystemUtils import SystemUtils
 from Services.Utils.UiUtils import UiUtils
-from Services.Translator.Translator import T
 
 
 class Utils(OSUtils, SystemUtils, UiUtils):
     @staticmethod
-    def injectionSafeFormat(string, **kwargs):
+    def injectionSafeFormat(string: str, **kwargs: str) -> str:
         index = 0
         while index < len(string):
             for key, value in kwargs.items():
@@ -21,22 +20,30 @@ class Utils(OSUtils, SystemUtils, UiUtils):
         return string
 
     @staticmethod
-    def toSeconds(h, m, s):
-        return int(h) * 3600 + int(m) * 60 + int(s)
+    def formatByteSize(byteSize: int) -> str:
+        sizeUnits = {
+            0: "B",
+            1: "KB",
+            2: "MB",
+            3: "GB",
+            4: "TB"
+        }
+        for key in sizeUnits:
+            if byteSize < 1000:
+                break
+            else:
+                byteSize /= 1024
+        return f"{round(byteSize, 2):.2f}{sizeUnits[key]}"
 
     @staticmethod
-    def toTime(seconds):
-        seconds = int(seconds)
-        return seconds // 3600, seconds % 3600 // 60, seconds % 3600 % 60
+    def formatMilliseconds(milliseconds: int) -> str:
+        seconds = int(milliseconds / 1000)
+        return f"{seconds // 3600:02}:{seconds % 3600 // 60:02}:{seconds % 3600 % 60:02}"
 
     @staticmethod
-    def formatTime(h, m, s):
-        return f"{h:02}:{m:02}:{s:02}"
-
-    @staticmethod
-    def getDoc(file, language, **kwargs):
+    def getDocument(file: str, language: str) -> str:
         try:
             with open(Utils.joinPath(Config.DOCS_ROOT, language, file), "r", encoding="utf-8") as file:
-                return T(file.read(), **kwargs)
+                return file.read()
         except:
             return ""

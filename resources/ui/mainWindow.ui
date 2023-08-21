@@ -10,11 +10,6 @@
     <height>850</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
-  </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
@@ -497,7 +492,7 @@ QToolButton:checked {
      <x>0</x>
      <y>0</y>
      <width>1500</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">

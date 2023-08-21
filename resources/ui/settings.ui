@@ -6,17 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>424</width>
-    <height>452</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
-  </property>
   <property name="locale">
-   <locale language="English" country="Kenya"/>
+   <locale language="English" country="UnitedStates"/>
   </property>
   <layout class="QVBoxLayout" name="FormLayout">
    <item>
@@ -414,42 +409,6 @@
             </layout>
            </widget>
           </item>
-          <item>
-           <widget class="QWidget" name="useCachingArea" native="true">
-            <layout class="QHBoxLayout" name="useCachingAreaLayout">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QCheckBox" name="useCaching">
-               <property name="text">
-                <string>Use caching</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="useCachingInfo">
-               <property name="toolTip">
-                <string>Help</string>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
@@ -639,8 +598,6 @@
         <widget class="QLabel" name="restrictedLabel">
          <property name="font">
           <font>
-           <pointsize>9</pointsize>
-           <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
@@ -693,42 +650,10 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>If it's too fast for your hardware, it can overload it and slow it down.
-The recommended setting is the optimal value calculated according to your system performance.
-Keep the recommended settings as much as possible.</string>
+             <string>Increasing speed boosts downloads, but can slow down other network activities like watching Twitch or YouTube.
+Please maintain a balanced speed.
+Keep in mind, beyond a certain level, boosting speed might not necessarily improve performance, depending on your hardware and network capabilities.</string>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="recommendedSpeedArea" native="true">
-            <layout class="QFormLayout" name="recommendedSpeedAreaLayout">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item row="0" column="1">
-              <widget class="QLabel" name="recommendedSpeed">
-               <property name="text">
-                <string>Speed</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="recommendedSpeedLabel">
-               <property name="text">
-                <string>Recommended:</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </widget>
           </item>
           <item>
@@ -761,65 +686,6 @@ Keep the recommended settings as much as possible.</string>
              </item>
              <item>
               <widget class="QSpinBox" name="speedSpinBox"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="downloadSpeedStreamInfoArea" native="true">
-            <layout class="QHBoxLayout" name="downloadSpeedStreamInfoAreaLayout">
-             <property name="spacing">
-              <number>5</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="downloadSpeedStreamInfoIcon">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>18</width>
-                 <height>18</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>18</width>
-                 <height>18</height>
-                </size>
-               </property>
-               <property name="pixmap">
-                <pixmap>../icons/info.svg</pixmap>
-               </property>
-               <property name="scaledContents">
-                <bool>true</bool>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="downloadSpeedStreamInfo">
-               <property name="text">
-                <string>Live downloads are not affected by this setting.</string>
-               </property>
-              </widget>
              </item>
             </layout>
            </widget>

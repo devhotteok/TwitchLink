@@ -1,142 +1,96 @@
 from Core.Ui import *
 from Services.Messages import Messages
-from Search import ExternalPlaylist
-from Download.DownloadHistoryManager import DownloadHistoryManager
+from Download.DownloadInfo import DownloadInfo
+from Download.History.DownloadHistory import DownloadHistory
 from Ui.Components.Widgets.RetryDownloadButton import RetryDownloadButton
-from Ui.Components.Utils.ResolutionNameGenerator import ResolutionNameGenerator
 
 
-class DownloadHistoryView(QtWidgets.QWidget, UiFile.downloadHistoryView):
-    def __init__(self, downloadHistory, parent=None):
-        super(DownloadHistoryView, self).__init__(parent=parent)
+class DownloadHistoryView(QtWidgets.QWidget):
+    accountPageShowRequested = QtCore.pyqtSignal()
+
+    def __init__(self, downloadHistory: DownloadHistory, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
         self.downloadHistory = downloadHistory
-        self.downloadInfo = downloadHistory.downloadInfo
-        self.videoData = self.downloadInfo.videoData
-        self.categoryImage.loadImage(filePath=Images.CATEGORY_IMAGE, url=self.videoData.game.boxArtURL, urlFormatSize=ImageSize.CATEGORY)
-        self.category.setText(self.videoData.game.displayName)
-        self.title.setText(self.videoData.title)
-        if self.downloadInfo.type.isStream():
-            self.showVideoType("stream" if self.videoData.isLive() else "rerun")
-            self.thumbnailImage.loadImage(filePath=Images.PREVIEW_IMAGE, url=self.videoData.previewImageURL, urlFormatSize=ImageSize.STREAM_PREVIEW, refresh=True)
-            self.channel.setText(self.videoData.broadcaster.displayName)
-            self.date.setText(self.videoData.createdAt.toTimeZone(DB.localization.getTimezone()))
-            self.duration.setText(T("unknown"))
-            self.unmuteVideoTag.hide()
-            self.updateTrackTag.hide()
-            self.clippingModeTag.hide()
-            self.prioritizeTag.hide()
-        elif self.downloadInfo.type.isVideo():
-            self.showVideoType("video")
-            self.thumbnailImage.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.previewThumbnailURL, urlFormatSize=ImageSize.VIDEO_THUMBNAIL)
-            self.channel.setText(self.videoData.owner.displayName)
-            self.date.setText(self.videoData.publishedAt.toTimeZone(DB.localization.getTimezone()))
-            start, end = self.downloadInfo.getRangeInSeconds()
-            totalSeconds = self.videoData.lengthSeconds
-            durationSeconds = (end or totalSeconds) - (start or 0)
-            self.showVideoDuration(start, end, totalSeconds, durationSeconds)
-            self.unmuteVideoTag.setVisible(self.downloadInfo.isUnmuteVideoEnabled())
-            self.updateTrackTag.setVisible(self.downloadInfo.isUpdateTrackEnabled())
-            self.clippingModeTag.setVisible(self.downloadInfo.isClippingModeEnabled())
-            self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
-        else:
-            self.showVideoType("clip")
-            self.thumbnailImage.loadImage(filePath=Images.THUMBNAIL_IMAGE, url=self.videoData.thumbnailURL, urlFormatSize=ImageSize.CLIP_THUMBNAIL)
-            self.channel.setText(self.videoData.broadcaster.displayName)
-            self.date.setText(self.videoData.createdAt.toTimeZone(DB.localization.getTimezone()))
-            self.duration.setText(self.videoData.durationString)
-            self.unmuteVideoTag.hide()
-            self.updateTrackTag.hide()
-            self.clippingModeTag.hide()
-            self.prioritizeTag.setVisible(self.downloadInfo.isPrioritizeEnabled())
-        self.resolution.setText(ResolutionNameGenerator.generateResolutionName(self.downloadInfo.resolution))
-        self.file.setText(self.downloadInfo.getAbsoluteFileName())
-        self.retryButtonManager = RetryDownloadButton(self.downloadInfo, self.retryButton, parent=self)
-        self.accountPageShowRequested = self.retryButtonManager.accountPageShowRequested
-        self.openFolderButton.clicked.connect(self.openFolder)
-        self.openFileButton.clicked.connect(self.openFile)
-        self.openLogsButton.clicked.connect(self.openLogs)
-        self.deleteButton.clicked.connect(self.deleteHistory)
-        self.downloadHistory.historyChanged.connect(self.reloadHistoryData)
+        self._ui = UiLoader.load("downloadHistoryView", self)
+        self._ui.downloadViewControlBar = Utils.setPlaceholder(self._ui.downloadViewControlBar, Ui.DownloadViewControlBar(parent=self))
+        self._ui.downloadViewControlBar.showDownloadInfo(self.downloadInfo)
+        self._retryButtonManager = RetryDownloadButton(
+            downloadInfo=self.downloadInfo,
+            button=self._ui.downloadViewControlBar.retryButton.button,
+            parent=self
+        )
+        self._retryButtonManager.accountPageShowRequested.connect(self.accountPageShowRequested)
+        self._ui.downloadViewControlBar.retryButton.setVisible()
+        self._ui.downloadViewControlBar.openFolderButton.clicked.connect(self.openFolder)
+        self._ui.downloadViewControlBar.openFolderButton.setVisible()
+        self._ui.downloadViewControlBar.openFileButton.clicked.connect(self.openFile)
+        self._ui.downloadViewControlBar.openLogsButton.clicked.connect(self.openLogs)
+        self._ui.downloadViewControlBar.deleteButton.clicked.connect(self.deleteHistory)
+        self._ui.downloadViewControlBar.deleteButton.setVisible()
+        self._ui.downloadInfoView = Utils.setPlaceholder(self._ui.downloadInfoView, Ui.DownloadInfoView(parent=self))
+        self._ui.downloadInfoView.showDownloadInfo(self.downloadInfo)
+        self.downloadHistory.historyUpdated.connect(self.reloadHistoryData)
         self.reloadHistoryData()
 
-    def reloadHistoryData(self):
-        self.startedAt.setText(self.downloadHistory.startedAt.toTimeZone(DB.localization.getTimezone()))
-        self.completedAt.setText(T("unknown") if self.downloadHistory.completedAt == None else self.downloadHistory.completedAt.toTimeZone(DB.localization.getTimezone()))
-        self.result.setText(T(self.downloadHistory.result) if self.downloadHistory.error == None else f"{T(self.downloadHistory.result)}\n({T(self.downloadHistory.error)})")
-        if self.downloadHistory.result == self.downloadHistory.Result.completed or self.downloadHistory.result == self.downloadHistory.Result.skipped or self.downloadHistory.result == self.downloadHistory.Result.stopped:
+    @property
+    def downloadInfo(self) -> DownloadInfo:
+        return self.downloadHistory.downloadInfo
+
+    def reloadHistoryData(self) -> None:
+        self._updateDurationInfo()
+        self._ui.startedAt.setText(self.downloadHistory.startedAt)
+        self._ui.completedAt.setText(T("unknown") if self.downloadHistory.completedAt == None else self.downloadHistory.completedAt)
+        self._ui.result.setText(T(self.downloadHistory.result) if self.downloadHistory.error == None else f"{T(self.downloadHistory.result)}\n({T(self.downloadHistory.error)})")
+        if self.downloadHistory.result in (self.downloadHistory.Result.completed, self.downloadHistory.Result.stopped):
             self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-            self.setOpenFileButton(openFile=True)
-            self.setOpenLogsButton(viewLogs=True)
+            self._ui.downloadViewControlBar.openFileButton.setVisible()
+            self._ui.downloadViewControlBar.openLogsButton.setVisible()
         else:
             self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
             if self.downloadHistory.result == self.downloadHistory.Result.downloading:
-                self.setOpenFileButton(downloadingFile=True)
-                self.setOpenLogsButton(creatingFile=True)
+                self._ui.downloadViewControlBar.openFileButton.setDownloading()
+                self._ui.downloadViewControlBar.openLogsButton.setCreating()
             else:
-                styleSheet = "QLabel {color: #ff0000;}"
-                self.channel.setStyleSheet(styleSheet)
-                self.videoArea.setStyleSheet(styleSheet)
-                self.setOpenFileButton(fileNotFound=True)
-                self.setOpenLogsButton(viewLogs=True)
+                self._ui.historyInfoArea.setStyleSheet("QLabel {color: #ff0000;}")
+                self._ui.downloadViewControlBar.openFileButton.setFileNotFound()
+                self._ui.downloadViewControlBar.openLogsButton.setVisible()
 
-    def openFolder(self):
+    def _updateDurationInfo(self) -> None:
+        if self.downloadInfo.type.isStream():
+            self._ui.downloadInfoView.updateDurationInfo(self.downloadHistory.progressDetails.milliseconds)
+        elif self.downloadInfo.type.isVideo():
+            self._ui.downloadInfoView.updateDurationInfo(
+                totalMilliseconds=int(self.downloadInfo.content.lengthSeconds * 1000),
+                progressMilliseconds=self.downloadHistory.progressDetails.milliseconds,
+                cropRangeMilliseconds=self.downloadInfo.getCropRangeMilliseconds()
+            )
+        elif self.downloadInfo.type.isClip():
+            return
+        self._ui.downloadInfoView.showMutedInfo(self.downloadHistory.progressDetails.mutedFiles, self.downloadHistory.progressDetails.mutedMilliseconds)
+        self._ui.downloadInfoView.showSkippedInfo(self.downloadHistory.progressDetails.skippedFiles, self.downloadHistory.progressDetails.skippedMilliseconds)
+        self._ui.downloadInfoView.showMissingInfo(self.downloadHistory.progressDetails.missingFiles, self.downloadHistory.progressDetails.missingMilliseconds)
+
+    def deleteHistory(self) -> None:
+        App.DownloadHistory.removeHistory(self.downloadHistory)
+
+    def clickHandler(self) -> None:
+        if self.downloadHistory.result in (self.downloadHistory.Result.completed, self.downloadHistory.Result.stopped):
+            self.openFile()
+
+    def openFolder(self) -> None:
         try:
             Utils.openFolder(self.downloadInfo.directory)
         except:
-            self.info(*Messages.INFO.FOLDER_NOT_FOUND)
+            Utils.info(*Messages.INFO.FOLDER_NOT_FOUND, parent=self)
 
-    def openFile(self):
+    def openFile(self) -> None:
         try:
             Utils.openFile(self.downloadInfo.getAbsoluteFileName())
         except:
-            self.info(*Messages.INFO.FILE_NOT_FOUND)
+            Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=self)
 
-    def openLogs(self):
+    def openLogs(self) -> None:
         try:
             Utils.openFile(self.downloadHistory.logFile)
         except:
-            self.info(*Messages.INFO.FILE_NOT_FOUND)
-
-    def deleteHistory(self):
-        DownloadHistoryManager.removeHistory(self.downloadHistory)
-
-    def showVideoType(self, videoType):
-        self.videoTypeLabel.setText(f"{T('external-content')}:{T(videoType)}" if isinstance(self.downloadInfo.accessToken, ExternalPlaylist.ExternalPlaylist) else T(videoType))
-
-    def showVideoDuration(self, start, end, totalSeconds, durationSeconds):
-        if start == None and end == None:
-            self.duration.setText(Utils.formatTime(*Utils.toTime(totalSeconds)))
-        else:
-            self.duration.setText(T(
-                "#{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]",
-                duration=Utils.formatTime(*Utils.toTime(durationSeconds)),
-                totalDuration=Utils.formatTime(*Utils.toTime(totalSeconds)),
-                startTime="" if start == None else Utils.formatTime(*Utils.toTime(start)),
-                endTime="" if end == None else Utils.formatTime(*Utils.toTime(end))
-            ))
-
-    def setOpenFileButton(self, openFile=False, downloadingFile=False, fileNotFound=False):
-        buttonText = T("open-file")
-        if openFile:
-            self.openFileButton.setEnabled(True)
-            self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_ICON))
-            self.openFileButton.setToolTip(buttonText)
-        elif downloadingFile:
-            self.openFileButton.setEnabled(False)
-            self.openFileButton.setIcon(QtGui.QIcon(Icons.DOWNLOADING_FILE_ICON))
-            self.openFileButton.setToolTip(f"{buttonText} ({T('downloading', ellipsis=True)})")
-        elif fileNotFound:
-            self.openFileButton.setEnabled(False)
-            self.openFileButton.setIcon(QtGui.QIcon(Icons.FILE_NOT_FOUND_ICON))
-            self.openFileButton.setToolTip(f"{buttonText} ({T('file-not-found')})")
-
-    def setOpenLogsButton(self, viewLogs=False, creatingFile=False):
-        buttonText = T("view-logs")
-        if viewLogs:
-            self.openLogsButton.setEnabled(True)
-            self.openLogsButton.setIcon(QtGui.QIcon(Icons.TEXT_FILE_ICON))
-            self.openLogsButton.setToolTip(buttonText)
-        elif creatingFile:
-            self.openLogsButton.setEnabled(False)
-            self.openLogsButton.setIcon(QtGui.QIcon(Icons.CREATING_FILE_ICON))
-            self.openLogsButton.setToolTip(f"{buttonText} ({T('creating', ellipsis=True)})")
+            Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=self)

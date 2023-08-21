@@ -2,40 +2,37 @@ from PyQt6 import QtWidgets
 
 
 class _QProgressBar(QtWidgets.QProgressBar):
-    def __init__(self, parent=None):
-        super(_QProgressBar, self).__init__(parent=parent)
-        self.customState = False
-        self.checkRange()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._customState = False
+        self._checkRange()
 
-    def setValue(self, value):
-        super().setValue(int(value))
-
-    def setMaximum(self, maximum):
+    def setMaximum(self, maximum: int) -> None:
         super().setMaximum(maximum)
-        self.checkRange()
+        self._checkRange()
 
-    def setMinimum(self, minimum):
+    def setMinimum(self, minimum: int) -> None:
         super().setMinimum(minimum)
-        self.checkRange()
+        self._checkRange()
 
-    def setRange(self, minimum, maximum):
+    def setRange(self, minimum: int, maximum: int) -> None:
         super().setRange(minimum, maximum)
-        self.checkRange()
+        self._checkRange()
 
-    def checkRange(self):
-        self.setTextVisible((self.minimum() != 0 or self.maximum() != 0) and not self.customState)
+    def _checkRange(self) -> None:
+        self.setTextVisible((self.minimum() != 0 or self.maximum() != 0) and not self._customState)
 
-    def showWarning(self):
+    def showWarning(self) -> None:
         self.showState(True, "#ffd700")
 
-    def showError(self):
+    def showError(self) -> None:
         self.showState(True, "#ff0000")
 
-    def clearState(self):
+    def clearState(self) -> None:
         self.showState(False)
 
-    def showState(self, enabled, color="#ffffff"):
-        self.customState = enabled
-        self.setStyleSheet(f"QProgressBar::chunk {{margin:1px;background-color: {color};}}" if self.customState else "")
-        self.checkRange()
+    def showState(self, enabled: bool, color: str = "#ffffff") -> None:
+        self._customState = enabled
+        self.setStyleSheet(f"QProgressBar::chunk {{margin:1px;background-color: {color};}}" if self._customState else "")
+        self._checkRange()
 QtWidgets.QProgressBar = _QProgressBar #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)

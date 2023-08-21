@@ -1,25 +1,24 @@
-# TwitchLink
-
-[![Platform][badge-platforms]][Releases] [![Latest Release][badge-latest-release]][Releases] [![GitHub issues][badge-issues]][Issues] [![GitHub forks][badge-forks]][Forks] [![GitHub stars][badge-stars]][Stars] [![GitHub license][badge-license]][License]
+<h1 style="padding: unset; border: unset;"><img src="./.github/img/logo.png" width="50" height="50">&nbsp;<span>TwitchLink</span></h1>
 
 ##### Twitch Stream / Video / Clip Downloader
 
-[![TwitchLink Logo](./.github/img/logo.png)][Homepage]
+[![Platform][badge-platforms]][Releases] [![Latest Release][badge-latest-release]][Releases] [![GitHub issues][badge-issues]][Issues] [![GitHub forks][badge-forks]][Forks] [![GitHub stars][badge-stars]][Stars] [![GitHub license][badge-license]][License]
 
-#
+<br/>
+<br/>
 
 ##### Preview
-<img src="https://twitchlink.github.io/resources/github/GitHub_README_1.png">
+<img src="./.github/img/preview.png">
 <table>
     <tr>
         <td>
-            <img src="https://twitchlink.github.io/resources/github/GitHub_README_2.png">
+            <img src="https://twitchlink.github.io/resources/github/PREVIEW_1.png">
         </td>
         <td>
-            <img src="https://twitchlink.github.io/resources/github/GitHub_README_3.png">
+            <img src="https://twitchlink.github.io/resources/github/PREVIEW_2.png">
         </td>
         <td>
-            <img src="https://twitchlink.github.io/resources/github/GitHub_README_4.png">
+            <img src="https://twitchlink.github.io/resources/github/PREVIEW_3.png">
         </td>
     </tr>
 </table>
@@ -33,13 +32,14 @@
 
 ## Download
 
-- **TwitchLink** for Windows 10 or higher. [[Install]][Releases]
+- **TwitchLink** for Windows 10 or higher. [[Releases]][Releases]
 
 
 ## Features
 
 - **Stream / Video / Clip Download Support**
 - **Subscriber-Only Video Download Support**
+- **Scheduled Download Support**
 - **Thumbnail Download Support**
 - **Audio Only Download Support**
 - **Video Unmute Support**
@@ -56,19 +56,17 @@
 **TwitchLink** is a Free & Open Source Project.
 
 - Email: twitchlinkhelp@gmail.com
-- Discord: DevHotteok#6437
 - Donate: [Become a Sponsor][Donate]
 
 ***
 
 ### Follow the checklist below when creating a new issue!
 
-- **Take a look at the latest issues.**
-- **Maybe your problem has already been reported or resolved.**
 - **Use the latest version of TwitchLink.**
-- **Provide as much information about the problem as possible.**
+- **Take a look at the latest issues.**
 - **Try to describe the problem as detailed as possible.**
-- **If there is a problem using the app, please attach the log file with the issue.**
+- **Provide as much information about the problem as possible.**
+- **Please attach the log file with the issue.**
 - **Please use English. This is a global project.**
 
 

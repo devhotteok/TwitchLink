@@ -1,25 +1,11 @@
-from Services.Logging.ErrorDetector import ErrorDetector
-
-from PyQt6 import QtCore, QtWebEngineCore, QtWebEngineWidgets
-
-
-class Exceptions:
-    class WebViewError(Exception):
-        def __str__(self):
-            return "Unable to load WebView."
+from PyQt6 import QtCore, QtGui, QtWebEngineCore, QtWebEngineWidgets
 
 
 class _QWebEngineView(QtWebEngineWidgets.QWebEngineView):
     firstLoad = True
 
-    def __init__(self, parent=None):
-        if ErrorDetector.hasHistory("WebView"):
-            if ErrorDetector.getHistory("WebView") > ErrorDetector.MAX_IGNORE_COUNT:
-                raise Exceptions.WebViewError
-        self.detectorId = f"WebView_{self.__class__.__name__}_{id(self)}"
-        ErrorDetector.setDetector(self.detectorId, 0)
-        super(_QWebEngineView, self).__init__(parent=parent)
-        ErrorDetector.setDetector(self.detectorId, 1)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.NoContextMenu)
         self._loading = False
@@ -28,22 +14,16 @@ class _QWebEngineView(QtWebEngineWidgets.QWebEngineView):
         if _QWebEngineView.firstLoad:
             QtWebEngineCore.QWebEngineProfile.setup()
             _QWebEngineView.firstLoad = False
-        ErrorDetector.removeDetector(self.detectorId)
 
-    def _onLoadStart(self):
+    def _onLoadStart(self) -> None:
         self._loading = True
 
-    def _onLoadFinish(self):
+    def _onLoadFinish(self) -> None:
         self._loading = False
 
-    def isLoading(self):
+    def isLoading(self) -> bool:
         return self._loading
 
-    def load(self, url):
-        ErrorDetector.setDetector(self.detectorId, 2)
-        super().load(url)
-        ErrorDetector.removeDetector(self.detectorId)
-
-    def dropEvent(self, event):
+    def dropEvent(self, event: QtGui.QDropEvent) -> None:
         event.ignore()
 QtWebEngineWidgets.QWebEngineView = _QWebEngineView #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)

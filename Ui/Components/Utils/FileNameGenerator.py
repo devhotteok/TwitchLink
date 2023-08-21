@@ -1,36 +1,39 @@
+from Core import App
+from Core.App import T
 from Services.Utils.Utils import Utils
-from Services.Twitch.Gql import TwitchGqlModels
-from Services.Translator.Translator import T
-from Database.Database import DB
+from Services.Playlist.Resolution import Resolution
+from Services.Twitch.GQL import TwitchGQLModels
+
+from PyQt6 import QtCore
 
 
 class FileNameGenerator:
-    @classmethod
-    def combineTemplateVariables(cls, *args):
+    @staticmethod
+    def combineFormData(*args: dict[str, str]) -> dict[str, str]:
         formData = {}
         for data in args:
             formData.update(data)
         return formData
 
-    @classmethod
-    def getBaseVariables(cls, dataType, videoData):
+    @staticmethod
+    def getBaseVariables(contentType: str, content: TwitchGQLModels.Stream | TwitchGQLModels.Video | TwitchGQLModels.Clip) -> dict[str, str]:
         return {
-            "type": T(dataType),
-            "id": videoData.id,
-            "title": videoData.title,
-            "game": videoData.game.displayName
+            "type": T(contentType),
+            "id": content.id,
+            "title": content.title,
+            "game": content.game.displayName
         }
 
-    @classmethod
-    def getChannelVariables(cls, name, channel):
+    @staticmethod
+    def getUserVariables(name: str, user: TwitchGQLModels.User) -> dict[str, str]:
         return {
-            name: channel.login,
-            f"{name}_name": channel.displayName,
-            f"{name}_formatted_name": channel.formattedName
+            name: user.login,
+            f"{name}_name": user.displayName,
+            f"{name}_formatted_name": user.formattedName
         }
 
-    @classmethod
-    def getDatetimeVariables(cls, name, datetime):
+    @staticmethod
+    def getDatetimeVariables(name: str, datetime: QtCore.QDateTime) -> dict[str, str]:
         return {
             name: datetime.toString("yyyy-MM-dd HH:mm:ss"),
             "date": datetime.date().toString("yyyy-MM-dd"),
@@ -43,112 +46,101 @@ class FileNameGenerator:
             "second": f"{datetime.time().second():02}"
         }
 
-    @classmethod
-    def getResolutionVariables(self, resolutionText):
+    @staticmethod
+    def getResolutionVariables(resolutionText: str) -> dict[str, str]:
         return {
             "resolution": resolutionText
         }
 
     @classmethod
-    def getStreamFileNameTemplateVariables(cls, stream, resolutionText):
-        startedAt = stream.createdAt.toTimeZone(DB.localization.getTimezone())
-        return cls.combineTemplateVariables(
+    def getStreamFileNameTemplateVariables(cls, stream: TwitchGQLModels.Stream, resolutionText: str) -> dict[str, str]:
+        return cls.combineFormData(
             cls.getBaseVariables("stream", stream),
-            cls.getChannelVariables("channel", stream.broadcaster),
-            cls.getDatetimeVariables("started_at", startedAt),
+            cls.getUserVariables("channel", stream.broadcaster),
+            cls.getDatetimeVariables("started_at", stream.createdAt),
             cls.getResolutionVariables(resolutionText)
         )
 
     @classmethod
-    def getVideoFileNameTemplateVariables(cls, video, resolutionText):
-        publishedAt = video.publishedAt.toTimeZone(DB.localization.getTimezone())
-        return cls.combineTemplateVariables(
+    def getVideoFileNameTemplateVariables(cls, video: TwitchGQLModels.Video, resolutionText: str) -> dict[str, str]:
+        return cls.combineFormData(
             cls.getBaseVariables("video", video),
-            cls.getChannelVariables("channel", video.owner),
+            cls.getUserVariables("channel", video.owner),
             {
                 "duration": video.durationString
             },
-            cls.getDatetimeVariables("published_at", publishedAt),
+            cls.getDatetimeVariables("published_at", video.publishedAt),
             {
-                "views": video.viewCount
+                "views": str(video.viewCount)
             },
             cls.getResolutionVariables(resolutionText)
         )
 
     @classmethod
-    def getClipFileNameTemplateVariables(cls, clip, resolutionText):
-        createdAt = clip.createdAt.toTimeZone(DB.localization.getTimezone())
-        return cls.combineTemplateVariables(
+    def getClipFileNameTemplateVariables(cls, clip: TwitchGQLModels.Clip, resolutionText: str) -> dict[str, str]:
+        return cls.combineFormData(
             cls.getBaseVariables("clip", clip),
             {
                 "slug": clip.slug
             },
-            cls.getChannelVariables("channel", clip.broadcaster),
-            cls.getChannelVariables("creator", clip.curator),
+            cls.getUserVariables("channel", clip.broadcaster),
+            cls.getUserVariables("creator", clip.curator),
             {
                 "duration": clip.durationString
             },
-            cls.getDatetimeVariables("created_at", createdAt),
+            cls.getDatetimeVariables("created_at", clip.createdAt),
             {
-                "views": clip.viewCount
+                "views": str(clip.viewCount)
             },
             cls.getResolutionVariables(resolutionText)
         )
 
     @classmethod
-    def getStreamFileNameTemplate(cls):
-        return DB.templates.getStreamFilename()
+    def getStreamFileNameTemplate(cls) -> str:
+        return App.Preferences.templates.getStreamFilename()
 
     @classmethod
-    def getVideoFileNameTemplate(cls):
-        return DB.templates.getVideoFilename()
+    def getVideoFileNameTemplate(cls) -> str:
+        return App.Preferences.templates.getVideoFilename()
 
     @classmethod
-    def getClipFileNameTemplate(cls):
-        return DB.templates.getClipFilename()
+    def getClipFileNameTemplate(cls) -> str:
+        return App.Preferences.templates.getClipFilename()
 
     @classmethod
-    def generateFileName(cls, videoData, resolution, customTemplate=None):
-        if resolution == None:
-            resolutionText = T("unknown")
-        elif resolution.isAudioOnly():
-            resolutionText = T("audio-only")
+    def generateFileName(cls, content: TwitchGQLModels.Stream | TwitchGQLModels.Video | TwitchGQLModels.Clip, resolution: Resolution | None = None, filenameTemplate: str | None = None) -> str:
+        resolutionText = T("unknown") if resolution == None else cls.generateResolutionName(resolution)
+        if isinstance(content, TwitchGQLModels.Stream):
+            defaultFilenameTemplate = cls.getStreamFileNameTemplate()
+            variables = cls.getStreamFileNameTemplateVariables(content, resolutionText)
+        elif isinstance(content, TwitchGQLModels.Video):
+            defaultFilenameTemplate = cls.getVideoFileNameTemplate()
+            variables = cls.getVideoFileNameTemplateVariables(content, resolutionText)
         else:
-            resolutionText = resolution.name
-        if isinstance(videoData, TwitchGqlModels.Stream):
-            template = cls.getStreamFileNameTemplate()
-            variables = cls.getStreamFileNameTemplateVariables(videoData, resolutionText)
-        elif isinstance(videoData, TwitchGqlModels.Video):
-            template = cls.getVideoFileNameTemplate()
-            variables = cls.getVideoFileNameTemplateVariables(videoData, resolutionText)
-        else:
-            template = cls.getClipFileNameTemplate()
-            variables = cls.getClipFileNameTemplateVariables(videoData, resolutionText)
-        return Utils.getValidFileName(Utils.injectionSafeFormat(customTemplate or template, **variables))
+            defaultFilenameTemplate = cls.getClipFileNameTemplate()
+            variables = cls.getClipFileNameTemplateVariables(content, resolutionText)
+        return Utils.getValidFileName(Utils.injectionSafeFormat(filenameTemplate or defaultFilenameTemplate, **variables))
 
     @staticmethod
-    def getFormData(*args):
-        formData = {}
-        for data in args:
-            formData.update(data)
-        return formData
+    def generateResolutionName(resolution: Resolution) -> str:
+        return T("audio-only") if resolution.isAudioOnly() else f"{resolution.displayName} ({T('source')})" if resolution.isSource() else resolution.displayName
 
     @staticmethod
-    def getInfoTitle(dataType):
-        return f"{T(dataType)} {T('#Filename Template Variables')}"
+    def getInfoTitle(contentType: str) -> str:
+        return f"{T(contentType)} {T('#Filename Template Variables')}"
 
     @staticmethod
-    def getBaseInfo(dataType):
-        dataType = T(dataType)
+    def getBaseInfo(contentType: str) -> dict[str, str]:
+        contentType = T(contentType)
         return {
-            "{type}": f"{T('file-type')} ({dataType})",
-            "{id}": f"{dataType} {T('id')} (XXXXXXXXXX)",
+            "{type}": f"{T('file-type')} ({contentType})",
+            "{id}": f"{contentType} {T('id')} (XXXXXXXXXX)",
             "{title}": "title",
             "{game}": "category"
         }
 
     @staticmethod
-    def getNameInfo(nameType):
+    def getNameInfo(nameType: str) -> dict[str, str]:
         translated = T(nameType)
         return {
             f"{{{nameType}}}": f"{translated} {T('username')}",
@@ -157,7 +149,7 @@ class FileNameGenerator:
         }
 
     @staticmethod
-    def getTimeInfo(timeType):
+    def getTimeInfo(timeType: str) -> dict[str, str]:
         return {
             f"{{{timeType}_at}}": f"{T(f'{timeType}-at')} (YYYY-MM-DD HH:MM:SS)",
             "{date}": f"{T(f'{timeType}-date')} (YYYY-MM-DD)",
@@ -171,14 +163,14 @@ class FileNameGenerator:
         }
 
     @staticmethod
-    def getResolutionInfo():
+    def getResolutionInfo() -> dict[str, str]:
         return {
             "{resolution}": "file-resolution"
         }
 
     @classmethod
-    def getStreamFileNameTemplateFormData(cls):
-        return cls.getFormData(
+    def getStreamFileNameTemplateFormData(cls) -> dict[str, str]:
+        return cls.combineFormData(
             cls.getBaseInfo("stream"),
             cls.getNameInfo("channel"),
             cls.getTimeInfo("started"),
@@ -186,8 +178,8 @@ class FileNameGenerator:
         )
 
     @classmethod
-    def getVideoFileNameTemplateFormData(cls):
-        return cls.getFormData(
+    def getVideoFileNameTemplateFormData(cls) -> dict[str, str]:
+        return cls.combineFormData(
             cls.getBaseInfo("video"),
             cls.getNameInfo("channel"),
             {
@@ -201,8 +193,8 @@ class FileNameGenerator:
         )
 
     @classmethod
-    def getClipFileNameTemplateFormData(cls):
-        return cls.getFormData(
+    def getClipFileNameTemplateFormData(cls) -> dict[str, str]:
+        return cls.combineFormData(
             cls.getBaseInfo("clip"),
             {
                 "{slug}": f"{T('slug')} (SlugExampleHelloTwitch)"

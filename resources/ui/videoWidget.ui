@@ -10,11 +10,6 @@
     <height>282</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
-  </property>
   <property name="contextMenuPolicy">
    <enum>Qt::CustomContextMenu</enum>
   </property>
@@ -82,12 +77,6 @@
       </property>
       <item>
        <widget class="QLabel" name="categoryImage">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="maximumSize">
          <size>
           <width>45</width>

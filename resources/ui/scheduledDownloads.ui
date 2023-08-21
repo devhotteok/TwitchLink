@@ -10,11 +10,6 @@
     <height>400</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
    <string>Scheduled Downloads</string>
   </property>
@@ -315,7 +310,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QWidget" name="adArea_1" native="true">
+          <widget class="QWidget" name="partnerContentArea_1" native="true">
            <property name="minimumSize">
             <size>
              <width>320</width>

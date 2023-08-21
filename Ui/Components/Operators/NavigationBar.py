@@ -1,9 +1,14 @@
-from PyQt6 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class PageObject(QtCore.QObject):
-    def __init__(self, button, widget, icon=None, parent=None):
-        super(PageObject, self).__init__(parent=parent)
+    showRequested = QtCore.pyqtSignal(object)
+    buttonVisibilityChanged = QtCore.pyqtSignal(object, bool)
+    blockChanged = QtCore.pyqtSignal(object, bool)
+    focusChanged = QtCore.pyqtSignal(object, bool)
+
+    def __init__(self, button: QtWidgets.QToolButton, widget: QtWidgets.QWidget, icon: QtGui.QIcon | None = None, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
         self.button = button
         self.widget = widget
         self.hidden = False
@@ -13,72 +18,87 @@ class PageObject(QtCore.QObject):
         if icon != None:
             self.setPageIcon(icon)
 
-    def setPageIcon(self, icon, size=None):
-        self.button.setIcon(QtGui.QIcon(icon))
+    def setPageIcon(self, icon: QtGui.QIcon, size: QtCore.QSize | None = None) -> None:
+        self.button.setIcon(icon)
         self.button.setIconSize(size or QtCore.QSize(24, 24))
 
-    def setPageName(self, name):
+    def setPageName(self, name: str) -> None:
         self.button.setText(name)
         if name == "":
             self.button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly)
         else:
             self.button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
 
-    def show(self):
-        self.parent().setCurrentPage(self)
+    def show(self) -> None:
+        self.showRequested.emit(self)
 
-    def showButton(self):
-        self.parent().showPageButton(self)
+    def showButton(self) -> None:
+        self.buttonVisibilityChanged.emit(self, True)
 
-    def hideButton(self):
-        self.parent().hidePageButton(self)
+    def hideButton(self) -> None:
+        self.buttonVisibilityChanged.emit(self, False)
 
-    def block(self):
-        self.parent().blockPage(self)
+    def block(self) -> None:
+        self.blockChanged.emit(self, True)
 
-    def unblock(self):
-        self.parent().unblockPage(self)
+    def unblock(self) -> None:
+        self.blockChanged.emit(self, False)
 
-    def focus(self):
-        self.parent().focus(self)
+    def focus(self) -> None:
+        self.focusChanged.emit(self, True)
 
-    def unfocus(self):
-        self.parent().unfocus(self)
-
-    def isCurrentPage(self):
-        return self.parent().isCurrentPage(self)
+    def unfocus(self) -> None:
+        self.focusChanged.emit(self, False)
 
 
 class NavigationBar(QtCore.QObject):
     focusChanged = QtCore.pyqtSignal(bool)
 
-    def __init__(self, stackedWidget, parent=None):
-        super(NavigationBar, self).__init__(parent=parent)
+    def __init__(self, stackedWidget: QtWidgets.QStackedWidget, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
         self.stackedWidget = stackedWidget
         self.pages = []
         self.currentPage = None
 
-    def showPageButton(self, pageObject):
+    def setPageButtonVisible(self, pageObject: PageObject, visible: bool) -> None:
+        if visible:
+            self.showPageButton(pageObject)
+        else:
+            self.hidePageButton(pageObject)
+
+    def showPageButton(self, pageObject: PageObject) -> None:
         if pageObject.hidden:
             pageObject.hidden = False
             pageObject.button.show()
 
-    def hidePageButton(self, pageObject):
+    def hidePageButton(self, pageObject: PageObject) -> None:
         if not pageObject.hidden:
             pageObject.hidden = True
             pageObject.button.hide()
 
-    def blockPage(self, pageObject):
+    def setPageBlockEnabled(self, pageObject: PageObject, enabled: bool) -> None:
+        if enabled:
+            self.blockPage(pageObject)
+        else:
+            self.unblockPage(pageObject)
+
+    def blockPage(self, pageObject: PageObject) -> None:
         if not pageObject.blocked:
             pageObject.blocked = True
             self._reload()
 
-    def unblockPage(self, pageObject):
+    def unblockPage(self, pageObject: PageObject) -> None:
         if pageObject.blocked:
             pageObject.blocked = False
             self._reload()
 
-    def focus(self, pageObject):
+    def setPageFocusEnabled(self, pageObject: PageObject, enabled: bool) -> None:
+        if enabled:
+            self.focusPage(pageObject)
+        else:
+            self.unfocusPage(pageObject)
+
+    def focusPage(self, pageObject: PageObject) -> None:
         if not pageObject.focused:
             hadFocus = self.hasFocus()
             pageObject.focused = True
@@ -86,14 +106,14 @@ class NavigationBar(QtCore.QObject):
             if hadFocus == False:
                 self.focusChanged.emit(True)
 
-    def unfocus(self, pageObject):
+    def unfocusPage(self, pageObject: PageObject) -> None:
         if pageObject.focused:
             pageObject.focused = False
             self._reload()
             if self.hasFocus() == False:
                 self.focusChanged.emit(False)
 
-    def setCurrentPage(self, pageObject):
+    def setCurrentPage(self, pageObject: PageObject) -> bool:
         if pageObject in self.getAvailablePages():
             pageObject.button.setChecked(True)
             self.stackedWidget.setCurrentWidget(pageObject.widget)
@@ -102,34 +122,38 @@ class NavigationBar(QtCore.QObject):
         else:
             return False
 
-    def getCurrentPage(self):
+    def getCurrentPage(self) -> PageObject:
         return self.currentPage
 
-    def isCurrentPage(self, pageObject):
+    def isCurrentPage(self, pageObject: PageObject) -> bool:
         return pageObject == self.getCurrentPage()
 
-    def getBlockedPages(self):
+    def getBlockedPages(self) -> list[PageObject]:
         return [pageObject for pageObject in self.pages if pageObject.blocked]
 
-    def getFocusedPages(self):
+    def getFocusedPages(self) -> list[PageObject]:
         return [pageObject for pageObject in self.pages if pageObject.focused]
 
-    def hasFocus(self):
+    def hasFocus(self) -> bool:
         return len(self.getFocusedPages()) != 0
 
-    def getAvailablePages(self):
+    def getAvailablePages(self) -> list[PageObject]:
         unblockedPages = [pageObject for pageObject in self.pages if not pageObject.blocked]
         return [pageObject for pageObject in unblockedPages if pageObject.focused] or unblockedPages
 
-    def addPage(self, button, widget, icon=None):
+    def addPage(self, button: QtWidgets.QToolButton, widget: QtWidgets.QWidget, icon: QtGui.QIcon | None = None) -> PageObject:
         pageObject = PageObject(button, widget, icon=icon, parent=self)
+        pageObject.showRequested.connect(self.setCurrentPage)
+        pageObject.buttonVisibilityChanged.connect(self.setPageButtonVisible)
+        pageObject.blockChanged.connect(self.setPageBlockEnabled)
+        pageObject.focusChanged.connect(self.setPageFocusEnabled)
         self.pages.append(pageObject)
         if self.getCurrentPage() == None:
             self.setCurrentPage(pageObject)
         self._reload()
         return pageObject
 
-    def _reload(self):
+    def _reload(self) -> None:
         availablePages = self.getAvailablePages()
         for pageObject in self.pages:
             pageObject.button.setEnabled(pageObject in availablePages)

@@ -2,16 +2,18 @@ from Core import Qt
 from Core.Config import Config
 from Services.Utils.OSUtils import OSUtils
 from Services.Logging.Logger import Logger
-from Services.Logging.ErrorDetector import ErrorDetector
 
 from PyQt6 import QtCore, QtWidgets, QtNetwork
 
+import typing
+import types
 import sys
 import uuid
 
 
 class ExitCode:
-    UNEXPECTED_ERROR = 1
+    UNEXPECTED_ERROR = 2
+    UNEXPECTED_ERROR_RESTART = 1
     EXIT = 0
     RESTART = -1
 
@@ -19,37 +21,52 @@ class ExitCode:
 class SingleApplicationLauncher(QtWidgets.QApplication):
     EXIT_CODE = ExitCode
 
-    def __init__(self, guid, argv):
-        super(SingleApplicationLauncher, self).__init__(argv)
+    newInstanceStarted = QtCore.pyqtSignal()
+
+    def __init__(self, appId: str, argv: list[str]):
+        super().__init__(argv)
         self.setApplicationName(Config.APP_NAME)
         self.setApplicationVersion(Config.APP_VERSION)
         self.setApplicationDisplayName("")
         self.logger = Logger(fileName=f"{Config.APP_NAME}_{Logger.getFormattedTime()}#{uuid.uuid4()}.log")
         self.logger.info(f"\n\n{Config.getProjectInfo()}\n")
         self.logger.info(OSUtils.getOSInfo())
-        self.shared = QtCore.QSharedMemory(guid, parent=self)
+        self.shared = QtCore.QSharedMemory(appId, parent=self)
         if self.shared.create(512, QtCore.QSharedMemory.AccessMode.ReadWrite):
             self.logger.info("Application started successfully.")
             self._server = QtNetwork.QLocalServer(parent=self)
-            self.newInstanceStarted = self._server.newConnection
-            self._server.listen(guid)
-            ErrorDetector.start(self.logger)
-            self.aboutToQuit.connect(ErrorDetector.saveAll)
-            sys.excepthook = self.excepthook
+            self._server.newConnection.connect(self.newInstanceStarted)
+            if not self._server.listen(appId):
+                self.logger.warning("Failed to open Local Server.")
         else:
-            self.logger.error("Another instance of this application is already running.")
+            self.logger.warning("Another instance of this application is already running.")
             self._socket = QtNetwork.QLocalSocket(parent=self)
-            self._socket.connectToServer(guid)
-            self._socket.waitForConnected()
+            self._socket.connectToServer(appId)
+            if not self._socket.waitForConnected():
+                self.logger.warning("Unable to connect to Local Server.")
             sys.exit(self.EXIT_CODE.EXIT)
+        self._started: QtCore.QDateTime | None = None
+        self._crashed = False
 
-    def exec(self):
+    def _excepthook(self, exceptionType: typing.Type[BaseException], exception: BaseException, tracebackType: types.TracebackType | None) -> None:
+        self.logger.critical("Unexpected Error", exc_info=(exceptionType, exception, tracebackType))
+        if not self._crashed:
+            self._crashed = True
+            try:
+                file = QtCore.QFile(Config.TRACEBACK_FILE, self)
+                file.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
+                file.write(self.logger.getPath().encode())
+                file.close()
+                file.deleteLater()
+            except:
+                pass
+            self.exit(self.EXIT_CODE.UNEXPECTED_ERROR if self._started.addSecs(Config.CRASH_AUTOMATIC_RESTART_COOLDOWN) > QtCore.QDateTime.currentDateTimeUtc() else self.EXIT_CODE.UNEXPECTED_ERROR_RESTART)
+
+    def exec(self) -> int:
+        self._started = QtCore.QDateTime.currentDateTimeUtc()
+        sys.excepthook = self._excepthook
         self.logger.info("Launching...")
         returnCode = super().exec()
         self.logger.info(f"Application exited with exit code {returnCode}.")
         self.logger.info(f"All logs were written to '{self.logger.getPath()}'.")
         return returnCode
-
-    def excepthook(self, exc_type, exc_value, exc_tb):
-        self.logger.critical("Unexpected Error", exc_info=(exc_type, exc_value, exc_tb))
-        self.exit(self.EXIT_CODE.UNEXPECTED_ERROR)

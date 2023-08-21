@@ -1,180 +1,120 @@
-from Core.App import App
-from Services.Messages import Messages
-from Services.Utils.Utils import Utils
-from Services.Translator.Translator import T
-from Database.Database import DB
-from Download.Downloader.Engine.Engine import TwitchDownloader
-from Download.DownloadManager import DownloadManager
-from Download.ScheduledDownloadManager import ScheduledDownloadManager
-from Download.DownloadHistoryManager import DownloadHistoryManager
+from Core import App
+from Core.App import T
+from Core.Config import Config
+from Core.GlobalExceptions import Exceptions
+from Services.Script import Script
+from Download.Downloader.TwitchDownloader import TwitchDownloader
+from Download.Downloader.Core.StreamDownloader import StreamDownloader
+from Download.Downloader.Core.VideoDownloader import VideoDownloader
+from Download.Downloader.Core.ClipDownloader import ClipDownloader
+from Download.ScheduledDownloadManager import ScheduledDownload
 
 from PyQt6 import QtCore
 
+import uuid
 
-class _GlobalDownloadManager(QtCore.QObject):
+
+class GlobalDownloadManager(QtCore.QObject):
     runningCountChangedSignal = QtCore.pyqtSignal(int)
-    statsUpdated = QtCore.pyqtSignal(object)
+    allCompletedSignal = QtCore.pyqtSignal()
+    statsUpdated = QtCore.pyqtSignal(object, object)
 
-    def __init__(self, parent=None):
-        super(_GlobalDownloadManager, self).__init__(parent=parent)
-        DownloadManager.createdSignal.connect(self._downloadManagerDownloaderCreated)
-        DownloadManager.startedSignal.connect(self._downloadManagerDownloadStarted)
-        DownloadManager.completedSignal.connect(self._downloadManagerDownloadFinished)
-        ScheduledDownloadManager.downloaderCreatedSignal.connect(self._scheduledDownloaderCreated)
-        ScheduledDownloadManager.downloaderDestroyedSignal.connect(self._scheduledDownloaderDestroyed)
-        self._representativeDownloader = None
+    def __init__(self, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        App.DownloadManager.createdSignal.connect(self._downloadManagerDownloaderCreated)
+        App.DownloadManager.startedSignal.connect(self._downloadManagerDownloadStarted)
+        App.DownloadManager.completedSignal.connect(self._downloadManagerDownloadFinished)
+        App.ScheduledDownloadManager.downloaderCreatedSignal.connect(self._scheduledDownloaderCreated)
+        App.ScheduledDownloadManager.downloaderDestroyedSignal.connect(self._scheduledDownloaderDestroyed)
+        App.ContentManager.restrictionsUpdated.connect(self.restrictionsUpdated)
 
-    def setDownloaderCreationEnabled(self, enabled):
+    def setDownloaderCreationEnabled(self, enabled: bool) -> None:
         TwitchDownloader.setCreationEnabled(enabled)
 
-    def _downloadManagerDownloaderCreated(self, downloaderId):
-        DownloadHistoryManager.createHistory(DownloadManager.get(downloaderId))
+    def _downloadManagerDownloaderCreated(self, downloaderId: uuid.UUID) -> None:
+        App.DownloadHistory.createHistory(App.DownloadManager.get(downloaderId))
 
-    def _scheduledDownloaderCreated(self, scheduledDownload, downloader):
-        DownloadHistoryManager.createHistory(downloader)
+    def _scheduledDownloaderCreated(self, scheduledDownload: ScheduledDownload, downloader: StreamDownloader) -> None:
+        App.DownloadHistory.createHistory(downloader)
         self.downloadStarted(downloader)
-        if DB.general.isNotifyEnabled():
-            App.notification.toastMessage(
+        if App.Preferences.general.isNotifyEnabled():
+            App.Instance.notification.toastMessage(
                 title=T("download-started"),
-                message=f"{T('title')}: {downloader.setup.downloadInfo.videoData.title}\n{T('file')}: {downloader.setup.downloadInfo.getAbsoluteFileName()}"
+                message=f"{T('title')}: {downloader.downloadInfo.content.title}\n{T('file')}: {downloader.downloadInfo.getAbsoluteFileName()}",
+                icon=App.Instance.notification.Icons.Information
             )
 
-    def _scheduledDownloaderDestroyed(self, scheduledDownload, downloader):
+    def _scheduledDownloaderDestroyed(self, scheduledDownload: ScheduledDownload, downloader: StreamDownloader) -> None:
         self.downloadFinished(downloader)
-        if DB.general.isNotifyEnabled():
+
+    def _downloadManagerDownloadStarted(self, downloaderId: uuid.UUID) -> None:
+        self.downloadStarted(App.DownloadManager.get(downloaderId))
+
+    def _downloadManagerDownloadFinished(self, downloaderId: uuid.UUID) -> None:
+        self.downloadFinished(App.DownloadManager.get(downloaderId))
+
+    def downloadStarted(self, downloader: StreamDownloader | VideoDownloader | ClipDownloader) -> None:
+        self.runningCountChangedSignal.emit(len(self.getRunningDownloaders()))
+
+    def downloadFinished(self, downloader: StreamDownloader | VideoDownloader | ClipDownloader) -> None:
+        self.runningCountChangedSignal.emit(len(self.getRunningDownloaders()))
+        if len(self.getRunningDownloaders()) == 0:
+            self.allCompletedSignal.emit()
+        if App.Preferences.general.isNotifyEnabled():
             if downloader.status.terminateState.isTrue():
-                if downloader.status.getError() == None:
-                    title = "download-stopped"
+                if isinstance(downloader.status.getError(), Exceptions.AbortRequested):
+                    title = "download-stopped" if downloader.downloadInfo.type.isStream() else "download-canceled"
                 else:
                     title = "download-aborted"
             else:
                 title = "download-complete"
-            App.notification.toastMessage(
+            App.Instance.notification.toastMessage(
                 title=T(title),
-                message=f"{T('title')}: {downloader.setup.downloadInfo.videoData.title}\n{T('file')}: {downloader.setup.downloadInfo.getAbsoluteFileName()}",
-                actions={
-                    T("open-file"): lambda: _GlobalDownloadManager.openFile(downloader.setup.downloadInfo.getAbsoluteFileName()),
-                    T("open-folder"): lambda: _GlobalDownloadManager.openFolder(downloader.setup.downloadInfo.directory)
-                } if downloader.status.getError() == None else None
+                message=f"{T('title')}: {downloader.downloadInfo.content.title}\n{T('file')}: {downloader.downloadInfo.getAbsoluteFileName()}",
+                icon=App.Instance.notification.Icons.Information
             )
-
-    def _downloadManagerDownloadStarted(self, downloaderId):
-        self.downloadStarted(DownloadManager.get(downloaderId))
-
-    def _downloadManagerDownloadFinished(self, downloaderId):
-        self.downloadFinished(DownloadManager.get(downloaderId))
-
-    def downloadStarted(self, downloader):
-        representativeDownloader = self.getRepresentativeDownloader()
-        if representativeDownloader == None:
-            if self._representativeDownloader != None:
-                self.hideDownloaderProgress(complete=False)
-        else:
-            self.showDownloaderProgress(representativeDownloader)
-        self.runningCountChangedSignal.emit(len(self.getRunningDownloaders()))
-
-    def downloadFinished(self, downloader):
-        representativeDownloader = self.getRepresentativeDownloader()
-        if representativeDownloader == None:
-            if self._representativeDownloader != None:
-                self.hideDownloaderProgress(complete=True)
-        else:
-            self.showDownloaderProgress(representativeDownloader)
         self.updateDownloadStats(downloader)
-        self.runningCountChangedSignal.emit(len(self.getRunningDownloaders()))
 
-    def updateDownloadStats(self, downloader):
+    def updateDownloadStats(self, downloader: StreamDownloader | VideoDownloader | ClipDownloader) -> None:
         if downloader.status.terminateState.isTrue():
-            if downloader.status.getError() == None:
-                if not downloader.setup.downloadInfo.type.isStream():
+            if isinstance(downloader.status.getError(), Exceptions.AbortRequested):
+                if not downloader.downloadInfo.type.isStream():
                     return
             else:
                 return
-        DB.temp.updateDownloadStats(downloader.progress.totalByteSize)
-        self.statsUpdated.emit(DB.temp.getDownloadStats())
-
-    def getRepresentativeDownloader(self):
-        runningDownloaders = self.getRunningDownloaders()
-        if len(self.getRunningDownloaders()) == 1:
-            return runningDownloaders[0]
+        App.Preferences.temp.updateDownloadStats(downloader.progress.totalByteSize)
+        downloadStats = App.Preferences.temp.getDownloadStats()
+        totalFiles = downloadStats["totalFiles"]
+        totalByteSize = downloadStats["totalByteSize"]
+        if totalFiles < Config.SHOW_STATS[0]:
+            showContributeInfo = totalFiles in Config.SHOW_STATS[1]
         else:
-            return None
+            showContributeInfo = totalFiles % Config.SHOW_STATS[0] == 0
+        if showContributeInfo:
+            self.statsUpdated.emit(totalFiles, totalByteSize)
 
-    def showDownloaderProgress(self, downloader):
-        self._representativeDownloader = downloader
-        self._representativeDownloader.hasUpdate.connect(self.handleRepresentativeDownloader)
-        App.taskbar.show(indeterminate=self._representativeDownloader.setup.downloadInfo.type.isStream())
-        self._representativeDownloader.hasUpdate.emit()
+    def restrictionsUpdated(self) -> None:
+        downloaders = [downloader for downloader in self.getRunningDownloaders() if downloader.status.terminateState.isFalse()]
+        contents = list({downloader.downloadInfo.content.id: downloader.downloadInfo.content for downloader in downloaders}.values())
+        restrictions = App.ContentManager.checkRestrictions(contents)
+        for restriction in restrictions:
+            for downloader in downloaders:
+                if downloader.downloadInfo.content.id == restriction.content.id:
+                    if downloader.status.terminateState.isFalse():
+                        downloader.abort(restriction)
 
-    def hideDownloaderProgress(self, complete):
-        self._representativeDownloader.hasUpdate.disconnect(self.handleRepresentativeDownloader)
-        self._representativeDownloader = None
-        if complete:
-            App.taskbar.complete()
-        else:
-            App.taskbar.hide()
+    def cancelAll(self) -> None:
+        App.DownloadManager.cancelAll()
+        App.ScheduledDownloadManager.cancelAll()
 
-    def cancelAll(self):
-        DownloadManager.cancelAll()
-        ScheduledDownloadManager.cancelAll()
+    def getAllDownloaders(self) -> list[StreamDownloader | VideoDownloader | ClipDownloader]:
+        return [*App.DownloadManager.downloaders, *App.ScheduledDownloadManager.getRunningDownloaders()]
 
-    def waitAll(self):
-        DownloadManager.waitAll()
-        ScheduledDownloadManager.waitAll()
+    def getRunningDownloaders(self) -> list[StreamDownloader | VideoDownloader | ClipDownloader]:
+        return [*App.DownloadManager.getRunningDownloaders(), *App.ScheduledDownloadManager.getRunningDownloaders()]
 
-    def getAllDownloaders(self):
-        return [*DownloadManager.downloaders, *ScheduledDownloadManager.getRunningDownloaders()]
-
-    def getRunningDownloaders(self):
-        return [*DownloadManager.getRunningDownloaders(), *ScheduledDownloadManager.getRunningDownloaders()]
-
-    def isDownloaderRunning(self):
+    def isDownloaderRunning(self) -> bool:
         return len(self.getRunningDownloaders()) != 0
 
-    def isShuttingDown(self):
+    def isShuttingDown(self) -> bool:
         return not any(downloader.status.terminateState.isFalse() for downloader in self.getRunningDownloaders())
-
-    def handleRepresentativeDownloader(self):
-        if self._representativeDownloader.setup.downloadInfo.type.isStream():
-            self.handleStreamProgress(self._representativeDownloader)
-        elif self._representativeDownloader.setup.downloadInfo.type.isVideo():
-            self.handleVideoProgress(self._representativeDownloader)
-        else:
-            self.handleClipProgress(self._representativeDownloader)
-
-    def handleStreamProgress(self, downloader):
-        status = downloader.status
-        if not status.terminateState.isFalse():
-            App.taskbar.stop()
-
-    def handleVideoProgress(self, downloader):
-        status = downloader.status
-        progress = downloader.progress
-        if status.isEncoding():
-            App.taskbar.setValue(progress.timeProgress)
-        else:
-            App.taskbar.setValue(progress.fileProgress)
-        if not status.terminateState.isFalse():
-            App.taskbar.stop()
-        elif not status.pauseState.isFalse() or status.isWaiting() or status.isUpdating() or status.isEncoding():
-            App.taskbar.pause()
-
-    def handleClipProgress(self, downloader):
-        progress = downloader.progress
-        App.taskbar.setValue(progress.sizeProgress)
-
-    @staticmethod
-    def openFile(fileName):
-        try:
-            Utils.openFile(fileName)
-        except:
-            Utils.info(*Messages.INFO.FILE_NOT_FOUND)
-
-    @staticmethod
-    def openFolder(directory):
-        try:
-            Utils.openFile(directory)
-        except:
-            Utils.info(*Messages.INFO.FOLDER_NOT_FOUND)
-
-GlobalDownloadManager = _GlobalDownloadManager()

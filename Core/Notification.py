@@ -9,9 +9,9 @@ class Notification(QtCore.QObject):
         Warning = QtWidgets.QSystemTrayIcon.MessageIcon.Warning
         Critical = QtWidgets.QSystemTrayIcon.MessageIcon.Critical
 
-    def __init__(self, parent=None):
-        super(Notification, self).__init__(parent=parent)
+    def __init__(self, systemTrayIcon: QtWidgets.QSystemTrayIcon, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        self.systemTrayIcon = systemTrayIcon
 
-    #Not Implemented
-    def toastMessage(self, title, message, icon=None, actions=None):
-        self.parent().systemTray.showMessage(title, message, icon or QtGui.QIcon(Icons.APP_LOGO_ICON))
+    def toastMessage(self, title: str, message: str, icon: QtWidgets.QSystemTrayIcon.MessageIcon | QtGui.QIcon | None = None) -> None:
+        self.systemTrayIcon.showMessage(title, message, icon or QtGui.QIcon(Icons.APP_LOGO_ICON))

@@ -1,9 +1,13 @@
+from .SearchMode import SearchMode
 from .QueryParser import TwitchQueryParser
-from .ExternalPlaylist import ExternalPlaylistReader
+from . import ExternalPlaybackGenerator
 
+from Core import App
 from Core import GlobalExceptions
-from Services.Twitch.Gql import TwitchGqlAPI
-from Services.Twitch.Playback import TwitchPlaybackAccessTokens
+from Services.Twitch.GQL import TwitchGQLAPI
+from Services.Twitch.GQL import TwitchGQLModels
+
+from PyQt6 import QtCore
 
 
 class Exceptions(GlobalExceptions.Exceptions):
@@ -28,94 +32,73 @@ class Exceptions(GlobalExceptions.Exceptions):
             return "No Results Found"
 
 
-class Search:
-    API = TwitchGqlAPI.TwitchGqlAPI()
+class SearchEngine(QtCore.QObject):
+    finished = QtCore.pyqtSignal(object)
 
-    @classmethod
-    def Query(cls, mode, query, searchExternalContent=False):
-        if mode.isUnknown():
-            parsedData = TwitchQueryParser.parseQuery(query)
-            for mode, query in parsedData:
-                try:
-                    return cls.Mode(mode, query, searchExternalContent)
-                except TwitchGqlAPI.Exceptions.NetworkError:
-                    raise Exceptions.NetworkError
-                except:
-                    pass
-            raise Exceptions.NoResultsFound
-        elif mode.isUrl():
-            mode, query = TwitchQueryParser.parseUrl(query)
-        return cls.Mode(mode, query, searchExternalContent)
+    def __init__(self, mode: SearchMode, query: str, searchExternalContent: bool = False, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        self._mode = mode
+        self._query = query
+        self._searchExternalContent = searchExternalContent
+        self._multipleSearch: list[tuple[SearchMode, str]] | None = None
+        self._error: Exception | None = None
+        self._data: TwitchGQLModels.Channel | TwitchGQLModels.Video | TwitchGQLModels.Clip | ExternalPlaybackGenerator.ExternalPlayback | None = None
+        self._parseQuery()
 
-    @classmethod
-    def Mode(cls, mode, query, searchExternalContent=False):
-        if mode.isChannel():
-            try:
-                return cls.API.getChannel(login=query)
-            except TwitchGqlAPI.Exceptions.DataNotFound:
-                raise Exceptions.ChannelNotFound
-        elif mode.isVideo():
-            try:
-                return cls.API.getVideo(query)
-            except TwitchGqlAPI.Exceptions.DataNotFound:
-                raise Exceptions.VideoNotFound
-        elif mode.isClip():
-            try:
-                return cls.API.getClip(query)
-            except TwitchGqlAPI.Exceptions.DataNotFound:
-                raise Exceptions.ClipNotFound
+    def _parseQuery(self) -> None:
+        if self._mode.isUnknown():
+            self._multipleSearch = TwitchQueryParser.parseQuery(self._query)
+        elif self._mode.isUrl():
+            self._mode, self._query = TwitchQueryParser.parseUrl(self._query)
+        self._search()
+
+    def _search(self) -> None:
+        if self._multipleSearch != None:
+            self._mode, self._query = self._multipleSearch.pop(0)
+        if self._mode.isChannel():
+            App.TwitchGQL.getChannel(login=self._query).finished.connect(self._searchFinished)
+        elif self._mode.isVideo():
+            App.TwitchGQL.getVideo(id=self._query).finished.connect(self._searchFinished)
+        elif self._mode.isClip():
+            App.TwitchGQL.getClip(slug=self._query).finished.connect(self._searchFinished)
+        elif self._searchExternalContent:
+            ExternalPlaybackGenerator.ExternalPlaybackGenerator(QtCore.QUrl(self._query), parent=self).finished.connect(self._externalPlaybackSearchFinished)
         else:
-            if searchExternalContent:
-                try:
-                    return ExternalPlaylistReader(query).checkUrl()
-                except:
-                    pass
-            raise Exceptions.InvalidURL
+            self._raiseException(Exceptions.InvalidURL())
 
-    @classmethod
-    def Channel(cls, id="", login=""):
-        try:
-            return cls.API.getChannel(id, login)
-        except TwitchGqlAPI.Exceptions.DataNotFound:
-            raise Exceptions.ChannelNotFound
+    def _searchFinished(self, response: TwitchGQLAPI.TwitchGQLResponse) -> None:
+        if response.getError() == None:
+            self._data = response.getData()
+            self._setFinished()
+        elif self._multipleSearch == None:
+            if self._mode.isChannel():
+                self._raiseException(Exceptions.ChannelNotFound())
+            elif self._mode.isVideo():
+                self._raiseException(Exceptions.VideoNotFound())
+            else:
+                self._raiseException(Exceptions.ClipNotFound())
+        elif len(self._multipleSearch) != 0:
+            self._search()
+        else:
+            self._raiseException(Exceptions.NoResultsFound())
 
-    @classmethod
-    def ChannelVideos(cls, channel, videoType, sort, cursor, integrityGenerator):
-        try:
-            integrity = integrityGenerator()
-            if integrity == None:
-                raise Exceptions.NetworkError
-            return cls.API.getChannelVideos(channel, videoType, sort, cursor=cursor, headers=integrity.getHeaders())
-        except TwitchGqlAPI.Exceptions.DataNotFound:
-            raise Exceptions.ChannelNotFound
+    def _externalPlaybackSearchFinished(self, generator: ExternalPlaybackGenerator.ExternalPlaybackGenerator) -> None:
+        if generator.getError() == None:
+            self._data = generator.getData()
+            self._setFinished()
+        else:
+            self._raiseException(Exceptions.InvalidURL())
 
-    @classmethod
-    def ChannelClips(cls, channel, filter, cursor, integrityGenerator):
-        try:
-            integrity = integrityGenerator()
-            if integrity == None:
-                raise Exceptions.NetworkError
-            return cls.API.getChannelClips(channel, filter, cursor=cursor, headers=integrity.getHeaders())
-        except TwitchGqlAPI.Exceptions.DataNotFound:
-            raise Exceptions.ChannelNotFound
+    def _setFinished(self) -> None:
+        self.finished.emit(self)
+        self.deleteLater()
 
-    @classmethod
-    def StreamAccessToken(cls, login, oAuthToken, integrityGenerator):
-        integrity = integrityGenerator()
-        if integrity == None:
-            raise Exceptions.NetworkError
-        return TwitchPlaybackAccessTokens.TwitchStream(login, oAuthToken, headers=integrity.getHeaders())
+    def _raiseException(self, exception: Exception) -> None:
+        self._error = exception
+        self._setFinished()
 
-    @classmethod
-    def VideoAccessToken(cls, videoId, oAuthToken, integrityGenerator):
-        integrity = integrityGenerator()
-        if integrity == None:
-            raise Exceptions.NetworkError
-        return TwitchPlaybackAccessTokens.TwitchVideo(videoId, oAuthToken, headers=integrity.getHeaders())
+    def getError(self) -> Exception:
+        return self._error
 
-    @classmethod
-    def ClipAccessToken(cls, slug, oAuthToken, integrityGenerator):
-        integrity = integrityGenerator()
-        if integrity == None:
-            raise Exceptions.NetworkError
-        return TwitchPlaybackAccessTokens.TwitchClip(slug, oAuthToken, headers=integrity.getHeaders())
+    def getData(self) -> TwitchGQLModels.Channel | TwitchGQLModels.Video | TwitchGQLModels.Clip | ExternalPlaybackGenerator.ExternalPlayback:
+        return self._data

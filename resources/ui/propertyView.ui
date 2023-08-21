@@ -7,13 +7,8 @@
     <x>0</x>
     <y>0</y>
     <width>426</width>
-    <height>406</height>
+    <height>411</height>
    </rect>
-  </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>

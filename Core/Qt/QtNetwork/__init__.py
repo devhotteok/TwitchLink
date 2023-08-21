@@ -1,1 +1,1 @@
-from . import QNetworkRequest
+from . import QNetworkAccessManager, QNetworkRequest

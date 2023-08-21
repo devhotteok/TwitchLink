@@ -1,69 +1,71 @@
-from Core import GlobalExceptions
-from Database.EncoderDecoder import Codable
-from Search import Engine
+from Core import App
+from Services.Twitch.Authentication.OAuth.OAuthToken import OAuthToken
+from Services.Twitch.GQL import TwitchGQLModels
+from AppData.EncoderDecoder import Serializable
 
 from PyQt6 import QtCore
 
-
-class Exceptions(GlobalExceptions.Exceptions):
-    class InvalidToken(Exception):
-        def __str__(self):
-            return "Invalid Token"
-
-    class UserNotFound(Exception):
-        def __str__(self):
-            return "User Not Found"
+import typing
 
 
-class TwitchAccount(QtCore.QObject, Codable):
+class TwitchAccount(QtCore.QObject, Serializable):
+    SERIALIZABLE_INIT_MODEL = False
+    SERIALIZABLE_STRICT_MODE = False
+
     accountUpdated = QtCore.pyqtSignal()
+    authorizationExpired = QtCore.pyqtSignal()
 
-    def __init__(self, parent=None):
-        super(TwitchAccount, self).__init__(parent=parent)
-        self.logout()
-
-    def login(self, username, token, expiry=None):
-        if self.isConnected():
-            self.logout()
-        self.username = username
-        self.token = token
-        self.expiry = expiry
-        self.updateAccount()
-
-    def logout(self):
+    def __init__(self, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
         self.clearData()
+
+    def login(self, user: TwitchGQLModels.User, token: str, expiration: int | None = None) -> None:
+        if self.isLoggedIn():
+            self.logout()
+        self.user = user
+        self.oAuthToken = OAuthToken(token, expiration)
+        self.updateIntegrityToken()
         self.accountUpdated.emit()
 
-    def clearData(self):
-        self.username = ""
-        self.token = ""
-        self.expiry = None
-        self.data = None
+    def logout(self) -> None:
+        self.clearData()
+        self.updateIntegrityToken()
+        self.accountUpdated.emit()
 
-    def isConnected(self):
-        return self.data != None
+    def invalidate(self) -> None:
+        self.logout()
+        self.authorizationExpired.emit()
 
-    def checkToken(self):
-        if self.expiry != None:
-            if QtCore.QDateTime.currentDateTimeUtc() > self.expiry:
-                self.logout()
-                raise Exceptions.InvalidToken
+    def setData(self, user: TwitchGQLModels.User | None, oAuthToken: OAuthToken | None) -> None:
+        self.user = user
+        self.oAuthToken = oAuthToken
 
-    def updateAccount(self):
-        self.checkToken()
-        self._updateAccountData()
+    def getData(self) -> tuple[TwitchGQLModels.User, OAuthToken]:
+        return self.user, self.oAuthToken
 
-    def _updateAccountData(self):
-        if self.username != "":
+    def clearData(self) -> None:
+        self.user = None
+        self.oAuthToken = None
+
+    def isLoggedIn(self) -> bool:
+        return self.user != None
+
+    def validateOAuthToken(self) -> None:
+        if self.isLoggedIn():
             try:
-                data = Engine.Search.Channel(login=self.username)
-            except Engine.Exceptions.ChannelNotFound:
-                self.logout()
-                raise Exceptions.UserNotFound
+                self.oAuthToken.validate()
             except:
-                self.logout()
-                raise Exceptions.NetworkError
-            else:
-                data.stream = None
-                self.data = data
-                self.accountUpdated.emit()
+                self.invalidate()
+
+    def getOAuthToken(self) -> str:
+        self.validateOAuthToken()
+        if self.oAuthToken == None:
+            return ""
+        else:
+            return self.oAuthToken.value
+
+    def updateIntegrityToken(self) -> None:
+        App.TwitchIntegrityGenerator.updateIntegrity(forceUpdate=True)
+
+    def getIntegrityToken(self, callback: typing.Callable) -> None:
+        App.TwitchIntegrityGenerator.getIntegrity(callback)

@@ -2,16 +2,11 @@ from PyQt6 import QtCore, QtWidgets
 
 
 class _QTabBar(QtWidgets.QTabBar):
-    def isTabBarHorizontal(self):
-        tabPosition = self.parent().tabPosition()
-        return tabPosition == QtWidgets.QTabWidget.TabPosition.North or tabPosition == QtWidgets.QTabWidget.TabPosition.South
-
-    def tabSizeHint(self, index):
-        if self.isTabBarHorizontal():
-            width = min(int(self.parent().width() / self.count()), 200)
+    def tabSizeHint(self, index: int) -> QtCore.QSize:
+        if self.shape() in (_QTabBar.Shape.RoundedNorth, _QTabBar.Shape.RoundedSouth, _QTabBar.Shape.TriangularNorth, _QTabBar.Shape.TriangularSouth):
+            width = max(min(int(max(self.parent().width(), 200) / self.count()), 200), 100)
             height = super().tabSizeHint(index).height() + 10
+            return QtCore.QSize(width, height)
         else:
-            width = super().tabSizeHint(index).height()
-            height = super().tabSizeHint(index).width() + 50
-        return QtCore.QSize(width, height)
+            return super().tabSizeHint(index)
 QtWidgets.QTabBar = _QTabBar #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)

@@ -1,4 +1,4 @@
-from .Modes import SearchModes
+from .SearchMode import SearchMode
 from .Config import Config
 
 import re
@@ -6,43 +6,43 @@ import re
 
 class TwitchQueryParser:
     @classmethod
-    def parseQuery(cls, query):
+    def parseQuery(cls, query: str) -> list[tuple[SearchMode, str]]:
         if re.search(Config.VIDEO_ID_REGEX, query) != None:
             return [
-                (SearchModes(SearchModes.VIDEO), query),
-                (SearchModes(SearchModes.CHANNEL), query)
+                (SearchMode(SearchMode.Types.VIDEO), query),
+                (SearchMode(SearchMode.Types.CHANNEL), query)
             ]
         elif re.search(Config.CHANNEL_ID_REGEX, query) != None:
             return [
-                (SearchModes(SearchModes.CHANNEL), query),
-                (SearchModes(SearchModes.CLIP), query)
+                (SearchMode(SearchMode.Types.CHANNEL), query),
+                (SearchMode(SearchMode.Types.CLIP), query)
             ]
         elif re.search(Config.CLIP_ID_REGEX, query) != None:
             return [
-                (SearchModes(SearchModes.CLIP), query)
+                (SearchMode(SearchMode.Types.CLIP), query)
             ]
         else:
             scanUrl = []
             check = re.search(Config.VIDEO_URL_REGEX, query)
             if check != None:
-                scanUrl.append((SearchModes(SearchModes.VIDEO), check.group(1)))
+                scanUrl.append((SearchMode(SearchMode.Types.VIDEO), check.group(1)))
             check = re.search(Config.CLIP_URL_REGEX, query)
             if check != None:
-                scanUrl.append((SearchModes(SearchModes.CLIP), check.group(1)))
+                scanUrl.append((SearchMode(SearchMode.Types.CLIP), check.group(1)))
             check = re.search(Config.CHANNEL_URL_REGEX, query)
             if check != None:
-                scanUrl.append((SearchModes(SearchModes.CHANNEL), check.group(1)))
-            return scanUrl or [(SearchModes(SearchModes.UNKNOWN), query)]
+                scanUrl.append((SearchMode(SearchMode.Types.CHANNEL), check.group(1)))
+            return scanUrl or [(SearchMode(SearchMode.Types.UNKNOWN), query)]
 
     @classmethod
-    def parseUrl(cls, url):
+    def parseUrl(cls, url: str) -> tuple[SearchMode, str]:
         check = re.search(Config.VIDEO_URL_REGEX, url)
         if check != None:
-            return SearchModes(SearchModes.VIDEO), check.group(1)
+            return SearchMode(SearchMode.Types.VIDEO), check.group(1)
         check = re.search(Config.CLIP_URL_REGEX, url)
         if check != None:
-            return SearchModes(SearchModes.CLIP), check.group(1)
+            return SearchMode(SearchMode.Types.CLIP), check.group(1)
         check = re.search(Config.CHANNEL_URL_REGEX, url)
         if check != None:
-            return SearchModes(SearchModes.CHANNEL), check.group(1)
-        return SearchModes(SearchModes.UNKNOWN), url
+            return SearchMode(SearchMode.Types.CHANNEL), check.group(1)
+        return SearchMode(SearchMode.Types.UNKNOWN), url

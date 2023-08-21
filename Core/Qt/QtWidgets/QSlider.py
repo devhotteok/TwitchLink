@@ -2,7 +2,7 @@ from PyQt6 import QtWidgets
 
 
 class _QSlider_Patcher(QtWidgets.QSlider):
-    def setValueSilent(self, value):
+    def setValueSilent(self, value: int) -> None:
         self.blockSignals(True)
         self.setValue(value)
         self.blockSignals(False)

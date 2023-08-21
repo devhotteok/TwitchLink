@@ -1,6 +1,7 @@
 from Core.GlobalExceptions import Exceptions
 
 import os
+import ctypes
 import platform
 import shutil
 
@@ -10,27 +11,48 @@ from PyQt6 import QtCore, QtGui
 
 
 class OSUtils:
-    isFile = os.path.isfile
-    isDirectory = os.path.isdir
-    removeFile = os.remove
-    removeDirectory = shutil.rmtree
-    openFolder = os.startfile
-    openFile = os.startfile
+    @staticmethod
+    def listDirectory(path: str) -> list[str]:
+        return os.listdir(path)
 
     @staticmethod
-    def openUrl(url):
+    def isFile(path: str) -> bool:
+        return os.path.isfile(path)
+
+    @staticmethod
+    def isDirectory(path: str) -> bool:
+        return os.path.isdir(path)
+
+    @staticmethod
+    def removeFile(path: str) -> None:
+        os.remove(path)
+
+    @staticmethod
+    def removeDirectory(path: str) -> None:
+        shutil.rmtree(path)
+
+    @staticmethod
+    def openFolder(path: str) -> None:
+        os.startfile(path)
+
+    @staticmethod
+    def openFile(path: str) -> None:
+        os.startfile(path)
+
+    @staticmethod
+    def openUrl(url) -> bool:
         return QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
 
     @staticmethod
-    def copyToClipboard(text):
+    def copyToClipboard(text: str) -> None:
         QtGui.QGuiApplication.clipboard().setText(text)
 
     @staticmethod
-    def joinPath(*args):
+    def joinPath(*args: str) -> str:
         return "/".join([string.strip("\\/") for string in args]).replace("\\", "/")
 
     @staticmethod
-    def joinUrl(*args, params=None):
+    def joinUrl(*args: str, params: dict[str, str] | None = None) -> str:
         url = "/".join([string.strip("/") for string in args])
         if params != None:
             return f"{url}?{urlencode(params)}"
@@ -38,7 +60,7 @@ class OSUtils:
             return url
 
     @staticmethod
-    def createDirectory(directory):
+    def createDirectory(directory: str) -> None:
         try:
             if not OSUtils.isDirectory(directory):
                 os.makedirs(directory)
@@ -46,7 +68,7 @@ class OSUtils:
             raise Exceptions.FileSystemError
 
     @staticmethod
-    def getValidFileName(name):
+    def getValidFileName(name: str) -> str:
         characters = {
             "\\": "￦",
             "/": "／",
@@ -65,7 +87,7 @@ class OSUtils:
         return name.strip()
 
     @staticmethod
-    def createUniqueFile(path, preferredFileName, fileFormat, exclude=None, maxScan=1000):
+    def createUniqueFile(path: str, preferredFileName: str, fileFormat: str, exclude: list[str] | None = None, maxScan: int = 1000) -> str:
         exclude = exclude or []
         absoluteFileName = OSUtils.joinPath(path, f"{preferredFileName}.{fileFormat}")
         if absoluteFileName not in exclude:
@@ -74,8 +96,8 @@ class OSUtils:
                     return absoluteFileName
             except:
                 pass
-        for i in range(maxScan):
-            absoluteFileName = OSUtils.joinPath(path, f"{preferredFileName} ({i}).{fileFormat}")
+        for index in range(maxScan):
+            absoluteFileName = OSUtils.joinPath(path, f"{preferredFileName} ({index}).{fileFormat}")
             if absoluteFileName not in exclude:
                 try:
                     with open(absoluteFileName, "x"):
@@ -85,9 +107,13 @@ class OSUtils:
         raise Exceptions.FileSystemError
 
     @staticmethod
-    def getOSInfo():
+    def hideFileOrDirectory(target: str) -> None:
+        ctypes.windll.kernel32.SetFileAttributesW(target, 2)
+
+    @staticmethod
+    def getOSInfo() -> str:
         return f"{platform.system()} {platform.release()} {platform.version()}; {platform.machine()};"
 
     @staticmethod
-    def shutdownSystem(message, time=10):
+    def shutdownSystem(message: str, time: int = 10) -> None:
         os.system(f"shutdown /s /c \"{message}\" /t {time}")

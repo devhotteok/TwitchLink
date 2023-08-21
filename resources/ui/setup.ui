@@ -7,13 +7,8 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>329</height>
+    <height>347</height>
    </rect>
-  </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
   </property>
   <property name="windowTitle">
    <string>Setup</string>

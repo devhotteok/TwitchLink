@@ -1,21 +1,20 @@
+from Core import App
 from Core.Config import Config
-from Services.Translator.Translator import Translator
 from Services.Document import DocumentData, DocumentButtonData
-from Database.Database import DB
 
 from PyQt6 import QtCore
 
 
-class _NotificationManager(QtCore.QObject):
+class NotificationManager(QtCore.QObject):
     notificationsUpdated = QtCore.pyqtSignal(object)
 
-    def __init__(self, parent=None):
-        super(_NotificationManager, self).__init__(parent=parent)
+    def __init__(self, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
         self.notifications = {}
 
-    def updateNotifications(self, data):
+    def updateNotifications(self, data: dict) -> None:
         updatedNotifications = []
-        for notification in data.get(Translator.getLanguage(), []):
+        for notification in data.get(App.Translator.getLanguage(), []):
             if Config.APP_VERSION in notification.get("targetVersion", [Config.APP_VERSION]):
                 documentData = DocumentData(
                     contentId=notification.get("contentId", None),
@@ -24,7 +23,7 @@ class _NotificationManager(QtCore.QObject):
                     content=notification.get("content", ""),
                     contentType=notification.get("contentType", ""),
                     modal=notification.get("modal", False),
-                    blockExpiry=notification.get("blockExpiry", False),
+                    blockExpiration=notification.get("blockExpiration", False),
                     buttons=[
                         DocumentButtonData(
                             text=button.get("text", ""),
@@ -40,22 +39,20 @@ class _NotificationManager(QtCore.QObject):
         if len(updatedNotifications) != 0:
             self.notificationsUpdated.emit(updatedNotifications)
 
-    def _isNew(self, documentData):
+    def _isNew(self, documentData: DocumentData) -> bool:
         if documentData.contentId in self.notifications:
             if documentData.contentVersion == self.notifications[documentData.contentId].contentVersion:
                 return False
         return True
 
-    def isBlocked(self, notification):
-        return notification.blockExpiry != False and DB.temp.isContentBlocked(notification.contentId, notification.contentVersion)
+    def isBlocked(self, notification: DocumentData) -> bool:
+        return notification.blockExpiration != False and App.Preferences.temp.isContentBlocked(notification.contentId, notification.contentVersion)
 
-    def block(self, notification):
-        DB.temp.blockContent(notification.contentId, notification.contentVersion, notification.blockExpiry)
+    def block(self, notification: DocumentData) -> None:
+        App.Preferences.temp.blockContent(notification.contentId, notification.contentVersion, notification.blockExpiration)
 
-    def getNotifications(self):
-        return self.notifications.values()
+    def getNotifications(self) -> list[DocumentData]:
+        return list(self.notifications.values())
 
-    def clearAll(self):
-        self.notifications = {}
-
-NotificationManager = _NotificationManager()
+    def clearAll(self) -> None:
+        self.notifications.clear()

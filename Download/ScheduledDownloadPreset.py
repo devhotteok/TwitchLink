@@ -1,8 +1,7 @@
-from Database.Database import DB
-from Database.EncoderDecoder import Codable
-from Download import DownloadOptionHistory
-
-import copy
+from Core import App
+from Services.Playlist.Resolution import Resolution
+from Download.History import DownloadOptionHistory
+from AppData.EncoderDecoder import Serializable
 
 
 class Exceptions:
@@ -11,41 +10,41 @@ class Exceptions:
             return "Preferred Resolution Not Found"
 
 
-class Quality(Codable):
-    CODABLE_INIT_MODEL = False
-    CODABLE_STRICT_MODE = False
+class Quality(Serializable):
+    SERIALIZABLE_INIT_MODEL = False
+    SERIALIZABLE_STRICT_MODE = False
 
-    def __init__(self, key):
+    def __init__(self, key: int | str):
         self.key = key
 
-    def isValid(self):
+    def isValid(self) -> bool:
         return type(self.key) == int
 
-    def toString(self):
+    def toString(self) -> str:
         return f"{self.key}p" if self.isValid() else str(self.key)
 
-    def checkMatch(self, quality):
+    def checkMatch(self, quality: int | str) -> bool:
         return self.key == quality if self.isValid() else False
 
 
-class FrameRate(Codable):
-    CODABLE_INIT_MODEL = False
-    CODABLE_STRICT_MODE = False
+class FrameRate(Serializable):
+    SERIALIZABLE_INIT_MODEL = False
+    SERIALIZABLE_STRICT_MODE = False
 
-    def __init__(self, key):
+    def __init__(self, key: int | str):
         self.key = key
 
-    def isValid(self):
+    def isValid(self) -> bool:
         return type(self.key) == int
 
-    def toString(self):
+    def toString(self) -> str:
         return str(self.key)
 
-    def checkMatch(self, frameRate):
+    def checkMatch(self, frameRate: int | str) -> bool:
         return self.key == frameRate if self.isValid() else False
 
 
-class ScheduledDownloadPreset(Codable):
+class ScheduledDownloadPreset(Serializable):
     class AVAILABLE_QUALITY:
         BEST = Quality("best")
         RESOLUTION_1080P = Quality(1080)
@@ -57,16 +56,16 @@ class ScheduledDownloadPreset(Codable):
         AUDIO_ONLY = Quality("audio-only")
 
         @classmethod
-        def getList(cls):
-            return [cls.BEST, cls.RESOLUTION_1080P, cls.RESOLUTION_720P, cls.RESOLUTION_480P, cls.RESOLUTION_360P, cls.RESOLUTION_160P, cls.WORST, cls.AUDIO_ONLY]
+        def getList(cls) -> tuple[Quality, ...]:
+            return cls.BEST, cls.RESOLUTION_1080P, cls.RESOLUTION_720P, cls.RESOLUTION_480P, cls.RESOLUTION_360P, cls.RESOLUTION_160P, cls.WORST, cls.AUDIO_ONLY
 
     class AVAILABLE_FRAMERATE:
         HIGH = FrameRate("high")
         LOW = FrameRate("low")
 
         @classmethod
-        def getList(cls):
-            return [cls.HIGH, cls.LOW]
+        def getList(cls) -> tuple[FrameRate, ...]:
+            return cls.HIGH, cls.LOW
 
     def __init__(self):
         self.channel = ""
@@ -75,76 +74,83 @@ class ScheduledDownloadPreset(Codable):
         self.preferredQualityIndex = 0
         self.preferredFrameRateIndex = 0
         self.fileFormat = self.getAvailableFormat()
+        self.remux = True
         self.preferredResolutionOnly = False
         self.enabled = True
 
-    def setEnabled(self, enabled):
+    def setEnabled(self, enabled: bool) -> None:
         self.enabled = enabled
 
-    def isEnabled(self):
+    def isEnabled(self) -> bool:
         return self.enabled
 
     @property
-    def optionHistory(self):
-        return DB.temp.getDownloadOptionHistory(DownloadOptionHistory.ScheduledDownloadHistory)
+    def optionHistory(self) -> DownloadOptionHistory.ScheduledDownloadHistory:
+        return App.Preferences.temp.getDownloadOptionHistory(DownloadOptionHistory.ScheduledDownloadHistory)
 
-    def setChannel(self, channel):
+    def setChannel(self, channel: str) -> None:
         self.channel = channel
 
-    def setDirectory(self, directory):
+    def setDirectory(self, directory: str) -> None:
         self.directory = directory
 
-    def setFilenameTemplate(self, filenameTemplate):
+    def setFilenameTemplate(self, filenameTemplate: str) -> None:
         self.filenameTemplate = filenameTemplate
 
-    def setFileFormat(self, fileFormat):
+    def setFileFormat(self, fileFormat: str) -> None:
         self.fileFormat = fileFormat
 
-    def getAvailableFormat(self, currentFormat=None):
+    def getAvailableFormat(self, currentFormat: str | None = None) -> str:
         availableFormats = self.getAvailableFormats()
         if currentFormat != None:
             if currentFormat in availableFormats:
                 return currentFormat
         return availableFormats[0]
 
-    def getAvailableFormats(self):
+    def getAvailableFormats(self) -> list[str]:
         if self.isAudioOnlyPreferred():
             return self.optionHistory.getAvailableAudioFormats()
         else:
             return self.optionHistory.getAvailableFormats()
 
-    def setPreferredQuality(self, index):
+    def setPreferredQuality(self, index: int) -> None:
         self.preferredQualityIndex = index
         self.setFileFormat(self.getAvailableFormat(self.fileFormat))
 
     @property
-    def preferredQuality(self):
+    def preferredQuality(self) -> Quality:
         return self.getQualityList()[self.preferredQualityIndex]
 
-    def getQualityList(self):
+    def getQualityList(self) -> tuple[Quality, ...]:
         return self.AVAILABLE_QUALITY.getList()
 
-    def isAudioOnlyPreferred(self):
+    def isAudioOnlyPreferred(self) -> bool:
         return self.preferredQuality == self.AVAILABLE_QUALITY.AUDIO_ONLY
 
-    def setPreferredFrameRate(self, index):
+    def setPreferredFrameRate(self, index: int) -> None:
         self.preferredFrameRateIndex = index
         self.setFileFormat(self.getAvailableFormat(self.fileFormat))
 
     @property
-    def preferredFrameRate(self):
+    def preferredFrameRate(self) -> FrameRate:
         return self.getFrameRateList()[self.preferredFrameRateIndex]
 
-    def getFrameRateList(self):
+    def getFrameRateList(self) -> tuple[FrameRate, ...]:
         return self.AVAILABLE_FRAMERATE.getList()
 
-    def setPreferredResolutionOnlyEnabled(self, enabled):
+    def setRemuxEnabled(self, enabled: bool) -> None:
+        self.remux = enabled
+
+    def isRemuxEnabled(self) -> bool:
+        return self.remux
+
+    def setPreferredResolutionOnlyEnabled(self, enabled: bool) -> None:
         self.preferredResolutionOnly = enabled
 
-    def isPreferredResolutionOnlyEnabled(self):
+    def isPreferredResolutionOnlyEnabled(self) -> bool:
         return self.preferredResolutionOnly
 
-    def selectResolution(self, resolutions):
+    def selectResolution(self, resolutions: list[Resolution]) -> Resolution:
         if self.preferredQuality == self.AVAILABLE_QUALITY.BEST:
             return resolutions[0]
         elif self.preferredQuality == self.AVAILABLE_QUALITY.WORST:
@@ -169,13 +175,10 @@ class ScheduledDownloadPreset(Codable):
             raise Exceptions.PreferredResolutionNotFound
         return resolutions[0]
 
-    def saveOptionHistory(self):
+    def saveOptionHistory(self) -> None:
         self.optionHistory.setFilenameTemplate(self.filenameTemplate)
         self.optionHistory.setDirectory(self.directory)
         if self.isAudioOnlyPreferred():
             self.optionHistory.setAudioFormat(self.fileFormat)
         else:
             self.optionHistory.setFormat(self.fileFormat)
-
-    def copy(self):
-        return copy.deepcopy(self)

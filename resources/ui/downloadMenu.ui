@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>420</width>
-    <height>804</height>
+    <height>864</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,11 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
   </property>
   <property name="windowTitle">
    <string>Download Menu</string>
@@ -576,7 +571,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>This may not be accurate with your current settings.</string>
+                <string>The actual cut may vary a few seconds from the specified range.</string>
                </property>
               </widget>
              </item>
@@ -649,40 +644,38 @@
            </widget>
           </widget>
          </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="encoderArea">
+        <property name="title">
+         <string>Encoder</string>
+        </property>
+        <layout class="QHBoxLayout" name="encoderAreaLayout">
          <item>
-          <widget class="QWidget" name="clippingModeArea" native="true">
-           <layout class="QHBoxLayout" name="clippingModeAreaLayout">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QCheckBox" name="clippingModeCheckBox">
-              <property name="text">
-               <string>Clipping Mode</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="clippingModeInfo">
-              <property name="toolTip">
-               <string>Help</string>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <widget class="QRadioButton" name="remuxRadioButton">
+           <property name="text">
+            <string>Remux (Recommended)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="concatRadioButton">
+           <property name="text">
+            <string>Concat</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="encoderInfo">
+           <property name="toolTip">
+            <string>Help</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+           </property>
           </widget>
          </item>
         </layout>
@@ -815,17 +808,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="adArea_1" native="true">
+    <widget class="QWidget" name="partnerContentArea_1" native="true">
      <property name="minimumSize">
       <size>
        <width>320</width>
@@ -849,6 +832,16 @@
        <number>0</number>
       </property>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
     </widget>
    </item>
   </layout>

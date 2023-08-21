@@ -1,12 +1,10 @@
-from Core.Config import Config as CoreConfig, _P
+from Core.Config import Config as CoreConfig
 
 import logging
 
 
 class Config:
     LOG_ROOT = CoreConfig.TEMP_PATH
-
-    ERROR_DETECTOR_FILE = _P(CoreConfig.DB_ROOT, "error_detector.json")
 
     TARGET_ROOT = "root"
     TARGET_NOT_ROOT = "not_root"
@@ -16,7 +14,7 @@ class Config:
         "oauth_token"
     ]
 
-    REPLACEMENT_STRING = "[---{appName} automatically replaced this({dataType}) for security reasons---]"
+    REPLACEMENT_STRING = f"[---{CoreConfig.APP_NAME} automatically replaced this({{dataType}}) for security reasons---]"
 
     STREAM_HANDLERS = [
         {

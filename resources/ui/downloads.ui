@@ -10,11 +10,6 @@
     <height>600</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
    <string>Downloads</string>
   </property>
@@ -421,7 +416,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QWidget" name="adArea_1" native="true">
+          <widget class="QWidget" name="partnerContentArea_1" native="true">
            <property name="minimumSize">
             <size>
              <width>320</width>
@@ -451,14 +446,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="downloadCompleteActionArea" native="true">
+       <widget class="QWidget" name="scheduledShutdownArea" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QVBoxLayout" name="downloadCompleteActionAreaLayout">
+        <layout class="QVBoxLayout" name="scheduledShutdownAreaLayout">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -472,14 +467,14 @@
           <number>0</number>
          </property>
          <item alignment="Qt::AlignRight">
-          <widget class="QWidget" name="downloadCompleteActionControlArea" native="true">
+          <widget class="QWidget" name="scheduledShutdownControlArea" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <layout class="QHBoxLayout" name="downloadCompleteActionControlAreaLayout">
+           <layout class="QHBoxLayout" name="scheduledShutdownControlAreaLayout">
             <property name="leftMargin">
              <number>0</number>
             </property>
@@ -493,14 +488,14 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="downloadCompleteActionLabel">
+             <widget class="QLabel" name="scheduledShutdownLabel">
               <property name="text">
-               <string>Action to perform after all downloads:</string>
+               <string>Scheduled Shutdown:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="downloadCompleteAction">
+             <widget class="QComboBox" name="scheduledShutdown">
               <item>
                <property name="text">
                 <string>None</string>
@@ -519,7 +514,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="downloadCompleteActionInfo">
+             <widget class="QToolButton" name="scheduledShutdownInfo">
               <property name="toolTip">
                <string>Help</string>
               </property>
@@ -542,8 +537,6 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>

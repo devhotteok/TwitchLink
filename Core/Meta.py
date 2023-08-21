@@ -4,22 +4,20 @@ from PyQt6 import QtCore
 class Meta:
     APP_NAME = "TwitchLink"
 
-    APP_VERSION = "2.4.0"
+    APP_VERSION = "3.0.0"
 
     AUTHOR = "DevHotteok"
 
-    LICENSE = "MIT"
-
-    FIRST_VERSION_RELEASED = QtCore.QDate(2021, 2, 1)
+    FIRST_VERSION_RELEASED_YEAR = 2021
 
     CONTACT = {}
 
     HOMEPAGE_URL = "https://twitchlink.github.io/"
 
     @classmethod
-    def getCopyrightInfo(cls):
-        return f"ⓒ {max(cls.FIRST_VERSION_RELEASED.year(), QtCore.QDate().currentDate().year())} {cls.AUTHOR}."
+    def getCopyrightInfo(cls) -> str:
+        return f"ⓒ {max(cls.FIRST_VERSION_RELEASED_YEAR, QtCore.QDate().currentDate().year())} {cls.AUTHOR}."
 
     @classmethod
-    def getProjectInfo(cls):
-        return f"{cls.APP_NAME} {cls.APP_VERSION}\n\n[Author]\n{cls.AUTHOR}\n\n[License]\n{cls.LICENSE} License\n\n{cls.getCopyrightInfo()}"
+    def getProjectInfo(cls) -> str:
+        return f"{cls.APP_NAME} {cls.APP_VERSION}\n\n{cls.getCopyrightInfo()}"

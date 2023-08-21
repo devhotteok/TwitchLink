@@ -3,25 +3,25 @@ from Ui.Components.Operators.TabManager import TabManager
 
 
 class WebViewTabManager(TabManager):
-    def __init__(self, parent=None):
-        super(WebViewTabManager, self).__init__(parent=parent)
+    def __init__(self, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
         self.webViewWidgets = []
 
-    def updateWebTabIcon(self, widget, icon):
-        self.setTabIcon(self.indexOf(widget), self.getDefaultIcon(widget.webView, widget.webView.url().toString()) if icon.isNull() else icon)
+    def updateWebTabIcon(self, widget: Ui.WebViewWidget, icon: QtGui.QIcon) -> None:
+        self.setTabIcon(self.indexOf(widget), self.getDefaultIcon(widget._ui.webView, widget._ui.webView.url()) if icon.isNull() else icon)
 
-    def updateWebTabTitle(self, widget, title):
+    def updateWebTabTitle(self, widget: Ui.WebViewWidget, title: str) -> None:
         self.setTabText(self.indexOf(widget), title)
 
-    def getDefaultIcon(self, webView, url):
-        if url.startswith("file:///"):
+    def getDefaultIcon(self, webView: QtWebEngineWidgets.QWebEngineView, url: QtCore.QUrl) -> str:
+        if url.toString().startswith("file:///"):
             return Icons.FOLDER_ICON
-        elif url.startswith("devtools://"):
+        elif url.toString().startswith("devtools://"):
             if webView.page().inspectedPage() != None:
                 return Icons.SETTINGS_ICON
         return Icons.WEB_ICON
 
-    def addWebTab(self, webViewWidget, index=-1, closable=True, uniqueValue=None):
+    def addWebTab(self, webViewWidget: Ui.WebViewWidget, index: int = -1, closable: bool = True, uniqueValue: typing.Any = None) -> int:
         webViewWidget.iconChanged.connect(self.updateWebTabIcon)
         webViewWidget.titleChanged.connect(self.updateWebTabTitle)
         webViewWidget.newTabRequested.connect(self.openWebTab)
@@ -29,21 +29,21 @@ class WebViewTabManager(TabManager):
         self.webViewWidgets.append(webViewWidget)
         return self.addTab(webViewWidget, index=index, closable=closable, uniqueValue=uniqueValue)
 
-    def openWebTab(self, webViewWidget, index=-1, closable=True, uniqueValue=None):
+    def openWebTab(self, webViewWidget: Ui.WebViewWidget, index: int = -1, closable: bool = True, uniqueValue: typing.Any = None) -> None:
         self.setCurrentIndex(self.addWebTab(webViewWidget, index=index, closable=closable, uniqueValue=uniqueValue))
 
-    def closeWebTab(self, webViewWidget):
+    def closeWebTab(self, webViewWidget: Ui.WebViewWidget) -> None:
         self.closeTab(self.indexOf(webViewWidget))
 
-    def closeAllWebTabs(self):
+    def closeAllWebTabs(self) -> None:
         while len(self.webViewWidgets) != 0:
-            super().closeTab(self.indexOf(self.webViewWidgets.pop(0)))
+            self.closeTab(self.indexOf(self.webViewWidgets[0]))
 
-    def closeTab(self, index):
+    def closeTab(self, index: int) -> None:
         widget = self.widget(index)
         if widget in self.webViewWidgets:
-            self.webViewWidgets.remove(widget)
-            devToolsPage = widget.webView.page().devToolsPage()
+            devToolsPage = widget._ui.webView.page().devToolsPage()
             if devToolsPage != None:
                 devToolsPage.windowCloseRequested.emit()
+            self.webViewWidgets.remove(widget)
         super().closeTab(index)

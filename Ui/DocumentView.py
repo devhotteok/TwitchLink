@@ -1,99 +1,91 @@
 from Core.Ui import *
-from Services.NotificationManager import NotificationManager
 from Services.Script import Script
+from Services.Document import DocumentData, DocumentButtonData
 
 
 class DocumentViewButton(QtWidgets.QPushButton):
-    def __init__(self, documentButton, parent=None):
-        super(DocumentViewButton, self).__init__(parent=parent)
-        self.setText(documentButton.text)
-        self.setAction(documentButton.action)
-        self.setRole(documentButton.role)
-        self.setDefault(documentButton.default)
+    def __init__(self, documentButtonData: DocumentButtonData, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
+        self.setText(documentButtonData.text)
+        self._action = None if documentButtonData.action == None else Script(documentButtonData.action, parent=self)
+        self._role = documentButtonData.role
+        self.setDefault(documentButtonData.default)
         self.clicked.connect(self.runAction)
 
-    def setAction(self, action):
-        self.action = action
+    def runAction(self) -> None:
+        if self._action != None:
+            self._action()
 
-    def runAction(self):
-        if self.action != None:
-            Script.run(self.action)
-
-    def setRole(self, role):
-        self.role = role
-
-    def getRole(self):
-        return self.role
+    def getRole(self) -> QtWidgets.QDialogButtonBox.ButtonRole:
+        return self._role
 
 
-class DocumentView(QtWidgets.QWidget, UiFile.documentView):
+class DocumentView(QtWidgets.QWidget):
     closeRequested = QtCore.pyqtSignal(object)
 
-    def __init__(self, document, parent=None):
-        super(DocumentView, self).__init__(parent=parent)
-        self.document = document
-        self.setTitle(document.title)
-        self.setContent(document.content, document.contentType)
-        self.setModal(document.modal)
-        self.setBlockExpiry(False if document.contentId == None else document.blockExpiry)
-        for button in document.buttons:
+    def __init__(self, documentData: DocumentData, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
+        self.documentData = documentData
+        self._ui = UiLoader.load("documentView", self)
+        self.setTitle(documentData.title)
+        self.setContent(documentData.content, documentData.contentType)
+        self.setModal(documentData.modal)
+        self.setBlockExpiration(False if documentData.contentId == None else documentData.blockExpiration)
+        for button in documentData.buttons:
             self.addButton(button)
-        self.buttonBox.accepted.connect(self.requestClose)
+        self._ui.buttonBox.accepted.connect(self._requestClose)
         if self.isBlockable():
-            self.buttonBox.accepted.connect(self.checkContentBlock)
-        self.buttonBox.rejected.connect(self.requestClose)
+            self._ui.buttonBox.accepted.connect(self._checkContentBlock)
+        self._ui.buttonBox.rejected.connect(self._requestClose)
 
-    def setTitle(self, title):
+    def setTitle(self, title: str) -> None:
         self.setWindowTitle(title)
-        self.windowTitleLabel.setText(title)
+        self._ui.windowTitleLabel.setText(title)
 
-    def setContent(self, content, contentType):
+    def setContent(self, content: str, contentType: str) -> None:
         if contentType == "html":
-            self.contentBrowser.setHtml(content)
+            self._ui.contentBrowser = Utils.setPlaceholder(self._ui.contentBrowser, QtWebEngineWidgets.QWebEngineView(parent=self))
+            self._ui.contentBrowser.setHtml(content)
         elif contentType == "url":
-            try:
-                self.contentBrowser = Utils.setPlaceholder(self.contentBrowser, QtWebEngineWidgets.QWebEngineView(parent=self))
-            except Exception as e:
-                self.contentBrowser.setText(f"{T('#An unexpected error has occurred.')}\n{e}")
-            else:
-                self.contentBrowser.load(QtCore.QUrl(content))
+            self._ui.contentBrowser = Utils.setPlaceholder(self._ui.contentBrowser, QtWebEngineWidgets.QWebEngineView(parent=self))
+            self._ui.contentBrowser.load(QtCore.QUrl(content))
         else:
-            self.contentBrowser.setText(content)
+            self._ui.contentBrowser.setText(content)
 
-    def setModal(self, modal):
+    def setModal(self, modal: bool) -> None:
         self.modal = modal
 
-    def setBlockExpiry(self, blockExpiry):
-        self.blockExpiry = blockExpiry
+    def setBlockExpiration(self, blockExpiration: bool | int | None) -> None:
+        self.blockExpiration = blockExpiration
         if self.isBlockable():
-            if self.blockExpiry == None:
-                self.checkBox.setText(T("#Do not show this again."))
+            if self.blockExpiration == None:
+                self._ui.checkBox.setText(T("#Do not show this again."))
             else:
-                self.checkBox.setText(T("#Do not show this again for {blockExpiry} days.", blockExpiry=blockExpiry))
-            self.checkBox.show()
+                self._ui.checkBox.setText(T("#Do not show this again for {blockExpiration} days.", blockExpiration=blockExpiration))
+            self._ui.checkBox.show()
         else:
-            self.checkBox.hide()
+            self._ui.checkBox.hide()
 
-    def addButton(self, button):
-        buttonWidget = DocumentViewButton(button, parent=self)
-        self.buttonBox.addButton(buttonWidget, buttonWidget.getRole())
+    def addButton(self, documentButtonData: DocumentButtonData) -> DocumentViewButton:
+        buttonWidget = DocumentViewButton(documentButtonData, parent=self)
+        self._ui.buttonBox.addButton(buttonWidget, buttonWidget.getRole())
         return buttonWidget
 
-    def isModal(self):
+    def isModal(self) -> bool:
         return self.modal
 
-    def isBlockable(self):
-        return self.blockExpiry != False
+    def isBlockable(self) -> bool:
+        return self.blockExpiration != False
 
-    def accept(self):
-        self.buttonBox.accepted.emit()
+    def accept(self) -> None:
+        self._ui.buttonBox.accepted.emit()
 
-    def reject(self):
-        self.buttonBox.rejected.emit()
+    def reject(self) -> None:
+        self._ui.buttonBox.rejected.emit()
 
-    def requestClose(self):
+    def _requestClose(self) -> None:
         self.closeRequested.emit(self)
 
-    def checkContentBlock(self):
-        if self.checkBox.isChecked():
-            NotificationManager.block(self.document)
+    def _checkContentBlock(self) -> None:
+        if self._ui.checkBox.isChecked():
+            App.Notifications.block(self.documentData)

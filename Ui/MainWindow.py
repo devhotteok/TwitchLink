@@ -1,114 +1,133 @@
-from Core.App import App
-from Core.Updater import Updater
 from Core.Ui import *
 from Services.Messages import Messages
-from Services.Image.Loader import ImageLoader
 from Services.Document import DocumentData, DocumentButtonData
-from Services.Logging.ErrorDetector import ErrorDetector, ErrorHandlers
-from Services.NotificationManager import NotificationManager
-from Services import ContentManager
-from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
-from Download.GlobalDownloadManager import GlobalDownloadManager
-from Download.ScheduledDownloadManager import ScheduledDownloadManager
 from Ui.Components.Operators.NavigationBar import NavigationBar
 from Ui.Components.Pages.SearchPage import SearchPage
 from Ui.Components.Pages.DownloadsPage import DownloadsPage
 from Ui.Components.Pages.ScheduledDownloadsPage import ScheduledDownloadsPage
 from Ui.Components.Pages.AccountPage import AccountPage
 from Ui.Components.Pages.InformationPage import InformationPage
-from Ui.Components.Widgets.ProgressDialog import ProgressDialog
 
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 
-class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager):
-    def __init__(self, parent=None):
-        super(MainWindow, self).__init__(parent=parent)
-        App.appStarted.connect(self.start, QtCore.Qt.ConnectionType.QueuedConnection)
-        App.newInstanceStarted.connect(self.activate)
+class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
+    def __init__(self, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
+        self._ui = UiLoader.load("mainWindow", self)
+        self._webViewEnabled = False
+        App.Instance.appStarted.connect(self.start, QtCore.Qt.ConnectionType.QueuedConnection)
+        App.Instance.newInstanceStarted.connect(self.activate)
 
-    def start(self):
-        if DB.setup.needSetup():
+    def start(self) -> None:
+        if App.Preferences.setup.needSetup():
             if Ui.Setup().exec():
-                App.restart()
+                App.Instance.restart()
             else:
-                App.exit()
+                App.Instance.exit()
         else:
-            Ui.Loading().exec()
-            self.loadWindowGeometry()
-            self.loadComponents()
-            self.setupSystemTray()
-            self.setup()
+            loading = Ui.Loading()
+            loading.completeSignal.connect(self.onLoadingComplete)
+            loading.exec()
+            self.show()
 
-    def loadComponents(self):
+    def onLoadingComplete(self) -> None:
+        self.loadWindowGeometry()
+        self.loadComponents()
+        self.setupSystemTray()
+        self.setup()
+
+    def loadComponents(self) -> None:
         self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
-        self.actionGettingStarted.triggered.connect(self.gettingStarted)
-        self.actionAbout.triggered.connect(self.openAbout)
-        self.actionTermsOfService.triggered.connect(self.openTermsOfService)
-        self.actionSponsor.triggered.connect(self.sponsor)
-        self.navigationBar = NavigationBar(self.navigationArea, parent=self)
+        self._ui.actionGettingStarted.triggered.connect(self.gettingStarted)
+        self._ui.actionAbout.triggered.connect(self.openAbout)
+        self._ui.actionTermsOfService.triggered.connect(self.openTermsOfService)
+        self._ui.actionSponsor.triggered.connect(self.sponsor)
+        self.navigationBar = NavigationBar(self._ui.navigationArea, parent=self)
         self.navigationBar.focusChanged.connect(self.onFocusChange)
-        self.searchPageObject = self.navigationBar.addPage(self.searchPageButton, self.searchPage, icon=Icons.SEARCH_ICON)
-        self.downloadsPageObject = self.navigationBar.addPage(self.downloadsPageButton, self.downloadsPage, icon=Icons.DOWNLOAD_ICON)
-        self.scheduledDownloadsPageObject = self.navigationBar.addPage(self.scheduledDownloadsPageButton, self.scheduledDownloadsPage, icon=Icons.SCHEDULED_ICON)
-        self.accountPageObject = self.navigationBar.addPage(self.accountPageButton, self.accountPage, icon=Icons.ACCOUNT_ICON)
-        self.settingsPageObject = self.navigationBar.addPage(self.settingsPageButton, self.settingsPage, icon=Icons.SETTINGS_ICON)
-        self.informationPageObject = self.navigationBar.addPage(self.informationPageButton, self.informationPage, icon=Icons.INFO_ICON)
+        self.searchPageObject = self.navigationBar.addPage(self._ui.searchPageButton, self._ui.searchPage, icon=QtGui.QIcon(Icons.SEARCH_ICON))
+        self.downloadsPageObject = self.navigationBar.addPage(self._ui.downloadsPageButton, self._ui.downloadsPage, icon=QtGui.QIcon(Icons.DOWNLOAD_ICON))
+        self.scheduledDownloadsPageObject = self.navigationBar.addPage(self._ui.scheduledDownloadsPageButton, self._ui.scheduledDownloadsPage, icon=QtGui.QIcon(Icons.SCHEDULED_ICON))
+        self.accountPageObject = self.navigationBar.addPage(self._ui.accountPageButton, self._ui.accountPage, icon=QtGui.QIcon(Icons.ACCOUNT_ICON))
+        self.settingsPageObject = self.navigationBar.addPage(self._ui.settingsPageButton, self._ui.settingsPage, icon=QtGui.QIcon(Icons.SETTINGS_ICON))
+        self.informationPageObject = self.navigationBar.addPage(self._ui.informationPageButton, self._ui.informationPage, icon=QtGui.QIcon(Icons.INFO_ICON))
         self.search = SearchPage(self.searchPageObject, parent=self)
         self.search.accountPageShowRequested.connect(self.accountPageObject.show)
-        self.searchPage.layout().addWidget(self.search)
+        self._ui.searchPage.layout().addWidget(self.search)
         self.downloads = DownloadsPage(self.downloadsPageObject, parent=self)
         self.downloads.accountPageShowRequested.connect(self.accountPageObject.show)
         self.downloads.appShutdownRequested.connect(self.shutdown)
         self.downloads.systemShutdownRequested.connect(self.shutdownSystem)
-        self.downloadsPage.layout().addWidget(self.downloads)
+        self._ui.downloadsPage.layout().addWidget(self.downloads)
         self.scheduledDownloads = ScheduledDownloadsPage(self.scheduledDownloadsPageObject, parent=self)
-        self.scheduledDownloadsPage.layout().addWidget(self.scheduledDownloads)
+        self._ui.scheduledDownloadsPage.layout().addWidget(self.scheduledDownloads)
         self.account = AccountPage(self.accountPageObject, parent=self)
-        self.accountPage.layout().addWidget(self.account)
+        self._ui.accountPage.layout().addWidget(self.account)
         self.settings = Ui.Settings(parent=self)
         self.settings.restartRequired.connect(self.restart)
-        self.settingsPage.layout().addWidget(self.settings)
+        self._ui.settingsPage.layout().addWidget(self.settings)
         self.information = InformationPage(self.informationPageObject, parent=self)
-        self.information.accountRefreshRequested.connect(self.account.refreshAccount)
+        self.information.termsOfServiceAccepted.connect(self._termsOfServiceAccepted)
         self.information.appShutdownRequested.connect(self.shutdown)
-        self.informationPage.layout().addWidget(self.information)
+        self._ui.informationPage.layout().addWidget(self.information)
 
-    def setupSystemTray(self):
-        contextMenu = App.systemTray.contextMenu()
+    def setupSystemTray(self) -> None:
+        contextMenu = App.Instance.systemTrayIcon.contextMenu()
         self.openAppAction = QtGui.QAction(T("open"), parent=contextMenu)
         self.closeAppAction = QtGui.QAction(T("exit"), parent=contextMenu)
         self.openAppAction.triggered.connect(self.activate)
         self.closeAppAction.triggered.connect(self.close)
         contextMenu.addAction(self.openAppAction)
         contextMenu.addAction(self.closeAppAction)
-        App.systemTray.clicked.connect(self.activate)
+        App.Instance.systemTrayIcon.clicked.connect(self.activate)
 
-    def setup(self):
+    def setup(self) -> None:
         self.statusUpdated(isInSetup=True)
-        if Updater.status.isOperational():
-            if DB.setup.getTermsOfServiceAgreement() == None:
+        if App.Updater.status.isOperational():
+            if App.Preferences.setup.getTermsOfServiceAgreement() == None:
                 self.openTermsOfService()
             else:
-                self.account.refreshAccount()
-            Updater.statusUpdated.connect(self.statusUpdated)
-            Updater.startAutoUpdate()
-            ContentManager.ContentManager.restrictionsUpdated.connect(self.restrictionsUpdated)
-            GlobalDownloadManager.statsUpdated.connect(self.showContributeInfo, QtCore.Qt.ConnectionType.QueuedConnection)
-        self.show(webViewRenderingEnabled=True)
-        self.showErrorHistory()
+                self._termsOfServiceAccepted()
+            App.Updater.statusUpdated.connect(self.statusUpdated)
+            App.Updater.startAutoUpdate()
+            App.GlobalDownloadManager.statsUpdated.connect(self.showContributeInfo, QtCore.Qt.ConnectionType.QueuedConnection)
+        if Utils.isFile(Config.TRACEBACK_FILE):
+            file = QtCore.QFile(Config.TRACEBACK_FILE, self)
+            if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
+                fileName = file.readAll().data().decode()
+                self.information.showAppInfo(
+                    DocumentData(
+                        contentId="CRASH_REPORT",
+                        title=T("#{appName} has crashed.", appName=Config.APP_NAME),
+                        content=T("#{appName} has crashed due to an unexpected error.\nIf this happens frequently, please attach the following log file and report it to us.\n\nFile: {fileName}", appName=Config.APP_NAME, fileName=fileName),
+                        contentType="text",
+                        modal=True,
+                        buttons=[
+                            DocumentButtonData(text=T("ok"), role="accept", default=True),
+                            DocumentButtonData(text=T("open-file"), action=f"file:{fileName}", role="action", default=False),
+                            DocumentButtonData(text=T("report-error"), action=f"url:{Config.HOMEPAGE_URL}", role="action", default=False)
+                        ]
+                    )
+                )
+            file.remove()
+            file.deleteLater()
 
-    def show(self, webViewRenderingEnabled=False):
-        if webViewRenderingEnabled:
-            webView = QWebEngineView(parent=self)
-            webView.load(QtCore.QUrl(""))
+    def _termsOfServiceAccepted(self) -> None:
+        self.account.refreshAccount()
+        App.Account.updateIntegrityToken()
+
+    def show(self) -> None:
+        if self._webViewEnabled:
             super().show()
-            webView.setParent(None)
         else:
+            webView = QWebEngineView(parent=self)
+            webView.load(QtCore.QUrl())
+            webView.deleteLater()
+            self._webViewEnabled = True
             super().show()
 
-    def statusUpdated(self, isInSetup=False):
-        isOperational = Updater.status.isOperational()
+    def statusUpdated(self, isInSetup: bool = False) -> None:
+        isOperational = App.Updater.status.isOperational()
         allowPageView = not isInSetup
         self.menuBar().setEnabled(isOperational or allowPageView)
         if not isOperational and allowPageView:
@@ -119,12 +138,12 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
             self.downloadsPageObject.unfocus()
             self.scheduledDownloadsPageObject.unfocus()
             self.settingsPageObject.unfocus()
-        GlobalDownloadManager.setDownloaderCreationEnabled(isOperational)
-        ScheduledDownloadManager.setBlocked(not isOperational)
+        App.GlobalDownloadManager.setDownloaderCreationEnabled(isOperational)
+        App.ScheduledDownloadManager.setBlocked(not isOperational)
         contentId = "APP_STATUS"
         self.information.removeAppInfo(contentId)
-        status = Updater.status.getStatus()
-        if status == Updater.status.CONNECTION_FAILURE:
+        status = App.Updater.status.getStatus()
+        if status == App.Updater.status.Types.CONNECTION_FAILURE:
             if isInSetup:
                 content = T("#Please try again later.")
                 buttons = [
@@ -143,8 +162,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
                     buttons=buttons
                 )
             )
-        elif status == Updater.status.UNEXPECTED_ERROR:
-            Updater.stopAutoUpdate()
+        elif status == App.Updater.status.Types.UNEXPECTED_ERROR:
+            App.Updater.stopAutoUpdate()
             if isInSetup:
                 content = T("#Please try again later.")
                 buttons = [
@@ -163,8 +182,8 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
                     buttons=buttons
                 )
             )
-        elif status == Updater.status.SESSION_EXPIRED:
-            Updater.stopAutoUpdate()
+        elif status == App.Updater.status.Types.SESSION_EXPIRED:
+            App.Updater.stopAutoUpdate()
             self.information.showAppInfo(
                 DocumentData(
                     contentId=contentId,
@@ -175,151 +194,124 @@ class MainWindow(QtWidgets.QMainWindow, UiFile.mainWindow, WindowGeometryManager
                     buttons=[]
                 )
             )
-        elif status == Updater.status.UNAVAILABLE:
+        elif status == App.Updater.status.Types.UNAVAILABLE:
             self.information.showAppInfo(
                 DocumentData(
                     contentId=contentId,
                     title=T("service-unavailable"),
-                    content=Updater.status.operationalInfo or T("#{appName} is currently unavailable.", appName=Config.APP_NAME),
-                    contentType=Updater.status.operationalInfoType or "text",
+                    content=App.Updater.status.operationalInfo or T("#{appName} is currently unavailable.", appName=Config.APP_NAME),
+                    contentType=App.Updater.status.operationalInfoType or "text",
                     modal=True,
                     buttons=[DocumentButtonData(text=T("ok"), action=self.shutdown, role="action", default=True)] if isInSetup else []
                 )
             )
             if not isInSetup:
                 self.restart()
-        elif status == Updater.status.UPDATE_REQUIRED or status == Updater.status.UPDATE_FOUND:
-            if status == Updater.status.UPDATE_REQUIRED:
-                Updater.stopAutoUpdate()
+        elif status == App.Updater.status.Types.UPDATE_REQUIRED or status == App.Updater.status.Types.UPDATE_FOUND:
+            if status == App.Updater.status.Types.UPDATE_REQUIRED:
+                App.Updater.stopAutoUpdate()
             self.information.showAppInfo(
                 DocumentData(
                     contentId=contentId,
-                    title=T("recommended-update" if status == Updater.status.UPDATE_FOUND else "required-update"),
-                    content=Updater.status.version.updateNote or f"{T('#A new version of {appName} has been released!', appName=Config.APP_NAME)}\n\n[{Config.APP_NAME} {Updater.status.version.latestVersion}]",
-                    contentType=Updater.status.version.updateNoteType if Updater.status.version.updateNote else "text",
-                    modal=status == Updater.status.UPDATE_REQUIRED,
+                    title=T("recommended-update" if status == App.Updater.status.Types.UPDATE_FOUND else "required-update"),
+                    content=App.Updater.status.versionInfo.updateNote or f"{T('#A new version of {appName} has been released!', appName=Config.APP_NAME)}\n\n[{Config.APP_NAME} {App.Updater.status.versionInfo.latestVersion if App.Updater.status.versionInfo.hasUpdate() else T('unknown')}]",
+                    contentType=App.Updater.status.versionInfo.updateNoteType if App.Updater.status.versionInfo.updateNote else "text",
+                    modal=status == App.Updater.status.Types.UPDATE_REQUIRED,
                     buttons=[
                         DocumentButtonData(text=T("update"), action=self.confirmUpdateShutdown, role="action", default=True),
-                        DocumentButtonData(text=T("cancel"), action=(self.shutdown if isInSetup else self.confirmShutdown) if status == Updater.status.UPDATE_REQUIRED else None, role="reject", default=False)
+                        DocumentButtonData(text=T("cancel"), action=(self.shutdown if isInSetup else self.confirmShutdown) if status == App.Updater.status.Types.UPDATE_REQUIRED else None, role="reject", default=False)
                     ]
                 ),
                 icon=Icons.UPDATE_FOUND_ICON
             )
 
-    def showErrorHistory(self):
-        for key in ErrorHandlers.getHandlerDict():
-            if ErrorDetector.hasHistory(key):
-                if ErrorDetector.getHistory(key) > ErrorDetector.MAX_IGNORE_COUNT:
-                    errorInfo = T("#We detected an error and disabled some features.\nClick '{buttonText}' to try again.", buttonText=T("delete-error-history"))
-                    errorMessages = "\n".join(map(T, ErrorHandlers.getHandler(key).errorMessages))
-                    contactInfo = T("#If the error persists, contact the developer.")
-                    if self.ask("error", f"{errorInfo}\n\n{key}: {ErrorDetector.getHistory(key)}\n\n{errorMessages}\n\n{contactInfo}", contentTranslate=False, okText="delete-error-history", cancelText="ok"):
-                        ErrorDetector.deleteHistory(key)
-                        self.info("warning", "#Some features may not be activated until the app is restarted.")
-
-    def onFocusChange(self, focus):
+    def onFocusChange(self, focus: bool) -> None:
         enabled = not focus
-        self.actionAbout.setEnabled(enabled)
-        self.actionTermsOfService.setEnabled(enabled)
+        self._ui.actionAbout.setEnabled(enabled)
+        self._ui.actionTermsOfService.setEnabled(enabled)
         if focus:
             self.activate()
 
-    def restrictionsUpdated(self):
-        for downloader in GlobalDownloadManager.getRunningDownloaders():
-            if downloader.status.terminateState.isFalse():
-                try:
-                    ContentManager.ContentManager.checkRestrictions(downloader.setup.downloadInfo.videoData, user=DB.account.user)
-                except ContentManager.Exceptions.RestrictedContent as e:
-                    downloader.abort(e)
+    def showContributeInfo(self, totalFiles: int, totalByteSize: int) -> None:
+        if Utils.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=totalFiles, totalSize=Utils.formatByteSize(totalByteSize), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self):
+            Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getLanguage()}))
 
-    def getContentInfoString(self, downloadInfo):
-        if downloadInfo.type.isStream():
-            channel = downloadInfo.videoData.broadcaster
-        elif downloadInfo.type.isVideo():
-            channel = downloadInfo.videoData.owner
-        else:
-            channel = downloadInfo.videoData.broadcaster
-        return f"[{channel.displayName}] [{T(downloadInfo.type.toString())}] {downloadInfo.videoData.title}"
-
-    def showContributeInfo(self, downloadStats):
-        if downloadStats["totalFiles"] < DownloadEngineConfig.SHOW_STATS[0]:
-            showContributeInfo = downloadStats["totalFiles"] in DownloadEngineConfig.SHOW_STATS[1]
-        else:
-            showContributeInfo = downloadStats["totalFiles"] % DownloadEngineConfig.SHOW_STATS[0] == 0
-        if showContributeInfo:
-            if self.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=downloadStats["totalFiles"], totalSize=Utils.formatByteSize(downloadStats["totalByteSize"]), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True):
-                Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": Translator.getLanguage()}))
-
-    def confirmShutdown(self):
-        if GlobalDownloadManager.isDownloaderRunning() and not GlobalDownloadManager.isShuttingDown():
-            if self.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS):
+    def confirmShutdown(self) -> None:
+        if App.GlobalDownloadManager.isDownloaderRunning() and not App.GlobalDownloadManager.isShuttingDown():
+            if Utils.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS, parent=self):
                 self.shutdown()
         else:
             self.shutdown()
 
-    def confirmUpdateShutdown(self):
-        if GlobalDownloadManager.isDownloaderRunning() and not GlobalDownloadManager.isShuttingDown():
-            if not Utils.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS):
+    def confirmUpdateShutdown(self) -> None:
+        if App.GlobalDownloadManager.isDownloaderRunning() and not App.GlobalDownloadManager.isShuttingDown():
+            if not Utils.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS, parent=self):
                 return
-        Utils.openUrl(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": Translator.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(App.Updater.status.versionInfo.updateUrl, params={"lang": App.Translator.getLanguage()}))
         self.shutdown()
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         super().closeEvent(event)
         event.ignore()
-        if Updater.status.isOperational() and self.isVisible() and DB.general.isSystemTrayEnabled() and event.spontaneous():
-            self.hide()
-            App.notification.toastMessage(T("#Minimized to system tray"), T("#{appName} is running in the background.", appName=Config.APP_NAME), icon=App.notification.Icons.Information)
+        if App.Updater.status.isOperational() and self.isVisible() and App.Preferences.general.isSystemTrayEnabled() and event.spontaneous():
+            self.moveToSystemTray()
         else:
             self.confirmShutdown()
 
-    def gettingStarted(self):
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": Translator.getLanguage()}))
+    def gettingStarted(self) -> None:
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": App.Translator.getLanguage()}))
 
-    def openAbout(self):
+    def openAbout(self) -> None:
         self.information.openAbout()
 
-    def openTermsOfService(self):
+    def openTermsOfService(self) -> None:
         self.information.openTermsOfService()
 
-    def sponsor(self):
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": Translator.getLanguage()}))
+    def sponsor(self) -> None:
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getLanguage()}))
 
-    def cleanup(self):
-        GlobalDownloadManager.cancelAll()
-        ImageLoader.threadPool.clear()
-        GlobalDownloadManager.waitAll()
-        ImageLoader.threadPool.waitForDone()
-
-    def waitForCleanup(self):
-        if GlobalDownloadManager.isDownloaderRunning() or ImageLoader.threadPool.activeThreadCount() != 0:
-            msg = ProgressDialog(cancelAllowed=False, parent=self)
+    def waitForCleanup(self) -> None:
+        if App.GlobalDownloadManager.isDownloaderRunning():
+            msg = QtWidgets.QProgressDialog(parent=self)
             msg.setWindowTitle(T("shutting-down"))
-            msg.setLabelText(T("#Shutting down all downloads" if GlobalDownloadManager.isDownloaderRunning() else "shutting-down", ellipsis=True))
+            msg.setLabelText(T("#Shutting down all downloads" if App.GlobalDownloadManager.isDownloaderRunning() else "shutting-down", ellipsis=True))
             msg.setRange(0, 0)
-            msg.exec(target=self.cleanup)
+            msg.setCancelButton(None)
+            App.GlobalDownloadManager.cancelAll()
+            App.GlobalDownloadManager.allCompletedSignal.connect(msg.close)
+            msg.exec()
 
-    def restart(self):
+    def restart(self) -> None:
         self.shutdown(restart=True)
 
-    def shutdown(self, restart=False):
-        Updater.stopAutoUpdate()
-        NotificationManager.clearAll()
-        GlobalDownloadManager.setDownloaderCreationEnabled(False)
-        ScheduledDownloadManager.setBlocked(True)
-        self.downloads.setDownloadCompleteAction(None)
+    def shutdown(self, restart: bool = False) -> None:
+        App.Updater.stopAutoUpdate()
+        App.Updater.status.setStatus(App.Updater.status.Types.NONE)
+        App.Notifications.clearAll()
+        App.GlobalDownloadManager.setDownloaderCreationEnabled(False)
+        App.ScheduledDownloadManager.setBlocked(True)
+        self.downloads.setScheduledShutdown(None)
         self.waitForCleanup()
         self.saveWindowGeometry()
         if restart:
-            App.restart()
+            App.Instance.restart()
         else:
-            App.exit()
+            App.Instance.exit()
 
-    def shutdownSystem(self):
+    def shutdownSystem(self) -> None:
         self.shutdown()
         Utils.shutdownSystem(message=T("#Shutdown by {appName}'s scheduled task.", appName=Config.APP_NAME))
 
-    def activate(self):
+    def moveToSystemTray(self) -> None:
+        if not self.isHidden():
+            self.hide()
+            App.Instance.notification.toastMessage(
+                title=T("#Minimized to system tray"),
+                message=T("#{appName} is running in the background.", appName=Config.APP_NAME),
+                icon=App.Instance.notification.Icons.Information
+            )
+
+    def activate(self) -> None:
         if self.isHidden():
             self.show()
         self.setWindowState((self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized) | QtCore.Qt.WindowState.WindowActive)

@@ -24,29 +24,3 @@ class Config:
             "font": ["나눔고딕"]
         }
     }
-
-    TRANSLATION_LIST = [
-        "mainWindow",
-        "loading",
-        "setup",
-        "settings",
-        "propertyView",
-        "account",
-        "about",
-        "documentView",
-        "home",
-        "search",
-        "videoWidget",
-        "videoDownloadWidget",
-        "searchResult",
-        "downloadMenu",
-        "downloads",
-        "downloadPreview",
-        "download",
-        "scheduledDownloads",
-        "scheduledDownloadPreview",
-        "scheduledDownloadSettings",
-        "downloadHistory",
-        "downloadHistoryView",
-        "webViewWidget"
-    ]

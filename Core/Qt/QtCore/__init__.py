@@ -1,1 +1,1 @@
-from . import QThread, QTimeZone
+from . import QTimeZone

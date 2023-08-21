@@ -1,179 +1,131 @@
 from Core.Ui import *
-from Services.Image.Loader import ImageLoader
-from Download.Downloader.Engine.ThreadPool import DownloadThreadPool
-from Download.Downloader.Engine.Config import Config as DownloadEngineConfig
-from Download.GlobalDownloadManager import GlobalDownloadManager
-from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
+from Download.Downloader.Core.Engine.Config import Config as DownloadEngineConfig
+from Ui.Components.Widgets.FileNameTemplateInfo import FileNameTemplateInfo
 
 
-class TemplateInfoWindow(QtCore.QObject):
-    class TYPE:
-        STREAM = "stream"
-        VIDEO = "video"
-        CLIP = "clip"
-
-    FORM_DATA = {
-        TYPE.STREAM: FileNameGenerator.getStreamFileNameTemplateFormData,
-        TYPE.VIDEO: FileNameGenerator.getVideoFileNameTemplateFormData,
-        TYPE.CLIP: FileNameGenerator.getClipFileNameTemplateFormData
-    }
-
-    def __init__(self, templateType, parent=None):
-        super(TemplateInfoWindow, self).__init__(parent=parent)
-        self.templateType = templateType
-        self.window = None
-
-    def show(self):
-        if self.window == None:
-            self.window = Ui.PropertyView(
-                FileNameGenerator.getInfoTitle(self.templateType),
-                None,
-                self.FORM_DATA[self.templateType](),
-                enableLabelSelection=True,
-                enableFieldTranslation=True,
-                parent=self.parent()
-            )
-            self.window.destroyed.connect(self.closed)
-            self.window.show()
-        else:
-            self.window.activateWindow()
-
-    def closed(self):
-        self.window = None
-
-
-class Settings(QtWidgets.QWidget, UiFile.settings):
+class Settings(QtWidgets.QWidget):
     restartRequired = QtCore.pyqtSignal()
 
-    def __init__(self, parent=None):
-        super(Settings, self).__init__(parent=parent)
-        self.openProgressWindow.setChecked(DB.general.isOpenProgressWindowEnabled())
-        self.openProgressWindow.toggled.connect(DB.general.setOpenProgressWindowEnabled)
-        self.notify.setChecked(DB.general.isNotifyEnabled())
-        self.notify.toggled.connect(DB.general.setNotifyEnabled)
-        self.windowClose.setCurrentIndex(1 if DB.general.isSystemTrayEnabled() else 0)
-        self.windowClose.currentIndexChanged.connect(self.windowCloseChanged)
-        self.streamTemplateInfoWindow = TemplateInfoWindow(TemplateInfoWindow.TYPE.STREAM, parent=self)
-        self.streamFilename.setText(DB.templates.getStreamFilename())
-        self.streamFilename.editingFinished.connect(self.setStreamFilename)
-        self.streamTemplateInfo.clicked.connect(self.streamTemplateInfoWindow.show)
-        self.videoTemplateInfoWindow = TemplateInfoWindow(TemplateInfoWindow.TYPE.VIDEO, parent=self)
-        self.videoFilename.setText(DB.templates.getVideoFilename())
-        self.videoFilename.editingFinished.connect(self.setVideoFilename)
-        self.videoTemplateInfo.clicked.connect(self.videoTemplateInfoWindow.show)
-        self.clipTemplateInfoWindow = TemplateInfoWindow(TemplateInfoWindow.TYPE.CLIP, parent=self)
-        self.clipFilename.setText(DB.templates.getClipFilename())
-        self.clipFilename.editingFinished.connect(self.setClipFilename)
-        self.clipTemplateInfo.clicked.connect(self.clipTemplateInfoWindow.show)
-        for bookmark in DB.general.getBookmarks():
+    def __init__(self, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
+        self._ui = UiLoader.load("settings", self)
+        self._ui.openProgressWindow.setChecked(App.Preferences.general.isOpenProgressWindowEnabled())
+        self._ui.openProgressWindow.toggled.connect(App.Preferences.general.setOpenProgressWindowEnabled)
+        self._ui.notify.setChecked(App.Preferences.general.isNotifyEnabled())
+        self._ui.notify.toggled.connect(App.Preferences.general.setNotifyEnabled)
+        self._ui.windowClose.setCurrentIndex(1 if App.Preferences.general.isSystemTrayEnabled() else 0)
+        self._ui.windowClose.currentIndexChanged.connect(self.windowCloseChanged)
+        self.streamTemplateInfoWindow = FileNameTemplateInfo(FileNameTemplateInfo.TYPE.STREAM, parent=self)
+        self._ui.streamFilename.setText(App.Preferences.templates.getStreamFilename())
+        self._ui.streamFilename.editingFinished.connect(self.setStreamFilename)
+        self._ui.streamTemplateInfo.clicked.connect(self.streamTemplateInfoWindow.show)
+        self.videoTemplateInfoWindow = FileNameTemplateInfo(FileNameTemplateInfo.TYPE.VIDEO, parent=self)
+        self._ui.videoFilename.setText(App.Preferences.templates.getVideoFilename())
+        self._ui.videoFilename.editingFinished.connect(self.setVideoFilename)
+        self._ui.videoTemplateInfo.clicked.connect(self.videoTemplateInfoWindow.show)
+        self.clipTemplateInfoWindow = FileNameTemplateInfo(FileNameTemplateInfo.TYPE.CLIP, parent=self)
+        self._ui.clipFilename.setText(App.Preferences.templates.getClipFilename())
+        self._ui.clipFilename.editingFinished.connect(self.setClipFilename)
+        self._ui.clipTemplateInfo.clicked.connect(self.clipTemplateInfoWindow.show)
+        for bookmark in App.Preferences.general.getBookmarks():
             self.addBookmark(bookmark)
-        self.bookmarkList.model().rowsInserted.connect(self.saveBookmark)
-        self.bookmarkList.model().rowsMoved.connect(self.saveBookmark)
-        self.bookmarkList.model().rowsRemoved.connect(self.saveBookmark)
-        self.bookmarkList.currentRowChanged.connect(self.reloadBookmarkArea)
-        self.newBookmark.returnPressed.connect(self.tryAddBookmark)
-        self.newBookmark.textChanged.connect(self.reloadBookmarkArea)
-        self.addBookmarkButton.clicked.connect(self.tryAddBookmark)
-        self.removeBookmarkButton.clicked.connect(self.removeBookmark)
-        self.searchExternalContent.setChecked(DB.advanced.isSearchExternalContentEnabled())
-        self.searchExternalContent.toggled.connect(DB.advanced.setSearchExternalContentEnabled)
-        self.searchExternalContentInfo.clicked.connect(self.showSearchExternalContentInfo)
-        self.useCaching.setChecked(ImageLoader.isCachingEnabled())
-        self.useCaching.toggled.connect(ImageLoader.setCachingEnabled)
-        self.useCachingInfo.clicked.connect(self.showCachingInfo)
-        self.language.addItems(Translator.getLanguageList())
-        self.language.setCurrentIndex(Translator.getLanguageKeyList().index(Translator.getLanguage()))
-        self.language.currentIndexChanged.connect(self.setLanguage)
-        self.timezone.addItems(DB.localization.getTimezoneNameList())
-        self.timezone.setCurrentText(DB.localization.getTimezone().name())
-        self.timezone.currentTextChanged.connect(self.setTimezone)
-        self.recommendedSpeed.setText(DownloadEngineConfig.RECOMMENDED_THREAD_LIMIT)
-        self.downloadSpeed.setRange(1, DownloadEngineConfig.MAX_THREAD_LIMIT)
-        self.downloadSpeed.valueChanged.connect(self.setDownloadSpeed)
-        self.speedSpinBox.setRange(1, DownloadEngineConfig.MAX_THREAD_LIMIT)
-        self.speedSpinBox.valueChanged.connect(self.setDownloadSpeed)
-        self.setDownloadSpeed(DownloadThreadPool.maxThreadCount())
-        self.downloadSpeedStreamInfoIcon = Utils.setSvgIcon(self.downloadSpeedStreamInfoIcon, Icons.INFO_ICON)
-        self.resetButton.clicked.connect(self.resetSettings)
+        self._ui.bookmarkList.model().rowsInserted.connect(self.saveBookmark)
+        self._ui.bookmarkList.model().rowsMoved.connect(self.saveBookmark)
+        self._ui.bookmarkList.model().rowsRemoved.connect(self.saveBookmark)
+        self._ui.bookmarkList.currentRowChanged.connect(self.reloadBookmarkArea)
+        self._ui.newBookmark.returnPressed.connect(self.tryAddBookmark)
+        self._ui.newBookmark.textChanged.connect(self.reloadBookmarkArea)
+        self._ui.addBookmarkButton.clicked.connect(self.tryAddBookmark)
+        self._ui.removeBookmarkButton.clicked.connect(self.removeBookmark)
+        self._ui.searchExternalContent.setChecked(App.Preferences.advanced.isSearchExternalContentEnabled())
+        self._ui.searchExternalContent.toggled.connect(App.Preferences.advanced.setSearchExternalContentEnabled)
+        self._ui.searchExternalContentInfo.clicked.connect(self.showSearchExternalContentInfo)
+        self._ui.language.addItems(App.Translator.getLanguageList())
+        self._ui.language.setCurrentIndex(App.Translator.getLanguageKeyList().index(App.Translator.getLanguage()))
+        self._ui.language.currentIndexChanged.connect(self.setLanguage)
+        self._ui.timezone.addItems(App.Preferences.localization.getTimezoneNameList())
+        self._ui.timezone.setCurrentText(App.Preferences.localization.getTimezone().name())
+        self._ui.timezone.currentTextChanged.connect(self.setTimezone)
+        self._ui.downloadSpeed.setRange(DownloadEngineConfig.FILE_DOWNLOAD_MANAGER_MIN_POOL_SIZE, DownloadEngineConfig.FILE_DOWNLOAD_MANAGER_MAX_POOL_SIZE)
+        self._ui.downloadSpeed.valueChanged.connect(self.setDownloadSpeed)
+        self._ui.speedSpinBox.setRange(DownloadEngineConfig.FILE_DOWNLOAD_MANAGER_MIN_POOL_SIZE, DownloadEngineConfig.FILE_DOWNLOAD_MANAGER_MAX_POOL_SIZE)
+        self._ui.speedSpinBox.valueChanged.connect(self.setDownloadSpeed)
+        self.setDownloadSpeed(App.FileDownloadManager.getPoolSize())
+        self._ui.resetButton.clicked.connect(self.resetSettings)
         self.reloadBookmarkArea()
-        GlobalDownloadManager.runningCountChangedSignal.connect(self.reload)
+        App.GlobalDownloadManager.runningCountChangedSignal.connect(self.reload)
         self.reload()
 
-    def reload(self):
-        if GlobalDownloadManager.isDownloaderRunning():
-            self.languageArea.setEnabled(False)
-            self.timezoneArea.setEnabled(False)
-            self.resetArea.setEnabled(False)
-            self.restrictedLabel.show()
-            ImageLoader.throttle(True)
+    def reload(self) -> None:
+        if App.GlobalDownloadManager.isDownloaderRunning():
+            self._ui.languageArea.setEnabled(False)
+            self._ui.timezoneArea.setEnabled(False)
+            self._ui.resetArea.setEnabled(False)
+            self._ui.restrictedLabel.show()
         else:
-            self.languageArea.setEnabled(True)
-            self.timezoneArea.setEnabled(True)
-            self.resetArea.setEnabled(True)
-            self.restrictedLabel.hide()
-            ImageLoader.throttle(False)
+            self._ui.languageArea.setEnabled(True)
+            self._ui.timezoneArea.setEnabled(True)
+            self._ui.resetArea.setEnabled(True)
+            self._ui.restrictedLabel.hide()
 
-    def windowCloseChanged(self, index):
-        DB.general.setSystemTrayEnabled(False if index == 0 else True)
+    def windowCloseChanged(self, index: int) -> None:
+        App.Preferences.general.setSystemTrayEnabled(False if index == 0 else True)
 
-    def setStreamFilename(self):
-        DB.templates.setStreamFilename(self.streamFilename.text())
+    def setStreamFilename(self) -> None:
+        App.Preferences.templates.setStreamFilename(self._ui.streamFilename.text())
 
-    def setVideoFilename(self):
-        DB.templates.setVideoFilename(self.videoFilename.text())
+    def setVideoFilename(self) -> None:
+        App.Preferences.templates.setVideoFilename(self._ui.videoFilename.text())
 
-    def setClipFilename(self):
-        DB.templates.setClipFilename(self.clipFilename.text())
+    def setClipFilename(self) -> None:
+        App.Preferences.templates.setClipFilename(self._ui.clipFilename.text())
 
-    def reloadBookmarkArea(self):
-        selected = self.bookmarkList.currentRow() != -1
-        text = self.newBookmark.text().strip().lower()
-        textNotEmptyOrDuplicate = text != "" and len(self.bookmarkList.findItems(text, QtCore.Qt.MatchFlag.MatchFixedString)) == 0
-        self.addBookmarkButton.setEnabled(textNotEmptyOrDuplicate)
-        self.removeBookmarkButton.setEnabled(selected)
+    def reloadBookmarkArea(self) -> None:
+        selected = self._ui.bookmarkList.currentRow() != -1
+        text = self._ui.newBookmark.text().strip().lower()
+        textNotEmptyOrDuplicate = text != "" and len(self._ui.bookmarkList.findItems(text, QtCore.Qt.MatchFlag.MatchFixedString)) == 0
+        self._ui.addBookmarkButton.setEnabled(textNotEmptyOrDuplicate)
+        self._ui.removeBookmarkButton.setEnabled(selected)
 
-    def tryAddBookmark(self):
-        if self.addBookmarkButton.isEnabled():
-            self.addBookmark(self.newBookmark.text().strip().lower())
-            self.newBookmark.clear()
+    def tryAddBookmark(self) -> None:
+        if self._ui.addBookmarkButton.isEnabled():
+            self.addBookmark(self._ui.newBookmark.text().strip().lower())
+            self._ui.newBookmark.clear()
 
-    def addBookmark(self, bookmark):
+    def addBookmark(self, bookmark: str) -> None:
         item = QtWidgets.QListWidgetItem(bookmark)
         item.setIcon(QtGui.QIcon(Icons.MOVE_ICON))
         item.setToolTip(T("#Drag to change order."))
-        self.bookmarkList.addItem(item)
-        self.newBookmark.clear()
+        self._ui.bookmarkList.addItem(item)
+        self._ui.newBookmark.clear()
 
-    def removeBookmark(self):
-        self.bookmarkList.takeItem(self.bookmarkList.currentRow())
-        self.bookmarkList.setCurrentRow(-1)
+    def removeBookmark(self) -> None:
+        self._ui.bookmarkList.takeItem(self._ui.bookmarkList.currentRow())
+        self._ui.bookmarkList.setCurrentRow(-1)
 
-    def saveBookmark(self):
-        DB.general.setBookmarks([self.bookmarkList.item(index).text() for index in range(self.bookmarkList.count())])
+    def saveBookmark(self) -> None:
+        App.Preferences.general.setBookmarks([self._ui.bookmarkList.item(index).text() for index in range(self._ui.bookmarkList.count())])
 
-    def showSearchExternalContentInfo(self):
-        self.info("information", "#Allow URL Search to retrieve external content.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.")
+    def showSearchExternalContentInfo(self) -> None:
+        Utils.info("information", "#Allow URL Search to retrieve external content.\nYou can download content outside of Twitch.", parent=self)
 
-    def showCachingInfo(self):
-        self.info("information", "#Caches images for faster retrieval next time, but consumes a lot of memory(RAM).")
-
-    def setLanguage(self, index):
-        Translator.setLanguage(Translator.getLanguageCode(index))
+    def setLanguage(self, index: int) -> None:
+        App.Translator.setLanguage(App.Translator.getLanguageCode(index))
         self.requestRestart()
 
-    def setTimezone(self, timezone):
-        DB.localization.setTimezone(bytes(timezone, encoding="utf-8"))
+    def setTimezone(self, timezone: str) -> None:
+        App.Preferences.localization.setTimezone(bytes(timezone, encoding="utf-8"))
         self.requestRestart()
 
-    def setDownloadSpeed(self, speed):
-        DownloadThreadPool.setMaxThreadCount(speed)
-        self.downloadSpeed.setValueSilent(speed)
-        self.speedSpinBox.setValueSilent(speed)
+    def setDownloadSpeed(self, speed: int) -> None:
+        App.FileDownloadManager.setPoolSize(speed)
+        self._ui.downloadSpeed.setValueSilent(speed)
+        self._ui.speedSpinBox.setValueSilent(speed)
 
-    def resetSettings(self):
-        if self.ask("warning", "#This will reset all settings.\nProceed?"):
-            DB.reset()
+    def resetSettings(self) -> None:
+        if Utils.ask("warning", "#This will reset all settings.\nProceed?", parent=self):
+            App.Preferences.reset()
             self.requestRestart()
 
-    def requestRestart(self):
+    def requestRestart(self) -> None:
         self.restartRequired.emit()

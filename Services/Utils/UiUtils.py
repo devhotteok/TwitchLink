@@ -1,18 +1,19 @@
+from Core.App import T
 from Services.Image.Presets import Icons
-from Services.Translator.Translator import T
 
 from PyQt6 import QtGui, QtWidgets, QtSvgWidgets
 
 
 class UiUtils:
     @staticmethod
-    def setPlaceholder(placeholder, widget):
+    def setPlaceholder(placeholder: QtWidgets.QWidget, widget: QtWidgets.QWidget) -> QtWidgets.QWidget:
         placeholder.parent().layout().replaceWidget(placeholder, widget)
         placeholder.setParent(None)
+        placeholder.deleteLater()
         return widget
 
     @classmethod
-    def setSvgIcon(cls, placeholder, path):
+    def setSvgIcon(cls, placeholder: QtWidgets.QWidget, path: str) -> QtWidgets.QWidget:
         svgWidget = QtSvgWidgets.QSvgWidget(path, parent=placeholder.parent())
         svgWidget.setSizePolicy(placeholder.sizePolicy())
         svgWidget.setMinimumSize(placeholder.minimumSize())
@@ -20,24 +21,20 @@ class UiUtils:
         return cls.setPlaceholder(placeholder, svgWidget)
 
     @staticmethod
-    def info(title, content, titleTranslate=True, contentTranslate=True, buttonText=None, parent=None):
-        msg = QtWidgets.QMessageBox(
-            T(title) if titleTranslate else title,
-            T(content) if contentTranslate else content,
-            parent=parent
-        )
+    def info(title: str, content: str, titleTranslate: bool = True, contentTranslate: bool = True, buttonText: str | None = None, parent: QtWidgets.QWidget | None = None) -> None:
+        msg = QtWidgets.QMessageBox(parent=parent)
+        msg.setWindowTitle(T(title) if titleTranslate else title)
+        msg.setText(T(content) if contentTranslate else content)
         msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         if buttonText != None:
-            msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(T(buttonText))
+            msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(buttonText)
         msg.exec()
 
     @staticmethod
-    def ask(title, content, titleTranslate=True, contentTranslate=True, okText=None, cancelText=None, defaultOk=False, parent=None):
-        msg = QtWidgets.QMessageBox(
-            T(title) if titleTranslate else title,
-            T(content) if contentTranslate else content,
-            parent=parent
-        )
+    def ask(title: str, content: str, titleTranslate: bool = True, contentTranslate: bool = True, okText: str | None = None, cancelText: str | None = None, defaultOk: bool = False, parent: QtWidgets.QWidget | None = None) -> bool:
+        msg = QtWidgets.QMessageBox(parent=parent)
+        msg.setWindowTitle(T(title) if titleTranslate else title)
+        msg.setText(T(content) if contentTranslate else content)
         msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel)
         if okText != None:
             msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(T(okText))
@@ -47,7 +44,7 @@ class UiUtils:
         return msg.exec() == QtWidgets.QMessageBox.StandardButton.Ok
 
     @staticmethod
-    def askDirectory(directory, parent=None):
+    def askDirectory(directory: str, parent: QtWidgets.QWidget | None = None) -> str | None:
         fileDialog = QtWidgets.QFileDialog(parent=parent)
         fileDialog.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
         result = fileDialog.getExistingDirectory(
@@ -58,7 +55,7 @@ class UiUtils:
         return result or None
 
     @staticmethod
-    def askSaveAs(directory, filters, initialFilter=None, parent=None):
+    def askSaveAs(directory: str, filters: list[str], initialFilter: str | None = None, parent: QtWidgets.QWidget | None = None) -> str | None:
         mappedFilters = dict((T("#{fileFormat} file (*.{fileFormat})", fileFormat=key), key) for key in filters)
         fileDialog = QtWidgets.QFileDialog(parent=parent)
         fileDialog.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))

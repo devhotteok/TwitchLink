@@ -8,7 +8,7 @@ class ImageUrlFormatter:
     IMAGE_SIZE_FILTER = re.compile("-\d+x\d+")
 
     @classmethod
-    def formatUrl(cls, url, width=None, height=None):
+    def formatUrl(cls, url: str, width: int | None = None, height: int | None = None) -> str:
         for host, size in Config.IMAGE_FORCED_SIZE_POLICY:
             if url.split("//", 1)[-1].startswith(host):
                 width, height = size

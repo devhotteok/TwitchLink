@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>484</height>
+    <width>746</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,11 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
   </property>
   <property name="windowTitle">
    <string>Scheduled Download Settings</string>
@@ -241,81 +236,84 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="resolutionArea" native="true">
-        <layout class="QFormLayout" name="resolutionAreaLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="preferredQualityLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Quality</string>
-           </property>
+       <widget class="QWidget" name="resolutionSettingsArea" native="true">
+        <layout class="QVBoxLayout" name="resolutionSettingsAreaLayout">
+         <item>
+          <widget class="QWidget" name="resolutionArea" native="true">
+           <layout class="QFormLayout" name="resolutionAreaLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="preferredQualityLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Quality</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="preferredQuality">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="preferredFrameRateLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Frame Rate</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="preferredFrameRate">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="preferredFrameRateLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Frame Rate</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="preferredQuality">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="preferredFrameRate">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="advancedArea">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="title">
-         <string>Advanced</string>
-        </property>
-        <layout class="QVBoxLayout" name="advancedAreaLayout">
          <item>
           <widget class="QWidget" name="preferredResolutionOnlyArea" native="true">
            <layout class="QHBoxLayout" name="preferredResolutionOnlyAreaLayout">
@@ -359,11 +357,43 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="encoderArea">
+     <property name="title">
+      <string>Encoder</string>
+     </property>
+     <layout class="QHBoxLayout" name="encoderAreaLayout">
+      <item>
+       <widget class="QRadioButton" name="remuxRadioButton">
+        <property name="text">
+         <string>Remux (Recommended)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="concatRadioButton">
+        <property name="text">
+         <string>Concat</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="encoderInfo">
+        <property name="toolTip">
+         <string>Help</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="nextDownloadLabel">
      <property name="font">
       <font>
-       <pointsize>9</pointsize>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -376,21 +406,24 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
+    <spacer name="verticalSpacer_1">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
      </property>
-    </widget>
+    </spacer>
    </item>
    <item>
-    <widget class="QWidget" name="adArea_1" native="true">
+    <widget class="QWidget" name="partnerContentArea_1" native="true">
      <property name="minimumSize">
       <size>
-       <width>320</width>
-       <height>50</height>
+       <width>728</width>
+       <height>90</height>
       </size>
      </property>
      <layout class="QHBoxLayout" name="adAreaLayout_1">
@@ -410,6 +443,16 @@
        <number>0</number>
       </property>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
     </widget>
    </item>
   </layout>

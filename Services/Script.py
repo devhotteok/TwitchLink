@@ -1,30 +1,35 @@
-from Services.Utils.Utils import Utils
+from Services.Utils.OSUtils import OSUtils
+
+from PyQt6 import QtCore
+
+import typing
 
 
-class Exceptions:
-    class UnknownAction(Exception):
-        def __str__(self):
-            return "Unknown Action"
-
-
-class Script:
-    @classmethod
-    def run(cls, script, ignoreExceptions=True):
-        try:
-            if isinstance(script, list):
-                for line in script:
-                    cls.run(line, ignoreExceptions=False)
-            elif isinstance(script, str):
-                try:
-                    actionType, actionData = script.split(":", 1)
-                    if actionType == "open":
-                        Utils.openUrl(actionData)
-                    else:
-                        raise
-                except:
-                    raise Exceptions.UnknownAction
+class Script(QtCore.QObject):
+    def __init__(self, target: str | typing.Callable, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        if isinstance(target, str):
+            parseScript = target.split(":", 1)
+            if len(parseScript) == 1:
+                self._quickType = None
+                self._target = target
             else:
-                script()
+                self._quickType = parseScript[0]
+                self._target = parseScript[1]
+        else:
+            self._target = target
+
+    def __call__(self, ignoreExceptions: bool = True) -> None:
+        try:
+            if isinstance(self._target, str):
+                if self._quickType == "url":
+                    OSUtils.openUrl(self._target)
+                elif self._quickType == "file":
+                    OSUtils.openFile(self._target)
+                elif self._quickType == "folder":
+                    OSUtils.openFolder(self._target)
+            else:
+                self._target()
         except Exception as e:
             if not ignoreExceptions:
                 raise e

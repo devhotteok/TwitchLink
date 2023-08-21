@@ -1,6 +1,6 @@
 from .Config import Config
 
-from Core.App import App
+from Core import App
 from Services.Utils.OSUtils import OSUtils
 from Services.Utils.SystemUtils import SystemUtils
 
@@ -16,9 +16,9 @@ class Exceptions:
             return "Language Not Found"
 
 
-class _Translator:
-    def __init__(self, app):
-        self.app = app
+class Translator(QtCore.QObject):
+    def __init__(self, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
         self.translators = []
         self.translations = {}
         for fileName in ["KeywordTranslations.json", "Translations.json"]:
@@ -29,11 +29,11 @@ class _Translator:
                 pass
         self.setLanguage(self.getDefaultLanguage())
 
-    def reload(self):
+    def reload(self) -> None:
         self.unload()
         self.load()
 
-    def load(self):
+    def load(self) -> None:
         language = self.getLanguage()
         directory = QtCore.QLibraryInfo.path(QtCore.QLibraryInfo.LibraryPath.TranslationsPath)
         for fileName in os.listdir(directory):
@@ -41,52 +41,54 @@ class _Translator:
                 if fileName.endswith(f"_{language}.qm"):
                     self._loadTranslator(fileName, directory)
         directory = OSUtils.joinPath(Config.TRANSLATORS_PATH, language)
-        for fileName in Config.TRANSLATION_LIST:
-            self._loadTranslator(fileName, directory)
-        self.app.setFont(self.getFont())
+        if OSUtils.isDirectory(directory):
+            for fileName in (data for data in OSUtils.listDirectory(directory) if OSUtils.isFile(OSUtils.joinPath(directory, data))):
+                self._loadTranslator(fileName, directory)
+        App.Instance.setFont(self.getFont())
 
-    def _loadTranslator(self, fileName, directory):
-        translator = QtCore.QTranslator(parent=self.app)
+    def _loadTranslator(self, fileName: str, directory: str) -> None:
+        translator = QtCore.QTranslator(parent=self)
         translator.load(fileName, directory)
         self.translators.append(translator)
-        self.app.installTranslator(translator)
+        App.Instance.installTranslator(translator)
 
-    def unload(self):
+    def unload(self) -> None:
         for translator in self.translators:
-            self.app.removeTranslator(translator)
-        self.translators = []
+            App.Instance.removeTranslator(translator)
+        self.translators.clear()
 
-    def getLanguageList(self):
+    def getLanguageList(self) -> list[str]:
         return [language["name"] for language in Config.LANGUAGES.values()]
 
-    def getLanguageKeyList(self):
-        return list(Config.LANGUAGES)
+    def getLanguageKeyList(self) -> list[str]:
+        return list(Config.LANGUAGES.keys())
 
-    def getDefaultLanguage(self):
+    def getDefaultLanguage(self) -> str:
         systemLanguage = SystemUtils.getSystemLocale().language()
         for key, value in Config.LANGUAGES.items():
             if systemLanguage == value["languageId"]:
                 return key
         return self.getLanguageCode(0)
 
-    def getLanguageCode(self, index):
+    def getLanguageCode(self, index: int) -> str:
         return self.getLanguageKeyList()[index]
 
-    def setLanguage(self, language):
+    def setLanguage(self, language: str) -> None:
         if language in Config.LANGUAGES:
             self.language = language
             self.reload()
         else:
             raise Exceptions.LanguageNotFound
 
-    def getLanguage(self):
+    def getLanguage(self) -> str:
         return self.language
 
-    def getFont(self, font=QtGui.QFont()):
+    def getFont(self, font: QtGui.QFont | None = None) -> QtGui.QFont:
+        font = font or QtGui.QFont()
         font.setFamilies(Config.LANGUAGES[self.getLanguage()]["font"])
         return font
 
-    def translate(self, string, ellipsis=False, **kwargs):
+    def translate(self, string: str, ellipsis: bool = False, **kwargs: str) -> str:
         string = self.translateString(string)
         if kwargs:
             string = string.format(**kwargs)
@@ -95,11 +97,8 @@ class _Translator:
         else:
             return string
 
-    def translateString(self, string):
+    def translateString(self, string: str) -> str:
         try:
             return self.translations[string][self.language]
         except:
             return string
-
-Translator = _Translator(app=App)
-T = Translator.translate

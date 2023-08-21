@@ -1,59 +1,81 @@
 from .Config import Config
 
-from Core.App import App
+from Core.GlobalExceptions import Exceptions
 from Services.Utils.OSUtils import OSUtils
+from Services.Logging.Logger import Logger
+
+from PyQt6 import QtCore
 
 import os
-import ctypes
-import tempfile
 
 
-class SafeTempDirectory:
-    def __init__(self, directory, dirPrefix, keyFileDir):
-        self.directory = tempfile.TemporaryDirectory(dir=directory, prefix=dirPrefix)
-        self.name = self.directory.name
-        ctypes.windll.kernel32.SetFileAttributesW(self.name, 2)
-        self.file = tempfile.NamedTemporaryFile(dir=keyFileDir, mode="w", delete=False)
-        self.file.write(self.name)
-        self.file.flush()
+class SafeTempDirectory(QtCore.QObject):
+    def __init__(self, directory: str, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        self._error: Exceptions.FileSystemError | None = None
+        self._directory = QtCore.QTemporaryDir(OSUtils.joinPath(directory, Config.DIRECTORY_PREFIX))
+        if not self._directory.isValid():
+            self._raiseException(Exceptions.FileSystemError(self._directory))
+            return
+        try:
+            OSUtils.hideFileOrDirectory(self._directory.path())
+        except:
+            pass
+        self._keyFile = QtCore.QTemporaryFile(OSUtils.joinPath(Config.TEMP_LIST_DIRECTORY, Config.TEMP_KEY_FILE_PREFIX), self)
+        if not self._keyFile.open() or self._keyFile.write(self._directory.path().encode()) == -1:
+            self._directory.remove()
+            self._raiseException(Exceptions.FileSystemError(self._keyFile))
+            return
+        self._keyFile.close()
+        self._dirLock = QtCore.QFile(OSUtils.joinPath(self._directory.path(), Config.DIRECTORY_LOCK_FILE_NAME), self)
+        if not self._dirLock.open(QtCore.QFile.OpenModeFlag.ReadWrite):
+            self._directory.remove()
+            self._raiseException(Exceptions.FileSystemError(self._dirLock))
 
-    def cleanup(self):
-        self.directory.cleanup()
-        self.file.close()
-        OSUtils.removeFile(self.file.name)
+    def _raiseException(self, exception: Exception) -> None:
+        self._error = exception
+
+    def getError(self) -> Exceptions.FileSystemError | None:
+        return self._error
+
+    def path(self) -> str:
+        return self._directory.path()
+
+    def __del__(self):
+        if self.getError() == None:
+            self._dirLock.close()
 
 
-class _TempManager:
-    def __init__(self):
+class TempManager(QtCore.QObject):
+    def __init__(self, logger: Logger, parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        self.logger = logger
         try:
             OSUtils.createDirectory(Config.TEMP_LIST_DIRECTORY)
             self.cleanup()
         except:
             pass
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         files = os.listdir(Config.TEMP_LIST_DIRECTORY)
         if len(files) == 0:
             return
         else:
-            App.logger.info("Cleaning up temp files.")
+            self.logger.info("Cleaning up temp files.")
         for filename in files:
             path = OSUtils.joinPath(Config.TEMP_LIST_DIRECTORY, filename)
             try:
                 self.cleanTempDirKeyFile(path)
             except Exception as e:
-                App.logger.exception(e)
+                self.logger.exception(e)
 
-    def cleanTempDirKeyFile(self, tempDirKeyFile):
+    def cleanTempDirKeyFile(self, tempDirKeyFile: str) -> None:
         if OSUtils.isFile(tempDirKeyFile):
-            with open(tempDirKeyFile) as file:
-                tempDir = file.read()
+            file = QtCore.QFile(tempDirKeyFile, self)
+            if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
+                tempDir = file.readAll().data().decode()
                 if OSUtils.isDirectory(tempDir):
-                    App.logger.info(f"Removing temp directory: {tempDir}")
+                    self.logger.info(f"Removing temp directory: {tempDir}")
                     OSUtils.removeDirectory(tempDir)
-            OSUtils.removeFile(tempDirKeyFile)
-
-    def createTempDirectory(self, directory):
-        return SafeTempDirectory(directory, dirPrefix=Config.DIRECTORY_PREFIX, keyFileDir=Config.TEMP_LIST_DIRECTORY)
-
-TempManager = _TempManager()
+            file.remove()
+            file.deleteLater()

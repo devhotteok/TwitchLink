@@ -15,10 +15,6 @@
     "en": "An unexpected error occurred while connecting to the server.",
     "ko": "서버와 연결 중 예기치 못한 오류가 발생하였습니다."
   },
-  "#An unexpected error has occurred.": {
-    "en": "An unexpected error has occurred.",
-    "ko": "예기치 못한 오류가 발생하였습니다"
-  },
   "#{appName} is currently unavailable.": {
     "en": "{appName} is currently unavailable.",
     "ko": "현재 {appName} 서비스를 이용할 수 없습니다."
@@ -47,37 +43,21 @@
     "en": "Please restart the app.",
     "ko": "앱을 재시작하세요."
   },
-  "#We detected an error and disabled some features.\nClick '{buttonText}' to try again.": {
-    "en": "We detected an error and disabled some features.\nClick '{buttonText}' to try again.",
-    "ko": "오류를 감지하여 일부 기능을 비활성화하였습니다.\n다시 시도하려면 '{buttonText}' 버튼을 누르세요."
-  },
-  "#Some features may not be activated until the app is restarted.": {
-    "en": "Some features may not be activated until the app is restarted.",
-    "ko": "일부 기능은 기록 삭제 후 앱을 다시 실행해야 활성화될 수도 있습니다."
-  },
-  "#If the error persists, contact the developer.": {
-    "en": "If the error persists, contact the developer.",
-    "ko": "오류가 지속된다면 개발자에게 문의하세요."
-  },
-  "#This module cannot be loaded.": {
-    "en": "This module cannot be loaded.",
-    "ko": "해당 모듈을 불러올 수 없습니다."
-  },
-  "#It seems that some features are not compatible with your PC.": {
-    "en": "It seems that some features are not compatible with your PC.",
-    "ko": "사용자의 PC에서 일부 기능이 호환되지 않는 것 같습니다."
-  },
-  "#Try updating your graphics driver to the latest version.": {
-    "en": "Try updating your graphics driver to the latest version.",
-    "ko": "그래픽 드라이버를 최신 버전으로 업데이트하세요."
-  },
   "#Do not show this again.": {
     "en": "Do not show this again.",
     "ko": "다시 보지 않기"
   },
-  "#Do not show this again for {blockExpiry} days.": {
-    "en": "Do not show this again for {blockExpiry} days.",
-    "ko": "{blockExpiry}일 동안 다시 보지 않기"
+  "#Do not show this again for {blockExpiration} days.": {
+    "en": "Do not show this again for {blockExpiration} days.",
+    "ko": "{blockExpiration}일 동안 다시 보지 않기"
+  },
+  "#{appName} has crashed.": {
+    "en": "{appName} has crashed.",
+    "ko": "{appName}이/가 충돌하였습니다."
+  },
+  "#{appName} has crashed due to an unexpected error.\nIf this happens frequently, please attach the following log file and report it to us.\n\nFile: {fileName}": {
+    "en": "{appName} has crashed due to an unexpected error.\nIf this happens frequently, please attach the following log file and report it to us.\n\nFile: {fileName}",
+    "ko": "예기치 못한 오류로 인해 {appName}이/가 강제 종료되었습니다.\n이러한 일이 자주 발생한다면 아래 로그 파일을 첨부하여 문의하세요.\n\n파일: {fileName}"
   },
   "#There are one or more downloads in progress.\nAre you sure you want to stop/cancel them all?": {
     "en": "There are one or more downloads in progress.\nAre you sure you want to stop/cancel them all?",
@@ -91,9 +71,9 @@
     "en": "{appName} will shut down soon.",
     "ko": "{appName}이/가 곧 종료됩니다."
   },
-  "#The system will shut down after {seconds} seconds.": {
-    "en": "The system will shut down after {seconds} seconds.",
-    "ko": "시스템이 {seconds}초 후에 종료됩니다."
+  "#System will shut down soon.": {
+    "en": "System will shut down soon.",
+    "ko": "시스템이 곧 종료됩니다"
   },
   "#Shutdown by {appName}'s scheduled task.": {
     "en": "Shutdown by {appName}'s scheduled task.",
@@ -307,9 +287,13 @@
     "en": "You are not currently logged in.",
     "ko": "현재 로그인하지 않았습니다."
   },
-  "#This stream may contain ads.\n{appName} will block ads, but may fail, in which case an alternate screen will be displayed.\n\nTo completely block ads, you must log in with a subscribed account.\n{adBlockFailReason}\n\nProceed?": {
-    "en": "This stream may contain ads.\n{appName} will block ads, but may fail, in which case an alternate screen will be displayed.\n\nTo completely block ads, you must log in with a subscribed account.\n{adBlockFailReason}\n\nProceed?",
-    "ko": "이 생방송에서 광고가 송출될 수 있습니다.\n{appName}이/가 광고를 차단하지만 실패할 수 있으며 이 경우 대체화면이 표시됩니다.\n\n완전한 차단을 위해서는 구독된 계정의 로그인이 필요합니다.\n{adBlockFailReason}\n\n진행하시겠습니까?"
+  "#This stream may contain ads.\n{appName} won't save the advertisement portions, but the live stream may not be downloadable during this time and may appear interrupted.\nTo prevent this, you need to be logged in with a subscribed account.": {
+    "en": "This stream may contain ads.\n{appName} won't save the advertisement portions, but the live stream may not be downloadable during this time and may appear interrupted.\nTo prevent this, you need to be logged in with a subscribed account.",
+    "ko": "이 생방송에서 광고가 송출될 수 있습니다.\n{appName}은/는 광고 부분을 저장하지 않지만 그 시간 동안의 생방송은 다운로드할 수 없으며, 생방송이 중간에 끊기는 것처럼 보일 수 있습니다.\n이러한 현상을 방지하려면 구독된 계정의 로그인이 필요합니다."
+  },
+  "#Would you like to proceed?": {
+    "en": "Would you like to proceed?",
+    "ko": "이대로 진행하시겠습니까?"
   },
   "#Authentication of your account has been denied.": {
     "en": "Authentication of your account has been denied.",
@@ -327,9 +311,13 @@
     "en": "This is just a preview.\nSome values may be different from the actual ones. ({properties}, etc.)",
     "ko": "임시 미리보기입니다.\n일부 값이 실제와 다를 수 있습니다. ({properties} 등)"
   },
-  "#If enabled, the download will not be performed until a matching resolution is found.\nIf disabled, it automatically selects a different resolution.": {
-    "en": "If enabled, the download will not be performed until a matching resolution is found.\nIf disabled, it automatically selects a different resolution.",
-    "ko": "이 옵션을 활성화하면 일치하는 해상도를 찾을 때까지 다운로드를 하지 않습니다.\n이 옵션을 비활성화하면 자동으로 다른 해상도를 선택합니다."
+  "#Please note that certain video qualities (such as Source) may not be available immediately after a live broadcast begins.\nIf this option is disabled, it will automatically select and begin downloading the closest available quality.\nIf this option is enabled, it will wait until the selected quality is available.\n(Please be aware that if the selected quality continues to be unavailable, the download will not proceed.)": {
+    "en": "Please note that certain video qualities (such as Source) may not be available immediately after a live broadcast begins.\nIf this option is disabled, it will automatically select and begin downloading the closest available quality.\nIf this option is enabled, it will wait until the selected quality is available.\n(Please be aware that if the selected quality continues to be unavailable, the download will not proceed.)",
+    "ko": "생방송이 시작된 후 일정 시간 동안 일부 화질(원본 화질 등)이 제공되지 않을 수 있습니다.\n이 옵션이 해제된 경우 자동으로 가장 비슷한 다른 화질을 선택하여 다운로드를 시작합니다.\n이 옵션이 활성화된 경우 선택한 화질이 제공될 때까지 대기합니다.\n(선택한 화질이 계속 제공되지 않는다면 다운로드가 진행되지 않습니다.)"
+  },
+  "#Unable to start scheduled download for channel {channel}.": {
+    "en": "Unable to start scheduled download for channel {channel}.",
+    "ko": "{channel} 채널의 예약 다운로드를 시작할 수 없습니다."
   },
   "#Some fields are empty.": {
     "en": "Some fields are empty.",
@@ -347,9 +335,9 @@
     "en": "Unable to start a new download.\nThis feature has been disabled.",
     "ko": "새 다운로드를 시작할 수 없습니다.\n기능이 비활성화되었습니다."
   },
-  "#This stream may contain ads.\nTo block ads, you must log in with a subscribed account.\nChanges will take effect from the next download.": {
-    "en": "This stream may contain ads.\nTo block ads, you must log in with a subscribed account.\nChanges will take effect from the next download.",
-    "ko": "이 생방송에서 광고가 송출될 수 있습니다.\n광고 차단을 위해서는 구독된 계정의 로그인이 필요합니다.\n변경사항은 다음 다운로드부터 적용됩니다."
+  "#Changes will take effect from the next download.": {
+    "en": "Changes will take effect from the next download.",
+    "ko": "변경사항은 다음 다운로드부터 적용됩니다."
   },
   "#Download {type}": {
     "en": "Download {type}",
@@ -367,9 +355,9 @@
     "en": "Update track mode is currently enabled.\nSetting the end of the crop range will not track updates.\nProceed?",
     "ko": "현재 업데이트 추적 모드가 활성화되어있습니다.\n자르기 범위의 끝부분을 설정하면 업데이트 추적을 하지 않습니다.\n진행하시겠습니까?"
   },
-  "#This will crop the video at a point near this range that requires less computation.\nThis may result in an error of seconds.\nActivate '{menuName}' for accurate processing.": {
-    "en": "This will crop the video at a point near this range that requires less computation.\nThis may result in an error of seconds.\nActivate '{menuName}' for accurate processing.",
-    "ko": "설정된 범위와 가장 가까운 연산량이 적은 지점에서 비디오를 자릅니다.\n초 단위의 오차가 발생할 수 있습니다.\n정확한 범위 처리를 원한다면 '{menuName}' 옵션을 활성화하세요."
+  "#For precise range handling, it is necessary to re-encode the video from the beginning, a process which can be very time-consuming.\nTo speed up this process, {appName} performs the cutting operation using computationally inexpensive points near the specified range, without re-encoding.\nThere is no loss during this process, but a few additional seconds may be saved before and after the specified range.\nIf precise range handling is required, please process the downloaded video using a professional video editor.": {
+    "en": "For precise range handling, it is necessary to re-encode the video from the beginning, a process which can be very time-consuming.\nTo speed up this process, {appName} performs the cutting operation using computationally inexpensive points near the specified range, without re-encoding.\nThere is no loss during this process, but a few additional seconds may be saved before and after the specified range.\nIf precise range handling is required, please process the downloaded video using a professional video editor.",
+    "ko": "정확한 범위 처리를 위해서는 비디오를 처음부터 다시 인코딩해야 하며 이 작업은 시간이 매우 오래 걸립니다.\n{appName}은/는 빠른 처리를 위해 다시 인코딩하지 않고 지정된 범위에서 가까운 연산량이 적은 지점을 이용해 자르기를 수행합니다.\n이 과정에서 손실은 일어나지 않지만 지정된 범위에서 앞뒤로 몇 초 정도 추가로 저장될 수 있습니다.\n정확한 범위 처리가 필요하다면 다운로드한 비디오를 전문 비디오 편집기로 처리하세요."
   },
   "#The end of the crop range is currently set.\nEnabling update track mode will ignore the end of the crop range and continue downloading.\nProceed?": {
     "en": "The end of the crop range is currently set.\nEnabling update track mode will ignore the end of the crop range and continue downloading.\nProceed?",
@@ -378,10 +366,6 @@
   "#{fileFormat} file (*.{fileFormat})": {
     "en": "{fileFormat} file (*.{fileFormat})",
     "ko": "{fileFormat} 파일 (*.{fileFormat})"
-  },
-  "#You already have one or more {downloadType}s in progress.\nDepending on the network specifications, if you proceed with the {operationType} download, the live download may become unstable or interrupted.\nProceed?": {
-    "en": "You already have one or more {downloadType}s in progress.\nDepending on the network specifications, if you proceed with the {operationType} download, the live download may become unstable or interrupted.\nProceed?",
-    "ko": "이미 진행 중인 {downloadType}가 하나 이상 있습니다.\n네트워크 사양에 따라 {operationType} 다운로드를 함께 진행하면 실시간 다운로드가 불안정해지거나 중단될 수 있습니다.\n진행하시겠습니까?"
   },
   "#There is another download in progress with the same file name.": {
     "en": "There is another download in progress with the same file name.",
@@ -399,21 +383,21 @@
     "en": "An error occurred while generating the file name.",
     "ko": "파일명을 자동으로 생성할 수 없습니다."
   },
-  "#Failed to unmute {mutedFiles} segments ({mutedSeconds})": {
-    "en": "Failed to unmute {mutedFiles} segments ({mutedSeconds})",
-    "ko": "{mutedFiles}개 구간 음소거 해제 실패 ({mutedSeconds})"
+  "#Failed to unmute {fileCount} segments ({time})": {
+    "en": "Failed to unmute {fileCount} segments ({time})",
+    "ko": "{fileCount}개 구간 음소거 해제 실패 ({time})"
   },
-  "#Missing {missingFiles} segments ({missingSeconds})": {
-    "en": "Missing {missingFiles} segments ({missingSeconds})",
-    "ko": "{missingFiles}개 구간 누락 ({missingSeconds})"
+  "#Skipped {fileCount} commercial segments ({time})": {
+    "en": "Skipped {fileCount} commercial segments ({time})",
+    "ko": "{fileCount}개 광고 구간 건너뜀 ({time})"
   },
-  "#{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]": {
-    "en": "{duration} [Original: {totalDuration} / Crop: {startTime}~{endTime}]",
-    "ko": "{duration} [원본: {totalDuration} / 자르기: {startTime}~{endTime}]"
+  "#Missing {fileCount} segments ({time})": {
+    "en": "Missing {fileCount} segments ({time})",
+    "ko": "{fileCount}개 구간 누락 ({time})"
   },
-  "#This will skip the rest of the download and encode the already downloaded part.\nProceed?": {
-    "en": "This will skip the rest of the download and encode the already downloaded part.\nProceed?",
-    "ko": "나머지 다운로드를 건너뛰고 이미 다운로드된 부분만 인코딩을 진행합니다.\n진행하시겠습니까?"
+  "#[Original: {totalDuration} / Crop: {startTime}~{endTime}]": {
+    "en": "[Original: {totalDuration} / Crop: {startTime}~{endTime}]",
+    "ko": "[원본: {totalDuration} / 자르기: {startTime}~{endTime}]"
   },
   "#You cannot perform this action now.": {
     "en": "You cannot perform this action now.",
@@ -431,14 +415,6 @@
     "en": "This disables all scheduled downloads and disconnects from the channel.\nProceed?",
     "ko": "모든 예약 다운로드가 비활성화되며 채널과의 연결이 끊어집니다.\n진행하시겠습니까?"
   },
-  "#Waiting for download": {
-    "en": "Waiting for download",
-    "ko": "다운로드 대기 중"
-  },
-  "#Checking for additional files": {
-    "en": "Checking for additional files",
-    "ko": "추가 파일 확인 중"
-  },
   "#Are you sure you want to stop the download?": {
     "en": "Are you sure you want to stop the download?",
     "ko": "다운로드를 중지하시겠습니까?"
@@ -446,10 +422,6 @@
   "#Are you sure you want to cancel the download?": {
     "en": "Are you sure you want to cancel the download?",
     "ko": "다운로드를 취소하시겠습니까?"
-  },
-  "#Download completed.": {
-    "en": "Download completed.",
-    "ko": "다운로드가 완료되었습니다."
   },
   "#An error occurred while downloading.": {
     "en": "An error occurred while downloading.",
@@ -467,6 +439,10 @@
     "en": "A system error has occurred.\n\nPossible Causes\n\n* Too long or invalid filename or path\n* Out of storage capacity\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.",
     "ko": "시스템 오류가 발생하였습니다.\n\n가능한 원인\n\n* 너무 길거나 유효하지 않은 파일명 또는 경로\n* 저장 용량 부족\n* 해당 작업을 수행하기 위한 권한 필요\n\n오류가 지속된다면 프로그램을 관리자 권한으로 실행하세요."
   },
+  "#Process exited unexpectedly.\n\nPossible Causes\n\n* Corruption of the original file\n* Invalid crop range\n* Too long or invalid filename or path\n* Out of memory\n* Out of storage capacity\n* Lack of device performance\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.": {
+    "en": "Process exited unexpectedly.\n\nPossible Causes\n\n* Corruption of the original file\n* Invalid crop range\n* Too long or invalid filename or path\n* Out of memory\n* Out of storage capacity\n* Lack of device performance\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.",
+    "ko": "프로세스가 예기치 못하게 종료되었습니다.\n\n가능한 원인\n\n* 원본 파일의 손상\n* 유효하지 않은 자르기 범위\n* 너무 길거나 유효하지 않은 파일명 또는 경로\n* 메모리 부족\n* 저장 용량 부족\n* 장치의 성능 부족\n* 해당 작업을 수행하기 위한 권한 필요\n\n오류가 지속된다면 프로그램을 관리자 권한으로 실행하세요."
+  },
   "#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.": {
     "en": "You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.",
     "ko": "지금까지 총 {totalFiles}개({totalSize})의 영상을 다운로드하셨습니다.\n더 나은 기능과 서비스를 위해 {appName}의 발전에 기여해 주세요."
@@ -475,13 +451,17 @@
     "en": "Drag to change order.",
     "ko": "드래그하여 순서를 변경합니다."
   },
-  "#Allow URL Search to retrieve external content.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.": {
-    "en": "Allow URL Search to retrieve external content.\nStreamers or editors can download private videos from their dashboard.\nYou can download content outside of Twitch.",
-    "ko": "URL 검색에서 외부 콘텐츠를 검색하도록 허용합니다.\n스트리머 혹은 편집자가 대시보드 상의 비공개 비디오를 다운로드할 수 있습니다.\nTwitch 외부의 콘텐츠를 다운로드할 수 있습니다."
+  "#Allow URL Search to retrieve external content.\nYou can download content outside of Twitch.": {
+    "en": "Allow URL Search to retrieve external content.\nYou can download content outside of Twitch.",
+    "ko": "URL 검색에서 외부 콘텐츠를 검색하도록 허용합니다.\nTwitch 외부의 콘텐츠를 다운로드할 수 있습니다."
   },
-  "#Caches images for faster retrieval next time, but consumes a lot of memory(RAM).": {
-    "en": "Caches images for faster retrieval next time, but consumes a lot of memory(RAM).",
-    "ko": "이미지를 캐싱하여 다음에 더 빠르게 불러오지만 메모리(RAM)를 많이 사용합니다."
+  "#[Remux]\n\nThe file will be saved as a standard video file.\nThis involves a minor conversion process of the Transport Stream file to ensure its compatibility with standard players.\nThe quality of the video is retained, with only additional information about the video being modified for compatibility with standard players.": {
+    "en": "[Remux]\n\nThe file will be saved as a standard video file.\nThis involves a minor conversion process of the Transport Stream file to ensure its compatibility with standard players.\nThe quality of the video is retained, with only additional information about the video being modified for compatibility with standard players.",
+    "ko": "[Remux]\n\n스트리밍 전용 파일을 일반적인 비디오 파일로 저장합니다.\n이 경우 스트리밍 전용 파일을 일반 플레이어가 재생할 수 있도록 약간의 변환 과정을 거칩니다.\n영상의 품질은 원본 그대로 유지되며 일반적인 플레이어가 재생할 수 있도록 영상에 대한 부가정보만 수정합니다."
+  },
+  "#[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not display the entire length of the video correctly.": {
+    "en": "[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not display the entire length of the video correctly.",
+    "ko": "[Concat]\n\n스트리밍 전용 파일을 일반 플레이어가 재생할 수 있도록 하는 변환 과정 없이 완전한 원본 상태로 저장합니다.\n이러한 파일은 일반적으로 스트리밍 전용 파일이기에 일부 플레이어에서는 올바르게 재생되지 않을 수 있습니다.\n또한 생방송에서 광고가 송출되거나 네트워크 문제로 일부 구간이 누락되면 일부 플레이어에서는 비디오의 전체 길이가 올바르게 표시되지 않을 수 있습니다."
   },
   "#If there are no problems with the sound source used, or if there are parts that have been muted in error despite having permission to use them, you can use this function to unmute them.\nIn some cases, unmute may not be successful.": {
     "en": "If there are no problems with the sound source used, or if there are parts that have been muted in error despite having permission to use them, you can use this function to unmute them.\nIn some cases, unmute may not be successful.",
@@ -490,14 +470,6 @@
   "#Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.": {
     "en": "Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.",
     "ko": "실시간 다시보기를 방송이 종료될 때까지 이어서 받아옵니다.\n일정 시간 동안 비디오의 변동 사항이 없으면 다운로드가 종료됩니다."
-  },
-  "#Re-encodes the file to produce a video of the specified range.\nThis increases the computation of the encoding process and consumes a lot of time.": {
-    "en": "Re-encodes the file to produce a video of the specified range.\nThis increases the computation of the encoding process and consumes a lot of time.",
-    "ko": "파일을 재인코딩하여 지정된 범위의 비디오를 생성합니다.\n이 작업은 인코딩 과정의 연산량을 증가시키고 많은 시간을 소모합니다."
-  },
-  "#This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the video has corrupted parts, this may cause errors.": {
-    "en": "This operation is resource intensive.\nDepending on your PC specifications, the performance of other processes may be affected.\n\nIf the video has corrupted parts, this may cause errors.",
-    "ko": "이 작업은 리소스를 많이 소모합니다.\n사용자의 PC 사양에 따라 다른 프로세스의 성능에 영향을 줄 수도 있습니다.\n\n비디오에 손상된 부분이 있다면 오류가 발생할 수도 있습니다."
   },
   "#This download will be prioritized. Downloads with this option take precedence over those without.": {
     "en": "This download will be prioritized. Downloads with this option take precedence over those without.",

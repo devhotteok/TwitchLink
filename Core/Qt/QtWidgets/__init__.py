@@ -1,1 +1,1 @@
-from . import QDialog, QLabel, QLineEdit, QListWidget, QMessageBox, QProgressBar, QProgressDialog, QSlider, QSpinBox, QTabBar, QTabWidget
+from . import QLabel, QLineEdit, QListWidget, QMessageBox, QProgressBar, QProgressDialog, QSlider, QSpinBox, QTabBar, QTabWidget

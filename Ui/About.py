@@ -1,38 +1,43 @@
-from Core.Updater import Updater
 from Core.Ui import *
 
 
-class About(QtWidgets.QWidget, UiFile.about):
-    def __init__(self, parent=None):
-        super(About, self).__init__(parent=parent)
-        self.appNameLabel.setText(Config.APP_NAME)
-        self.appInfoLabel.setText(T("#Twitch Stream / Video / Clip Downloader"))
-        self.updateButton.clicked.connect(self.openUpdate)
-        self.copyrightInfoLabel.setText(Config.getCopyrightInfo())
-        self.homepageButton.clicked.connect(self.openHomepage)
-        for key, value in Config.CONTACT.items():
-            self.contactInfoArea.layout().addRow(f"{key}:", QtWidgets.QLabel(value, parent=self))
-        self.sponsorInfoLabel.setText(T("#If you like the program, please become a patron of {appName}!", appName=Config.APP_NAME))
-        self.sponsorButton.clicked.connect(self.openSponsor)
-        Updater.statusUpdated.connect(self.showVersionInfo)
+class About(QtWidgets.QWidget):
+    def __init__(self, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent=parent)
+        self._ui = UiLoader.load("about", self)
+        self._ui.appNameLabel.setText(Config.APP_NAME)
+        self._ui.appInfoLabel.setText(T("#Twitch Stream / Video / Clip Downloader"))
+        self._ui.updateButton.clicked.connect(self.openUpdate)
+        self._ui.copyrightInfoLabel.setText(Config.getCopyrightInfo())
+        self._ui.homepageButton.clicked.connect(self.openHomepage)
+        if len(Config.CONTACT) == 0:
+            self._ui.line_2.hide()
+            self._ui.contactLabel.hide()
+            self._ui.contactInfoArea.hide()
+        else:
+            for key, value in Config.CONTACT.items():
+                self._ui.contactInfoArea.layout().addRow(f"{key}:", QtWidgets.QLabel(value, parent=self))
+        self._ui.sponsorInfoLabel.setText(T("#If you like the program, please become a patron of {appName}!", appName=Config.APP_NAME))
+        self._ui.sponsorButton.clicked.connect(self.openSponsor)
+        App.Updater.statusUpdated.connect(self.showVersionInfo)
         self.showVersionInfo()
 
-    def showVersionInfo(self):
-        self.versionInfoLabel.setText(f"{T('version')} {Config.APP_VERSION}")
-        if Config.APP_VERSION == Updater.status.version.latestVersion:
-            self.updateInfoLabel.setText(T("#This is the latest version."))
-            self.updateInfoLabel.setStyleSheet("color: rgb(105, 105, 105);")
-            self.updateButton.hide()
+    def showVersionInfo(self) -> None:
+        self._ui.versionInfoLabel.setText(f"{T('version')} {Config.APP_VERSION}")
+        if App.Updater.status.versionInfo.hasUpdate():
+            self._ui.updateInfoLabel.setText(T("#{appName} {version} has been released!", appName=Config.APP_NAME, version=App.Updater.status.versionInfo.latestVersion))
+            self._ui.updateInfoLabel.setStyleSheet("color: rgb(255, 0, 0);")
+            self._ui.updateButton.show()
         else:
-            self.updateInfoLabel.setText(T("#{appName} {version} has been released!", appName=Config.APP_NAME, version=Updater.status.version.latestVersion))
-            self.updateInfoLabel.setStyleSheet("color: rgb(255, 0, 0);")
-            self.updateButton.show()
+            self._ui.updateInfoLabel.setText(T("#This is the latest version."))
+            self._ui.updateInfoLabel.setStyleSheet("color: rgb(105, 105, 105);")
+            self._ui.updateButton.hide()
 
-    def openHomepage(self):
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, params={"lang": Translator.getLanguage()}))
+    def openHomepage(self) -> None:
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, params={"lang": App.Translator.getLanguage()}))
 
-    def openSponsor(self):
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": Translator.getLanguage()}))
+    def openSponsor(self) -> None:
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getLanguage()}))
 
-    def openUpdate(self):
-        Utils.openUrl(Utils.joinUrl(Updater.status.version.updateUrl, params={"lang": Translator.getLanguage()}))
+    def openUpdate(self) -> None:
+        Utils.openUrl(Utils.joinUrl(App.Updater.status.versionInfo.updateUrl, params={"lang": App.Translator.getLanguage()}))

@@ -10,11 +10,6 @@
     <height>450</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>9</pointsize>
-   </font>
-  </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
