@@ -25,7 +25,8 @@ class Updaters:
     @classmethod
     def getUpdaters(cls, versionFrom: str) -> list[typing.Callable[[dict], dict]] | None:
         VERSIONS = {
-            "3.0.0": None
+            "3.0.0": None,
+            "3.0.1": None
         }
         updaters = []
         versionFound = False

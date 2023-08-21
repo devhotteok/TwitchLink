@@ -33,10 +33,10 @@ class Account(QtWidgets.QWidget):
         App.Account.validateOAuthToken()
         if App.Account.isLoggedIn():
             self.showLoading()
-            if self._tempAccountData == None:
-                App.TwitchGQL.getChannel(id=App.Account.user.id).finished.connect(self._updateAccountDataResultHandler)
-            else:
-                App.TwitchGQL.getChannel(login=self._tempAccountData.username).finished.connect(self._updateAccountDataResultHandler)
+            App.TwitchGQL.getChannel(id=App.Account.user.id).finished.connect(self._updateAccountDataResultHandler)
+        elif self._tempAccountData != None:
+            self.showLoading()
+            App.TwitchGQL.getChannel(login=self._tempAccountData.username).finished.connect(self._updateAccountDataResultHandler)
         else:
             self.showAccount()
 
