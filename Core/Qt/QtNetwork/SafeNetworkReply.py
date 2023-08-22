@@ -30,10 +30,12 @@ class SafeNetworkReply(QtCore.QObject):
             self._handleRuntimeError(e)
 
     def _replyReadyRead(self) -> None:
-        self.readyRead.emit()
+        if not self._finished:
+            self.readyRead.emit()
 
     def _replyDownloadProgress(self, bytesReceived: int, bytesTotal: int) -> None:
-        self.downloadProgress.emit(bytesReceived, bytesTotal)
+        if not self._finished:
+            self.downloadProgress.emit(bytesReceived, bytesTotal)
 
     def _replyErrorOccurred(self, error: QtNetwork.QNetworkReply.NetworkError) -> None:
         if not self._errorSignalEmitted and not self._finished:

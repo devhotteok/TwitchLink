@@ -99,7 +99,7 @@ class Status:
         self.versionInfo = VersionInfo(data.get("version", {}))
 
     def setStatus(self, status: Types) -> None:
-        if status == self.Types.CONNECTION_FAILURE and self.getStatus() != self.Types.NONE and self.networkErrorCount < Config.STATUS_UPDATE_NETWORK_ERROR_MAX_IGNORE_COUNT:
+        if self.getStatus() != self.Types.NONE and status in (self.Types.CONNECTION_FAILURE, self.Types.UNEXPECTED_ERROR) and self.networkErrorCount < Config.STATUS_UPDATE_NETWORK_ERROR_MAX_IGNORE_COUNT:
             self.networkErrorCount += 1
         else:
             self.networkErrorCount = 0
@@ -212,6 +212,7 @@ class Updater(QtCore.QObject):
 
     def update(self) -> None:
         self._tempStatus = Status()
+        self._tempStatus._status = self.status.getStatus()
         self.updateStatus()
 
     def updateStatus(self) -> None:

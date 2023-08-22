@@ -139,7 +139,8 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
             self.scheduledDownloadsPageObject.unfocus()
             self.settingsPageObject.unfocus()
         App.GlobalDownloadManager.setDownloaderCreationEnabled(isOperational)
-        App.ScheduledDownloadManager.setBlocked(not isOperational)
+        if isInSetup:
+            App.ScheduledDownloadManager.setBlocked(not isOperational)
         contentId = "APP_STATUS"
         self.information.removeAppInfo(contentId)
         status = App.Updater.status.getStatus()

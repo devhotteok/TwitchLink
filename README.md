@@ -1,4 +1,4 @@
-<h1 style="padding: unset; border: unset;"><img src="./.github/img/logo.png" width="50" height="50">&nbsp;<span>TwitchLink</span></h1>
+<h1 style="padding: unset; border: unset;"><img src="https://raw.githubusercontent.com/devhotteok/TwitchLink/main/.github/img/logo.png" width="50" height="50">&nbsp;<span>TwitchLink</span></h1>
 
 ##### Twitch Stream / Video / Clip Downloader
 
@@ -8,7 +8,7 @@
 <br/>
 
 ##### Preview
-<img src="./.github/img/preview.png">
+<img src="https://raw.githubusercontent.com/devhotteok/TwitchLink/main/.github/img/preview.png">
 <table>
     <tr>
         <td>
@@ -30,9 +30,9 @@
 - For more information, visit this homepage.
 
 
-## Download
+## Releases
 
-- **TwitchLink** for Windows 10 or higher. [[Releases]][Releases]
+- [**TwitchLink** for Windows 10 or higher.][Releases]
 
 
 ## Features
