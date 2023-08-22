@@ -42,8 +42,11 @@ class SafeTempDirectory(QtCore.QObject):
         return self._directory.path()
 
     def __del__(self):
-        if self.getError() == None:
-            self._dirLock.close()
+        try:
+            if self.getError() == None:
+                self._dirLock.close()
+        except:
+            pass
 
 
 class TempManager(QtCore.QObject):

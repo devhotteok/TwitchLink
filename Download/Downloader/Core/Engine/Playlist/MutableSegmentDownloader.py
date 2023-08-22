@@ -36,15 +36,12 @@ class MutableSegmentDownloader(FileDownloadManager.FileDownloader):
         if self._error != None:
             return
         self._error = exception
-        try:
-            if self._reply != None:
-                self._reply.abort()
-        except Exception as e:
-            self._onFinished()
-            self._handleRuntimeError(e)
+        if self._reply != None:
+            self._reply.abort()
         if self._retryTimer.isActive():
             self._retryTimer.stop()
-        if (isinstance(exception, Exceptions.NetworkError) or isinstance(exception, Exceptions.UnexpectedError)) and (self._unmuted == False or self._muted == False):
+        if isinstance(exception, Exceptions.NetworkError) and (self._unmuted == False or self._muted == False):
+            self._retryScheduled = True
             self._error = None
             if self._unmuted == False:
                 self._unmuted = True
@@ -54,10 +51,11 @@ class MutableSegmentDownloader(FileDownloadManager.FileDownloader):
                 self.url = self._mutedUrl
             self._request.setUrl(self.url)
             self._startHandler()
-        elif (isinstance(exception, Exceptions.NetworkError) or isinstance(exception, Exceptions.UnexpectedError)) and self._retryCount < Config.FILE_REQUEST_MAX_RETRY_COUNT:
+        elif isinstance(exception, Exceptions.NetworkError) and self._retryCount < Config.FILE_REQUEST_MAX_RETRY_COUNT:
             self._unmuted = False
             self._muted = False
             self._retryCount += 1
+            self._retryScheduled = True
             self._error = None
             self._request.setUrl(self._originalUrl)
             self._retryRequired.emit(self)

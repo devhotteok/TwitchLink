@@ -333,11 +333,11 @@ class ScheduledDownload(QtCore.QObject):
         return self.downloader != None
 
     def __del__(self):
-        if self.isPubSubConnected():
-            try:
+        try:
+            if self.isPubSubConnected():
                 App.ScheduledDownloadPubSubManager.unsubscribe(self.channel.id, key=self.getId())
-            except:
-                pass
+        except:
+            pass
 
 
 class ScheduledDownloadManager(QtCore.QObject):

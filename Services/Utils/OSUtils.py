@@ -32,6 +32,10 @@ class OSUtils:
         shutil.rmtree(path)
 
     @staticmethod
+    def renameFile(path: str, newPath: str) -> None:
+        os.rename(path, newPath)
+
+    @staticmethod
     def openFolder(path: str) -> None:
         os.startfile(path)
 

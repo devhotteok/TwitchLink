@@ -236,6 +236,8 @@ class Preferences(QtCore.QObject):
 
     def load(self) -> None:
         self._clearData()
+        if not OSUtils.isFile(Config.APPDATA_FILE):
+            Updaters.FindPreferences()
         try:
             with open(Config.APPDATA_FILE, "r", encoding="utf-8") as file:
                 for key, value in Decoder.decode(Updaters.update(json.load(file))).items():

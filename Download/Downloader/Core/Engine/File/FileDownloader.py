@@ -27,6 +27,7 @@ class FileDownloader(QtCore.QObject):
         self._request.setTransferTimeout(Config.FILE_REQUEST_TIMEOUT)
         self._reply: QtNetwork.QNetworkReply | None = None
         self._error: Exceptions.AbortRequested | Exceptions.FileSystemError | Exceptions.NetworkError | None = None
+        self._retryScheduled: bool = False
         self._retryCount = 0
         self._finished = False
         self._retryTimer = QtCore.QTimer(parent=self)
@@ -47,14 +48,11 @@ class FileDownloader(QtCore.QObject):
             if not self.file.open(QtCore.QIODevice.OpenModeFlag.WriteOnly):
                 self._raiseException(Exceptions.FileSystemError(self.file))
                 return
-            try:
-                self._reply = self._networkAccessManager.get(self._request)
-                self._reply.readyRead.connect(self._onReadyRead)
-                self._reply.downloadProgress.connect(self._setDownloadProgress)
-                self._reply.errorOccurred.connect(self._onNetworkError)
-                self._reply.finished.connect(self._onFinished)
-            except RuntimeError as e:
-                self._handleRuntimeError(e)
+            self._reply = self._networkAccessManager.get(self._request)
+            self._reply.readyRead.connect(self._onReadyRead)
+            self._reply.downloadProgress.connect(self._setDownloadProgress)
+            self._reply.errorOccurred.connect(self._onNetworkError)
+            self._reply.finished.connect(self._onFinished)
 
     def abort(self, reason: str | None = None) -> None:
         self._abortRequested.emit(reason)
@@ -71,47 +69,33 @@ class FileDownloader(QtCore.QObject):
         self.progressChanged.emit(self.bytesReceived, self.bytesTotal)
 
     def _onReadyRead(self) -> None:
-        if self._reply != None:
-            try:
-                if self._reply.attribute(QtNetwork.QNetworkRequest.Attribute.HttpStatusCodeAttribute) == 200:
-                    bytesWritten = self.file.write(self._reply.readAll())
-                    if bytesWritten == -1:
-                        self._raiseException(Exceptions.FileSystemError(self.file))
-            except RuntimeError as e:
-                self._handleRuntimeError(e)
+        if self._reply.attribute(QtNetwork.QNetworkRequest.Attribute.HttpStatusCodeAttribute) == 200:
+            bytesWritten = self.file.write(self._reply.readAll())
+            if bytesWritten == -1:
+                self._raiseException(Exceptions.FileSystemError(self.file))
 
     def _onFinished(self) -> None:
         self.file.close()
         self._reply = None
-        if self._error == None:
-            self._setFinished()
-        else:
+        if self._retryScheduled:
             self.file.remove()
+        elif self._error == None:
+            self._setFinished()
 
     def _onNetworkError(self, error: QtNetwork.QNetworkReply.NetworkError) -> None:
-        if self._reply != None:
-            try:
-                self._raiseException(Exceptions.NetworkError(self._reply))
-            except RuntimeError as e:
-                self._handleRuntimeError(e)
+        self._raiseException(Exceptions.NetworkError(self._reply))
 
-    def _handleRuntimeError(self, exception: Exception) -> None:
-        self._raiseException(Exceptions.UnexpectedError(f"Unexpected Runtime Error (QNetworkReply may have been deleted for unknown reasons.)\n{exception}"))
-
-    def _raiseException(self, exception: Exceptions.AbortRequested | Exceptions.FileSystemError | Exceptions.NetworkError | Exceptions.UnexpectedError) -> None:
+    def _raiseException(self, exception: Exceptions.AbortRequested | Exceptions.FileSystemError | Exceptions.NetworkError) -> None:
         if self._error != None:
             return
         self._error = exception
         if self._reply != None:
-            try:
-                self._reply.abort()
-            except RuntimeError as e:
-                self._onFinished()
-                self._handleRuntimeError(e)
+            self._reply.abort()
         if self._retryTimer.isActive():
             self._retryTimer.stop()
-        if (isinstance(exception, Exceptions.NetworkError) or isinstance(exception, Exceptions.UnexpectedError)) and self._retryCount < Config.FILE_REQUEST_MAX_RETRY_COUNT:
+        if isinstance(exception, Exceptions.NetworkError) and self._retryCount < Config.FILE_REQUEST_MAX_RETRY_COUNT:
             self._retryCount += 1
+            self._retryScheduled = True
             self._error = None
             self._retryRequired.emit(self)
             self._retryTimer.start(self._retryCount * Config.FILE_REQUEST_RETRY_INTERVAL)
@@ -121,6 +105,7 @@ class FileDownloader(QtCore.QObject):
 
     def _retryTimerTimeout(self) -> None:
         if self._error == None:
+            self._retryScheduled = False
             self._retryRequested.emit(self)
 
     def _setFinished(self) -> None:

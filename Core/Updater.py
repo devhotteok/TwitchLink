@@ -130,7 +130,9 @@ class DataLoader(QtCore.QObject):
         }.items():
             query.addQueryItem(key, value if isinstance(value, str) else json.dumps(value))
         url.setQuery(query)
-        self._networkReply = App.NetworkAccessManager.get(QtNetwork.QNetworkRequest(QtCore.QUrl(url)))
+        request = QtNetwork.QNetworkRequest(QtCore.QUrl(url))
+        request.setAttribute(QtNetwork.QNetworkRequest.Attribute.CacheLoadControlAttribute, QtNetwork.QNetworkRequest.CacheLoadControl.AlwaysNetwork)
+        self._networkReply = App.NetworkAccessManager.get(request)
         self._networkReply.finished.connect(self._finished)
 
     def _finished(self) -> None:
@@ -293,8 +295,8 @@ class Updater(QtCore.QObject):
                 "DOWNLOAD": DownloadConfig,
                 "FFMPEG": FFmpegConfig
             }
-            configData = data.get("global")
-            configData.update(data.get("local").get(App.Translator.getLanguage()))
+            configData = data.get("global", {})
+            configData.update(data.get("local", {}).get(App.Translator.getLanguage(), {}))
             for key, value in configData.items():
                 if ":" in key:
                     configTarget, configPath = key.split(":", 1)

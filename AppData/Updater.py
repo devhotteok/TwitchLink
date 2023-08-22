@@ -12,6 +12,14 @@ class Exceptions:
 
 class Updaters:
     @staticmethod
+    def FindPreferences() -> None:
+        if OSUtils.isFile(OSUtils.joinPath(Config.APPDATA_PATH, "settings.tl")):
+            try:
+                OSUtils.renameFile(OSUtils.joinPath(Config.APPDATA_PATH, "settings.tl"), Config.APPDATA_FILE)
+            except:
+                pass
+
+    @staticmethod
     def CleanUnknownVersion() -> None:
         try:
             OSUtils.removeDirectory(Config.TEMP_PATH)
@@ -22,11 +30,96 @@ class Updaters:
         except:
             pass
 
+    @staticmethod
+    def Update_3_0_0(data: dict) -> dict:
+        return {
+            "setup": {
+                "_needSetup": data["setup"]["_needSetup"],
+                "_termsOfServiceAgreement": data["setup"]["_termsOfServiceAgreement"],
+                "__type__": "obj:AppData.Preferences:Setup"
+            },
+            "account": {
+                "_accountData": {
+                    "data": [
+                        None,
+                        None
+                    ] if data["account"]["_account"]["data"] == None else [
+                        {
+                            "id": f"str:{data['account']['_account']['data']['id']}",
+                            "login": data["account"]["_account"]["data"]["login"],
+                            "displayName": data["account"]["_account"]["data"]["displayName"],
+                            "profileImageURL": data["account"]["_account"]["data"]["profileImageURL"],
+                            "createdAt": data["account"]["_account"]["data"]["createdAt"],
+                            "__type__": "obj:Services.Twitch.GQL.TwitchGQLModels:User"
+                        },
+                        {
+                            "value": data["account"]["_account"]["token"],
+                            "expiration": data["account"]["_account"]["expiry"],
+                            "__type__": "obj:Services.Twitch.Authentication.OAuth.OAuthToken:OAuthToken"
+                        }
+                    ],
+                    "__type__": "tuple"
+                },
+                "__type__": "obj:AppData.Preferences:Account"
+            },
+            "general": {
+                "_openProgressWindow": data["general"]["_openProgressWindow"],
+                "_notify": data["general"]["_notify"],
+                "_useSystemTray": data["general"]["_useSystemTray"],
+                "_bookmarks": data["general"]["_bookmarks"],
+                "__type__": "obj:AppData.Preferences:General"
+            },
+            "templates": {
+                "_streamFilename": data["templates"]["_streamFilename"],
+                "_videoFilename": data["templates"]["_videoFilename"],
+                "_clipFilename": data["templates"]["_clipFilename"],
+                "__type__": "obj:AppData.Preferences:Templates"
+            },
+            "advanced": {
+                "_searchExternalContent": data["advanced"]["_searchExternalContent"],
+                "__type__": "obj:AppData.Preferences:Advanced"
+            },
+            "localization": {
+                "_timezone": data["localization"]["_timezone"],
+                "_language": data["localization"]["_language"],
+                "__type__": "obj:AppData.Preferences:Localization"
+            },
+            "temp": {
+                "__type__": "obj:AppData.Preferences:Temp"
+            },
+            "download": {
+                "_downloadSpeed": data["download"]["_downloadSpeed"],
+                "__type__": "obj:AppData.Preferences:Download"
+            },
+            "scheduledDownloads": {
+                "_enabled": data["scheduledDownloads"]["_enabled"],
+                "_scheduledDownloadPresets": [
+                    {
+                        "channel": preset["channel"],
+                        "filenameTemplate": preset["filenameTemplate"],
+                        "directory": preset["directory"],
+                        "preferredQualityIndex": preset["preferredQualityIndex"],
+                        "preferredFrameRateIndex": preset["preferredFrameRateIndex"],
+                        "fileFormat": preset["fileFormat"],
+                        "remux": True,
+                        "preferredResolutionOnly": preset["preferredResolutionOnly"],
+                        "enabled": preset["enabled"],
+                        "__type__": "obj:Download.ScheduledDownloadPreset:ScheduledDownloadPreset"
+                    } for preset in data["scheduledDownloads"]["_scheduledDownloadPresets"]
+                ],
+                "__type__": "obj:AppData.Preferences:ScheduledDownloads"
+            },
+            "__type__": "dict"
+        }
+
     @classmethod
     def getUpdaters(cls, versionFrom: str) -> list[typing.Callable[[dict], dict]] | None:
         VERSIONS = {
-            "3.0.0": None,
-            "3.0.1": None
+            "2.3.2": None,
+            "2.4.0": None,
+            "3.0.0": cls.Update_3_0_0,
+            "3.0.1": None,
+            "3.0.2": None
         }
         updaters = []
         versionFound = False

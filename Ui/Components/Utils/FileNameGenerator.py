@@ -34,16 +34,17 @@ class FileNameGenerator:
 
     @staticmethod
     def getDatetimeVariables(name: str, datetime: QtCore.QDateTime) -> dict[str, str]:
+        localDatetime = datetime.toTimeZone(App.Preferences.localization.getTimezone())
         return {
-            name: datetime.toString("yyyy-MM-dd HH:mm:ss"),
-            "date": datetime.date().toString("yyyy-MM-dd"),
-            "year": f"{datetime.date().year():04}",
-            "month": f"{datetime.date().month():02}",
-            "day": f"{datetime.date().day():02}",
-            "time": datetime.time().toString("HH:mm:ss"),
-            "hour": f"{datetime.time().hour():02}",
-            "minute": f"{datetime.time().minute():02}",
-            "second": f"{datetime.time().second():02}"
+            name: localDatetime.toString("yyyy-MM-dd HH:mm:ss"),
+            "date": localDatetime.date().toString("yyyy-MM-dd"),
+            "year": f"{localDatetime.date().year():04}",
+            "month": f"{localDatetime.date().month():02}",
+            "day": f"{localDatetime.date().day():02}",
+            "time": localDatetime.time().toString("HH:mm:ss"),
+            "hour": f"{localDatetime.time().hour():02}",
+            "minute": f"{localDatetime.time().minute():02}",
+            "second": f"{localDatetime.time().second():02}"
         }
 
     @staticmethod

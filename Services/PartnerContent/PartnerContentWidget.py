@@ -22,4 +22,7 @@ class PartnerContentWidget(QtWidgets.QWidget):
         super().showEvent(event)
 
     def __del__(self):
-        App.PartnerContentManager.removeContent(self)
+        try:
+            App.PartnerContentManager.removeContent(self)
+        except:
+            pass

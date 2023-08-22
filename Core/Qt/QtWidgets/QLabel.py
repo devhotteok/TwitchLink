@@ -109,5 +109,8 @@ class _QLabel(QtWidgets.QLabel):
             super().paintEvent(event)
 
     def __del__(self):
-        self.cancelImageRequest()
+        try:
+            self.cancelImageRequest()
+        except:
+            pass
 QtWidgets.QLabel = _QLabel #Direct Class Patch - [Warning] Does not affect embedded objects (Use with caution)
