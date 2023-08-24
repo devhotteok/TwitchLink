@@ -10,13 +10,14 @@ class Exceptions:
             return f"Unexpected Error: {self.exception}"
 
     class FileSystemError(Exception):
-        def __init__(self, target: QtCore.QFile | QtCore.QTemporaryFile | QtCore.QTemporaryDir):
+        def __init__(self, target: QtCore.QFile | QtCore.QTemporaryFile | QtCore.QDir):
             if isinstance(target, QtCore.QFile) or isinstance(target, QtCore.QTemporaryFile):
                 self.exceptionType = target.error()
                 self.reasonText = target.errorString()
             else:
-                self.exceptionType = "Temporary Directory Error"
-                self.reasonText = target.errorString()
+                self.exceptionType = "Directory Error"
+                reasonText = f"Unable to create directory '{target.path()}'."
+                self.reasonText = f"{reasonText}\nThis directory already exists." if target.exists() else reasonText
 
         def __str__(self):
             return f"File System Error: {self.exceptionType}\n{self.reasonText}"

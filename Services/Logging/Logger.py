@@ -85,6 +85,8 @@ class Logger:
             return [cls._getObjectData(data) for data in target]
         elif isinstance(target, QtCore.QDateTime):
             return target.toString(QtCore.Qt.DateFormat.ISODateWithMs)
+        elif isinstance(target, QtCore.QUrl):
+            return target.toString()
         elif hasattr(target, "__dict__"):
             return cls._getObjectData(target.__dict__)
         else:

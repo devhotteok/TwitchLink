@@ -7,14 +7,15 @@ from Services.Logging.Logger import Logger
 from PyQt6 import QtCore
 
 import os
+import uuid
 
 
 class SafeTempDirectory(QtCore.QObject):
     def __init__(self, directory: str, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
         self._error: Exceptions.FileSystemError | None = None
-        self._directory = QtCore.QTemporaryDir(OSUtils.joinPath(directory, Config.DIRECTORY_PREFIX))
-        if not self._directory.isValid():
+        self._directory = QtCore.QDir(OSUtils.joinPath(directory, f"{Config.DIRECTORY_PREFIX}{uuid.uuid4()}"))
+        if not self._directory.mkdir(self._directory.path()):
             self._raiseException(Exceptions.FileSystemError(self._directory))
             return
         try:
@@ -23,13 +24,13 @@ class SafeTempDirectory(QtCore.QObject):
             pass
         self._keyFile = QtCore.QTemporaryFile(OSUtils.joinPath(Config.TEMP_LIST_DIRECTORY, Config.TEMP_KEY_FILE_PREFIX), self)
         if not self._keyFile.open() or self._keyFile.write(self._directory.path().encode()) == -1:
-            self._directory.remove()
+            self._directory.removeRecursively()
             self._raiseException(Exceptions.FileSystemError(self._keyFile))
             return
         self._keyFile.close()
         self._dirLock = QtCore.QFile(OSUtils.joinPath(self._directory.path(), Config.DIRECTORY_LOCK_FILE_NAME), self)
         if not self._dirLock.open(QtCore.QFile.OpenModeFlag.ReadWrite):
-            self._directory.remove()
+            self._directory.removeRecursively()
             self._raiseException(Exceptions.FileSystemError(self._dirLock))
 
     def _raiseException(self, exception: Exception) -> None:
@@ -45,6 +46,7 @@ class SafeTempDirectory(QtCore.QObject):
         try:
             if self.getError() == None:
                 self._dirLock.close()
+                self._directory.removeRecursively()
         except:
             pass
 
