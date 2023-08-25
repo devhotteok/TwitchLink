@@ -54,23 +54,27 @@ class FileDownloadManager(QtCore.QObject):
             downloader = self._queue.pop()
             downloader.finished.connect(self._removeFromPool)
             downloader._retryRequired.connect(self._downloadRetryRequired)
+            downloader._retryRequested.connect(self._downloadRetryRequested)
             downloader.start()
             self._pool.append(downloader)
 
     def _removeFromPool(self, downloader: FileDownloader) -> None:
         downloader.finished.disconnect(self._removeFromPool)
         downloader._retryRequired.disconnect(self._downloadRetryRequired)
+        downloader._retryRequested.disconnect(self._downloadRetryRequested)
         self._pool.remove(downloader)
         self._updateState()
 
     def _downloadRetryRequired(self, downloader: FileDownloader) -> None:
-        self._removeFromPool(downloader)
+        downloader.finished.disconnect(self._removeFromPool)
+        self._pool.remove(downloader)
+        self._updateState()
         self._tempPool.append(downloader)
         downloader.finished.connect(self._removeFromTempPool)
-        downloader._retryRequested.connect(self._downloadRetryRequested)
 
     def _removeFromTempPool(self, downloader: FileDownloader) -> None:
         downloader.finished.disconnect(self._removeFromTempPool)
+        downloader._retryRequired.disconnect(self._downloadRetryRequired)
         downloader._retryRequested.disconnect(self._downloadRetryRequested)
         self._tempPool.remove(downloader)
 

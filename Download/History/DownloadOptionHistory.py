@@ -78,7 +78,14 @@ class StreamHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, Serializ
 
     def __init__(self):
         super().__init__()
+        self.setSkipAdsEnabled(True)
         self.setRemuxEnabled(True)
+
+    def setSkipAdsEnabled(self, enabled: bool) -> None:
+        self.skipAds = enabled
+
+    def isSkipAdsEnabled(self) -> bool:
+        return self.skipAds
 
     def setRemuxEnabled(self, enabled: bool) -> None:
         self.remux = enabled
@@ -131,12 +138,7 @@ class ThumbnailHistory(BaseOptionHistory, FileHistory, Serializable):
     ]
 
 
-class ScheduledDownloadHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, Serializable):
-    SUPPORTED_FORMATS = [
-        "ts",
-        "mp4"
-    ]
-
+class ScheduledDownloadHistory(StreamHistory):
     def __init__(self):
         super().__init__()
         self.setFilenameTemplate("[{type}] [{channel_name}] [{date}] {title} {resolution}")

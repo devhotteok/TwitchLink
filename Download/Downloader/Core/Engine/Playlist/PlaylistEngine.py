@@ -78,7 +78,7 @@ class PlaylistEngine(BaseEngine):
                 for segment in self._playlistManager.getNewSegments():
                     self.progress.totalFiles += 1
                     self.progress.totalMilliseconds += segment.totalMilliseconds
-                    if isinstance(self.downloadInfo.playback, TwitchPlaybackModels.TwitchStreamPlayback) and not self.downloadInfo.playback.token.hideAds and any(re.match(filter, segment.title) for filter in Config.STREAM_SEGMENT_TITLE_FILTER_REGEX):
+                    if self.downloadInfo.type.isStream() and self.downloadInfo.isSkipAdsEnabled() and any(re.match(filter, segment.title) for filter in Config.STREAM_SEGMENT_TITLE_FILTER_REGEX):
                         self.progress.skippedFiles += 1
                         self.progress.skippedMilliseconds += segment.totalMilliseconds
                         self.logger.info(f"Skipping Segment: <Sequence: {segment.sequence} / Length: {segment.totalMilliseconds}>\n{segment.url.toString()}")

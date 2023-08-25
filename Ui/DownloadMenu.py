@@ -37,17 +37,16 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         self._ui.resolution.currentIndexChanged.connect(self.setResolution)
         if self.downloadInfo.type.isStream():
             self._ui.cropArea.hide()
-            self._ui.remuxRadioButton.setChecked(self.downloadInfo.isRemuxEnabled())
-            self._ui.concatRadioButton.setChecked(not self.downloadInfo.isRemuxEnabled())
-            self._ui.remuxRadioButton.toggled.connect(self.downloadInfo.setRemuxEnabled)
-            self._ui.encoderInfo.clicked.connect(self.showEncoderInfo)
+            if self.downloadInfo.playback.token.hideAds:
+                self._ui.adBlockArea.hide()
+            else:
+                self.setupAdBlockArea()
+            self.setupEncoderArea()
             self._ui.advancedArea.hide()
         elif self.downloadInfo.type.isVideo():
             self.setupCropArea()
-            self._ui.remuxRadioButton.setChecked(self.downloadInfo.isRemuxEnabled())
-            self._ui.concatRadioButton.setChecked(not self.downloadInfo.isRemuxEnabled())
-            self._ui.remuxRadioButton.toggled.connect(self.downloadInfo.setRemuxEnabled)
-            self._ui.encoderInfo.clicked.connect(self.showEncoderInfo)
+            self._ui.adBlockArea.hide()
+            self.setupEncoderArea()
             self._ui.unmuteVideoCheckBox.setChecked(self.downloadInfo.isUnmuteVideoEnabled())
             self._ui.unmuteVideoCheckBox.toggled.connect(self.downloadInfo.setUnmuteVideoEnabled)
             self._ui.unmuteVideoInfo.clicked.connect(self.showUnmuteVideoInfo)
@@ -60,6 +59,7 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
             self.reloadCropArea()
         else:
             self._ui.cropArea.hide()
+            self._ui.adBlockArea.hide()
             self._ui.encoderArea.hide()
             self._ui.unmuteVideoArea.hide()
             self._ui.updateTrackArea.hide()
@@ -115,6 +115,18 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         if endMilliseconds != None:
             self._ui.cropToSelectRadioButton.setChecked(True)
             self.setToSeconds(int(endMilliseconds / 1000))
+
+    def setupAdBlockArea(self) -> None:
+        self._ui.adBlockSkipSegmentsRadioButton.setChecked(self.downloadInfo.isSkipAdsEnabled())
+        self._ui.adBlockAlternativeScreenRadioButton.setChecked(not self.downloadInfo.isSkipAdsEnabled())
+        self._ui.adBlockSkipSegmentsRadioButton.toggled.connect(self.downloadInfo.setSkipAdsEnabled)
+        self._ui.adBlockInfo.clicked.connect(self.showAdBlockInfo)
+
+    def setupEncoderArea(self) -> None:
+        self._ui.remuxRadioButton.setChecked(self.downloadInfo.isRemuxEnabled())
+        self._ui.concatRadioButton.setChecked(not self.downloadInfo.isRemuxEnabled())
+        self._ui.remuxRadioButton.toggled.connect(self.downloadInfo.setRemuxEnabled)
+        self._ui.encoderInfo.clicked.connect(self.showEncoderInfo)
 
     def startRangeChanged(self) -> None:
         self.setFromSeconds(self.checkCropRange(self.getFromSeconds(), maximum=int(self.downloadInfo.content.lengthSeconds) - 1))
@@ -203,9 +215,14 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
             self.downloadInfo.setAbsoluteFileName(newDirectory)
             self.reloadFileDirectory()
 
+    def showAdBlockInfo(self) -> None:
+        skipSegmentsInfo = T("#[Skip Segments]\n\nAds are skipped, but the stream during that time cannot be downloaded.\nIn this case, no alternative screen is shown, and it will directly connect to the scene after the ad, making the stream appear as if it's interrupted in the middle.")
+        alternativeScreenInfo = T("#[Alternative Screen]\n\nDisplays an alternate screen instead of skipping ads.\nIn this case, the entire length of the stream is maintained, but some players might not play the video correctly.")
+        Utils.info("information", f"{T('#If commercials are broadcast during this stream, they will be handled according to the following rules.')}\n\n{skipSegmentsInfo}\n\n\n{alternativeScreenInfo}", contentTranslate=False, parent=self)
+
     def showEncoderInfo(self) -> None:
         remuxInfo = T("#[Remux]\n\nThe file will be saved as a standard video file.\nThis involves a minor conversion process of the Transport Stream file to ensure its compatibility with standard players.\nThe quality of the video is retained, with only additional information about the video being modified for compatibility with standard players.")
-        concatInfo = T("#[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not display the entire length of the video correctly.")
+        concatInfo = T("#[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not play the video correctly.")
         Utils.info("information", f"{remuxInfo}\n\n\n{concatInfo}", contentTranslate=False, parent=self)
 
     def showUnmuteVideoInfo(self) -> None:

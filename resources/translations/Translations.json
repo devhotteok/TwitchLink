@@ -287,9 +287,9 @@
     "en": "You are not currently logged in.",
     "ko": "현재 로그인하지 않았습니다."
   },
-  "#This stream may contain ads.\n{appName} won't save the advertisement portions, but the live stream may not be downloadable during this time and may appear interrupted.\nTo prevent this, you need to be logged in with a subscribed account.": {
-    "en": "This stream may contain ads.\n{appName} won't save the advertisement portions, but the live stream may not be downloadable during this time and may appear interrupted.\nTo prevent this, you need to be logged in with a subscribed account.",
-    "ko": "이 생방송에서 광고가 송출될 수 있습니다.\n{appName}은/는 광고 부분을 저장하지 않지만 그 시간 동안의 생방송은 다운로드할 수 없으며, 생방송이 중간에 끊기는 것처럼 보일 수 있습니다.\n이러한 현상을 방지하려면 구독된 계정의 로그인이 필요합니다."
+  "#This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to log in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.": {
+    "en": "This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to log in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.",
+    "ko": "이 생방송에서 광고가 송출될 수 있습니다.\n광고가 송출되면 그 시간 동안의 생방송은 다운로드할 수 없으며, 생방송이 중간에 끊어진 것처럼 보일 수 있습니다.\n광고 송출을 방지하려면 Twitch Turbo, 채널을 구독한 계정 등의 광고 방지 혜택이 있는 계정으로의 로그인이 필요합니다."
   },
   "#Would you like to proceed?": {
     "en": "Would you like to proceed?",
@@ -455,13 +455,25 @@
     "en": "Allow URL Search to retrieve external content.\nYou can download content outside of Twitch.",
     "ko": "URL 검색에서 외부 콘텐츠를 검색하도록 허용합니다.\nTwitch 외부의 콘텐츠를 다운로드할 수 있습니다."
   },
+  "#If commercials are broadcast during this stream, they will be handled according to the following rules.": {
+    "en": "If commercials are broadcast during this stream, they will be handled according to the following rules.",
+    "ko": "만약 이 생방송에서 광고가 송출된다면 다음 설정에 따라 처리됩니다."
+  },
+  "#[Skip Segments]\n\nAds are skipped, but the stream during that time cannot be downloaded.\nIn this case, no alternative screen is shown, and it will directly connect to the scene after the ad, making the stream appear as if it's interrupted in the middle.": {
+    "en": "[Skip Segments]\n\nAds are skipped, but the stream during that time cannot be downloaded.\nIn this case, no alternative screen is shown, and it will directly connect to the scene after the ad, making the stream appear as if it's interrupted in the middle.",
+    "ko": "[구간 건너뛰기]\n\n광고 구간을 건너뛰지만 그동안의 영상은 다운로드할 수 없습니다.\n이 경우 대체화면이 표시되지 않고 바로 광고 이후의 장면으로 연결되며 생방송이 중간에 끊어진 것처럼 보일 수 있습니다."
+  },
+  "#[Alternative Screen]\n\nDisplays an alternate screen instead of skipping ads.\nIn this case, the entire length of the stream is maintained, but some players might not play the video correctly.": {
+    "en": "[Alternative Screen]\n\nDisplays an alternate screen instead of skipping ads.\nIn this case, the entire length of the stream is maintained, but some players might not play the video correctly.",
+    "ko": "[대체 화면]\n\n광고 구간을 건너뛰지 않고 대체화면을 표시합니다.\n이 경우 생방송의 전체 길이가 유지되지만 일부 플레이어에서는 비디오가 올바르게 재생되지 않을 수 있습니다."
+  },
   "#[Remux]\n\nThe file will be saved as a standard video file.\nThis involves a minor conversion process of the Transport Stream file to ensure its compatibility with standard players.\nThe quality of the video is retained, with only additional information about the video being modified for compatibility with standard players.": {
     "en": "[Remux]\n\nThe file will be saved as a standard video file.\nThis involves a minor conversion process of the Transport Stream file to ensure its compatibility with standard players.\nThe quality of the video is retained, with only additional information about the video being modified for compatibility with standard players.",
     "ko": "[Remux]\n\n스트리밍 전용 파일을 일반적인 비디오 파일로 저장합니다.\n이 경우 스트리밍 전용 파일을 일반 플레이어가 재생할 수 있도록 약간의 변환 과정을 거칩니다.\n영상의 품질은 원본 그대로 유지되며 일반적인 플레이어가 재생할 수 있도록 영상에 대한 부가정보만 수정합니다."
   },
-  "#[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not display the entire length of the video correctly.": {
-    "en": "[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not display the entire length of the video correctly.",
-    "ko": "[Concat]\n\n스트리밍 전용 파일을 일반 플레이어가 재생할 수 있도록 하는 변환 과정 없이 완전한 원본 상태로 저장합니다.\n이러한 파일은 일반적으로 스트리밍 전용 파일이기에 일부 플레이어에서는 올바르게 재생되지 않을 수 있습니다.\n또한 생방송에서 광고가 송출되거나 네트워크 문제로 일부 구간이 누락되면 일부 플레이어에서는 비디오의 전체 길이가 올바르게 표시되지 않을 수 있습니다."
+  "#[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not play the video correctly.": {
+    "en": "[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not play the video correctly.",
+    "ko": "[Concat]\n\n스트리밍 전용 파일을 일반 플레이어가 재생할 수 있도록 하는 변환 과정 없이 완전한 원본 상태로 저장합니다.\n이러한 파일은 일반적으로 스트리밍 전용 파일이기에 일부 플레이어에서는 올바르게 재생되지 않을 수 있습니다.\n또한, 생방송에서 광고가 송출되거나 네트워크 문제로 일부 구간이 누락되면 일부 플레이어에서는 비디오가 올바르게 재생되지 않을 수 있습니다."
   },
   "#If there are no problems with the sound source used, or if there are parts that have been muted in error despite having permission to use them, you can use this function to unmute them.\nIn some cases, unmute may not be successful.": {
     "en": "If there are no problems with the sound source used, or if there are parts that have been muted in error despite having permission to use them, you can use this function to unmute them.\nIn some cases, unmute may not be successful.",

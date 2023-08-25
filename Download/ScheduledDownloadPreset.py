@@ -74,7 +74,8 @@ class ScheduledDownloadPreset(Serializable):
         self.preferredQualityIndex = 0
         self.preferredFrameRateIndex = 0
         self.fileFormat = self.getAvailableFormat()
-        self.remux = True
+        self.skipAds = self.optionHistory.isSkipAdsEnabled()
+        self.remux = self.optionHistory.isRemuxEnabled()
         self.preferredResolutionOnly = False
         self.enabled = True
 
@@ -138,6 +139,12 @@ class ScheduledDownloadPreset(Serializable):
     def getFrameRateList(self) -> tuple[FrameRate, ...]:
         return self.AVAILABLE_FRAMERATE.getList()
 
+    def setSkipAdsEnabled(self, enabled: bool) -> None:
+        self.skipAds = enabled
+
+    def isSkipAdsEnabled(self) -> bool:
+        return self.skipAds
+
     def setRemuxEnabled(self, enabled: bool) -> None:
         self.remux = enabled
 
@@ -182,3 +189,5 @@ class ScheduledDownloadPreset(Serializable):
             self.optionHistory.setAudioFormat(self.fileFormat)
         else:
             self.optionHistory.setFormat(self.fileFormat)
+        self.optionHistory.setSkipAdsEnabled(self.skipAds)
+        self.optionHistory.setRemuxEnabled(self.remux)

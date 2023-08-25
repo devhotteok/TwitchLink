@@ -307,6 +307,8 @@ class ScheduledDownload(QtCore.QObject):
         selectedResolution = self.preset.selectResolution(playback.getResolutions())
         downloadInfo.setResolution(playback.getResolutions().index(selectedResolution))
         downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate), self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles()))
+        if not playback.token.hideAds:
+            downloadInfo.setSkipAdsEnabled(self.preset.isSkipAdsEnabled())
         downloadInfo.setRemuxEnabled(self.preset.isRemuxEnabled())
         self.downloader = TwitchDownloader.create(downloadInfo, parent=self)
         self.downloader.finished.connect(self.downloadResultHandler)

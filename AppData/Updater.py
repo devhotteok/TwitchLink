@@ -112,6 +112,32 @@ class Updaters:
             "__type__": "dict"
         }
 
+    @staticmethod
+    def Update_3_1_0(data: dict) -> dict:
+        data["temp"] = {
+            "__type__": "obj:AppData.Preferences:Temp"
+        }
+        data["scheduledDownloads"] = {
+            "_enabled": data["scheduledDownloads"]["_enabled"],
+            "_scheduledDownloadPresets": [
+                {
+                    "channel": preset["channel"],
+                    "filenameTemplate": preset["filenameTemplate"],
+                    "directory": preset["directory"],
+                    "preferredQualityIndex": preset["preferredQualityIndex"],
+                    "preferredFrameRateIndex": preset["preferredFrameRateIndex"],
+                    "fileFormat": preset["fileFormat"],
+                    "skipAds": False,
+                    "remux": preset["remux"],
+                    "preferredResolutionOnly": preset["preferredResolutionOnly"],
+                    "enabled": preset["enabled"],
+                    "__type__": "obj:Download.ScheduledDownloadPreset:ScheduledDownloadPreset"
+                } for preset in data["scheduledDownloads"]["_scheduledDownloadPresets"]
+            ],
+            "__type__": "obj:AppData.Preferences:ScheduledDownloads"
+        }
+        return data
+
     @classmethod
     def getUpdaters(cls, versionFrom: str) -> list[typing.Callable[[dict], dict]] | None:
         VERSIONS = {
@@ -121,7 +147,8 @@ class Updaters:
             "3.0.1": None,
             "3.0.2": None,
             "3.0.3": None,
-            "3.0.4": None
+            "3.0.4": None,
+            "3.1.0": cls.Update_3_1_0
         }
         updaters = []
         versionFound = False

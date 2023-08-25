@@ -43,6 +43,7 @@ class DownloadInfo(Serializable):
         self.content = content
         self.playback = playback
         if self.type.isStream():
+            self.skipAds = False if self.playback.token.hideAds else self.optionHistory.isSkipAdsEnabled()
             self.remux = self.optionHistory.isRemuxEnabled()
         elif self.type.isVideo():
             self.range = (None, None)
@@ -62,6 +63,8 @@ class DownloadInfo(Serializable):
 
     def updatePlayback(self, playback: TwitchStreamPlayback | TwitchVideoPlayback | TwitchClipPlayback) -> None:
         self.playback = playback
+        if isinstance(self.playback, TwitchStreamPlayback) and self.playback.token.hideAds:
+            self.skipAds = False
         self.setResolution(min(self.selectedResolutionIndex, len(self.playback.resolutions) - 1))
 
     @property
@@ -139,6 +142,9 @@ class DownloadInfo(Serializable):
     def setPrioritizeEnabled(self, enabled: bool) -> None:
         self.prioritize = enabled
 
+    def setSkipAdsEnabled(self, enabled: bool) -> None:
+        self.skipAds = enabled
+
     def setRemuxEnabled(self, enabled: bool) -> None:
         self.remux = enabled
 
@@ -151,6 +157,9 @@ class DownloadInfo(Serializable):
     def isPrioritizeEnabled(self) -> bool:
         return self.prioritize
 
+    def isSkipAdsEnabled(self) -> bool:
+        return self.skipAds
+
     def isRemuxEnabled(self) -> bool:
         return self.remux
 
@@ -161,6 +170,8 @@ class DownloadInfo(Serializable):
         else:
             self.optionHistory.setFormat(self.fileFormat)
         if self.type.isStream():
+            if not self.playback.token.hideAds:
+                self.optionHistory.setSkipAdsEnabled(self.skipAds)
             self.optionHistory.setRemuxEnabled(self.remux)
         elif self.type.isVideo():
             self.optionHistory.setUnmuteVideoEnabled(self.unmuteVideo)

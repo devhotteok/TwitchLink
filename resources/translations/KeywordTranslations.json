@@ -171,6 +171,18 @@
     "en": "Source",
     "ko": "원본"
   },
+  "ad-block": {
+    "en": "Ad Block",
+    "ko": "광고 차단"
+  },
+  "skip-segments": {
+    "en": "Skip Segments",
+    "ko": "구간 건너뛰기"
+  },
+  "alternative-screen": {
+    "en": "Alternative Screen",
+    "ko": "대체 화면"
+  },
   "preparing": {
     "en": "Preparing",
     "ko": "준비 중"

@@ -32,6 +32,9 @@ class MutableSegmentDownloader(FileDownloadManager.FileDownloader):
         self._unmuted = False
         self._muted = False
 
+    def getPriority(self) -> int:
+        return super().getPriority() + 1 if self._unmuted or self._muted else 0
+
     def _raiseException(self, exception: Exceptions.AbortRequested | Exceptions.FileSystemError | Exceptions.NetworkError) -> None:
         if self._error != None:
             return
@@ -50,7 +53,8 @@ class MutableSegmentDownloader(FileDownloadManager.FileDownloader):
                 self._muted = True
                 self.url = self._mutedUrl
             self._request.setUrl(self.url)
-            self._startHandler()
+            self._retryRequired.emit(self)
+            self._retryTimerTimeout()
         elif isinstance(exception, Exceptions.NetworkError) and self._retryCount < Config.FILE_REQUEST_MAX_RETRY_COUNT:
             self._unmuted = False
             self._muted = False

@@ -42,6 +42,10 @@ class ScheduledDownloadSettings(QtWidgets.QDialog, WindowGeometryManager):
         self._ui.preferredResolutionOnlyCheckBox.setChecked(self.virtualPreset.isPreferredResolutionOnlyEnabled())
         self._ui.preferredResolutionOnlyCheckBox.toggled.connect(self.virtualPreset.setPreferredResolutionOnlyEnabled)
         self._ui.preferredResolutionOnlyInfo.clicked.connect(self.showPreferredResolutionOnlyInfo)
+        self._ui.adBlockSkipSegmentsRadioButton.setChecked(self.virtualPreset.isSkipAdsEnabled())
+        self._ui.adBlockAlternativeScreenRadioButton.setChecked(not self.virtualPreset.isSkipAdsEnabled())
+        self._ui.adBlockSkipSegmentsRadioButton.toggled.connect(self.virtualPreset.setSkipAdsEnabled)
+        self._ui.adBlockInfo.clicked.connect(self.showAdBlockInfo)
         self._ui.remuxRadioButton.setChecked(self.virtualPreset.isRemuxEnabled())
         self._ui.concatRadioButton.setChecked(not self.virtualPreset.isRemuxEnabled())
         self._ui.remuxRadioButton.toggled.connect(self.virtualPreset.setRemuxEnabled)
@@ -94,9 +98,14 @@ class ScheduledDownloadSettings(QtWidgets.QDialog, WindowGeometryManager):
     def showPreferredResolutionOnlyInfo(self) -> None:
         Utils.info("information", "#Please note that certain video qualities (such as Source) may not be available immediately after a live broadcast begins.\nIf this option is disabled, it will automatically select and begin downloading the closest available quality.\nIf this option is enabled, it will wait until the selected quality is available.\n(Please be aware that if the selected quality continues to be unavailable, the download will not proceed.)", parent=self)
 
+    def showAdBlockInfo(self) -> None:
+        skipSegmentsInfo = T("#[Skip Segments]\n\nAds are skipped, but the stream during that time cannot be downloaded.\nIn this case, no alternative screen is shown, and it will directly connect to the scene after the ad, making the stream appear as if it's interrupted in the middle.")
+        alternativeScreenInfo = T("#[Alternative Screen]\n\nDisplays an alternate screen instead of skipping ads.\nIn this case, the entire length of the stream is maintained, but some players might not play the video correctly.")
+        Utils.info("information", f"{T('#If commercials are broadcast during this stream, they will be handled according to the following rules.')}\n\n{skipSegmentsInfo}\n\n\n{alternativeScreenInfo}", contentTranslate=False, parent=self)
+
     def showEncoderInfo(self) -> None:
         remuxInfo = T("#[Remux]\n\nThe file will be saved as a standard video file.\nThis involves a minor conversion process of the Transport Stream file to ensure its compatibility with standard players.\nThe quality of the video is retained, with only additional information about the video being modified for compatibility with standard players.")
-        concatInfo = T("#[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not display the entire length of the video correctly.")
+        concatInfo = T("#[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not play the video correctly.")
         Utils.info("information", f"{remuxInfo}\n\n\n{concatInfo}", contentTranslate=False, parent=self)
 
     def createPreviewStream(self) -> TwitchGQLModels.Stream:
@@ -137,6 +146,7 @@ class ScheduledDownloadSettings(QtWidgets.QDialog, WindowGeometryManager):
         self.scheduledDownloadPreset.preferredQualityIndex = self.virtualPreset.preferredQualityIndex
         self.scheduledDownloadPreset.preferredFrameRateIndex = self.virtualPreset.preferredFrameRateIndex
         self.scheduledDownloadPreset.preferredResolutionOnly = self.virtualPreset.preferredResolutionOnly
+        self.scheduledDownloadPreset.skipAds = self.virtualPreset.skipAds
         self.scheduledDownloadPreset.remux = self.virtualPreset.remux
 
     def getChannelFromText(self, text: str) -> str | None:

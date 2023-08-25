@@ -97,6 +97,11 @@ class DownloadInfoView(QtWidgets.QWidget):
             self._ui.unmuteVideoTag.setVisible(False)
             self._ui.updateTrackTag.setVisible(False)
             self._ui.prioritizeTag.setVisible(False)
+            if downloadInfo.playback.token.hideAds:
+                self._ui.adBlockTag.setVisible(False)
+            else:
+                self._ui.adBlockTagLabel.setText(f"{T('ad-block')}: {T('skip-segments') if downloadInfo.isSkipAdsEnabled() else T('alternative-screen')}")
+                self._ui.adBlockTag.setVisible(True)
             self._ui.concatEncoderTag.setVisible(not downloadInfo.isRemuxEnabled())
         elif downloadInfo.type.isVideo():
             self.updateDurationInfo(
@@ -106,11 +111,13 @@ class DownloadInfoView(QtWidgets.QWidget):
             self._ui.unmuteVideoTag.setVisible(downloadInfo.isUnmuteVideoEnabled())
             self._ui.updateTrackTag.setVisible(downloadInfo.isUpdateTrackEnabled())
             self._ui.prioritizeTag.setVisible(downloadInfo.isPrioritizeEnabled())
+            self._ui.adBlockTag.setVisible(False)
             self._ui.concatEncoderTag.setVisible(not downloadInfo.isRemuxEnabled())
         elif downloadInfo.type.isClip():
             self._ui.unmuteVideoTag.setVisible(False)
             self._ui.updateTrackTag.setVisible(False)
             self._ui.prioritizeTag.setVisible(downloadInfo.isPrioritizeEnabled())
+            self._ui.adBlockTag.setVisible(False)
             self._ui.concatEncoderTag.setVisible(False)
         self.showMutedInfo(0, 0)
         self.showSkippedInfo(0, 0)
