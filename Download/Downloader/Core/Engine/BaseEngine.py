@@ -51,6 +51,8 @@ class BaseEngine(QtCore.QObject):
         self._raiseException(exception)
 
     def _raiseException(self, exception: Exception) -> None:
+        self.logger.warning("The following exception occurred.")
+        self.logger.warning(exception)
         self.status.raiseError(exception)
         self._syncStatus()
 

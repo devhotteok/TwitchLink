@@ -8,7 +8,6 @@ from Core.GlobalExceptions import Exceptions
 from Services.Utils.Utils import Utils
 from Services.Logging.Logger import Logger
 from Services.Temp.TempManager import SafeTempDirectory
-from Services.Twitch.Playback import TwitchPlaybackModels
 from Services.Playlist import Playlist
 from Services.Playlist.Segment import Segment
 from Services.Playlist.PlaylistManager import PlaylistManager
@@ -144,7 +143,10 @@ class PlaylistEngine(BaseEngine):
         if segmentDownloader.file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
             while not segmentDownloader.file.atEnd():
                 if self.downloadInfo.isRemuxEnabled():
-                    if self._FFmpeg.write(segmentDownloader.file.read(Config.FILE_CHUNK_SIZE)) == -1 or not self._FFmpeg.waitForBytesWritten(Config.PIPE_TIMEOUT):
+                    if self._FFmpeg == None:
+                        self.logger.warning("Unable to find pipe target.")
+                        self._raiseException(Exceptions.UnexpectedError())
+                    elif self._FFmpeg.write(segmentDownloader.file.read(Config.FILE_CHUNK_SIZE)) == -1 or not self._FFmpeg.waitForBytesWritten(Config.PIPE_TIMEOUT):
                         self.logger.warning("Unable to write data to pipe.")
                         self._raiseException(Exceptions.UnexpectedError())
                 else:

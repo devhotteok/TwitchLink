@@ -127,7 +127,7 @@ class Updaters:
                     "preferredQualityIndex": preset["preferredQualityIndex"],
                     "preferredFrameRateIndex": preset["preferredFrameRateIndex"],
                     "fileFormat": preset["fileFormat"],
-                    "skipAds": False,
+                    "skipAds": True,
                     "remux": preset["remux"],
                     "preferredResolutionOnly": preset["preferredResolutionOnly"],
                     "enabled": preset["enabled"],
@@ -148,7 +148,8 @@ class Updaters:
             "3.0.2": None,
             "3.0.3": None,
             "3.0.4": None,
-            "3.1.0": cls.Update_3_1_0
+            "3.1.0": cls.Update_3_1_0,
+            "3.1.1": None
         }
         updaters = []
         versionFound = False
