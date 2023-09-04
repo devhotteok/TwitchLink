@@ -27,13 +27,19 @@ class PlaylistManager(QtCore.QObject):
         self._maxRetryCount = maxRetryCount
         self._retryInterval = retryInterval
         self._running = False
+        self._currentNetworkError: QtNetwork.QNetworkReply.NetworkError | None = None
         self._retryCount = 0
         self._nextSequence = 0
 
     def update(self) -> None:
         if self._reply == None:
-            self._error = None
+            self._currentNetworkError = None
             self._retryCount = 0
+            self._updatePlaylist()
+
+    def _updatePlaylist(self) -> None:
+        if self._reply == None:
+            self._error = None
             self._running = True
             self._reply = self._networkAccessManager.get(self._request)
             self._reply.finished.connect(self._requestDone)
@@ -50,6 +56,7 @@ class PlaylistManager(QtCore.QObject):
         if self._error != None:
             return
         if reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
+            self._currentNetworkError = None
             try:
                 self.playlist.loads(reply.readAll().data().decode(), baseUrl=self.url)
             except Exception as e:
@@ -57,7 +64,10 @@ class PlaylistManager(QtCore.QObject):
             else:
                 self._running = False
                 self.playlistUpdated.emit()
+        elif self._currentNetworkError == QtNetwork.QNetworkReply.NetworkError.ContentAccessDenied and self._retryCount != 0:
+            self._raiseException(Exceptions.NetworkError(reply))
         elif self._retryCount < self._maxRetryCount:
+            self._currentNetworkError = reply.error()
             self._retryCount += 1
             self._retryTimer.start(self._retryInterval)
         else:
@@ -75,7 +85,7 @@ class PlaylistManager(QtCore.QObject):
         self.errorOccurred.emit(exception)
 
     def _retryTimerTimeout(self) -> None:
-        self.update()
+        self._updatePlaylist()
 
     def hasNewSegments(self) -> bool:
         segments = list(self.playlist.getRangedSegments(*self._range))

@@ -42,13 +42,10 @@ class SafeTempDirectory(QtCore.QObject):
     def path(self) -> str:
         return self._directory.path()
 
-    def __del__(self):
-        try:
-            if self.getError() == None:
-                self._dirLock.close()
-                self._directory.removeRecursively()
-        except:
-            pass
+    def clear(self):
+        self._dirLock.close()
+        self._dirLock.remove()
+        self._directory.removeRecursively()
 
 
 class TempManager(QtCore.QObject):

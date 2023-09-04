@@ -46,6 +46,11 @@ class PlaylistEngine(BaseEngine):
             self._raiseException(self._safeTempDirectory.getError())
             self._finish()
 
+    def _finish(self) -> None:
+        if self._safeTempDirectory.getError() == None:
+            self._safeTempDirectory.clear()
+        super()._finish()
+
     def _startFFmpegProcess(self) -> None:
         self._FFmpeg = FFmpeg(self.logger, parent=self)
         self._FFmpeg.started.connect(self._updatePlaylist)

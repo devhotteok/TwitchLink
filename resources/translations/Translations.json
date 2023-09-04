@@ -55,9 +55,9 @@
     "en": "{appName} has crashed.",
     "ko": "{appName}이/가 충돌하였습니다."
   },
-  "#{appName} has crashed due to an unexpected error.\nIf this happens frequently, please attach the following log file and report it to us.\n\nFile: {fileName}": {
-    "en": "{appName} has crashed due to an unexpected error.\nIf this happens frequently, please attach the following log file and report it to us.\n\nFile: {fileName}",
-    "ko": "예기치 못한 오류로 인해 {appName}이/가 강제 종료되었습니다.\n이러한 일이 자주 발생한다면 아래 로그 파일을 첨부하여 문의하세요.\n\n파일: {fileName}"
+  "#{appName} has crashed due to an unexpected error.\nIf you see this message, please attach the following log file and report it to us.\n\nFile: {fileName}": {
+    "en": "{appName} has crashed due to an unexpected error.\nIf you see this message, please attach the following log file and report it to us.\n\nFile: {fileName}",
+    "ko": "예기치 못한 오류로 인해 {appName}이/가 강제 종료되었습니다.\n이 메시지를 보게 된다면 아래 로그 파일을 첨부하여 오류를 신고해 주세요.\n\n파일: {fileName}"
   },
   "#There are one or more downloads in progress.\nAre you sure you want to stop/cancel them all?": {
     "en": "There are one or more downloads in progress.\nAre you sure you want to stop/cancel them all?",

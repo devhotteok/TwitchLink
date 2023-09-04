@@ -35,6 +35,10 @@
     "en": "Cancel",
     "ko": "취소"
   },
+  "close": {
+    "en": "Close",
+    "ko": "닫기"
+  },
   "notification": {
     "en": "Notification",
     "ko": "알림"

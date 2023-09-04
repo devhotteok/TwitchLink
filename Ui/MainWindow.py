@@ -95,17 +95,18 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
             file = QtCore.QFile(Config.TRACEBACK_FILE, self)
             if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
                 fileName = file.readAll().data().decode()
+                url = Utils.joinUrl(Config.HOMEPAGE_URL, "report", params={"lang": App.Translator.getLanguage()})
                 self.information.showAppInfo(
                     DocumentData(
                         contentId="CRASH_REPORT",
                         title=T("#{appName} has crashed.", appName=Config.APP_NAME),
-                        content=T("#{appName} has crashed due to an unexpected error.\nIf this happens frequently, please attach the following log file and report it to us.\n\nFile: {fileName}", appName=Config.APP_NAME, fileName=fileName),
+                        content=T("#{appName} has crashed due to an unexpected error.\nIf you see this message, please attach the following log file and report it to us.\n\nFile: {fileName}", appName=Config.APP_NAME, fileName=fileName),
                         contentType="text",
                         modal=True,
                         buttons=[
-                            DocumentButtonData(text=T("ok"), role="accept", default=True),
+                            DocumentButtonData(text=T("close"), role="accept", default=False),
                             DocumentButtonData(text=T("open-file"), action=f"file:{fileName}", role="action", default=False),
-                            DocumentButtonData(text=T("report-error"), action=f"url:{Config.HOMEPAGE_URL}", role="action", default=False)
+                            DocumentButtonData(text=T("report-error"), action=f"url:{url}", role="action", default=True)
                         ]
                     )
                 )
