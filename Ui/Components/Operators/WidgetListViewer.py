@@ -49,6 +49,12 @@ class WidgetListViewer(QtCore.QObject):
         self._listWidget.clear()
         self._contentItems.clear()
 
+    def setHidden(self, widget: QtWidgets.QWidget, hidden: bool) -> None:
+        next(contentItem for contentItem in self._contentItems if contentItem.widget == widget).setHidden(hidden)
+
+    def isHidden(self, widget: QtWidgets.QWidget) -> bool:
+        return next(contentItem for contentItem in self._contentItems if contentItem.widget == widget).isHidden()
+
     def _createWidgetListViewerItem(self, widget: QtWidgets.QWidget, resizeSignal: QtCore.pyqtSignal | None = None) -> WidgetListViewerItem:
         return WidgetListViewerItem(widget, resizeSignal=resizeSignal)
 

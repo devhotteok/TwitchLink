@@ -47,7 +47,7 @@ class Downloads(QtWidgets.QWidget):
         self.showStats()
 
     def setPreviewHidden(self, downloaderId: uuid.UUID, hidden: bool) -> None:
-        self._previewWidgets[downloaderId].setHidden(hidden)
+        self._widgetListViewer.setHidden(self._previewWidgets[downloaderId], hidden)
 
     def getPreviewCount(self) -> int:
         return len(self._previewWidgets)
@@ -70,7 +70,7 @@ class Downloads(QtWidgets.QWidget):
         self.showStats()
 
     def getFilteredPreviewCount(self) -> int:
-        return sum(0 if item.isHidden() else 1 for item in self._previewWidgets.values())
+        return sum(0 if self._widgetListViewer.isHidden(widget) else 1 for widget in self._previewWidgets.values())
 
     def filterPreview(self, downloaderId: uuid.UUID) -> bool:
         downloader = App.DownloadManager.get(downloaderId)

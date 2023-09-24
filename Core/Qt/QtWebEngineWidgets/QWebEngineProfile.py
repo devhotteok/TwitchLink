@@ -11,7 +11,9 @@ class _QWebEngineProfile(QtWebEngineCore.QWebEngineProfile):
         self._setupProfile()
 
     def _setupProfile(self) -> None:
-        self.setHttpUserAgent(re.sub("QtWebEngine/\S*", f"{Config.APP_NAME}/{Config.APP_VERSION}", self.httpUserAgent()))
+        formatString = re.sub("QtWebEngine/\S*", "{appInfo}", self.httpUserAgent()) if Config.USER_AGENT_FORMAT == None else Config.USER_AGENT_FORMAT
+        userAgent = formatString.format(appInfo=f"{Config.APP_NAME}/{Config.APP_VERSION}")
+        self.setHttpUserAgent(userAgent)
 
     @classmethod
     def setup(cls) -> None:
