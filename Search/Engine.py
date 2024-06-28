@@ -97,7 +97,7 @@ class SearchEngine(QtCore.QObject):
         self._error = exception
         self._setFinished()
 
-    def getError(self) -> Exception:
+    def getError(self) -> Exception | None:
         return self._error
 
     def getData(self) -> TwitchGQLModels.Channel | TwitchGQLModels.Video | TwitchGQLModels.Clip | ExternalPlaybackGenerator.ExternalPlayback:

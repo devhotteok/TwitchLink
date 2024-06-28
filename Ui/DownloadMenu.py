@@ -16,8 +16,8 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         self.setWindowGeometryKey(f"{self.getWindowGeometryKey()}/{self.downloadInfo.type.toString()}")
         self.loadWindowGeometry()
         self._ui.videoWidget = Utils.setPlaceholder(self._ui.videoWidget, Ui.VideoWidget(self.downloadInfo.content, parent=self))
-        self._ui.cropSettingsInfoIcon = Utils.setSvgIcon(self._ui.cropSettingsInfoIcon, Icons.INFO_ICON)
-        self._ui.cropRangeInfoIcon = Utils.setSvgIcon(self._ui.cropRangeInfoIcon, Icons.ALERT_RED_ICON)
+        self._ui.cropSettingsInfoIcon = Utils.setSvgIcon(self._ui.cropSettingsInfoIcon, Icons.INFO)
+        self._ui.cropRangeInfoIcon = Utils.setSvgIcon(self._ui.cropRangeInfoIcon, Icons.ALERT_RED)
         self.loadOptions()
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -50,12 +50,15 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
             self._ui.unmuteVideoCheckBox.setChecked(self.downloadInfo.isUnmuteVideoEnabled())
             self._ui.unmuteVideoCheckBox.toggled.connect(self.downloadInfo.setUnmuteVideoEnabled)
             self._ui.unmuteVideoInfo.clicked.connect(self.showUnmuteVideoInfo)
+            Utils.setIconViewer(self._ui.unmuteVideoInfo, Icons.HELP)
             self._ui.updateTrackCheckBox.setChecked(self.downloadInfo.isUpdateTrackEnabled())
             self._ui.updateTrackCheckBox.toggled.connect(self.setUpdateTrackEnabled)
             self._ui.updateTrackInfo.clicked.connect(self.showUpdateTrackInfo)
+            Utils.setIconViewer(self._ui.updateTrackInfo, Icons.HELP)
             self._ui.prioritizeCheckBox.setChecked(self.downloadInfo.isPrioritizeEnabled())
             self._ui.prioritizeCheckBox.toggled.connect(self.downloadInfo.setPrioritizeEnabled)
             self._ui.prioritizeInfo.clicked.connect(self.showPrioritizeInfo)
+            Utils.setIconViewer(self._ui.prioritizeInfo, Icons.HELP)
             self.reloadCropArea()
         else:
             self._ui.cropArea.hide()
@@ -66,6 +69,7 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
             self._ui.prioritizeCheckBox.setChecked(self.downloadInfo.isPrioritizeEnabled())
             self._ui.prioritizeCheckBox.toggled.connect(self.downloadInfo.setPrioritizeEnabled)
             self._ui.prioritizeInfo.clicked.connect(self.showPrioritizeInfo)
+            Utils.setIconViewer(self._ui.prioritizeInfo, Icons.HELP)
 
     def reloadFileDirectory(self) -> None:
         self._ui.currentDirectory.setText(self.downloadInfo.getAbsoluteFileName())
@@ -108,6 +112,7 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         self._ui.toSpinM.valueChanged.connect(self.endRangeChanged)
         self._ui.toSpinS.valueChanged.connect(self.endRangeChanged)
         self._ui.cropSettingsInfoButton.clicked.connect(self.showCropInfo)
+        Utils.setIconViewer(self._ui.cropSettingsInfoButton, Icons.HELP)
         startMilliseconds, endMilliseconds = self.downloadInfo.getCropRangeMilliseconds()
         if startMilliseconds != None:
             self._ui.cropFromSelectRadioButton.setChecked(True)
@@ -121,12 +126,14 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         self._ui.adBlockAlternativeScreenRadioButton.setChecked(not self.downloadInfo.isSkipAdsEnabled())
         self._ui.adBlockSkipSegmentsRadioButton.toggled.connect(self.downloadInfo.setSkipAdsEnabled)
         self._ui.adBlockInfo.clicked.connect(self.showAdBlockInfo)
+        Utils.setIconViewer(self._ui.adBlockInfo, Icons.HELP)
 
     def setupEncoderArea(self) -> None:
         self._ui.remuxRadioButton.setChecked(self.downloadInfo.isRemuxEnabled())
         self._ui.concatRadioButton.setChecked(not self.downloadInfo.isRemuxEnabled())
         self._ui.remuxRadioButton.toggled.connect(self.downloadInfo.setRemuxEnabled)
         self._ui.encoderInfo.clicked.connect(self.showEncoderInfo)
+        Utils.setIconViewer(self._ui.encoderInfo, Icons.HELP)
 
     def startRangeChanged(self) -> None:
         self.setFromSeconds(self.checkCropRange(self.getFromSeconds(), maximum=int(self.downloadInfo.content.lengthSeconds) - 1))

@@ -6,8 +6,8 @@ from Ui.Components.Widgets.DownloadButton import DownloadButton
 
 
 class InstantDownloadButton(DownloadButton):
-    def __init__(self, content: TwitchGQLModels.Channel | TwitchGQLModels.Stream | TwitchGQLModels.Video | TwitchGQLModels.Clip, button: QtWidgets.QPushButton | QtWidgets.QToolButton, buttonText: str | None = None, parent: QtCore.QObject | None = None):
-        super().__init__(content, button, buttonText, parent=parent)
+    def __init__(self, content: TwitchGQLModels.Channel | TwitchGQLModels.Stream | TwitchGQLModels.Video | TwitchGQLModels.Clip, button: QtWidgets.QPushButton | QtWidgets.QToolButton, buttonIcon: ThemedIcon | None = None, buttonText: str | None = None, parent: QtCore.QObject | None = None):
+        super().__init__(content, button, buttonIcon, buttonText, parent=parent)
 
     def showStreamAdWarning(self) -> bool:
         return True

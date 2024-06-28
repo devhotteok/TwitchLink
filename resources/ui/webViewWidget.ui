@@ -109,7 +109,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/back.svg</normaloff>../icons/back.svg</iconset>
+                <normaloff>../icons/light/back.svg</normaloff>../icons/light/back.svg</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -132,7 +132,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/forward.svg</normaloff>../icons/forward.svg</iconset>
+                <normaloff>../icons/light/forward.svg</normaloff>../icons/light/forward.svg</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -155,7 +155,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/reload.svg</normaloff>../icons/reload.svg</iconset>
+                <normaloff>../icons/light/reload.svg</normaloff>../icons/light/reload.svg</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -178,7 +178,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/cancel.svg</normaloff>../icons/cancel.svg</iconset>
+                <normaloff>../icons/light/cancel.svg</normaloff>../icons/light/cancel.svg</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -274,7 +274,7 @@ padding-right: 10px;</string>
                </size>
               </property>
               <property name="pixmap">
-               <pixmap>../icons/info.svg</pixmap>
+               <pixmap>../icons/light/info.svg</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>

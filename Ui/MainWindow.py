@@ -38,19 +38,19 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         self.setup()
 
     def loadComponents(self) -> None:
-        self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
+        self.setWindowIcon(Icons.APP_LOGO.icon)
         self._ui.actionGettingStarted.triggered.connect(self.gettingStarted)
         self._ui.actionAbout.triggered.connect(self.openAbout)
         self._ui.actionTermsOfService.triggered.connect(self.openTermsOfService)
         self._ui.actionSponsor.triggered.connect(self.sponsor)
-        self.navigationBar = NavigationBar(self._ui.navigationArea, parent=self)
+        self.navigationBar = NavigationBar(self._ui.navigationBar, self._ui.navigationArea, parent=self)
         self.navigationBar.focusChanged.connect(self.onFocusChange)
-        self.searchPageObject = self.navigationBar.addPage(self._ui.searchPageButton, self._ui.searchPage, icon=QtGui.QIcon(Icons.SEARCH_ICON))
-        self.downloadsPageObject = self.navigationBar.addPage(self._ui.downloadsPageButton, self._ui.downloadsPage, icon=QtGui.QIcon(Icons.DOWNLOAD_ICON))
-        self.scheduledDownloadsPageObject = self.navigationBar.addPage(self._ui.scheduledDownloadsPageButton, self._ui.scheduledDownloadsPage, icon=QtGui.QIcon(Icons.SCHEDULED_ICON))
-        self.accountPageObject = self.navigationBar.addPage(self._ui.accountPageButton, self._ui.accountPage, icon=QtGui.QIcon(Icons.ACCOUNT_ICON))
-        self.settingsPageObject = self.navigationBar.addPage(self._ui.settingsPageButton, self._ui.settingsPage, icon=QtGui.QIcon(Icons.SETTINGS_ICON))
-        self.informationPageObject = self.navigationBar.addPage(self._ui.informationPageButton, self._ui.informationPage, icon=QtGui.QIcon(Icons.INFO_ICON))
+        self.searchPageObject = self.navigationBar.addPage(self._ui.searchPageButton, self._ui.searchPage, icon=Icons.SEARCH)
+        self.downloadsPageObject = self.navigationBar.addPage(self._ui.downloadsPageButton, self._ui.downloadsPage, icon=Icons.DOWNLOAD)
+        self.scheduledDownloadsPageObject = self.navigationBar.addPage(self._ui.scheduledDownloadsPageButton, self._ui.scheduledDownloadsPage, icon=Icons.SCHEDULED)
+        self.accountPageObject = self.navigationBar.addPage(self._ui.accountPageButton, self._ui.accountPage, icon=Icons.ACCOUNT)
+        self.settingsPageObject = self.navigationBar.addPage(self._ui.settingsPageButton, self._ui.settingsPage, icon=Icons.SETTINGS)
+        self.informationPageObject = self.navigationBar.addPage(self._ui.informationPageButton, self._ui.informationPage, icon=Icons.INFO)
         self.search = SearchPage(self.searchPageObject, parent=self)
         self.search.accountPageShowRequested.connect(self.accountPageObject.show)
         self._ui.searchPage.layout().addWidget(self.search)
@@ -94,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         if Utils.isFile(Config.TRACEBACK_FILE):
             file = QtCore.QFile(Config.TRACEBACK_FILE, self)
             if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
-                fileName = file.readAll().data().decode()
+                fileName = file.readAll().data().decode(errors="ignore")
                 url = Utils.joinUrl(Config.HOMEPAGE_URL, "report", params={"lang": App.Translator.getLanguage()})
                 self.information.showAppInfo(
                     DocumentData(
@@ -224,7 +224,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
                         DocumentButtonData(text=T("cancel"), action=(self.shutdown if isInSetup else self.confirmShutdown) if status == App.Updater.status.Types.UPDATE_REQUIRED else None, role="reject", default=False)
                     ]
                 ),
-                icon=Icons.UPDATE_FOUND_ICON
+                icon=Icons.UPDATE_FOUND
             )
 
     def onFocusChange(self, focus: bool) -> None:

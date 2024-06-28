@@ -173,7 +173,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/list.svg</normaloff>../icons/list.svg</iconset>
+          <normaloff>../icons/light/list.svg</normaloff>../icons/light/list.svg</iconset>
         </property>
        </widget>
       </item>

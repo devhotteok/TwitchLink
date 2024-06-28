@@ -75,7 +75,7 @@ class TempManager(QtCore.QObject):
         if OSUtils.isFile(tempDirKeyFile):
             file = QtCore.QFile(tempDirKeyFile, self)
             if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
-                tempDir = file.readAll().data().decode()
+                tempDir = file.readAll().data().decode(errors="ignore")
                 if OSUtils.isDirectory(tempDir):
                     self.logger.info(f"Removing temp directory: {tempDir}")
                     OSUtils.removeDirectory(tempDir)

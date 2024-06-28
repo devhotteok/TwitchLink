@@ -184,7 +184,7 @@
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+                 <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
                </property>
               </widget>
              </item>
@@ -216,7 +216,7 @@
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+                 <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
                </property>
               </widget>
              </item>
@@ -248,7 +248,7 @@
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+                 <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
                </property>
               </widget>
              </item>
@@ -330,7 +330,7 @@
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>../icons/plus.svg</normaloff>../icons/plus.svg</iconset>
+                 <normaloff>../icons/light/plus.svg</normaloff>../icons/light/plus.svg</iconset>
                </property>
               </widget>
              </item>
@@ -344,7 +344,7 @@
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>../icons/trash.svg</normaloff>../icons/trash.svg</iconset>
+                 <normaloff>../icons/light/trash.svg</normaloff>../icons/light/trash.svg</iconset>
                </property>
               </widget>
              </item>
@@ -362,7 +362,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="advancedSettingsLayout">
        <item>
-        <widget class="QGroupBox" name="advancedArea">
+        <widget class="QGroupBox" name="themeArea">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -370,9 +370,150 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Advanced</string>
+          <string>Appearance</string>
          </property>
-         <layout class="QVBoxLayout" name="advancedAreaLayout">
+         <layout class="QHBoxLayout" name="themeAreaLayout">
+          <item>
+           <layout class="QVBoxLayout" name="automaticThemeAreaLayout">
+            <item>
+             <widget class="QLabel" name="automaticThemeIcon">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="pixmap">
+               <pixmap>../icons/light/theme_automatic.svg</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="automaticThemeRadioButton">
+              <property name="minimumSize">
+               <size>
+                <width>220</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Automatic (Follow System Settings)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="lightThemeAreaLayout">
+            <item>
+             <widget class="QLabel" name="lightThemeIcon">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="pixmap">
+               <pixmap>../icons/light/theme_light.svg</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="lightThemeRadioButton">
+              <property name="minimumSize">
+               <size>
+                <width>220</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Light</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="darkThemeAreaLayout">
+            <item>
+             <widget class="QLabel" name="darkThemeIcon">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="pixmap">
+               <pixmap>../icons/light/theme_dark.svg</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="darkThemeRadioButton">
+              <property name="minimumSize">
+               <size>
+                <width>220</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Dark</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="searchArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Search</string>
+         </property>
+         <layout class="QVBoxLayout" name="searchAreaLayout">
           <item>
            <widget class="QWidget" name="searchExternalContentArea" native="true">
             <layout class="QHBoxLayout" name="searchExternalContentAreaLayout">
@@ -402,7 +543,7 @@
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+                 <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
                </property>
               </widget>
              </item>
@@ -466,7 +607,7 @@
                 </size>
                </property>
                <property name="pixmap">
-                <pixmap>../icons/alert_red.svg</pixmap>
+                <pixmap>../icons/light/alert_red.svg</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -543,7 +684,7 @@
                 </size>
                </property>
                <property name="pixmap">
-                <pixmap>../icons/alert_red.svg</pixmap>
+                <pixmap>../icons/light/alert_red.svg</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>

@@ -106,11 +106,11 @@ class FFmpeg(QtCore.QObject):
         self.finished.emit()
 
     def _readStandardOutput(self) -> None:
-        for line in self._process.readAllStandardOutput().data().decode().splitlines():
+        for line in self._process.readAllStandardOutput().data().decode(errors="ignore").splitlines():
             self.logger.debug(line)
 
     def _readStandardError(self) -> None:
-        for line in self._process.readAllStandardError().data().decode().splitlines():
+        for line in self._process.readAllStandardError().data().decode(errors="ignore").splitlines():
             self.logger.debug(line)
 
     def _getCodecParams(self, fileName: str, transcode: bool = False) -> tuple[str, ...]:

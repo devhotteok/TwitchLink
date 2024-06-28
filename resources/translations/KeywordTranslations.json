@@ -543,6 +543,10 @@
     "en": "Second",
     "ko": "초"
   },
+  "unix-time": {
+    "en": "UNIX Time",
+    "ko": "UNIX 시간"
+  },
   "views": {
     "en": "Views",
     "ko": "조회수"

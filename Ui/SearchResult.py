@@ -37,15 +37,19 @@ class SearchResult(QtWidgets.QWidget):
         super().__init__(parent=parent)
         self.data = data
         self._ui = UiLoader.load("searchResult", self)
-        self._ui.viewIcon = Utils.setSvgIcon(self._ui.viewIcon, Icons.VIEWER_ICON)
-        self._ui.verifiedIcon = Utils.setSvgIcon(self._ui.verifiedIcon, Icons.VERIFIED_ICON)
-        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.INFO_ICON)
-        self._ui.loadingIcon = Utils.setSvgIcon(self._ui.loadingIcon, Icons.INFO_ICON)
-        self._ui.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self._ui.stackedWidget.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Window).name()};}}")
+        App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+        self._setupThemeStyle()
+        self._ui.viewIcon = Utils.setSvgIcon(self._ui.viewIcon, Icons.VIEWER)
+        self._ui.verifiedIcon = Utils.setSvgIcon(self._ui.verifiedIcon, Icons.VERIFIED)
+        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.INFO)
+        self._ui.loadingIcon = Utils.setSvgIcon(self._ui.loadingIcon, Icons.INFO)
         self._ui.videoArea.setStyleSheet("#videoArea {background-color: transparent;}")
         self._ui.videoArea.verticalScrollBar().valueChanged.connect(self.searchMoreVideos)
         self._widgetListViewer = PartnerContentInFeedWidgetListViewer(self._ui.videoArea, responsive=False, parent=self)
         self.setup()
+
+    def _setupThemeStyle(self) -> None:
+        self._ui.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {App.Instance.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Window).name()};}}")
 
     def setLoading(self, loading: bool, showErrorMessage: bool = False) -> None:
         self._loading = loading
@@ -77,8 +81,11 @@ class SearchResult(QtWidgets.QWidget):
             self._ui.searchType.currentIndexChanged.connect(self.loadSortOrFilter)
             self._ui.sortOrFilter.currentIndexChanged.connect(self.setSearchOptions)
             self._ui.refreshChannelButton.clicked.connect(self.refreshChannel)
+            Utils.setIconViewer(self._ui.refreshChannelButton, Icons.RELOAD)
             self._ui.refreshVideoListButton.clicked.connect(self.refreshVideoList)
+            Utils.setIconViewer(self._ui.refreshVideoListButton, Icons.RELOAD)
             self._ui.openInWebBrowserButton.clicked.connect(self.openInWebBrowser)
+            Utils.setIconViewer(self._ui.openInWebBrowserButton, Icons.LAUNCH)
             self.loadSortOrFilter(0)
         else:
             self._ui.tabWidget.setCurrentIndex(1)
@@ -129,7 +136,7 @@ class SearchResult(QtWidgets.QWidget):
         self._ui.viewIcon.setSizePolicy(sizePolicy)
         self._ui.channelMainWidget = Utils.setPlaceholder(self._ui.channelMainWidget, Ui.VideoDownloadWidget(content, parent=self))
         self._ui.channelMainWidget.accountPageShowRequested.connect(self.accountPageShowRequested)
-        self._ui.channelMainWidget.setThumbnailImageStyleSheet(f"#thumbnailImage {{background-color: #{self.channel.primaryColorHex or self.DEFAULT_CHANNEL_PRIMARY_COLOR};background-image: url('{Icons.CHANNEL_BACKGROUND_WHITE_ICON}');background-position: center center;}}")
+        self._ui.channelMainWidget.setThumbnailImageStyleSheet(f"#thumbnailImage {{background-color: #{self.channel.primaryColorHex or self.DEFAULT_CHANNEL_PRIMARY_COLOR};background-image: url('{Icons.CHANNEL_BACKGROUND_WHITE.path}');background-position: center center;}}")
         self._ui.profileImage.loadImage(filePath=Images.PROFILE_IMAGE, url=self.channel.profileImageURL, urlFormatSize=ImageSize.USER_PROFILE, refresh=True)
         self._ui.displayName.setText(self.channel.displayName)
         sizePolicy = self._ui.verifiedIcon.sizePolicy()

@@ -10,13 +10,16 @@ class ScheduledDownloads(QtWidgets.QWidget):
         super().__init__(parent=parent)
         self.previewWidgets = {}
         self._ui = UiLoader.load("scheduledDownloads", self)
-        self.showEnableState()
+        App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+        self._setupThemeStyle()
+        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.SCHEDULED)
         self._ui.enableButton.clicked.connect(self.enableButtonClicked)
-        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.SCHEDULED_ICON)
-        self._ui.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self._ui.stackedWidget.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Base).name()};}}")
+        self._enableButtonIconViewer = Utils.setIconViewer(self._ui.enableButton, Icons.TOGGLE_OFF)
+        self.showEnableState()
         self._widgetListViewer = PartnerContentInFeedWidgetListViewer(self._ui.previewWidgetView, partnerContentSize=QtCore.QSize(320, 100), parent=self)
         self.showStats()
         self._ui.addScheduledDownloadButton.clicked.connect(self.addScheduledDownload)
+        Utils.setIconViewer(self._ui.addScheduledDownloadButton, Icons.PLUS)
         App.ScheduledDownloadManager.enabledChangedSignal.connect(self.showEnableState)
         App.ScheduledDownloadManager.createdSignal.connect(self.scheduledDownloadCreated)
         App.ScheduledDownloadManager.destroyedSignal.connect(self.scheduledDownloadDestroyed)
@@ -26,9 +29,12 @@ class ScheduledDownloads(QtWidgets.QWidget):
             self.scheduledDownloadCreated(scheduledDownloadId)
         self._widgetListViewer.setAutoReloadEnabled(True)
 
+    def _setupThemeStyle(self) -> None:
+        self._ui.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {App.Instance.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Base).name()};}}")
+
     def showEnableState(self) -> None:
         enabled = App.ScheduledDownloadManager.isEnabled()
-        self._ui.enableButton.setIcon(QtGui.QIcon(Icons.TOGGLE_ON_ICON if App.ScheduledDownloadManager.isEnabled() else Icons.TOGGLE_OFF_ICON))
+        self._enableButtonIconViewer.setIcon(Icons.TOGGLE_ON if App.ScheduledDownloadManager.isEnabled() else Icons.TOGGLE_OFF)
         if not enabled:
             self._ui.enableButton.setEnabled(not App.ScheduledDownloadManager.isDownloaderRunning())
 

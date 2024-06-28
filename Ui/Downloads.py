@@ -14,16 +14,22 @@ class Downloads(QtWidgets.QWidget):
         super().__init__(parent=parent)
         self._previewWidgets = {}
         self._ui = UiLoader.load("downloads", self)
+        App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+        self._setupThemeStyle()
+        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.STORAGE)
         self._ui.typeFilter.currentIndexChanged.connect(self.updateFilter)
         self._ui.statusFilter.currentIndexChanged.connect(self.updateFilter)
         self.updateFilter()
-        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.STORAGE_ICON)
-        self._ui.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self._ui.stackedWidget.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Base).name()};}}")
         self._widgetListViewer = PartnerContentInFeedWidgetListViewer(self._ui.previewWidgetView, partnerContentSize=QtCore.QSize(320, 100), parent=self)
         self._widgetListViewer.widgetClicked.connect(self.openProgressWindow)
         self.showStats()
         self._ui.downloadHistoryButton.clicked.connect(self.downloadHistoryRequested)
+        Utils.setIconViewer(self._ui.downloadHistoryButton, Icons.HISTORY)
         self._ui.scheduledShutdownInfo.clicked.connect(self.showScheduledShutdownInfo)
+        Utils.setIconViewer(self._ui.scheduledShutdownInfo, Icons.HELP)
+
+    def _setupThemeStyle(self) -> None:
+        self._ui.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {App.Instance.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Base).name()};}}")
 
     def downloaderCreated(self, downloaderId: uuid.UUID) -> None:
         widget = Ui.DownloadPreview(downloaderId, parent=None)

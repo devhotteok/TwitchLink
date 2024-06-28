@@ -1,7 +1,10 @@
 from Core.App import T
 from Services.Image.Presets import Icons
+from Services.Theme.ThemedIcon import ThemedIcon
+from Services.Theme.ThemedIconViewer import ThemedIconViewer
+from Services.Theme.ThemedSvgWidget import ThemedSvgWidget
 
-from PyQt6 import QtGui, QtWidgets, QtSvgWidgets
+from PyQt6 import QtGui, QtWidgets
 
 
 class UiUtils:
@@ -12,9 +15,13 @@ class UiUtils:
         placeholder.deleteLater()
         return widget
 
+    @staticmethod
+    def setIconViewer(widget: QtWidgets.QWidget, icon: QtGui.QIcon | ThemedIcon | None) -> ThemedIconViewer:
+        return ThemedIconViewer(widget, icon)
+
     @classmethod
-    def setSvgIcon(cls, placeholder: QtWidgets.QWidget, path: str) -> QtWidgets.QWidget:
-        svgWidget = QtSvgWidgets.QSvgWidget(path, parent=placeholder.parent())
+    def setSvgIcon(cls, placeholder: QtWidgets.QWidget, icon: ThemedIcon) -> QtWidgets.QWidget:
+        svgWidget = ThemedSvgWidget(icon, parent=placeholder.parent())
         svgWidget.setSizePolicy(placeholder.sizePolicy())
         svgWidget.setMinimumSize(placeholder.minimumSize())
         svgWidget.setMaximumSize(placeholder.maximumSize())
@@ -46,7 +53,7 @@ class UiUtils:
     @staticmethod
     def askDirectory(directory: str, parent: QtWidgets.QWidget | None = None) -> str | None:
         fileDialog = QtWidgets.QFileDialog(parent=parent)
-        fileDialog.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
+        fileDialog.setWindowIcon(Icons.APP_LOGO.icon)
         result = fileDialog.getExistingDirectory(
             parent=parent,
             caption=T("select-folder"),
@@ -58,7 +65,7 @@ class UiUtils:
     def askSaveAs(directory: str, filters: list[str], initialFilter: str | None = None, parent: QtWidgets.QWidget | None = None) -> str | None:
         mappedFilters = dict((T("#{fileFormat} file (*.{fileFormat})", fileFormat=key), key) for key in filters)
         fileDialog = QtWidgets.QFileDialog(parent=parent)
-        fileDialog.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
+        fileDialog.setWindowIcon(Icons.APP_LOGO.icon)
         result = fileDialog.getSaveFileName(
             parent=parent,
             caption=T("save-as"),

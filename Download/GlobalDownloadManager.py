@@ -2,7 +2,6 @@ from Core import App
 from Core.App import T
 from Core.Config import Config
 from Core.GlobalExceptions import Exceptions
-from Services.Script import Script
 from Download.Downloader.TwitchDownloader import TwitchDownloader
 from Download.Downloader.Core.StreamDownloader import StreamDownloader
 from Download.Downloader.Core.VideoDownloader import VideoDownloader

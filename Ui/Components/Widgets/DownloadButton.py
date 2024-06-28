@@ -11,12 +11,14 @@ from Download.DownloadInfo import DownloadInfo
 class DownloadButton(QtCore.QObject):
     accountPageShowRequested = QtCore.pyqtSignal()
 
-    def __init__(self, content: TwitchGQLModels.Channel | TwitchGQLModels.Stream | TwitchGQLModels.Video | TwitchGQLModels.Clip, button: QtWidgets.QPushButton | QtWidgets.QToolButton, buttonText: str | None = None, parent: QtCore.QObject | None = None):
+    def __init__(self, content: TwitchGQLModels.Channel | TwitchGQLModels.Stream | TwitchGQLModels.Video | TwitchGQLModels.Clip, button: QtWidgets.QPushButton | QtWidgets.QToolButton, buttonIcon: ThemedIcon | None = None, buttonText: str | None = None, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
         self.button = button
         self.buttonText = buttonText
         self.content = content
         self.showLoading(False)
+        if buttonIcon != None:
+            Utils.setIconViewer(self.button, buttonIcon)
         if isinstance(content, TwitchGQLModels.Channel):
             self.button.setEnabled(False)
         elif isinstance(content, TwitchGQLModels.Stream):

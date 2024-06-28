@@ -138,7 +138,7 @@ class DataLoader(QtCore.QObject):
     def _finished(self) -> None:
         if self._networkReply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
             try:
-                text = self._networkReply.readAll().data().decode()
+                text = self._networkReply.readAll().data().decode(errors="ignore")
                 if text.startswith("redirect:"):
                     if self._redirectCount < Config.STATUS_UPDATE_MAX_REDIRECT_COUNT:
                         self._redirectCount += 1

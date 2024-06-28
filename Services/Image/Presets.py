@@ -1,4 +1,6 @@
 from Core.Config import Config as CoreConfig, _P
+from Services.Theme.ThemedIconManager import ThemedIconManager
+from Services.Theme.ThemedIcon import ThemedIcon
 
 
 class Images:
@@ -20,39 +22,67 @@ class ImageSize:
     CATEGORY = (90, 120)
 
 
+class IconPath:
+    ROOT = _P(CoreConfig.RESOURCE_ROOT, "icons")
+    LIGHT = _P(ROOT, "light")
+    DARK = _P(ROOT, "dark")
+
+
 class Icons:
-    ICON_ROOT = _P(CoreConfig.RESOURCE_ROOT, "icons")
+    @staticmethod
+    def I(name: str, route: bool = True) -> ThemedIcon:
+        if route:
+            return ThemedIconManager.create(_P(IconPath.LIGHT, name), _P(IconPath.DARK, name))
+        else:
+            return ThemedIconManager.create(_P(IconPath.ROOT, name), _P(IconPath.ROOT, name))
 
-    APP_LOGO_ICON = _P(ICON_ROOT, "icon.ico")
 
-    SEARCH_ICON = _P(ICON_ROOT, "search.svg")
-    DOWNLOAD_ICON = _P(ICON_ROOT, "download.svg")
-    SCHEDULED_ICON = _P(ICON_ROOT, "scheduled.svg")
-    ACCOUNT_ICON = _P(ICON_ROOT, "account.svg")
-    SETTINGS_ICON = _P(ICON_ROOT, "settings.svg")
-    INFO_ICON = _P(ICON_ROOT, "info.svg")
-    HOME_ICON = _P(ICON_ROOT, "home.svg")
-    FOLDER_ICON = _P(ICON_ROOT, "folder.svg")
-    FILE_ICON = _P(ICON_ROOT, "file.svg")
-    FILE_NOT_FOUND_ICON = _P(ICON_ROOT, "file_not_found.svg")
-    UPDATE_FOUND_ICON = _P(ICON_ROOT, "update_found.svg")
-    LOADING_ICON = _P(ICON_ROOT, "loading.svg")
-    DOWNLOADING_FILE_ICON = _P(ICON_ROOT, "downloading_file.svg")
-    CREATING_FILE_ICON = _P(ICON_ROOT, "creating_file.svg")
-    CLOSE_ICON = _P(ICON_ROOT, "close.svg")
-    SAVE_ICON = _P(ICON_ROOT, "save.svg")
-    MOVE_ICON = _P(ICON_ROOT, "move.svg")
-    LOGIN_ICON = _P(ICON_ROOT, "login.svg")
-    ANNOUNCEMENT_ICON = _P(ICON_ROOT, "announcement.svg")
-    NOTICE_ICON = _P(ICON_ROOT, "notice.svg")
-    TEXT_FILE_ICON = _P(ICON_ROOT, "text_file.svg")
-    IMAGE_ICON = _P(ICON_ROOT, "image.svg")
-    ALERT_RED_ICON = _P(ICON_ROOT, "alert_red.svg")
-    TOGGLE_OFF_ICON = _P(ICON_ROOT, "toggle_off.svg")
-    TOGGLE_ON_ICON = _P(ICON_ROOT, "toggle_on.svg")
-    WEB_ICON = _P(ICON_ROOT, "web.svg")
-    VIEWER_ICON = _P(ICON_ROOT, "viewer.svg")
-    VERIFIED_ICON = _P(ICON_ROOT, "verified.svg")
-    CHANNEL_BACKGROUND_WHITE_ICON = _P(ICON_ROOT, "channel_background_white.svg")
-    STORAGE_ICON = _P(ICON_ROOT, "storage.svg")
-    HISTORY_ICON = _P(ICON_ROOT, "history.svg")
+    APP_LOGO = I("icon.ico", route=False)
+
+    ACCOUNT = I("account.svg")
+    ALERT_RED = I("alert_red.svg")
+    ANNOUNCEMENT = I("announcement.svg")
+    BACK = I("back.svg")
+    CANCEL = I("cancel.svg")
+    CHANNEL_BACKGROUND_WHITE = I("channel_background_white.svg")
+    CLOSE = I("close.svg")
+    COPY = I("copy.svg")
+    CREATING_FILE = I("creating_file.svg")
+    DOWNLOAD = I("download.svg")
+    DOWNLOADING_FILE = I("downloading_file.svg")
+    FILE = I("file.svg")
+    FILE_NOT_FOUND = I("file_not_found.svg")
+    FOLDER = I("folder.svg")
+    FORWARD = I("forward.svg")
+    HELP = I("help.svg")
+    HISTORY = I("history.svg")
+    HOME = I("home.svg")
+    IMAGE = I("image.svg")
+    INFO = I("info.svg")
+    INSTANT_DOWNLOAD = I("instant_download.svg")
+    LAUNCH = I("launch.svg")
+    LIST = I("list.svg")
+    LOADING = I("loading.svg")
+    LOGIN = I("login.svg")
+    MOVE = I("move.svg")
+    NOTICE = I("notice.svg")
+    PLUS = I("plus.svg")
+    RELOAD = I("reload.svg")
+    RETRY = I("retry.svg")
+    SAVE = I("save.svg")
+    SCHEDULED = I("scheduled.svg")
+    SEARCH = I("search.svg")
+    SETTINGS = I("settings.svg")
+    STORAGE = I("storage.svg")
+    TEXT_FILE = I("text_file.svg")
+    THEME_AUTOMATIC = I("theme_automatic.svg")
+    THEME_DARK = I("theme_dark.svg")
+    THEME_LIGHT = I("theme_light.svg")
+    TOGGLE_OFF = I("toggle_off.svg")
+    TOGGLE_ON = I("toggle_on.svg")
+    TRASH = I("trash.svg")
+    UPDATE_FOUND = I("update_found.svg")
+    VERIFIED = I("verified.svg")
+    VIEWER = I("viewer.svg")
+    WARNING_RED = I("warning_red.svg")
+    WEB = I("web.svg")

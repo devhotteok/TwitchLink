@@ -552,7 +552,7 @@
                 </size>
                </property>
                <property name="pixmap">
-                <pixmap>../icons/info.svg</pixmap>
+                <pixmap>../icons/light/info.svg</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -582,7 +582,7 @@
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+                 <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
                </property>
               </widget>
              </item>
@@ -617,7 +617,7 @@
                 </size>
                </property>
                <property name="pixmap">
-                <pixmap>../icons/alert_red.svg</pixmap>
+                <pixmap>../icons/light/alert_red.svg</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -674,7 +674,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+             <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
            </property>
           </widget>
          </item>
@@ -708,7 +708,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+             <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
            </property>
           </widget>
          </item>
@@ -756,7 +756,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+                <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
               </property>
              </widget>
             </item>
@@ -792,7 +792,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+                <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
               </property>
              </widget>
             </item>
@@ -828,7 +828,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+                <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
               </property>
              </widget>
             </item>

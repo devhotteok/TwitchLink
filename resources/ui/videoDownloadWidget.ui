@@ -78,7 +78,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/download.svg</normaloff>../icons/download.svg</iconset>
+          <normaloff>../icons/light/download.svg</normaloff>../icons/light/download.svg</iconset>
         </property>
        </widget>
       </item>
@@ -101,7 +101,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/instant_download.svg</normaloff>../icons/instant_download.svg</iconset>
+          <normaloff>../icons/light/instant_download.svg</normaloff>../icons/light/instant_download.svg</iconset>
         </property>
        </widget>
       </item>

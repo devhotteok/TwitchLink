@@ -14,13 +14,13 @@ class AccountPage(WebViewTabManager):
         self.account.startLoginRequested.connect(self._startLoginRequested)
         self.account.cancelLoginRequested.connect(self._cancelLoginRequested)
         self.account.profileImageChanged.connect(self._profileImageChanged)
-        self.addTab(self.account, icon=Icons.ACCOUNT_ICON, closable=False)
+        self.addTab(self.account, icon=Icons.ACCOUNT, closable=False)
         self._profile: QtWebEngineCore.QWebEngineProfile | None = None
         self._closing = False
 
     def _profileImageChanged(self, image: QtGui.QPixmap | None) -> None:
         if image == None:
-            self.pageObject.setPageIcon(QtGui.QIcon(Icons.ACCOUNT_ICON))
+            self.pageObject.setPageIcon(Icons.ACCOUNT)
         else:
             self.pageObject.setPageIcon(QtGui.QIcon(image), size=QtCore.QSize(32, 32))
 

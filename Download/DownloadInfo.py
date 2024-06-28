@@ -13,7 +13,7 @@ import enum
 import os
 
 
-class DownloadInfoType(Serializable):
+class DownloadInfoType:
     class Types(enum.Enum):
         STREAM = "stream"
         VIDEO = "video"

@@ -8,8 +8,8 @@ import uuid
 
 
 class RetryDownloadButton(DownloadButton):
-    def __init__(self, downloadInfo: DownloadInfo, button: QtWidgets.QPushButton | QtWidgets.QToolButton, downloaderId: uuid.UUID | None = None, buttonText: str | None = None, parent: QtCore.QObject | None = None):
-        super().__init__(downloadInfo.content, button, buttonText, parent=parent)
+    def __init__(self, downloadInfo: DownloadInfo, button: QtWidgets.QPushButton | QtWidgets.QToolButton, buttonIcon: ThemedIcon | None = None, buttonText: str | None = None, downloaderId: uuid.UUID | None = None, parent: QtCore.QObject | None = None):
+        super().__init__(downloadInfo.content, button, buttonIcon, buttonText, parent=parent)
         self.downloadInfo = downloadInfo
         self.downloaderId = downloaderId
         if isinstance(self.downloadInfo.playback, ExternalPlaybackGenerator.ExternalPlayback):

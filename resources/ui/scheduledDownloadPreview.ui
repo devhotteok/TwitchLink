@@ -85,7 +85,7 @@
             </sizepolicy>
            </property>
            <property name="pixmap">
-            <pixmap>../icons/alert_red.svg</pixmap>
+            <pixmap>../icons/light/alert_red.svg</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -131,6 +131,12 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">QPushButton:!hover {
 	background-color: transparent;
@@ -138,12 +144,12 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/toggle_off.svg</normaloff>../icons/toggle_off.svg</iconset>
+          <normaloff>../icons/light/toggle_off.svg</normaloff>../icons/light/toggle_off.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
-          <width>48</width>
-          <height>48</height>
+          <width>36</width>
+          <height>18</height>
          </size>
         </property>
        </widget>
@@ -169,7 +175,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/reload.svg</normaloff>../icons/reload.svg</iconset>
+          <normaloff>../icons/light/reload.svg</normaloff>../icons/light/reload.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -200,7 +206,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/settings.svg</normaloff>../icons/settings.svg</iconset>
+          <normaloff>../icons/light/settings.svg</normaloff>../icons/light/settings.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -231,7 +237,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/trash.svg</normaloff>../icons/trash.svg</iconset>
+          <normaloff>../icons/light/trash.svg</normaloff>../icons/light/trash.svg</iconset>
         </property>
         <property name="iconSize">
          <size>

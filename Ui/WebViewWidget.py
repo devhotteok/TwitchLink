@@ -6,12 +6,9 @@ import typing
 
 
 class WebViewWidget(QtWidgets.QWidget):
-    iconChanged = QtCore.pyqtSignal(object, QtGui.QIcon)
+    iconChanged = QtCore.pyqtSignal(object, object)
     titleChanged = QtCore.pyqtSignal(object, str)
     tabCloseRequested = QtCore.pyqtSignal(object)
-
-    DEFAULT_LOADING_ICON = QtGui.QIcon(Icons.LOADING_ICON)
-    DEFAULT_FAILED_ICON = QtGui.QIcon(Icons.WEB_ICON)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent=parent)
@@ -25,13 +22,18 @@ class WebViewWidget(QtWidgets.QWidget):
         self._ui.webView.tabCloseRequested.connect(self.tabCloseRequestHandler)
         self.newTabRequested = self._ui.webView.newTabRequested
         self._ui.backButton.clicked.connect(self._ui.webView.back)
+        Utils.setIconViewer(self._ui.backButton, Icons.BACK)
         self._ui.forwardButton.clicked.connect(self._ui.webView.forward)
+        Utils.setIconViewer(self._ui.forwardButton, Icons.FORWARD)
         self._ui.reloadButton.clicked.connect(self._ui.webView.reload)
+        Utils.setIconViewer(self._ui.reloadButton, Icons.RELOAD)
         self._ui.stopLoadingButton.clicked.connect(self._ui.webView.stop)
+        Utils.setIconViewer(self._ui.stopLoadingButton, Icons.CANCEL)
         self._ui.urlEdit.returnPressed.connect(self.urlEdited)
         self.reloadControlArea()
         self.reloadUrl()
-        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.INFO_ICON)
+        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.INFO)
+        self._infoButtonIconViewer = Utils.setIconViewer(self._ui.infoButton, None)
         self.hideInfo()
         self.setupShortcuts()
 
@@ -53,7 +55,7 @@ class WebViewWidget(QtWidgets.QWidget):
         self.refreshShortcut.setEnabled(False)
         self.stopShortcut.setEnabled(False)
         self._ui.controlArea.hide()
-        self.showInfo(f"{T('developer-tools')} - {T('#Close the window by pressing [{key}].', key='F12')}", icon=Icons.SETTINGS_ICON, buttonIcon=Icons.CLOSE_ICON, buttonTransparent=True, buttonHandler=self.hideInfo)
+        self.showInfo(f"{T('developer-tools')} - {T('#Close the window by pressing [{key}].', key='F12')}", icon=Icons.SETTINGS, buttonIcon=Icons.CLOSE, buttonTransparent=True, buttonHandler=self.hideInfo)
         self._ui.webView.page().setInspectedPage(page)
 
     def setProfile(self, profile: QtWebEngineCore.QWebEngineProfile) -> None:
@@ -70,12 +72,12 @@ class WebViewWidget(QtWidgets.QWidget):
         self._ui.urlEdit.setText(self._ui.webView.url().toString())
         self._ui.urlEdit.clearFocus()
 
-    def showInfo(self, text: str, icon: str | None = None, buttonIcon: str | None = None, buttonText: str = "", buttonTransparent: bool = False, buttonHandler: typing.Callable | None = None) -> None:
+    def showInfo(self, text: str, icon: str | ThemedIcon | None = None, buttonIcon: QtGui.QIcon | ThemedIcon | None = None, buttonText: str = "", buttonTransparent: bool = False, buttonHandler: typing.Callable | None = None) -> None:
         self._ui.infoLabel.setText(text)
         if icon == None:
             self._ui.infoIcon.hide()
         else:
-            self._ui.infoIcon.load(icon)
+            self._ui.infoIcon.setIcon(icon)
             self._ui.infoIcon.show()
         try:
             self._ui.infoButton.clicked.disconnect()
@@ -84,7 +86,7 @@ class WebViewWidget(QtWidgets.QWidget):
         if buttonHandler == None:
             self._ui.infoButton.hide()
         else:
-            self._ui.infoButton.setIcon(QtGui.QIcon(buttonIcon))
+            self._infoButtonIconViewer.setIcon(buttonIcon)
             self._ui.infoButton.setText(buttonText)
             self._ui.infoButton.setStyleSheet("QPushButton:!hover {background-color: transparent;}" if buttonTransparent else "")
             self._ui.infoButton.clicked.connect(buttonHandler)
@@ -112,11 +114,11 @@ class WebViewWidget(QtWidgets.QWidget):
         self.reloadControlArea()
         self.reloadUrl()
         self._ui.urlEdit.clearFocus()
-        self.iconChanged.emit(self, self.DEFAULT_LOADING_ICON)
+        self.iconChanged.emit(self, Icons.LOADING)
 
     def loadFinished(self, isSuccessful: bool) -> None:
         self.reloadControlArea()
-        self.iconChanged.emit(self, self._ui.webView.icon() if isSuccessful else self.DEFAULT_FAILED_ICON)
+        self.iconChanged.emit(self, self._ui.webView.icon() if isSuccessful else Icons.WEB)
 
     def tabCloseRequestHandler(self) -> None:
         self.tabCloseRequested.emit(self)

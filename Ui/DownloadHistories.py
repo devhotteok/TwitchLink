@@ -10,13 +10,17 @@ class DownloadHistories(QtWidgets.QWidget):
         super().__init__(parent=parent)
         self.previewWidgets = {}
         self._ui = UiLoader.load("downloadHistories", self)
-        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.HISTORY_ICON)
-        self._ui.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {self._ui.stackedWidget.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Base).name()};}}")
+        App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+        self._setupThemeStyle()
+        self._ui.infoIcon = Utils.setSvgIcon(self._ui.infoIcon, Icons.HISTORY)
         self._widgetListViewer = PartnerContentInFeedWidgetListViewer(self._ui.previewWidgetView, partnerContentSize=QtCore.QSize(320, 100), parent=self)
         self._widgetListViewer.widgetClicked.connect(self.openFile)
         App.DownloadHistory.historyCreated.connect(self.createHistoryView)
         App.DownloadHistory.historyRemoved.connect(self.removeHistoryView)
         self.loadHistory()
+
+    def _setupThemeStyle(self) -> None:
+        self._ui.stackedWidget.setStyleSheet(f"#stackedWidget {{background-color: {App.Instance.palette().color(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Base).name()};}}")
 
     def loadHistory(self) -> None:
         self._widgetListViewer.setAutoReloadEnabled(False)

@@ -13,14 +13,14 @@ class VideoDownloadWidget(QtWidgets.QWidget):
         self.content = content
         self._ui = UiLoader.load("videoDownloadWidget", self)
         self._ui.videoWidget = Utils.setPlaceholder(self._ui.videoWidget, Ui.VideoWidget(self.content, resizable=resizable, parent=self))
-        self.downloadButtonManager = DownloadButton(self.content, self._ui.downloadButton, buttonText=T("live-download" if isinstance(self.content, Channel) or isinstance(self.content, Stream) else "download"), parent=self)
+        self.downloadButtonManager = DownloadButton(self.content, self._ui.downloadButton, buttonIcon=Icons.DOWNLOAD, buttonText=T("live-download" if isinstance(self.content, Channel) or isinstance(self.content, Stream) else "download"), parent=self)
         self.downloadButtonManager.accountPageShowRequested.connect(self.accountPageShowRequested)
-        self.instantDownloadButtonManager = InstantDownloadButton(self.content, self._ui.instantDownloadButton, parent=self)
+        self.instantDownloadButtonManager = InstantDownloadButton(self.content, self._ui.instantDownloadButton, buttonIcon=Icons.INSTANT_DOWNLOAD, parent=self)
         self.instantDownloadButtonManager.accountPageShowRequested.connect(self.accountPageShowRequested)
         self._contextMenu = QtWidgets.QMenu(parent=self)
-        self._filePropertyAction = QtGui.QAction(QtGui.QIcon(Icons.FILE_ICON), T("view-file-properties"), parent=self._contextMenu)
-        self._imagePropertyAction = QtGui.QAction(QtGui.QIcon(Icons.IMAGE_ICON), T("view-image-properties"), parent=self._contextMenu)
-        self._saveImageAction = QtGui.QAction(QtGui.QIcon(Icons.SAVE_ICON), T("save-image"), parent=self._contextMenu)
+        self._filePropertyAction = QtGui.QAction(Icons.FILE.icon, T("view-file-properties"), parent=self._contextMenu)
+        self._imagePropertyAction = QtGui.QAction(Icons.IMAGE.icon, T("view-image-properties"), parent=self._contextMenu)
+        self._saveImageAction = QtGui.QAction(Icons.SAVE.icon, T("save-image"), parent=self._contextMenu)
         self._filePropertyAction.triggered.connect(self.showFileProperty)
         self._imagePropertyAction.triggered.connect(self.showImageProperty)
         self._saveImageAction.triggered.connect(self.saveImage)
@@ -31,6 +31,12 @@ class VideoDownloadWidget(QtWidgets.QWidget):
             self._saveImageAction.setVisible(False)
         self.customContextMenuRequested.connect(self.contextMenuRequested)
         self._ui.videoWidget.thumbnailImage.customContextMenuRequested.connect(self.thumbnailImageContextMenuRequested)
+        App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+
+    def _setupThemeStyle(self) -> None:
+        self._filePropertyAction.setIcon(Icons.FILE.icon)
+        self._imagePropertyAction.setIcon(Icons.IMAGE.icon)
+        self._saveImageAction.setIcon(Icons.SAVE.icon)
 
     def setThumbnailImageStyleSheet(self, styleSheet: str) -> None:
         self._ui.videoWidget.thumbnailImage.setStyleSheet(styleSheet)

@@ -10,24 +10,43 @@ class TabManager(QtWidgets.QTabWidget):
         self.setDocumentMode(True)
         self.setTabsClosable(True)
         self.setMovable(True)
-        self.uniqueTabs = {}
+        self.uniqueTabs: dict[typing.Any, QtWidgets.QWidget] = {}
+        self._themedTabIcons: dict[QtWidgets.QWidget, ThemedIcon] = {}
         self.tabCloseRequested.connect(self.processTabCloseRequest)
+        App.ThemeManager.themeUpdated.connect(self._updateThemedTabIcons)
 
-    def addTab(self, widget: QtWidgets.QWidget, index: int = -1, icon: str | QtGui.QIcon = "", closable: bool = True, uniqueValue: typing.Any = None) -> int:
+    def addTab(self, widget: QtWidgets.QWidget, index: int = -1, icon: QtGui.QIcon | ThemedIcon | None = None, closable: bool = True, uniqueValue: typing.Any = None) -> int:
         if uniqueValue != None:
             tabIndex = self.getUniqueTabIndex(uniqueValue)
             if tabIndex != None:
                 return tabIndex
             self.uniqueTabs[uniqueValue] = widget
-        tabIndex = self.insertTab(index, widget, icon if isinstance(icon, QtGui.QIcon) else QtGui.QIcon(icon), self.getInjectionSafeText(widget.windowTitle()))
+        if isinstance(icon, ThemedIcon):
+            self._themedTabIcons[widget] = icon
+            tabIcon = icon.icon
+        else:
+            tabIcon = icon or QtGui.QIcon()
+        tabIndex = self.insertTab(index, widget, tabIcon, self.getInjectionSafeText(widget.windowTitle()))
         self.setTabToolTip(tabIndex, widget.windowTitle())
         if not closable:
             self.tabBar().setTabButton(tabIndex, QtWidgets.QTabBar.ButtonPosition.RightSide, None)
         self.tabCountChanged.emit(self.count())
         return tabIndex
 
-    def setTabIcon(self, index: int, icon: str | QtGui.QIcon) -> None:
-        super().setTabIcon(index, icon if isinstance(icon, QtGui.QIcon) else QtGui.QIcon(icon))
+    def setTabIcon(self, index: int, icon: QtGui.QIcon | ThemedIcon | None) -> None:
+        tabWidget = self.widget(index)
+        if isinstance(icon, ThemedIcon):
+            self._themedTabIcons[tabWidget] = icon
+            tabIcon = icon.icon
+        else:
+            if tabWidget in self._themedTabIcons:
+                self._themedTabIcons.pop(tabWidget)
+            tabIcon = icon or QtGui.QIcon()
+        super().setTabIcon(index, tabIcon)
+
+    def _updateThemedTabIcons(self) -> None:
+        for tabWidget, themedIcon in self._themedTabIcons.items():
+            super().setTabIcon(self.indexOf(tabWidget), themedIcon.icon)
 
     def setTabText(self, index: int, text: str) -> None:
         super().setTabText(index, self.getInjectionSafeText(text))
@@ -43,13 +62,15 @@ class TabManager(QtWidgets.QTabWidget):
             return None
 
     def closeTab(self, index: int) -> None:
-        widget = self.widget(index)
+        tabWidget = self.widget(index)
         self.removeTab(index)
+        if tabWidget in self._themedTabIcons:
+            self._themedTabIcons.pop(tabWidget)
         for key, value in self.uniqueTabs.items():
-            if value == widget:
+            if value == tabWidget:
                 del self.uniqueTabs[key]
                 break
-        widget.close()
+        tabWidget.close()
         self.tabCountChanged.emit(self.count())
 
     def processTabCloseRequest(self, index: int) -> None:

@@ -62,10 +62,13 @@ class PropertyView(QtWidgets.QDialog, WindowGeometryManager):
             self._ui.urlArea.setEnabled(False)
         else:
             self._ui.saveImageButton.clicked.connect(self.saveImage)
+            Utils.setIconViewer(self._ui.saveImageButton, Icons.SAVE)
             self._ui.urlData.setText(self.embedUrl)
             self._ui.urlData.setToolTip(self.embedUrl)
             self._ui.copyUrlButton.clicked.connect(self.copyUrl)
+            Utils.setIconViewer(self._ui.copyUrlButton, Icons.COPY)
             self._ui.openUrlButton.clicked.connect(self.openUrl)
+            Utils.setIconViewer(self._ui.openUrlButton, Icons.LAUNCH)
 
     def saveImage(self) -> None:
         VideoWidgetImageSaver.saveImage(self.targetVideoWidget.content, self.targetVideoWidget.thumbnailImage.pixmap(), parent=self)

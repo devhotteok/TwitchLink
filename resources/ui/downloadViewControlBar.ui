@@ -133,7 +133,7 @@ border-radius: 10px;</string>
          </sizepolicy>
         </property>
         <property name="pixmap">
-         <pixmap>../icons/viewer.svg</pixmap>
+         <pixmap>../icons/light/viewer.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -199,7 +199,7 @@ To block ads, you must log in with a subscribed account.</string>
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/warning_red.svg</normaloff>../icons/warning_red.svg</iconset>
+          <normaloff>../icons/light/warning_red.svg</normaloff>../icons/light/warning_red.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -222,7 +222,7 @@ To block ads, you must log in with a subscribed account.</string>
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/retry.svg</normaloff>../icons/retry.svg</iconset>
+          <normaloff>../icons/light/retry.svg</normaloff>../icons/light/retry.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -245,7 +245,7 @@ To block ads, you must log in with a subscribed account.</string>
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/folder.svg</normaloff>../icons/folder.svg</iconset>
+          <normaloff>../icons/light/folder.svg</normaloff>../icons/light/folder.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -268,7 +268,7 @@ To block ads, you must log in with a subscribed account.</string>
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/file.svg</normaloff>../icons/file.svg</iconset>
+          <normaloff>../icons/light/file.svg</normaloff>../icons/light/file.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -291,7 +291,7 @@ To block ads, you must log in with a subscribed account.</string>
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/text_file.svg</normaloff>../icons/text_file.svg</iconset>
+          <normaloff>../icons/light/text_file.svg</normaloff>../icons/light/text_file.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -314,7 +314,7 @@ To block ads, you must log in with a subscribed account.</string>
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/trash.svg</normaloff>../icons/trash.svg</iconset>
+          <normaloff>../icons/light/trash.svg</normaloff>../icons/light/trash.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -337,7 +337,7 @@ To block ads, you must log in with a subscribed account.</string>
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/close.svg</normaloff>../icons/close.svg</iconset>
+          <normaloff>../icons/light/close.svg</normaloff>../icons/light/close.svg</iconset>
         </property>
         <property name="iconSize">
          <size>

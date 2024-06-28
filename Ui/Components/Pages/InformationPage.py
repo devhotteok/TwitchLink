@@ -17,7 +17,7 @@ class InformationPage(DocumentViewer):
         App.Notifications.notificationsUpdated.connect(self.notificationsUpdated)
         self.notificationsUpdated(App.Notifications.getNotifications())
 
-    def showDocument(self, documentData: DocumentData, icon: str | QtGui.QIcon | None = None, uniqueValue: typing.Any = None, important: bool = False) -> Ui.DocumentView:
+    def showDocument(self, documentData: DocumentData, icon: QtGui.QIcon | ThemedIcon | None = None, uniqueValue: typing.Any = None, important: bool = False) -> Ui.DocumentView:
         documentView = Ui.DocumentView(documentData, parent=self)
         super().showDocument(documentView, icon=icon, uniqueValue=uniqueValue, important=important)
         self.pageObject.show()
@@ -25,7 +25,7 @@ class InformationPage(DocumentViewer):
 
     def openAbout(self) -> None:
         tabIndex = self.getUniqueTabIndex(Ui.About)
-        self.setCurrentIndex(self.addTab(Ui.About(parent=self), icon=Icons.INFO_ICON, uniqueValue=Ui.About) if tabIndex == None else tabIndex)
+        self.setCurrentIndex(self.addTab(Ui.About(parent=self), icon=Icons.INFO, uniqueValue=Ui.About) if tabIndex == None else tabIndex)
         self.pageObject.show()
 
     def openTermsOfService(self) -> None:
@@ -51,7 +51,7 @@ class InformationPage(DocumentViewer):
             self.pageObject.showButton()
             self.pageObject.unblock()
 
-    def showAppInfo(self, documentData: DocumentData, icon: str | QtGui.QIcon | None = None) -> Ui.DocumentView:
+    def showAppInfo(self, documentData: DocumentData, icon: QtGui.QIcon | ThemedIcon | None = None) -> Ui.DocumentView:
         return self.showDocument(
             documentData=documentData,
             icon=icon,
@@ -72,5 +72,5 @@ class InformationPage(DocumentViewer):
                 oldVersionIndex = self.getUniqueTabIndex(uniqueValue)
                 if oldVersionIndex != None:
                     self.closeTab(oldVersionIndex)
-                self.showDocument(notification, icon=None if notification.modal else Icons.NOTICE_ICON, uniqueValue=uniqueValue)
+                self.showDocument(notification, icon=None if notification.modal else Icons.NOTICE, uniqueValue=uniqueValue)
         self.setCurrentIndex(newIndex)

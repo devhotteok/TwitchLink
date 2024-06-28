@@ -51,7 +51,7 @@ class UiLoader:
         instance.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         if isinstance(instance, QtWidgets.QMainWindow) or isinstance(instance, QtWidgets.QDialog):
             instance.setWindowFlag(QtCore.Qt.WindowType.WindowContextHelpButtonHint, False)
-            instance.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
+            instance.setWindowIcon(Icons.APP_LOGO.icon)
             instance.setWindowTitle(instance.windowTitle() or Config.APP_NAME)
         cls.setPartnerContent(instance)
 

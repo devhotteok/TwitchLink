@@ -103,7 +103,16 @@ class Templates(Serializable):
 
 class Advanced(Serializable):
     def __init__(self):
+        self._themeMode = App.ThemeManager.getThemeMode().value
         self._searchExternalContent = True
+
+    def __setup__(self):
+        App.ThemeManager.setThemeMode(App.ThemeManager.Modes.fromString(self._themeMode))
+        del self._themeMode
+
+    def __save__(self):
+        self._themeMode = App.ThemeManager.getThemeMode().value
+        return super().__save__()
 
     def setSearchExternalContentEnabled(self, enabled: bool) -> None:
         self._searchExternalContent = enabled
@@ -162,7 +171,7 @@ class Temp(Serializable):
         self._downloadHistory = App.DownloadHistory.getHistoryList()
         return super().__save__()
 
-    def getDownloadOptionHistory(self, historyType: DownloadOptionHistory.BaseOptionHistory) -> None:
+    def getDownloadOptionHistory(self, historyType: DownloadOptionHistory.BaseOptionHistory) -> DownloadOptionHistory.BaseOptionHistory:
         return self._downloadOptionHistory[historyType.getId()]
 
     def updateDownloadStats(self, fileSize: int) -> None:

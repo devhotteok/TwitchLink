@@ -8,7 +8,7 @@ class Loading(QtWidgets.QDialog):
         super().__init__(parent=parent)
         self._ui = UiLoader.load("loading", self)
         self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
-        self.setWindowIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
+        self.setWindowIcon(Icons.APP_LOGO.icon)
         self._ui.appLogo.setMargin(10)
         self._ui.appName.setText(Config.APP_NAME)
         self._ui.version.setText(f"{Config.APP_NAME} {Config.APP_VERSION}")

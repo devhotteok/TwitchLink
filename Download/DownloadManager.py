@@ -31,7 +31,7 @@ class DownloadManager(QtCore.QObject):
         self.runningCountChangedSignal.emit(len(self.runningDownloaders))
         self.completedSignal.emit(downloader.getId())
 
-    def create(self, downloadInfo: DownloadInfo) -> None:
+    def create(self, downloadInfo: DownloadInfo) -> uuid.UUID:
         downloader = TwitchDownloader.create(downloadInfo, parent=self)
         downloader.started.connect(self.onStart)
         downloader.finished.connect(self.onFinish)

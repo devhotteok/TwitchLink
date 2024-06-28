@@ -74,7 +74,7 @@ class ScheduledDownloadStatus(QtCore.QObject):
     def isDownloaderError(self) -> bool:
         return self._status == self.DOWNLOADER_ERROR
 
-    def getError(self) -> Exception:
+    def getError(self) -> Exception | None:
         return self._error
 
     def cleanup(self) -> None:

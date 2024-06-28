@@ -25,7 +25,7 @@ class DownloadsPage(TabManager):
         self.downloads.accountPageShowRequested.connect(self.accountPageShowRequested)
         self.downloads.progressWindowRequested.connect(self.openDownloadTab)
         self.downloads.downloadHistoryRequested.connect(self.openDownloadHistory)
-        self.addTab(self.downloads, icon=Icons.FOLDER_ICON, closable=False)
+        self.addTab(self.downloads, icon=Icons.FOLDER, closable=False)
         App.DownloadManager.createdSignal.connect(self.downloaderCreated)
         App.DownloadManager.destroyedSignal.connect(self.downloaderDestroyed)
         App.DownloadManager.startedSignal.connect(self.downloadStarted)
@@ -40,7 +40,7 @@ class DownloadsPage(TabManager):
         if tabIndex == None:
             downloadTab = Ui.Download(downloaderId, parent=self)
             downloadTab.accountPageShowRequested.connect(self.accountPageShowRequested)
-            tabIndex = self.addTab(downloadTab, icon=Icons.DOWNLOAD_ICON, uniqueValue=downloaderId)
+            tabIndex = self.addTab(downloadTab, icon=Icons.DOWNLOAD, uniqueValue=downloaderId)
         self.setCurrentIndex(tabIndex)
         self.pageObject.show()
 
@@ -54,7 +54,7 @@ class DownloadsPage(TabManager):
         if tabIndex == None:
             downloadHistoryTab = Ui.DownloadHistories(parent=self)
             downloadHistoryTab.accountPageShowRequested.connect(self.accountPageShowRequested)
-            tabIndex = self.addTab(downloadHistoryTab, icon=Icons.HISTORY_ICON, uniqueValue=Ui.DownloadHistories)
+            tabIndex = self.addTab(downloadHistoryTab, icon=Icons.HISTORY, uniqueValue=Ui.DownloadHistories)
         self.setCurrentIndex(tabIndex)
         self.pageObject.show()
 

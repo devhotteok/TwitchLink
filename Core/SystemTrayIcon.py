@@ -1,7 +1,7 @@
 from Core.Config import Config
 from Services.Image.Presets import Icons
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
@@ -9,7 +9,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
     def __init__(self, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
-        self.setIcon(QtGui.QIcon(Icons.APP_LOGO_ICON))
+        self.setIcon(Icons.APP_LOGO.icon)
         self.setContextMenu(QtWidgets.QMenu())
         self.activated.connect(self._activatedHandler)
         self.messageClicked.connect(self._messageClickedHandler)

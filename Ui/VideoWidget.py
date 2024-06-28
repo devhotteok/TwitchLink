@@ -26,6 +26,7 @@ class VideoWidget(QtWidgets.QWidget):
             self._ui.more.hide()
         else:
             self._ui.more.clicked.connect(self.moreClicked)
+            Utils.setIconViewer(self._ui.more, Icons.LIST)
 
     @property
     def thumbnailImage(self) -> QtWidgets.QLabel:

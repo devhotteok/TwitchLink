@@ -58,7 +58,7 @@ class PlaylistManager(QtCore.QObject):
         if reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
             self._currentNetworkError = None
             try:
-                self.playlist.loads(reply.readAll().data().decode(), baseUrl=self.url)
+                self.playlist.loads(reply.readAll().data().decode(errors="ignore"), baseUrl=self.url)
             except Exception as e:
                 self._raiseException(e)
             else:

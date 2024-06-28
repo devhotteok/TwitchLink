@@ -151,7 +151,7 @@
             </sizepolicy>
            </property>
            <property name="pixmap">
-            <pixmap>../icons/alert_red.svg</pixmap>
+            <pixmap>../icons/light/alert_red.svg</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -182,7 +182,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../icons/help.svg</normaloff>../icons/help.svg</iconset>
+             <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
            </property>
           </widget>
          </item>
@@ -380,7 +380,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/retry.svg</normaloff>../icons/retry.svg</iconset>
+          <normaloff>../icons/light/retry.svg</normaloff>../icons/light/retry.svg</iconset>
         </property>
        </widget>
       </item>
@@ -403,7 +403,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/folder.svg</normaloff>../icons/folder.svg</iconset>
+          <normaloff>../icons/light/folder.svg</normaloff>../icons/light/folder.svg</iconset>
         </property>
        </widget>
       </item>
@@ -426,7 +426,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../icons/file.svg</normaloff>../icons/file.svg</iconset>
+          <normaloff>../icons/light/file.svg</normaloff>../icons/light/file.svg</iconset>
         </property>
        </widget>
       </item>

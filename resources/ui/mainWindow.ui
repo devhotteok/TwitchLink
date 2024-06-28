@@ -86,7 +86,7 @@ QToolButton:checked {
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../icons/search.svg</normaloff>../icons/search.svg</iconset>
+           <normaloff>../icons/light/search.svg</normaloff>../icons/light/search.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -141,7 +141,7 @@ QToolButton:checked {
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../icons/download.svg</normaloff>../icons/download.svg</iconset>
+           <normaloff>../icons/light/download.svg</normaloff>../icons/light/download.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -193,7 +193,7 @@ QToolButton:checked {
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../icons/scheduled.svg</normaloff>../icons/scheduled.svg</iconset>
+           <normaloff>../icons/light/scheduled.svg</normaloff>../icons/light/scheduled.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -258,7 +258,7 @@ QToolButton:checked {
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../icons/account.svg</normaloff>../icons/account.svg</iconset>
+           <normaloff>../icons/light/account.svg</normaloff>../icons/light/account.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -310,7 +310,7 @@ QToolButton:checked {
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../icons/settings.svg</normaloff>../icons/settings.svg</iconset>
+           <normaloff>../icons/light/settings.svg</normaloff>../icons/light/settings.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -362,7 +362,7 @@ QToolButton:checked {
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../icons/info.svg</normaloff>../icons/info.svg</iconset>
+           <normaloff>../icons/light/info.svg</normaloff>../icons/light/info.svg</iconset>
          </property>
          <property name="iconSize">
           <size>

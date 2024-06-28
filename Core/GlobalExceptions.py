@@ -26,7 +26,7 @@ class Exceptions:
         def __init__(self, reply: QtNetwork.QNetworkReply):
             self.reasonCode = reply.error()
             self.reasonText = reply.errorString()
-            self.responseText = "" if self.reasonCode == QtNetwork.QNetworkReply.NetworkError.OperationCanceledError else reply.readAll().data().decode()
+            self.responseText = "" if self.reasonCode == QtNetwork.QNetworkReply.NetworkError.OperationCanceledError else reply.readAll().data().decode(errors="ignore")
 
         def __str__(self):
             if self.responseText == "":

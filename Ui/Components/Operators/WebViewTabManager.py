@@ -7,19 +7,23 @@ class WebViewTabManager(TabManager):
         super().__init__(parent=parent)
         self.webViewWidgets = []
 
-    def updateWebTabIcon(self, widget: Ui.WebViewWidget, icon: QtGui.QIcon) -> None:
-        self.setTabIcon(self.indexOf(widget), self.getDefaultIcon(widget._ui.webView, widget._ui.webView.url()) if icon.isNull() else icon)
+    def updateWebTabIcon(self, widget: Ui.WebViewWidget, icon: QtGui.QIcon | ThemedIcon) -> None:
+        if isinstance(icon, QtGui.QIcon) and icon.isNull():
+            tabIcon = self.getDefaultIcon(widget._ui.webView, widget._ui.webView.url())
+        else:
+            tabIcon = icon
+        self.setTabIcon(self.indexOf(widget), tabIcon)
 
     def updateWebTabTitle(self, widget: Ui.WebViewWidget, title: str) -> None:
         self.setTabText(self.indexOf(widget), title)
 
-    def getDefaultIcon(self, webView: QtWebEngineWidgets.QWebEngineView, url: QtCore.QUrl) -> str:
+    def getDefaultIcon(self, webView: QtWebEngineWidgets.QWebEngineView, url: QtCore.QUrl) -> ThemedIcon:
         if url.toString().startswith("file:///"):
-            return Icons.FOLDER_ICON
+            return Icons.FOLDER
         elif url.toString().startswith("devtools://"):
             if webView.page().inspectedPage() != None:
-                return Icons.SETTINGS_ICON
-        return Icons.WEB_ICON
+                return Icons.SETTINGS
+        return Icons.WEB
 
     def addWebTab(self, webViewWidget: Ui.WebViewWidget, index: int = -1, closable: bool = True, uniqueValue: typing.Any = None) -> int:
         webViewWidget.iconChanged.connect(self.updateWebTabIcon)

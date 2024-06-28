@@ -20,8 +20,9 @@ class DownloaderView(QtWidgets.QWidget):
         super().__init__(parent=parent)
         self._ui = UiLoader.load("downloaderView", self)
         self._ui.downloadInfoView = Utils.setPlaceholder(self._ui.downloadInfoView, Ui.DownloadInfoView(parent=self))
-        self._ui.alertIcon = Utils.setSvgIcon(self._ui.alertIcon, Icons.ALERT_RED_ICON)
+        self._ui.alertIcon = Utils.setSvgIcon(self._ui.alertIcon, Icons.ALERT_RED)
         self._ui.statusInfoButton.clicked.connect(self.showErrorInfo)
+        Utils.setIconViewer(self._ui.statusInfoButton, Icons.HELP)
         self._updateTrackInfoDisplay = UpdateTrackInfoDisplay(target=self._ui.updateTrackInfo, parent=self)
         self._downloader: StreamDownloader | VideoDownloader | ClipDownloader | None = None
         self._exception: Exception | None = None

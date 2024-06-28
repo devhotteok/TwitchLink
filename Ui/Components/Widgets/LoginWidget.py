@@ -29,9 +29,9 @@ class LoginWidget(WebViewWidget):
     def urlChangeHandler(self, url: QtCore.QUrl) -> None:
         super().urlChangeHandler(url)
         if url.toString() != Config.LOGIN_PAGE:
-            self.showInfo(T("#You left the login page."), icon=Icons.ALERT_RED_ICON, buttonIcon=Icons.LOGIN_ICON, buttonText=T("#Return to login page"), buttonHandler=self.showLoginPage)
+            self.showInfo(T("#You left the login page."), icon=Icons.ALERT_RED, buttonIcon=Icons.LOGIN, buttonText=T("#Return to login page"), buttonHandler=self.showLoginPage)
         else:
-            self.showInfo(T("#Please follow the login procedure."), icon=Icons.INFO_ICON)
+            self.showInfo(T("#Please follow the login procedure."), icon=Icons.INFO)
 
     def hasAccountData(self) -> bool:
         return self.accountData.username != None and self.accountData.token != None
@@ -46,10 +46,10 @@ class LoginWidget(WebViewWidget):
     def _getOAuthToken(self, cookie: QtNetwork.QNetworkCookie) -> None:
         if cookie.domain() == Config.COOKIE_DOMAIN:
             if cookie.name() == Config.COOKIE_USERNAME:
-                self.setUsernameData(cookie.value().data().decode())
+                self.setUsernameData(cookie.value().data().decode(errors="ignore"))
                 self._checkToken()
             elif cookie.name() == Config.COOKIE_AUTH_TOKEN:
-                self.setTokenData(cookie.value().data().decode(), cookie.expirationDate())
+                self.setTokenData(cookie.value().data().decode(errors="ignore"), cookie.expirationDate())
                 self._checkToken()
 
     def _checkToken(self) -> None:

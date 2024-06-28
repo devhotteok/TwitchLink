@@ -8,7 +8,7 @@ class ScheduledDownloadsPage(TabManager):
         super().__init__(parent=parent)
         self.pageObject = pageObject
         self.scheduledDownloads = Ui.ScheduledDownloads(parent=self)
-        self.addTab(self.scheduledDownloads, icon=Icons.FOLDER_ICON, closable=False)
+        self.addTab(self.scheduledDownloads, icon=Icons.FOLDER, closable=False)
         App.ScheduledDownloadManager.downloaderCountChangedSignal.connect(self._changePageText)
 
     def _changePageText(self, downloadersCount: int) -> None:

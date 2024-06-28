@@ -47,7 +47,7 @@ class ExternalPlaybackGenerator(QtCore.QObject):
 
     def _replyFinished(self) -> None:
         if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
-            text = self._reply.readAll().data().decode()
+            text = self._reply.readAll().data().decode(errors="ignore")
             self._resolutions = VariantPlaylistReader.loads(text, baseUrl=self._reply.url())
             if len(self._resolutions) == 0:
                 try:
@@ -69,7 +69,7 @@ class ExternalPlaybackGenerator(QtCore.QObject):
         if self._playlistCheckReply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
             try:
                 playlist = Playlist()
-                playlist.loads(self._playlistCheckReply.readAll().data().decode(), baseUrl=self._playlistCheckReply.url())
+                playlist.loads(self._playlistCheckReply.readAll().data().decode(errors="ignore"), baseUrl=self._playlistCheckReply.url())
             except Exception as e:
                 self._raiseException(e)
             else:
@@ -89,7 +89,7 @@ class ExternalPlaybackGenerator(QtCore.QObject):
         self._error = exception
         self._setFinished()
 
-    def getError(self) -> Exception:
+    def getError(self) -> Exception | None:
         return self._error
 
     def getData(self) -> ExternalPlayback:

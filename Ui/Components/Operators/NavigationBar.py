@@ -1,3 +1,7 @@
+from Core import App
+from Services.Theme.ThemedIcon import ThemedIcon
+from Services.Utils.Utils import Utils
+
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -7,19 +11,26 @@ class PageObject(QtCore.QObject):
     blockChanged = QtCore.pyqtSignal(object, bool)
     focusChanged = QtCore.pyqtSignal(object, bool)
 
-    def __init__(self, button: QtWidgets.QToolButton, widget: QtWidgets.QWidget, icon: QtGui.QIcon | None = None, parent: QtCore.QObject | None = None):
+    def __init__(self, button: QtWidgets.QToolButton, widget: QtWidgets.QWidget, icon: QtGui.QIcon | ThemedIcon | None = None, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
         self.button = button
+        self.buttonIconViewer = Utils.setIconViewer(self.button, icon)
         self.widget = widget
         self.hidden = False
         self.blocked = False
         self.focused = False
         self.button.clicked.connect(self.show)
-        if icon != None:
-            self.setPageIcon(icon)
+        App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+        self._setupThemeStyle()
 
-    def setPageIcon(self, icon: QtGui.QIcon, size: QtCore.QSize | None = None) -> None:
-        self.button.setIcon(icon)
+    def _setupThemeStyle(self) -> None:
+        if App.ThemeManager.isDarkModeEnabled():
+            self.button.setStyleSheet("QToolButton {background: rgba(210, 179, 255, 255);border: none;} QToolButton:hover {background: rgba(200, 200, 200, 200);} QToolButton:checked {background: rgba(145, 71, 255, 255);}")
+        else:
+            self.button.setStyleSheet("QToolButton {background: rgba(255, 255, 255, 150);border: none;} QToolButton:hover {background: rgba(200, 200, 200, 255);} QToolButton:checked {background: rgba(255, 255, 255, 255);}")
+
+    def setPageIcon(self, icon: QtGui.QIcon | ThemedIcon | None, size: QtCore.QSize | None = None) -> None:
+        self.buttonIconViewer.setIcon(icon)
         self.button.setIconSize(size or QtCore.QSize(24, 24))
 
     def setPageName(self, name: str) -> None:
@@ -54,11 +65,20 @@ class PageObject(QtCore.QObject):
 class NavigationBar(QtCore.QObject):
     focusChanged = QtCore.pyqtSignal(bool)
 
-    def __init__(self, stackedWidget: QtWidgets.QStackedWidget, parent: QtCore.QObject | None = None):
+    def __init__(self, buttonArea: QtWidgets.QWidget, stackedWidget: QtWidgets.QStackedWidget, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
+        self.buttonArea = buttonArea
         self.stackedWidget = stackedWidget
-        self.pages = []
+        self.pages: list[PageObject] = []
         self.currentPage = None
+        App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+        self._setupThemeStyle()
+
+    def _setupThemeStyle(self) -> None:
+        if App.ThemeManager.isDarkModeEnabled():
+            self.buttonArea.setStyleSheet("#navigationBar {background: rgba(175, 154, 206, 230);}")
+        else:
+            self.buttonArea.setStyleSheet("#navigationBar {background: rgba(145, 71, 255, 255);}")
 
     def setPageButtonVisible(self, pageObject: PageObject, visible: bool) -> None:
         if visible:
@@ -141,7 +161,7 @@ class NavigationBar(QtCore.QObject):
         unblockedPages = [pageObject for pageObject in self.pages if not pageObject.blocked]
         return [pageObject for pageObject in unblockedPages if pageObject.focused] or unblockedPages
 
-    def addPage(self, button: QtWidgets.QToolButton, widget: QtWidgets.QWidget, icon: QtGui.QIcon | None = None) -> PageObject:
+    def addPage(self, button: QtWidgets.QToolButton, widget: QtWidgets.QWidget, icon: QtGui.QIcon | ThemedIcon | None = None) -> PageObject:
         pageObject = PageObject(button, widget, icon=icon, parent=self)
         pageObject.showRequested.connect(self.setCurrentPage)
         pageObject.buttonVisibilityChanged.connect(self.setPageButtonVisible)

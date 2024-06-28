@@ -112,7 +112,7 @@
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../icons/save.svg</normaloff>../icons/save.svg</iconset>
+           <normaloff>../icons/light/save.svg</normaloff>../icons/light/save.svg</iconset>
          </property>
          <property name="autoDefault">
           <bool>false</bool>
@@ -179,7 +179,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../icons/copy.svg</normaloff>../icons/copy.svg</iconset>
+              <normaloff>../icons/light/copy.svg</normaloff>../icons/light/copy.svg</iconset>
             </property>
            </widget>
           </item>
@@ -202,7 +202,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../icons/launch.svg</normaloff>../icons/launch.svg</iconset>
+              <normaloff>../icons/light/launch.svg</normaloff>../icons/light/launch.svg</iconset>
             </property>
            </widget>
           </item>

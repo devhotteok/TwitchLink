@@ -37,6 +37,7 @@ class FileNameGenerator:
         localDatetime = datetime.toTimeZone(App.Preferences.localization.getTimezone())
         return {
             name: localDatetime.toString("yyyy-MM-dd HH:mm:ss"),
+            "unix_time": f"{localDatetime.toSecsSinceEpoch()}",
             "date": localDatetime.date().toString("yyyy-MM-dd"),
             "year": f"{localDatetime.date().year():04}",
             "month": f"{localDatetime.date().month():02}",
@@ -153,6 +154,7 @@ class FileNameGenerator:
     def getTimeInfo(timeType: str) -> dict[str, str]:
         return {
             f"{{{timeType}_at}}": f"{T(f'{timeType}-at')} (YYYY-MM-DD HH:MM:SS)",
+            "{unix_time}": f"{T(f'{timeType}-at')} [{T(f'unix-time')}] (XXXXXXXXXX)",
             "{date}": f"{T(f'{timeType}-date')} (YYYY-MM-DD)",
             "{year}": f"{T(f'{timeType}-date')} - {T('year')}",
             "{month}": f"{T(f'{timeType}-date')} - {T('month')}",

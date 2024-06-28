@@ -84,13 +84,13 @@ class Encoder:
         elif isinstance(obj, QtCore.QDateTime):
             return f"datetime:{obj.toString(QtCore.Qt.DateFormat.ISODateWithMs)}"
         elif isinstance(obj, QtCore.QTimeZone):
-            return f"timezone:{obj.id().data().decode()}"
+            return f"timezone:{obj.id().data().decode(errors='ignore')}"
         elif isinstance(obj, QtCore.QUrl):
             return f"url:{obj.toString()}"
         elif isinstance(obj, bytes):
-            return f"bytes:{obj.decode()}"
+            return f"bytes:{obj.decode(errors='ignore')}"
         elif isinstance(obj, bytearray):
-            return f"bytearray:{obj.decode()}"
+            return f"bytearray:{obj.decode(errors='ignore')}"
         elif isinstance(obj, tuple):
             return cls._encodeTuple(obj)
         elif isinstance(obj, list):

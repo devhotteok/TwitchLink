@@ -26,6 +26,15 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         self._ui.downloadViewControlBar.openFileButton.clicked.connect(self.openFile)
         self._ui.downloadViewControlBar.openFileButton.setDisabled()
         self.scheduledDownload = App.ScheduledDownloadManager.get(self.scheduledDownloadId)
+        self._ui.networkAlertIcon = Utils.setSvgIcon(self._ui.networkAlertIcon, Icons.ALERT_RED)
+        self._ui.enableButton.clicked.connect(self._enableButtonClicked)
+        self._enableButtonIconViewer = Utils.setIconViewer(self._ui.enableButton, Icons.TOGGLE_OFF)
+        self._ui.refreshButton.clicked.connect(self.scheduledDownload.updateChannelData)
+        Utils.setIconViewer(self._ui.refreshButton, Icons.RELOAD)
+        self._ui.settingsButton.clicked.connect(self.editScheduledDownload)
+        Utils.setIconViewer(self._ui.settingsButton, Icons.SETTINGS)
+        self._ui.deleteButton.clicked.connect(self.tryRemoveScheduledDownload)
+        Utils.setIconViewer(self._ui.deleteButton, Icons.TRASH)
         self.scheduledDownload.activeChanged.connect(self._activeChanged)
         self._activeChanged()
         self.scheduledDownload.channelDataUpdateStarted.connect(self._channelDataUpdateStarted)
@@ -40,11 +49,6 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
             self._channelDataUpdateFinished()
         self._showChannel()
         self._showPubSubState()
-        self._ui.networkAlertIcon = Utils.setSvgIcon(self._ui.networkAlertIcon, Icons.ALERT_RED_ICON)
-        self._ui.enableButton.clicked.connect(self._enableButtonClicked)
-        self._ui.refreshButton.clicked.connect(self.scheduledDownload.updateChannelData)
-        self._ui.settingsButton.clicked.connect(self.editScheduledDownload)
-        self._ui.deleteButton.clicked.connect(self.tryRemoveScheduledDownload)
 
     def showEvent(self, event: QtGui.QShowEvent) -> None:
         self.resizedSignal.emit()
@@ -52,7 +56,7 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
 
     def _activeChanged(self) -> None:
         self._ui.downloaderArea.setEnabled(self.scheduledDownload.isActive())
-        self._ui.enableButton.setIcon(QtGui.QIcon(Icons.TOGGLE_ON_ICON if self.scheduledDownload.isEnabled() else Icons.TOGGLE_OFF_ICON))
+        self._enableButtonIconViewer.setIcon(Icons.TOGGLE_ON if self.scheduledDownload.isEnabled() else Icons.TOGGLE_OFF)
 
     def _enableButtonClicked(self) -> None:
         if self.scheduledDownload.isActive():

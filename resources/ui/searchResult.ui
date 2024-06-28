@@ -143,7 +143,7 @@ border-radius: 10px;</string>
              </sizepolicy>
             </property>
             <property name="pixmap">
-             <pixmap>../icons/viewer.svg</pixmap>
+             <pixmap>../icons/light/viewer.svg</pixmap>
             </property>
             <property name="scaledContents">
              <bool>true</bool>
@@ -173,7 +173,7 @@ border-radius: 10px;</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../icons/reload.svg</normaloff>../icons/reload.svg</iconset>
+              <normaloff>../icons/light/reload.svg</normaloff>../icons/light/reload.svg</iconset>
             </property>
            </widget>
           </item>
@@ -335,7 +335,7 @@ border-radius: 10px;</string>
                       </size>
                      </property>
                      <property name="pixmap">
-                      <pixmap>../icons/verified.svg</pixmap>
+                      <pixmap>../icons/light/verified.svg</pixmap>
                      </property>
                      <property name="scaledContents">
                       <bool>true</bool>
@@ -444,7 +444,7 @@ border-radius: 10px;</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../icons/launch.svg</normaloff>../icons/launch.svg</iconset>
+              <normaloff>../icons/light/launch.svg</normaloff>../icons/light/launch.svg</iconset>
             </property>
            </widget>
           </item>
@@ -536,7 +536,7 @@ border-radius: 10px;</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../icons/reload.svg</normaloff>../icons/reload.svg</iconset>
+              <normaloff>../icons/light/reload.svg</normaloff>../icons/light/reload.svg</iconset>
             </property>
            </widget>
           </item>
@@ -583,7 +583,7 @@ border-radius: 10px;</string>
                  </size>
                 </property>
                 <property name="pixmap">
-                 <pixmap>../icons/info.svg</pixmap>
+                 <pixmap>../icons/light/info.svg</pixmap>
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
@@ -695,7 +695,7 @@ border-radius: 10px;</string>
              </sizepolicy>
             </property>
             <property name="pixmap">
-             <pixmap>../icons/info.svg</pixmap>
+             <pixmap>../icons/light/info.svg</pixmap>
             </property>
             <property name="scaledContents">
              <bool>true</bool>

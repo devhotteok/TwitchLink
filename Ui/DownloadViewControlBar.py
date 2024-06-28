@@ -1,4 +1,5 @@
 from Core.Ui import *
+from Services.Theme.ThemedIcon import ThemedIcon
 from Services.Twitch.GQL.TwitchGQLModels import Channel, Stream, Video, Clip
 from Search import ExternalPlaybackGenerator
 from Download.DownloadInfo import DownloadInfo
@@ -15,9 +16,10 @@ class DownloadViewControlButtonTypes(enum.Enum):
     FileNotFound = 5
 
 class DownloadViewControlButton:
-    def __init__(self, button: QtWidgets.QPushButton):
+    def __init__(self, button: QtWidgets.QPushButton, icon: ThemedIcon | None = None):
         self.button = button
-        self._icon = self.button.icon()
+        self.defaultIcon = icon
+        self._buttonIconViewer = Utils.setIconViewer(self.button, icon)
         self._toolTip = self.button.toolTip()
         self.setHidden()
 
@@ -31,23 +33,23 @@ class DownloadViewControlButton:
         else:
             if type == DownloadViewControlButtonTypes.Visible:
                 self.button.setEnabled(True)
-                self.button.setIcon(self._icon)
+                self._buttonIconViewer.setIcon(self.defaultIcon)
                 self.button.setToolTip(self._toolTip)
             elif type == DownloadViewControlButtonTypes.Disabled:
                 self.button.setEnabled(False)
-                self.button.setIcon(self._icon)
+                self._buttonIconViewer.setIcon(self.defaultIcon)
                 self.button.setToolTip(self._toolTip)
             elif type == DownloadViewControlButtonTypes.Creating:
                 self.button.setEnabled(False)
-                self.button.setIcon(QtGui.QIcon(Icons.CREATING_FILE_ICON))
+                self._buttonIconViewer.setIcon(Icons.CREATING_FILE)
                 self.button.setToolTip(f"{self._toolTip} ({T('creating', ellipsis=True)})")
             elif type == DownloadViewControlButtonTypes.Downloading:
                 self.button.setEnabled(False)
-                self.button.setIcon(QtGui.QIcon(Icons.DOWNLOADING_FILE_ICON))
+                self._buttonIconViewer.setIcon(Icons.DOWNLOADING_FILE)
                 self.button.setToolTip(f"{self._toolTip} ({T('downloading', ellipsis=True)})")
             elif type == DownloadViewControlButtonTypes.FileNotFound:
                 self.button.setEnabled(False)
-                self.button.setIcon(QtGui.QIcon(Icons.FILE_NOT_FOUND_ICON))
+                self._buttonIconViewer.setIcon(Icons.FILE_NOT_FOUND)
                 self.button.setToolTip(f"{self._toolTip} ({T('file-not-found')})")
             self.button.show()
 
@@ -74,15 +76,15 @@ class DownloadViewControlBar(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent=parent)
         self._ui = UiLoader.load("downloadViewControlBar", self)
-        self._ui.viewIcon = Utils.setSvgIcon(self._ui.viewIcon, Icons.VIEWER_ICON)
-        self.adsInfoButton = DownloadViewControlButton(self._ui.adsInfoButton)
+        self._ui.viewIcon = Utils.setSvgIcon(self._ui.viewIcon, Icons.VIEWER)
+        self.adsInfoButton = DownloadViewControlButton(self._ui.adsInfoButton, icon=Icons.WARNING_RED)
         self.adsInfoButton.clicked.connect(self._showAdsInfo)
-        self.retryButton = DownloadViewControlButton(self._ui.retryButton)
-        self.openFolderButton = DownloadViewControlButton(self._ui.openFolderButton)
-        self.openFileButton = DownloadViewControlButton(self._ui.openFileButton)
-        self.openLogsButton = DownloadViewControlButton(self._ui.openLogsButton)
-        self.deleteButton = DownloadViewControlButton(self._ui.deleteButton)
-        self.closeButton = DownloadViewControlButton(self._ui.closeButton)
+        self.retryButton = DownloadViewControlButton(self._ui.retryButton, icon=Icons.RETRY)
+        self.openFolderButton = DownloadViewControlButton(self._ui.openFolderButton, icon=Icons.FOLDER)
+        self.openFileButton = DownloadViewControlButton(self._ui.openFileButton, icon=Icons.FILE)
+        self.openLogsButton = DownloadViewControlButton(self._ui.openLogsButton, icon=Icons.TEXT_FILE)
+        self.deleteButton = DownloadViewControlButton(self._ui.deleteButton, icon=Icons.TRASH)
+        self.closeButton = DownloadViewControlButton(self._ui.closeButton, icon=Icons.CLOSE)
 
     def showContentInfo(self, content: Channel | Stream | Video | Clip) -> None:
         if isinstance(content, Channel):

@@ -67,7 +67,7 @@ class TwitchGQLResponse(QtCore.QObject):
 
     def _replyFinished(self) -> None:
         if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
-            text = self._reply.readAll().data().decode()
+            text = self._reply.readAll().data().decode(errors="ignore")
             try:
                 jsonData = json.loads(text)
             except:
@@ -101,7 +101,7 @@ class TwitchGQLResponse(QtCore.QObject):
         self._error = exception
         self._setFinished()
 
-    def getError(self) -> Exception:
+    def getError(self) -> Exception | None:
         return self._error
 
     def getData(self) -> TwitchGQLModels.TwitchGQLObject:

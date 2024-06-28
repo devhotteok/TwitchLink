@@ -14,4 +14,4 @@ class Notification(QtCore.QObject):
         self.systemTrayIcon = systemTrayIcon
 
     def toastMessage(self, title: str, message: str, icon: QtWidgets.QSystemTrayIcon.MessageIcon | QtGui.QIcon | None = None) -> None:
-        self.systemTrayIcon.showMessage(title, message, icon or QtGui.QIcon(Icons.APP_LOGO_ICON))
+        self.systemTrayIcon.showMessage(title, message, icon or Icons.APP_LOGO.icon)

@@ -82,7 +82,7 @@
              </size>
             </property>
             <property name="pixmap">
-             <pixmap>../icons/history.svg</pixmap>
+             <pixmap>../icons/light/history.svg</pixmap>
             </property>
             <property name="scaledContents">
              <bool>true</bool>

@@ -64,6 +64,9 @@ TwitchIntegrityGenerator = _TwitchIntegrityGenerator(logger=Instance.logger, par
 from Services.Account.TwitchAccount import TwitchAccount as _TwitchAccount
 Account = _TwitchAccount(parent=Instance)
 
+from Services.Theme.ThemeManager import ThemeManager as _ThemeManager
+ThemeManager = _ThemeManager(parent=Instance)
+
 from Download.Downloader.Core.Engine.File.FileDownloadManager import FileDownloadManager as _FileDownloadManager
 FileDownloadManager = _FileDownloadManager(parent=Instance)
 

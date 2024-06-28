@@ -21,9 +21,9 @@ class IntegrityRequestInterceptor(QtWebEngineCore.QWebEngineUrlRequestIntercepto
     intercepted = QtCore.pyqtSignal(dict)
 
     def interceptRequest(self, info: QtWebEngineCore.QWebEngineUrlRequestInfo) -> None:
-        if info.requestUrl().toString() == Config.INTEGRITY_URL and info.requestMethod().data().decode() == "POST":
+        if info.requestUrl().toString() == Config.INTEGRITY_URL and info.requestMethod().data().decode(errors="ignore") == "POST":
             info.block(True)
-            self.intercepted.emit({key.data().decode(): value.data().decode() for key, value in info.httpHeaders().items()})
+            self.intercepted.emit({key.data().decode(errors="ignore"): value.data().decode(errors="ignore") for key, value in info.httpHeaders().items()})
 
 
 class TwitchIntegrityGenerator(QtCore.QObject):
@@ -96,7 +96,7 @@ class TwitchIntegrityGenerator(QtCore.QObject):
     def _requestDone(self) -> None:
         if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
             try:
-                data = json.loads(self._reply.readAll().data().decode())
+                data = json.loads(self._reply.readAll().data().decode(errors="ignore"))
                 self.integrity = IntegrityToken(
                     headers=self._headers,
                     value=data["token"],

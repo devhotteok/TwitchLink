@@ -121,7 +121,7 @@ class TwitchStreamPlaybackGenerator(QtCore.QObject):
 
     def _replyFinished(self) -> None:
         if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
-            resolutions = VariantPlaylistReader.loads(self._reply.readAll().data().decode(), baseUrl=self._reply.url())
+            resolutions = VariantPlaylistReader.loads(self._reply.readAll().data().decode(errors="ignore"), baseUrl=self._reply.url())
             if len(resolutions) == 0:
                 self._raiseException(Exceptions.ChannelIsOffline(self.login))
             else:
@@ -185,7 +185,7 @@ class TwitchVideoPlaybackGenerator(QtCore.QObject):
 
     def _replyFinished(self) -> None:
         if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
-            resolutions = VariantPlaylistReader.loads(self._reply.readAll().data().decode(), baseUrl=self._reply.url())
+            resolutions = VariantPlaylistReader.loads(self._reply.readAll().data().decode(errors="ignore"), baseUrl=self._reply.url())
             if len(resolutions) == 0:
                 self._raiseException(Exceptions.VideoNotFound(self.id))
             else:

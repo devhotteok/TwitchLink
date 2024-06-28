@@ -27,13 +27,16 @@ class Download(QtWidgets.QWidget):
         self._ui.downloadInfoView = Utils.setPlaceholder(self._ui.downloadInfoView, Ui.DownloadInfoView(parent=self))
         self._ui.downloadInfoView.setThumbnailImageSizePolicy(QtCore.QSize(480, 270), QtCore.QSize(1920, 1080))
         self._ui.downloadInfoView.setCategoryImageSize(QtCore.QSize(45, 60))
-        self._ui.alertIcon = Utils.setSvgIcon(self._ui.alertIcon, Icons.ALERT_RED_ICON)
+        self._ui.alertIcon = Utils.setSvgIcon(self._ui.alertIcon, Icons.ALERT_RED)
         self._ui.statusInfoButton.clicked.connect(self.showErrorInfo)
+        Utils.setIconViewer(self._ui.statusInfoButton, Icons.HELP)
         self._updateTrackInfoDisplay = UpdateTrackInfoDisplay(target=self._ui.updateTrackInfo, parent=self)
         self._ui.pauseButton.clicked.connect(self.pauseResume)
         self._ui.cancelButton.clicked.connect(self.cancel)
         self._ui.openFolderButton.clicked.connect(self.openFolder)
+        Utils.setIconViewer(self._ui.openFolderButton, Icons.FOLDER)
         self._ui.openFileButton.clicked.connect(self.openFile)
+        Utils.setIconViewer(self._ui.openFileButton, Icons.FILE)
         self._downloader: StreamDownloader | VideoDownloader | ClipDownloader | None = None
         self._exception: Exception | None = None
         self.connectDownloader(App.DownloadManager.get(downloaderId))
@@ -50,8 +53,9 @@ class Download(QtWidgets.QWidget):
         self._retryButtonManager = RetryDownloadButton(
             downloadInfo=self._downloader.downloadInfo,
             button=self._ui.retryButton,
-            downloaderId=self.downloaderId,
+            buttonIcon=Icons.RETRY,
             buttonText=self._ui.retryButton.text(),
+            downloaderId=self.downloaderId,
             parent=self
         )
         self._retryButtonManager.accountPageShowRequested.connect(self.accountPageShowRequested)
