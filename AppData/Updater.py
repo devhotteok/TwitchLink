@@ -157,7 +157,8 @@ class Updaters:
             "3.1.1": None,
             "3.1.2": None,
             "3.1.3": None,
-            "3.2.0": cls.Update_3_2_0
+            "3.2.0": cls.Update_3_2_0,
+            "3.2.1": None
         }
         updaters = []
         versionFound = False
