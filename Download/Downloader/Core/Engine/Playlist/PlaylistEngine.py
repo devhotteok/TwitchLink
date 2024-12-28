@@ -151,14 +151,17 @@ class PlaylistEngine(BaseEngine):
                     if self._FFmpeg == None:
                         self.logger.warning("Unable to find pipe target.")
                         self._raiseException(Exceptions.UnexpectedError())
+                        break
                     elif self._FFmpeg.write(segmentDownloader.file.read(Config.FILE_CHUNK_SIZE)) == -1 or not self._FFmpeg.waitForBytesWritten(Config.PIPE_TIMEOUT):
                         self.logger.warning("Unable to write data to pipe.")
                         self._raiseException(Exceptions.UnexpectedError())
+                        break
                 else:
                     if self.file.write(segmentDownloader.file.read(Config.FILE_CHUNK_SIZE)) == -1:
                         self.logger.warning("Unable to write data to file.")
                         self.file.close()
                         self._raiseException(Exceptions.FileSystemError(self.file))
+                        break
             segmentDownloader.file.close()
             self.progress.files += 1
             self.progress.milliseconds += segmentDownloader.segment.totalMilliseconds

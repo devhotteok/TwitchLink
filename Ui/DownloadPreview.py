@@ -140,19 +140,13 @@ class DownloadPreview(QtWidgets.QWidget):
                 Utils.info(*Messages.INFO.ACTION_PERFORM_ERROR, parent=self)
 
     def openFolder(self) -> None:
-        try:
-            Utils.openFolder(self._downloader.downloadInfo.directory)
-        except:
+        if not Utils.openFolder(self._downloader.downloadInfo.directory):
             Utils.info(*Messages.INFO.FOLDER_NOT_FOUND, parent=self)
 
     def openFile(self) -> None:
-        try:
-            Utils.openFile(self._downloader.downloadInfo.getAbsoluteFileName())
-        except:
+        if not Utils.openFile(self._downloader.downloadInfo.getAbsoluteFileName()):
             Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=self)
 
     def openLogs(self) -> None:
-        try:
-            Utils.openFile(self._downloader.logger.getPath())
-        except:
+        if not Utils.openFile(self._downloader.logger.getPath()):
             Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=self)

@@ -143,6 +143,11 @@ class Updaters:
         data["advanced"]["_themeMode"] = "str:"
         return data
 
+    @staticmethod
+    def Update_3_3_0(data: dict) -> dict:
+        data["temp"]["_downloadHistory"] = []
+        return data
+
     @classmethod
     def getUpdaters(cls, versionFrom: str) -> list[typing.Callable[[dict], dict]] | None:
         VERSIONS = {
@@ -158,7 +163,8 @@ class Updaters:
             "3.1.2": None,
             "3.1.3": None,
             "3.2.0": cls.Update_3_2_0,
-            "3.2.1": None
+            "3.2.1": None,
+            "3.3.0": cls.Update_3_3_0
         }
         updaters = []
         versionFound = False

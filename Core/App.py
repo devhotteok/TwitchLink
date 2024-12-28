@@ -30,7 +30,7 @@ class App(SingleApplicationLauncher):
     def restart(self) -> None:
         self.exit(self.EXIT_CODE.RESTART)
 
-Instance = App(Config.APP_ROOT, sys.argv)
+Instance = App(Config.APP_NAME, sys.argv)
 
 
 from Services.NetworkAccessManager import NetworkAccessManager as _NetworkAccessManager

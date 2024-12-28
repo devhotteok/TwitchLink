@@ -79,7 +79,8 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         self.closeAppAction.triggered.connect(self.close)
         contextMenu.addAction(self.openAppAction)
         contextMenu.addAction(self.closeAppAction)
-        App.Instance.systemTrayIcon.clicked.connect(self.activate)
+        if Utils.isWindows():
+            App.Instance.systemTrayIcon.clicked.connect(self.activate)
 
     def setup(self) -> None:
         self.statusUpdated(isInSetup=True)
@@ -317,4 +318,5 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         if self.isHidden():
             self.show()
         self.setWindowState((self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized) | QtCore.Qt.WindowState.WindowActive)
+        self.raise_()
         self.activateWindow()

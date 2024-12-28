@@ -123,7 +123,7 @@ class TwitchGQL(QtCore.QObject):
         useIntegrity = operation in (TwitchGQLOperations.GetChannelVideos, TwitchGQLOperations.GetChannelClips)
         return self._sendPayload(operation.load(variables), parser, useIntegrity=useIntegrity, useAuth=False)
 
-    def _sendPayload(self, payload: dict, parser: typing.Callable[[dict], TwitchGQLModels.TwitchGQLObject], useIntegrity: bool = False, useAuth: bool = False) -> TwitchGQLResponse:
+    def _sendPayload(self, payload: list | dict, parser: typing.Callable[[list | dict], TwitchGQLModels.TwitchGQLObject], useIntegrity: bool = False, useAuth: bool = False) -> TwitchGQLResponse:
         return TwitchGQLResponse(json.dumps(payload), parser, useIntegrity=useIntegrity, useAuth=useAuth, parent=self)
 
     @staticmethod
@@ -174,10 +174,8 @@ class TwitchGQL(QtCore.QObject):
             raise Exceptions.DataNotFound
         videos = user["videos"]
         edges = videos["edges"]
-        videoList = []
-        for data in edges:
-            videoList.append(TwitchGQLModels.Video(data["node"]))
-        hasNextPage = videos["pageInfo"]["hasNextPage"]
+        videoList = [TwitchGQLModels.Video(data["node"]) for data in edges if data["node"] != None]
+        hasNextPage = videos["pageInfo"]["hasNextPage"] and len(edges) != 0
         if hasNextPage:
             cursor = edges[-1]["cursor"]
         else:
@@ -203,10 +201,8 @@ class TwitchGQL(QtCore.QObject):
             raise Exceptions.DataNotFound
         clips = user["clips"]
         edges = clips["edges"]
-        clipList = []
-        for data in edges:
-            clipList.append(TwitchGQLModels.Clip(data["node"]))
-        hasNextPage = clips["pageInfo"]["hasNextPage"]
+        clipList = [TwitchGQLModels.Clip(data["node"]) for data in edges if data["node"] != None]
+        hasNextPage = clips["pageInfo"]["hasNextPage"] and len(edges) != 0
         if hasNextPage:
             cursor = edges[-1]["cursor"]
         else:
@@ -243,32 +239,51 @@ class TwitchGQL(QtCore.QObject):
 
     def getStreamPlaybackAccessToken(self, login: str) -> TwitchGQLResponse:
         return self._sendPayload(
-            payload={
-                "operationName": Config.STREAM_PLAYBACK_ACCESS_TOKEN_OPERATOR[0],
-                "extensions": {
-                    "persistedQuery": {
-                        "version": 1,
-                        "sha256Hash": Config.STREAM_PLAYBACK_ACCESS_TOKEN_OPERATOR[1]
+            payload=[
+                {
+                    "operationName": Config.STREAM_PLAYBACK_ACCESS_TOKEN_OPERATOR[0],
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": Config.STREAM_PLAYBACK_ACCESS_TOKEN_OPERATOR[1]
+                        }
+                    },
+                    "variables": {
+                        "isLive": True,
+                        "login": login,
+                        "isVod": False,
+                        "vodID": "",
+                        "playerType": "embed"
                     }
                 },
-                "variables": {
-                    "isLive": True,
-                    "login": login,
-                    "isVod": False,
-                    "vodID": "",
-                    "playerType": "embed"
+                {
+                    "operationName": Config.STREAM_AD_REQUEST_HANDLING_OPERATOR[0],
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": Config.STREAM_AD_REQUEST_HANDLING_OPERATOR[1]
+                        }
+                    },
+                    "variables": {
+                        "isLive": True,
+                        "login": login,
+                        "isVOD": False,
+                        "vodID": "",
+                        "isCollection": False,
+                        "collectionID": ""
+                    }
                 }
-            },
+            ],
             parser=self._streamPlaybackAccessTokenParser,
             useIntegrity=True,
             useAuth=True
         )
 
-    def _streamPlaybackAccessTokenParser(self, response: dict) -> TwitchGQLModels.TwitchGQLObject:
-        data = response["data"]["streamPlaybackAccessToken"]
+    def _streamPlaybackAccessTokenParser(self, response: list) -> TwitchGQLModels.TwitchGQLObject:
+        data = response[0]["data"]["streamPlaybackAccessToken"]
         if data == None:
             raise Exceptions.DataNotFound
-        return TwitchGQLModels.StreamPlaybackAccessToken(data)
+        return TwitchGQLModels.StreamPlaybackAccessToken(data, streamAdRequestHandling=response[1].get("data"))
 
     def getVideoPlaybackAccessToken(self, id: str) -> TwitchGQLResponse:
         return self._sendPayload(

@@ -1,6 +1,6 @@
 from Core import App
-from Core.GlobalExceptions import Exceptions
 from Core.Config import Config
+from Core.GlobalExceptions import Exceptions
 from Services.Utils.Utils import Utils
 
 from PyQt6 import QtCore, QtNetwork

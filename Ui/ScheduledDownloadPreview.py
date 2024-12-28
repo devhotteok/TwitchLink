@@ -163,16 +163,12 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         self.resizedSignal.emit()
 
     def openFolder(self) -> None:
-        try:
-            Utils.openFolder(self.scheduledDownload.preset.directory)
-        except:
+        if not Utils.openFolder(self.scheduledDownload.preset.directory):
             Utils.info(*Messages.INFO.FOLDER_NOT_FOUND, parent=self)
 
     def openFile(self) -> None:
-        try:
-            Utils.openFolder(self.scheduledDownload.downloader.downloadInfo.getAbsoluteFileName())
-        except:
-            Utils.info(*Messages.INFO.FOLDER_NOT_FOUND, parent=self)
+        if not Utils.openFile(self.scheduledDownload.downloader.downloadInfo.getAbsoluteFileName()):
+            Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=self)
 
     def editScheduledDownload(self) -> None:
         scheduledDownloadSettings = Ui.ScheduledDownloadSettings(self.scheduledDownload.preset, parent=self)

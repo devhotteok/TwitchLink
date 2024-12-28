@@ -110,6 +110,24 @@
    </item>
    <item>
     <widget class="QWidget" name="controlArea" native="true">
+     <property name="styleSheet">
+      <string notr="true">#controlArea &gt; QPushButton {
+	padding: 3px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+#controlArea &gt; QPushButton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid #cccccc;
+}
+
+#controlArea &gt; QPushButton:pressed {
+    background-color: rgba(255, 255, 255, 0.35);
+    border: 1px solid #aaaaaa;
+}</string>
+     </property>
      <layout class="QVBoxLayout" name="controlAreaLayout">
       <property name="leftMargin">
        <number>0</number>
@@ -137,11 +155,6 @@
           <height>30</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton:!hover {
-	background-color: transparent;
-}</string>
-        </property>
         <property name="icon">
          <iconset>
           <normaloff>../icons/light/toggle_off.svg</normaloff>../icons/light/toggle_off.svg</iconset>
@@ -167,11 +180,6 @@
           <width>60</width>
           <height>30</height>
          </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton:!hover {
-	background-color: transparent;
-}</string>
         </property>
         <property name="icon">
          <iconset>
@@ -199,11 +207,6 @@
           <height>30</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton:!hover {
-	background-color: transparent;
-}</string>
-        </property>
         <property name="icon">
          <iconset>
           <normaloff>../icons/light/settings.svg</normaloff>../icons/light/settings.svg</iconset>
@@ -229,11 +232,6 @@
           <width>60</width>
           <height>30</height>
          </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton:!hover {
-	background-color: transparent;
-}</string>
         </property>
         <property name="icon">
          <iconset>

@@ -2,8 +2,9 @@ from .Palette import Palette
 from .ThemedIconManager import ThemedIconManager
 
 from Core import App
+from Services.Utils.OSUtils import OSUtils
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui
 
 import typing
 import enum
@@ -40,7 +41,6 @@ class ThemeManager(QtCore.QObject):
     def __init__(self, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
         self._themeMode: ThemeManager.Modes = self.Modes.AUTO
-        self._currentTheme = ""
         App.Instance.styleHints().colorSchemeChanged.connect(self._colorSchemeChanged)
 
     def getThemeMode(self) -> Modes:
@@ -57,15 +57,12 @@ class ThemeManager(QtCore.QObject):
         self.updateTheme()
 
     def updateTheme(self) -> None:
-        newTheme = "Fusion" if self.isDarkModeEnabled() else "windowsvista"
-        if newTheme != self._currentTheme:
-            self._currentTheme = newTheme
-            ThemedIconManager.setDarkModeEnabled(self.isDarkModeEnabled())
-            palette = QtGui.QPalette()
-            paletteData = Palette.DARK if self.isDarkModeEnabled() else Palette.LIGHT
-            for role, roleData in paletteData.items():
-                for group, color in roleData.items():
-                    palette.setColor(group, role, QtGui.QColor(*color))
-            App.Instance.setPalette(palette)
-            App.Instance.setStyle(QtWidgets.QStyleFactory.create(self._currentTheme))
-            self.themeUpdated.emit()
+        ThemedIconManager.setDarkModeEnabled(self.isDarkModeEnabled())
+        palette = QtGui.QPalette()
+        paletteData = Palette.DARK if self.isDarkModeEnabled() else Palette.LIGHT
+        for role, roleData in paletteData.items():
+            for group, color in roleData.items():
+                palette.setColor(group, role, QtGui.QColor(*color))
+        App.Instance.setPalette(palette)
+        App.Instance.setStyle(OSUtils.getDarkStyle() if self.isDarkModeEnabled() else OSUtils.getLightStyle())
+        self.themeUpdated.emit()

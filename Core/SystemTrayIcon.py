@@ -1,4 +1,5 @@
 from Core.Config import Config
+from Services.Utils.OSUtils import OSUtils
 from Services.Image.Presets import Icons
 
 from PyQt6 import QtCore, QtWidgets
@@ -9,7 +10,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
     def __init__(self, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
-        self.setIcon(Icons.APP_LOGO.icon)
+        self.setIcon((Icons.APP_ICON if OSUtils.isWindows() else Icons.APP_ICON_WHITE).icon)
         self.setContextMenu(QtWidgets.QMenu())
         self.activated.connect(self._activatedHandler)
         self.messageClicked.connect(self._messageClickedHandler)

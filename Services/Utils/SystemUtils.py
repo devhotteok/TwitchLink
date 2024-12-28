@@ -1,4 +1,9 @@
+from Core.Config import Config
+from Services.Utils.OSUtils import OSUtils
+
 from PyQt6 import QtCore
+
+import platform
 
 
 class SystemUtils:
@@ -17,3 +22,15 @@ class SystemUtils:
     @classmethod
     def getLocalTimezone(cls) -> QtCore.QTimeZone:
         return cls.getTimezone(QtCore.QTimeZone.systemTimeZoneId())
+
+    @staticmethod
+    def getUserAgent() -> str:
+        appInfo = f"{Config.APP_NAME}/{Config.APP_VERSION}"
+        if OSUtils.isWindows():
+            version = ".".join(platform.win32_ver()[1].split(".")[:2])
+            info1 = "Win64" if platform.architecture()[0] == "64bit" else "Win32"
+            info2 = "x64" if platform.architecture()[0] == "64bit" else "x86"
+            systemInfo = f"Windows NT {version}; {info1}; {info2}"
+        else:
+            systemInfo = f"Macintosh; Intel Mac OS X 10_15_7"
+        return (Config.USER_AGENT_FORMAT or "{appInfo} ({systemInfo})").format(appInfo=appInfo, systemInfo=systemInfo)

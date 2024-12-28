@@ -142,9 +142,10 @@ class Game(TwitchGQLObject):
         self.displayName: str = data.get("displayName", self.name)
 
 class StreamPlaybackAccessToken(TwitchGQLObject):
-    def __init__(self, data: dict):
+    def __init__(self, data: dict, streamAdRequestHandling: dict | None = None):
         self.signature: str = data.get("signature") or ""
         self.value: str = data.get("value") or ""
+        self.streamAdRequestHandling = streamAdRequestHandling or {}
 
     @property
     def tokenData(self) -> dict:
@@ -155,7 +156,19 @@ class StreamPlaybackAccessToken(TwitchGQLObject):
 
     @property
     def hideAds(self) -> bool:
-        return True if self.tokenData.get("hide_ads", True) else False
+        try:
+            hasTurbo = self.streamAdRequestHandling["currentUser"]["hasTurbo"]
+            subscriptionBenefit = self.streamAdRequestHandling["user"]["self"]["subscriptionBenefit"]
+            adProperties = self.streamAdRequestHandling["user"]["adProperties"]
+            if hasTurbo:
+                return True
+            if subscriptionBenefit != None and subscriptionBenefit["product"]["hasAdFree"]:
+                return True
+            if adProperties["hasPrerollsDisabled"] and adProperties["hasPostrollsDisabled"]:
+                return True
+        except:
+            pass
+        return False
 
     @property
     def forbidden(self) -> bool:

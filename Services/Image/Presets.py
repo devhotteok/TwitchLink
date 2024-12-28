@@ -39,6 +39,10 @@ class Icons:
 
     APP_LOGO = I("icon.ico", route=False)
 
+    APP_ICON = I("icon.svg", route=False)
+    APP_ICON_WHITE = I("icon_white.svg", route=False)
+    APP_ICON_BLACK = I("icon_black.svg", route=False)
+
     ACCOUNT = I("account.svg")
     ALERT_RED = I("alert_red.svg")
     ANNOUNCEMENT = I("announcement.svg")

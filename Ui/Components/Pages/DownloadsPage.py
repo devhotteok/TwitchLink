@@ -33,6 +33,9 @@ class DownloadsPage(TabManager):
         App.DownloadManager.completedSignal.connect(self.performScheduledShutdown, QtCore.Qt.ConnectionType.QueuedConnection)
         App.DownloadManager.runningCountChangedSignal.connect(self._changePageText)
         App.ScheduledDownloadManager.enabledChangedSignal.connect(self.scheduledDownloadEnabledChanged)
+        if not Utils.isSystemShutdownSupported():
+            self.downloads._ui.scheduledShutdown.removeItem(ScheduledShutdownTypes.SHUTDOWN_SYSTEM.value)
+        self.setScheduledShutdown(None)
         self.scheduledDownloadEnabledChanged(App.ScheduledDownloadManager.isEnabled())
 
     def openDownloadTab(self, downloaderId: uuid.UUID) -> None:

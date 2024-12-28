@@ -88,7 +88,7 @@ class WebViewWidget(QtWidgets.QWidget):
         else:
             self._infoButtonIconViewer.setIcon(buttonIcon)
             self._ui.infoButton.setText(buttonText)
-            self._ui.infoButton.setStyleSheet("QPushButton:!hover {background-color: transparent;}" if buttonTransparent else "")
+            self._ui.infoButton.setStyleSheet("QPushButton {padding: 3px; background-color: transparent; border: 1px solid transparent; border-radius: 4px;} QPushButton:hover {background-color: rgba(255, 255, 255, 0.2); border: 1px solid #cccccc;} QPushButton:pressed {background-color: rgba(255, 255, 255, 0.35); border: 1px solid #aaaaaa;}" if buttonTransparent else "")
             self._ui.infoButton.clicked.connect(buttonHandler)
             self._ui.infoButton.show()
         self._ui.infoArea.show()

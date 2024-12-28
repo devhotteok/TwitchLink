@@ -36,13 +36,16 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
             self.logger.info("Application started successfully.")
             self._server = QtNetwork.QLocalServer(parent=self)
             self._server.newConnection.connect(self.newInstanceStarted)
+            self._server.removeServer(appId)
             if not self._server.listen(appId):
                 self.logger.warning("Failed to open Local Server.")
         else:
             self.logger.warning("Another instance of this application is already running.")
             self._socket = QtNetwork.QLocalSocket(parent=self)
             self._socket.connectToServer(appId)
-            if not self._socket.waitForConnected():
+            if self._socket.waitForConnected():
+                self._socket.close()
+            else:
                 self.logger.warning("Unable to connect to Local Server.")
             sys.exit(self.EXIT_CODE.EXIT)
         self._started: QtCore.QDateTime | None = None
@@ -69,4 +72,6 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
         returnCode = super().exec()
         self.logger.info(f"Application exited with exit code {returnCode}.")
         self.logger.info(f"All logs were written to '{self.logger.getPath()}'.")
+        self._server.close()
+        self.shared.detach()
         return returnCode

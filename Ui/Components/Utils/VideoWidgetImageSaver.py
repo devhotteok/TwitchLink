@@ -28,9 +28,7 @@ class VideoWidgetImageSaver:
                     cancelText=T("ok"),
                     parent=parent
                 ):
-                    try:
-                        Utils.openFile(fileName)
-                    except:
+                    if not Utils.openFile(fileName):
                         Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=parent)
 
     @staticmethod

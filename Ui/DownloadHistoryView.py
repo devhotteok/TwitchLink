@@ -78,19 +78,13 @@ class DownloadHistoryView(QtWidgets.QWidget):
             self.openFile()
 
     def openFolder(self) -> None:
-        try:
-            Utils.openFolder(self.downloadInfo.directory)
-        except:
+        if not Utils.openFolder(self.downloadInfo.directory):
             Utils.info(*Messages.INFO.FOLDER_NOT_FOUND, parent=self)
 
     def openFile(self) -> None:
-        try:
-            Utils.openFile(self.downloadInfo.getAbsoluteFileName())
-        except:
+        if not Utils.openFile(self.downloadInfo.getAbsoluteFileName()):
             Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=self)
 
     def openLogs(self) -> None:
-        try:
-            Utils.openFile(self.downloadHistory.logFile)
-        except:
+        if not Utils.openFile(self.downloadHistory.logFile):
             Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=self)

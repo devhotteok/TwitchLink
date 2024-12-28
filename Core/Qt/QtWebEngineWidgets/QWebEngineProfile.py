@@ -1,8 +1,6 @@
-from Core.Config import Config
+from Services.Utils.SystemUtils import SystemUtils
 
 from PyQt6 import QtWebEngineCore
-
-import re
 
 
 class _QWebEngineProfile(QtWebEngineCore.QWebEngineProfile):
@@ -11,9 +9,7 @@ class _QWebEngineProfile(QtWebEngineCore.QWebEngineProfile):
         self._setupProfile()
 
     def _setupProfile(self) -> None:
-        formatString = re.sub("QtWebEngine/\S*", "{appInfo}", self.httpUserAgent()) if Config.USER_AGENT_FORMAT == None else Config.USER_AGENT_FORMAT
-        userAgent = formatString.format(appInfo=f"{Config.APP_NAME}/{Config.APP_VERSION}")
-        self.setHttpUserAgent(userAgent)
+        self.setHttpUserAgent(SystemUtils.getUserAgent())
 
     @classmethod
     def setup(cls) -> None:

@@ -1,5 +1,6 @@
 from Core import App
 from Core.Config import Config
+from Services.Utils.OSUtils import OSUtils
 from Services.Document import DocumentData, DocumentButtonData
 
 from PyQt6 import QtCore
@@ -15,7 +16,9 @@ class NotificationManager(QtCore.QObject):
     def updateNotifications(self, data: dict) -> None:
         updatedNotifications = []
         for notification in data.get(App.Translator.getLanguage(), []):
-            if Config.APP_VERSION in notification.get("targetVersion", [Config.APP_VERSION]):
+            targetPlatforms = [item.lower() for item in notification.get("targetPlatforms", [OSUtils.getOSType()])]
+            targetVersions = notification.get("targetVersions", [Config.APP_VERSION])
+            if OSUtils.getOSType().lower() in targetPlatforms and Config.APP_VERSION in targetVersions:
                 documentData = DocumentData(
                     contentId=notification.get("contentId", None),
                     contentVersion=notification.get("contentVersion", 0),
