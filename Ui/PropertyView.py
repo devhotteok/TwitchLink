@@ -54,7 +54,7 @@ class PropertyView(QtWidgets.QDialog, WindowGeometryManager):
         self._ui.propertyViewArea.adjustSize()
 
     def setPreviewTab(self) -> None:
-        self._ui.previewImage.setImageSizePolicy(QtCore.QSize(384, 216), QtCore.QSize(1920, 1080))
+        self._ui.previewImage.setImageSizePolicy(minimumSize=QtCore.QSize(384, 216), maximumSize=None)
         self._ui.previewImage.syncImage(self.targetVideoWidget._ui.thumbnailImage)
         self.embedUrl = self.targetVideoWidget._ui.thumbnailImage.getImageUrl()
         if self.embedUrl == "":

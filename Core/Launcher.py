@@ -5,7 +5,6 @@ from Services.Logging.Logger import Logger
 
 from PyQt6 import QtCore, QtWidgets, QtNetwork
 
-import typing
 import types
 import sys
 import uuid
@@ -51,7 +50,7 @@ class SingleApplicationLauncher(QtWidgets.QApplication):
         self._started: QtCore.QDateTime | None = None
         self._crashed = False
 
-    def _excepthook(self, exceptionType: typing.Type[BaseException], exception: BaseException, tracebackType: types.TracebackType | None) -> None:
+    def _excepthook(self, exceptionType: type[BaseException], exception: BaseException, tracebackType: types.TracebackType | None) -> None:
         self.logger.critical("Unexpected Error", exc_info=(exceptionType, exception, tracebackType))
         if not self._crashed:
             self._crashed = True

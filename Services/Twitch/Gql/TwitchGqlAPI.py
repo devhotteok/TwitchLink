@@ -119,7 +119,7 @@ class TwitchGQL(QtCore.QObject):
     def __init__(self, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
 
-    def _send(self, operation: typing.Type[TwitchGQLOperations.TwitchGQLOperation], variables: dict, parser: typing.Callable[[dict], TwitchGQLModels.TwitchGQLObject]) -> TwitchGQLResponse:
+    def _send(self, operation: type[TwitchGQLOperations.TwitchGQLOperation], variables: dict, parser: typing.Callable[[dict], TwitchGQLModels.TwitchGQLObject]) -> TwitchGQLResponse:
         useIntegrity = operation in (TwitchGQLOperations.GetChannelVideos, TwitchGQLOperations.GetChannelClips)
         return self._sendPayload(operation.load(variables), parser, useIntegrity=useIntegrity, useAuth=False)
 
@@ -127,7 +127,7 @@ class TwitchGQL(QtCore.QObject):
         return TwitchGQLResponse(json.dumps(payload), parser, useIntegrity=useIntegrity, useAuth=useAuth, parent=self)
 
     @staticmethod
-    def _raiseIfNone(data: dict | None, model: typing.Type[TwitchGQLModels.TwitchGQLObject]) -> TwitchGQLModels.TwitchGQLObject:
+    def _raiseIfNone(data: dict | None, model: type[TwitchGQLModels.TwitchGQLObject]) -> TwitchGQLModels.TwitchGQLObject:
         if data == None:
             raise Exceptions.DataNotFound
         elif int(data.get("id") or 0) == 0:
@@ -160,7 +160,7 @@ class TwitchGQL(QtCore.QObject):
             "type": videoType,
             "sort": sort,
             "limit": limit or Config.LOAD_LIMIT,
-            "cursor": cursor or ""
+            "cursor": cursor or None
         }
         return self._send(
             operation=TwitchGQLOperations.GetChannelVideos,
@@ -187,7 +187,7 @@ class TwitchGQL(QtCore.QObject):
             "login": channel,
             "filter": filter,
             "limit": limit or Config.LOAD_LIMIT,
-            "cursor": cursor or ""
+            "cursor": cursor or None
         }
         return self._send(
             operation=TwitchGQLOperations.GetChannelClips,

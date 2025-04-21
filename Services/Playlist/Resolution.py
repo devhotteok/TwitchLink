@@ -9,7 +9,7 @@ class Resolution(Serializable):
     SERIALIZABLE_INIT_MODEL = False
     SERIALIZABLE_STRICT_MODE = False
 
-    RESOLUTION_TEXT = re.compile("(\d+)p(\d+)?")
+    RESOLUTION_TEXT = re.compile("(\d+)p(\d+(?:\.\d+)?)")
 
     def __init__(self, name: str, groupId: str, url: QtCore.QUrl, autoSelect: bool = True, default: bool = True):
         self.name: str = name
@@ -28,7 +28,7 @@ class Resolution(Serializable):
             tag = re.search(self.RESOLUTION_TEXT, string)
             if tag != None:
                 self.quality = int(tag.group(1))
-                self.frameRate = None if tag.group(2) == None else int(tag.group(2))
+                self.frameRate = None if tag.group(2) == None else round(float(tag.group(2)))
                 if self.frameRate != None:
                     return
 
@@ -40,23 +40,7 @@ class Resolution(Serializable):
 
     @property
     def displayName(self) -> str:
-        newString = ""
-        brackets = 0
-        for char in self.name:
-            if char == "(":
-                brackets += 1
-                continue
-            elif char == ")":
-                brackets -= 1
-                continue
-            if brackets == 0:
-                newString += char
-            elif brackets < 0:
-                return self.name
-        if brackets == 0:
-            return " ".join(newString.split())
-        else:
-            return self.name
+        return self.name if self.quality == None or self.frameRate == None else f"{self.quality}p{self.frameRate}"
 
     def __lt__(self, other):
         return (self.isSource(), self.quality or 0, self.frameRate or 0) < (other.isSource(), other.quality or 0, other.frameRate or 0)

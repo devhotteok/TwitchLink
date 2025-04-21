@@ -49,5 +49,6 @@ class WebViewTabManager(TabManager):
             devToolsPage = widget._ui.webView.page().devToolsPage()
             if devToolsPage != None:
                 devToolsPage.windowCloseRequested.emit()
+                index = self.indexOf(widget)
             self.webViewWidgets.remove(widget)
         super().closeTab(index)

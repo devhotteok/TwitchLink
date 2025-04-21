@@ -7,7 +7,7 @@ class VideoWidget(QtWidgets.QWidget):
         super().__init__(parent=parent)
         self.content = content
         self._ui = UiLoader.load("videoWidget", self)
-        self._ui.thumbnailImage.setImageSizePolicy(QtCore.QSize(384, 216), QtCore.QSize(1920, 1080) if resizable else QtCore.QSize(384, 216))
+        self._ui.thumbnailImage.setImageSizePolicy(minimumSize=QtCore.QSize(384, 216), maximumSize=None if resizable else QtCore.QSize(384, 216))
         if thumbnailSync != None:
             self._ui.thumbnailImage.syncImage(thumbnailSync)
         if categorySync != None:

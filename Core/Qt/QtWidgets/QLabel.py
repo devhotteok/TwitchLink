@@ -65,9 +65,9 @@ class _QLabel(QtWidgets.QLabel):
             App.ImageLoader.cancelRequest(QtCore.QUrl(self._imageUrl), self._imageLoaded)
             self._imageLoading = False
 
-    def setImageSizePolicy(self, minimumSize: QtCore.QSize, maximumSize: QtCore.QSize, keepAspectRatio: bool = True) -> None:
-        self.setMinimumSize(minimumSize)
-        self.setMaximumSize(maximumSize)
+    def setImageSizePolicy(self, minimumSize: QtCore.QSize | None = None, maximumSize: QtCore.QSize | None = None, keepAspectRatio: bool = True) -> None:
+        self.setMinimumSize(minimumSize or QtCore.QSize(0, 0))
+        self.setMaximumSize(maximumSize or QtCore.QSize(QtWidgets.QWIDGETSIZE_MAX, QtWidgets.QWIDGETSIZE_MAX))
         self.setKeepAspectRatio(keepAspectRatio)
 
     def setKeepAspectRatio(self, keepAspectRatio: bool) -> None:

@@ -70,7 +70,7 @@ Make sure your system meets the following requirements to run this project.
 
 ### Operating System
 - **Windows**: Windows 10 or later
-- **macOS**: macOS 14 (Sonoma) or later
+- **macOS (Apple Silicon)**: macOS 14 (Sonoma) or later
 
 ### Python
 - Python 3.12

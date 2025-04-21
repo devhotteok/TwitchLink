@@ -160,6 +160,10 @@ class MacOSUtils(BaseAdapter):
         return f"{platform.system()} {platform.release()} {platform.version()}; {platform.machine()}"
 
     @staticmethod
+    def isMinimizeToSystemTraySupported() -> bool:
+        return False
+
+    @staticmethod
     def isSystemShutdownSupported() -> bool:
         return False
 

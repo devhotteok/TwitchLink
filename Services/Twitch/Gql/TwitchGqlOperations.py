@@ -72,7 +72,7 @@ class GetChannel(TwitchGQLOperation):
 
 class GetChannelVideos(TwitchGQLOperation):
     query = """
-        query($login: String!, $type: BroadcastType, $sort: VideoSort!, $limit: Int!, $cursor: Cursor!) {
+        query($login: String!, $type: BroadcastType, $sort: VideoSort!, $limit: Int!, $cursor: Cursor) {
           user(login: $login) {
             videos(type: $type, sort: $sort, first: $limit, after: $cursor) {
               edges {
@@ -126,7 +126,7 @@ class GetChannelVideos(TwitchGQLOperation):
 
 class GetChannelClips(TwitchGQLOperation):
     query = """
-        query($login: String!, $filter: ClipsFilter!, $limit: Int!, $cursor: Cursor!) {
+        query($login: String!, $filter: ClipsFilter!, $limit: Int!, $cursor: Cursor) {
           user(login: $login) {
             clips(criteria: {filter: $filter}, first: $limit, after: $cursor) {
               edges {

@@ -1,7 +1,8 @@
 from Core.Ui import *
 from Services.Messages import Messages
+from Services.Account.AccountData import AccountData
+from Services.Account.BrowserAccountDetector import Exceptions, BrowserInfo, AvailableBrowsers
 from Services.Twitch.GQL import TwitchGQLAPI
-from Ui.Components.Widgets.LoginWidget import AccountData
 
 
 class Account(QtWidgets.QWidget):
@@ -16,6 +17,11 @@ class Account(QtWidgets.QWidget):
         self._ui.accountInfo.setText(T("#Log in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)", appName=CoreConfig.APP_NAME))
         self._ui.alertIcon = Utils.setSvgIcon(self._ui.alertIcon, Icons.ALERT_RED)
         self._ui.loginButton.clicked.connect(self.login)
+        if Utils.isWindows():
+            self._ui.importFromChromeButton.clicked.connect(self.importAccountFromChrome)
+            self._ui.importFromEdgeButton.clicked.connect(self.importAccountFromEdge)
+        else:
+            self._ui.importAccountArea.hide()
         self._ui.continueButton.clicked.connect(self.startLoginRequested)
         self._ui.cancelButton.clicked.connect(self.cancelLoginRequested)
         self._ui.logoutButton.clicked.connect(self.logout)
@@ -68,6 +74,8 @@ class Account(QtWidgets.QWidget):
             self._ui.accountMenu.setCurrentIndex(1)
             self._ui.infoArea.hide()
             self._ui.buttonArea.setCurrentIndex(0)
+            self._ui.importFromChromeButton.setEnabled(True)
+            self._ui.importFromEdgeButton.setEnabled(True)
             self._ui.profileImage.cancelImageRequest()
             self.updateAccountImage()
 
@@ -80,6 +88,8 @@ class Account(QtWidgets.QWidget):
     def login(self) -> None:
         self._ui.infoArea.show()
         self._ui.buttonArea.setCurrentIndex(1)
+        self._ui.importFromChromeButton.setEnabled(False)
+        self._ui.importFromEdgeButton.setEnabled(False)
         self.startLoginRequested.emit()
 
     def processAccountData(self, accountData: AccountData) -> None:
@@ -87,9 +97,46 @@ class Account(QtWidgets.QWidget):
         self.refreshAccount()
 
     def loginTabClosed(self) -> None:
+        self._loginProcessComplete()
+
+    def _loginProcessComplete(self) -> None:
         self._ui.infoArea.hide()
         self._ui.buttonArea.setCurrentIndex(0)
+        self._ui.loginButton.setEnabled(True)
+        self._ui.importFromChromeButton.setEnabled(True)
+        self._ui.importFromEdgeButton.setEnabled(True)
 
     def logout(self) -> None:
-        if Utils.ask("logout", "#Are you sure you want to log out?", parent=self):
+        if Utils.ask("log-out", "#Are you sure you want to log out?", parent=self):
             App.Account.logout()
+
+    def _confirmBrowserLogin(self, browserName: str) -> bool:
+        return Utils.ask("information", T("#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, logging out of your Twitch account in the browser will also log you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are logged in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.", browserName=browserName, appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self)
+
+    def importAccountFromBrowser(self, browserInfo: BrowserInfo) -> None:
+        if self._confirmBrowserLogin(browserName=browserInfo.getDisplayName()):
+            self._ui.infoArea.show()
+            self._ui.loginButton.setEnabled(False)
+            self._ui.importFromChromeButton.setEnabled(False)
+            self._ui.importFromEdgeButton.setEnabled(False)
+            accountImportProgressView = Ui.AccountImportProgressView(browserInfo=browserInfo, parent=self)
+            accountImportProgressView.accountDetected.connect(self.processAccountData, QtCore.Qt.ConnectionType.QueuedConnection)
+            accountImportProgressView.errorOccurred.connect(self._accountImportError, QtCore.Qt.ConnectionType.QueuedConnection)
+            accountImportProgressView.exec()
+            self._loginProcessComplete()
+
+    def importAccountFromChrome(self) -> None:
+        self.importAccountFromBrowser(browserInfo=AvailableBrowsers.Chrome)
+
+    def importAccountFromEdge(self) -> None:
+        self.importAccountFromBrowser(browserInfo=AvailableBrowsers.Edge)
+
+    def _accountImportError(self, browserInfo: BrowserInfo, exception: Exceptions.BrowserNotFound | Exceptions.DriverConnectionFailure | Exceptions.UnexpectedDriverError | Exceptions.AccountNotFound) -> None:
+        if isinstance(exception, Exceptions.BrowserNotFound):
+            Utils.info("error", T("#Unable to detect {browserName}.\nPlease make sure {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+        elif isinstance(exception, Exceptions.DriverConnectionFailure):
+            Utils.info("error", T("#{browserName} is currently running.\nPlease close all {browserName} windows and try again.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+        elif isinstance(exception, Exceptions.UnexpectedDriverError):
+            Utils.info("error", T("#An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+        else:
+            Utils.info("error", T("#Unable to find a Twitch account. Please make sure that {browserName} is logged in to Twitch.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)

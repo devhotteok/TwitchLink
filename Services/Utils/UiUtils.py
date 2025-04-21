@@ -4,7 +4,7 @@ from Services.Theme.ThemedIcon import ThemedIcon
 from Services.Theme.ThemedIconViewer import ThemedIconViewer
 from Services.Theme.ThemedSvgWidget import ThemedSvgWidget
 
-from PyQt6 import QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class UiUtils:
@@ -16,7 +16,7 @@ class UiUtils:
         return widget
 
     @staticmethod
-    def setIconViewer(widget: QtWidgets.QWidget, icon: QtGui.QIcon | ThemedIcon | None) -> ThemedIconViewer:
+    def setIconViewer(widget: QtWidgets.QPushButton | QtWidgets.QToolButton, icon: QtGui.QIcon | ThemedIcon | None) -> ThemedIconViewer:
         return ThemedIconViewer(widget, icon)
 
     @classmethod

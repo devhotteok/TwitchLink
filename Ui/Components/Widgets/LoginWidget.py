@@ -1,15 +1,9 @@
 from Core.Ui import *
 from Services.Account.Config import Config
+from Services.Account.AccountData import AccountData
 from Ui.WebViewWidget import WebViewWidget
 
 from PyQt6 import QtWebEngineCore, QtNetwork
-
-
-class AccountData:
-    def __init__(self):
-        self.username: str | None = None
-        self.token: str | None = None
-        self.expiration: int | None = None
 
 
 class LoginWidget(WebViewWidget):

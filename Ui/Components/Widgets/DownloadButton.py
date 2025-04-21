@@ -90,7 +90,7 @@ class DownloadButton(QtCore.QObject):
                 okText = T("change-account")
             else:
                 advice = T("#You need to log in to download subscriber-only videos.")
-                okText = T("login")
+                okText = T("log-in")
             if self.ask("unable-to-download", T("#This video is for subscribers only.\n{advice}", advice=advice), contentTranslate=False, okText=okText, cancelText=T("ok")):
                 self.accountPageShowRequested.emit()
         elif isinstance(generator.getError(), TwitchPlaybackGenerator.Exceptions.VideoNotFound):

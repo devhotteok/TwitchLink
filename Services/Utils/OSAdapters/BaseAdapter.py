@@ -143,6 +143,11 @@ class BaseAdapter(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
+    def isMinimizeToSystemTraySupported() -> bool:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
     def isSystemShutdownSupported() -> bool:
         pass
 

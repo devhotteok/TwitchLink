@@ -15,6 +15,8 @@ class Settings(QtWidgets.QWidget):
         self._ui.notify.toggled.connect(App.Preferences.general.setNotifyEnabled)
         self._ui.windowClose.setCurrentIndex(1 if App.Preferences.general.isSystemTrayEnabled() else 0)
         self._ui.windowClose.currentIndexChanged.connect(self.windowCloseChanged)
+        if not Utils.isMinimizeToSystemTraySupported():
+            self._ui.windowCloseArea.hide()
         self.streamTemplateInfoWindow = FileNameTemplateInfo(FileNameTemplateInfo.TYPE.STREAM, parent=self)
         self._ui.streamFilename.setText(App.Preferences.templates.getStreamFilename())
         self._ui.streamFilename.editingFinished.connect(self.setStreamFilename)

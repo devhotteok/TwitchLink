@@ -35,10 +35,9 @@ class TwitchIntegrityGenerator(QtCore.QObject):
         self.logger = logger
         self.integrity = None
         self._isUpdating = False
-        interceptor = IntegrityRequestInterceptor(parent=self)
-        interceptor.intercepted.connect(self._interceptedHandler)
-        self._profile = QtWebEngineCore.QWebEngineProfile(parent=self)
-        self._profile.setUrlRequestInterceptor(interceptor)
+        self._requestInterceptor = IntegrityRequestInterceptor(parent=self)
+        self._requestInterceptor.intercepted.connect(self._interceptedHandler)
+        self._profile: QtWebEngineCore.QWebEngineProfile | None = None
         self._webEngineView: QtWebEngineWidgets.QWebEngineView | None = None
         self._headers: dict | None = None
         self._reply: QtNetwork.QNetworkReply | None = None
@@ -63,6 +62,8 @@ class TwitchIntegrityGenerator(QtCore.QObject):
     def _createWebEngineView(self) -> None:
         self._isUpdating = True
         self.integrity = None
+        self._profile = QtWebEngineCore.QWebEngineProfile(parent=self)
+        self._profile.setUrlRequestInterceptor(self._requestInterceptor)
         self._webEngineView = QtWebEngineWidgets.QWebEngineView()
         self._webEngineView.setVisible(False)
         self._webEngineView.setPage(QtWebEngineCore.QWebEnginePage(self._profile, self._webEngineView))
@@ -71,8 +72,11 @@ class TwitchIntegrityGenerator(QtCore.QObject):
     def _webEngineViewtimeoutHandler(self) -> None:
         if self._webEngineView == None:
             return
+        self.logger.warning("[Request Timeout] Failed to update integrity token.")
         self._webEngineView.close()
         self._webEngineView = None
+        self._profile.deleteLater()
+        self._profile = None
         self._isUpdating = False
         self._integrityUpdated.emit(self.integrity)
 
@@ -82,6 +86,8 @@ class TwitchIntegrityGenerator(QtCore.QObject):
         self._timeoutTimer.stop()
         self._webEngineView.close()
         self._webEngineView = None
+        self._profile.deleteLater()
+        self._profile = None
         oAuthToken = App.Account.getOAuthToken()
         if oAuthToken != "":
             headers.update({"Authorization": f"OAuth {oAuthToken}"})

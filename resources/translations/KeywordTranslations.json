@@ -67,17 +67,25 @@
     "en": "Developer Tools",
     "ko": "개발자 도구"
   },
-  "login": {
-    "en": "Login",
+  "log-in": {
+    "en": "Log In",
     "ko": "로그인"
   },
   "cancel-login": {
     "en": "Cancel Login",
     "ko": "로그인 취소"
   },
-  "logout": {
-    "en": "Logout",
+  "log-out": {
+    "en": "Log Out",
     "ko": "로그아웃"
+  },
+  "detect-automatically": {
+    "en": "Detect Automatically",
+    "ko": "자동 감지"
+  },
+  "profile": {
+    "en": "Profile",
+    "ko": "프로필"
   },
   "version": {
     "en": "Version",

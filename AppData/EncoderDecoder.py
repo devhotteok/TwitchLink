@@ -14,7 +14,7 @@ class Exceptions:
             return f"Object Not Serializable\nType: {self.object.__class__}\nObject: {self.object}"
 
     class DecodeError(Exception):
-        def __init__(self, objectType: types.ModuleType | typing.Type[typing.Any], objectData: dict):
+        def __init__(self, objectType: types.ModuleType | type[typing.Any], objectData: dict):
             self.objectType = objectType
             self.objectData = objectData
 
@@ -26,7 +26,7 @@ class Exceptions:
             return f"Model Create Error\nType: {self.objectType}\nObjectData: {self.objectData}"
 
     class DataMismatchError(DecodeError):
-        def __init__(self, objectType: typing.Type[typing.Any], mismatchKey: str, objectData: dict, instanceData: dict):
+        def __init__(self, objectType: type[typing.Any], mismatchKey: str, objectData: dict, instanceData: dict):
             super().__init__(objectType, objectData)
             self.mismatchKey = mismatchKey
             self.instanceData = instanceData

@@ -33,4 +33,8 @@ class SystemUtils:
             systemInfo = f"Windows NT {version}; {info1}; {info2}"
         else:
             systemInfo = f"Macintosh; Intel Mac OS X 10_15_7"
-        return (Config.USER_AGENT_FORMAT or "{appInfo} ({systemInfo})").format(appInfo=appInfo, systemInfo=systemInfo)
+        userAgent = Config.USER_AGENT_TEMPLATE or "{appInfo} ({systemInfo})"
+        try:
+            return userAgent.format(appInfo=appInfo, systemInfo=systemInfo)
+        except:
+            return userAgent

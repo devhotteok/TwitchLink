@@ -1,7 +1,8 @@
 from Core.Ui import *
+from Services.Account.AccountData import AccountData
 from Ui.Components.Operators.NavigationBar import PageObject
 from Ui.Components.Operators.WebViewTabManager import WebViewTabManager
-from Ui.Components.Widgets.LoginWidget import LoginWidget, AccountData
+from Ui.Components.Widgets.LoginWidget import LoginWidget
 
 from PyQt6 import QtWebEngineCore
 

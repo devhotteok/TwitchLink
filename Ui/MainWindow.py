@@ -256,7 +256,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         super().closeEvent(event)
         event.ignore()
-        if App.Updater.status.isOperational() and self.isVisible() and App.Preferences.general.isSystemTrayEnabled() and event.spontaneous():
+        if App.Updater.status.isOperational() and self.isVisible() and Utils.isMinimizeToSystemTraySupported() and App.Preferences.general.isSystemTrayEnabled() and event.spontaneous():
             self.moveToSystemTray()
         else:
             self.confirmShutdown()

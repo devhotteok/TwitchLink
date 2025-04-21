@@ -89,7 +89,7 @@ class Stream(TwitchGQLObject):
         self.previewImageURL: str = data.get("previewImageURL") or ""
         self.broadcaster: User = User(data.get("broadcaster") or {})
         self.createdAt: QtCore.QDateTime = TimeUtils.Datetime(data.get("createdAt"))
-        self.viewersCount: str = data.get("viewersCount", 0)
+        self.viewersCount: int = data.get("viewersCount", 0)
 
     def isLive(self) -> bool:
         return not self.isRerun()

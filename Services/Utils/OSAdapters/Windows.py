@@ -84,7 +84,7 @@ class WindowsUtils(BaseAdapter):
 
     @staticmethod
     def joinPath(*args: str) -> str:
-        return "/".join([string.strip("\\/") for string in args]).replace("\\", "/")
+        return "/".join([value.rstrip("\\/") if index == 0 else value.strip("\\/") for index, value in enumerate(args)]).replace("\\", "/")
 
     @staticmethod
     def joinUrl(*args: str, params: dict[str, str] | None = None) -> str:
@@ -148,6 +148,10 @@ class WindowsUtils(BaseAdapter):
     @staticmethod
     def getOSInfo() -> str:
         return f"{platform.system()} {platform.release()} {platform.version()}; {platform.machine()}"
+
+    @staticmethod
+    def isMinimizeToSystemTraySupported() -> bool:
+        return True
 
     @staticmethod
     def isSystemShutdownSupported() -> bool:
