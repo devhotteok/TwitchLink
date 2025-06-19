@@ -34,10 +34,10 @@ class About(QtWidgets.QWidget):
             self._ui.updateButton.hide()
 
     def openHomepage(self) -> None:
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, params={"lang": App.Translator.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, params={"lang": App.Translator.getCurrentLanguageCode()}))
 
     def openSponsor(self) -> None:
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getCurrentLanguageCode()}))
 
     def openUpdate(self) -> None:
-        Utils.openUrl(Utils.joinUrl(App.Updater.status.versionInfo.updateUrl, params={"lang": App.Translator.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(App.Updater.status.versionInfo.updateUrl, params={"lang": App.Translator.getCurrentLanguageCode()}))

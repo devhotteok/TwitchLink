@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Windows
+    uses: ./.github/workflows/build-windows.yml
+    with:
+      version: ${{ github.event.release.tag_name }}
+
+  build-macos:
+    name: macOS
+    uses: ./.github/workflows/build-macos.yml
+    with:
+      version: ${{ github.event.release.tag_name }}

@@ -58,7 +58,7 @@ class VersionInfo:
         self.latestVersion = Version(data.get("latestVersion", ""))
         self.requiredVersion = Version(data.get("requiredVersion", ""))
         self.appVersion = Version(Config.APP_VERSION)
-        updateNoteData = data.get("updateNote", {}).get(App.Translator.getLanguage(), {})
+        updateNoteData = data.get("updateNote", {}).get(App.Translator.getCurrentLanguageCode(), {})
         self.updateNote = updateNoteData.get("content")
         self.updateNoteType = updateNoteData.get("contentType")
         self.updateUrl = data.get("updateUrl", Config.HOMEPAGE_URL)
@@ -93,7 +93,7 @@ class Status:
         self.session = data.get("session", None)
         self.sessionStrict = data.get("sessionStrict", True)
         self.operational = data.get("operational", False)
-        operationalInfoData = data.get("operationalInfo", {}).get(App.Translator.getLanguage(), {})
+        operationalInfoData = data.get("operationalInfo", {}).get(App.Translator.getCurrentLanguageCode(), {})
         self.operationalInfo = operationalInfoData.get("content", "")
         self.operationalInfoType = operationalInfoData.get("contentType", "")
         self.versionInfo = VersionInfo(data.get("version", {}))
@@ -297,7 +297,7 @@ class Updater(QtCore.QObject):
                 "FFMPEG": FFmpegConfig
             }
             configData = data.get("global", {})
-            configData.update(data.get("local", {}).get(App.Translator.getLanguage(), {}))
+            configData.update(data.get("local", {}).get(App.Translator.getCurrentLanguageCode(), {}))
             for key, value in configData.items():
                 if ":" in key:
                     configTarget, configPath = key.split(":", 1)

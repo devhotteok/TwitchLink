@@ -1,0 +1,30 @@
+name: 📝 General Issue
+description: Report a general issue or topic that doesn't fit into other categories
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for general issues, topics, or discussions that don't fall under bug reports, feature requests, or questions.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Description
+      description: Clearly describe your issue, topic, or concern
+      placeholder: |
+        Please provide:
+        - A clear description of the issue or topic
+        - Any relevant context or background information
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: ✔️ Confirmation
+      description: Please confirm the following before submitting
+      options:
+        - label: I have checked existing issues to avoid duplicates
+          required: true
+        - label: I have provided clear context and sufficient information to understand the issue
+          required: true

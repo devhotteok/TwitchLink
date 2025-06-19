@@ -191,9 +191,9 @@
     "en": "Unable to detect {browserName}.\nPlease make sure {browserName} is properly installed.",
     "ko": "{browserName}을(를) 감지할 수 없습니다.\n{browserName}이(가) 올바르게 설치되어 있는지 확인하세요."
   },
-  "#{browserName} is currently running.\nPlease close all {browserName} windows and try again.": {
-    "en": "{browserName} is currently running.\nPlease close all {browserName} windows and try again.",
-    "ko": "{browserName}이(가) 실행 중입니다.\n{browserName} 창을 모두 닫고 다시 시도해 주세요."
+  "#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.": {
+    "en": "Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.",
+    "ko": "{browserName}에 연결하지 못했습니다.\n\n{browserName}이 현재 실행 중이라면, 모든 창을 닫은 후 다시 시도하세요.\n\n실행 중이 아니라면, {browserName}의 보안 설정으로 인해 외부 연결이 차단되었을 수 있습니다.\n다른 브라우저를 사용해 보세요."
   },
   "#An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.": {
     "en": "An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.",

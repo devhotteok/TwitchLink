@@ -195,6 +195,8 @@ class SearchResult(QtWidgets.QWidget):
             self.setLoading(False, showErrorMessage=True)
             if isinstance(response.getError(), TwitchGQLAPI.Exceptions.DataNotFound):
                 Utils.info("error", "#Channel not found. Deleted or temporary error.", parent=self)
+            elif isinstance(response.getError(), TwitchGQLAPI.Exceptions.IntegrityError):
+                pass
             else:
                 Utils.info(*Messages.INFO.NETWORK_ERROR, parent=self)
 

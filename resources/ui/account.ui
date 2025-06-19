@@ -323,6 +323,19 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="importFromFirefoxButton">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>40</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Import from Firefox</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

@@ -28,6 +28,7 @@ class PlaylistEngine(BaseEngine):
         self._safeTempDirectory: SafeTempDirectory | None = None
         self._FFmpeg: FFmpeg | None = None
         self._segmentDownloaders: list[SegmentDownloader] = []
+        self._segmentMapInfo: str | None = None
         self._refreshTimer = QtCore.QTimer(parent=self)
         self._refreshTimer.setSingleShot(True)
         self._refreshTimer.setInterval(Config.PLAYLIST_UPDATE_INTERVAL)
@@ -80,6 +81,11 @@ class PlaylistEngine(BaseEngine):
             if self._playlistManager.hasNewSegments():
                 segmentsToDownload = []
                 for segment in self._playlistManager.getNewSegments():
+                    if self.progress.totalFiles == 0:
+                        if segment.mapInfo != self._segmentMapInfo:
+                            self._segmentMapInfo = segment.mapInfo
+                            self.progress.totalFiles += 1
+                            segmentsToDownload.append(Segment(-segment.sequence, segment.url.resolved(QtCore.QUrl(segment.mapInfo)), segment.datetime, 0, segment.startsAt))
                     self.progress.totalFiles += 1
                     self.progress.totalMilliseconds += segment.totalMilliseconds
                     if self.downloadInfo.type.isStream() and self.downloadInfo.isSkipAdsEnabled() and any(re.match(filter, segment.title) for filter in Config.STREAM_SEGMENT_TITLE_FILTER_REGEX):
@@ -90,7 +96,7 @@ class PlaylistEngine(BaseEngine):
                         segmentsToDownload.append(segment)
                 self._downloadSegments(segmentsToDownload)
                 self._syncProgress()
-            if self._playlistManager.playlist.isEndList():
+            if self._playlistManager.playlist.isEndList() or self.downloadInfo.type.isVideo():
                 self._checkDone()
             else:
                 self._refreshTimer.start()
@@ -136,7 +142,7 @@ class PlaylistEngine(BaseEngine):
 
     def _checkDone(self) -> None:
         if len(self._segmentDownloaders) == 0 and not self.status.isDone():
-            if self.status.terminateState.isProcessing() or self._playlistManager.playlist.isEndList():
+            if self.status.terminateState.isProcessing() or self._playlistManager.playlist.isEndList() or self.downloadInfo.type.isVideo():
                 if self._FFmpeg == None:
                     self._finish()
                 elif self.status.terminateState.isProcessing():

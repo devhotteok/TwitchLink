@@ -20,6 +20,7 @@ class Account(QtWidgets.QWidget):
         if Utils.isWindows():
             self._ui.importFromChromeButton.clicked.connect(self.importAccountFromChrome)
             self._ui.importFromEdgeButton.clicked.connect(self.importAccountFromEdge)
+            self._ui.importFromFirefoxButton.clicked.connect(self.importAccountFromFirefox)
         else:
             self._ui.importAccountArea.hide()
         self._ui.continueButton.clicked.connect(self.startLoginRequested)
@@ -76,6 +77,7 @@ class Account(QtWidgets.QWidget):
             self._ui.buttonArea.setCurrentIndex(0)
             self._ui.importFromChromeButton.setEnabled(True)
             self._ui.importFromEdgeButton.setEnabled(True)
+            self._ui.importFromFirefoxButton.setEnabled(True)
             self._ui.profileImage.cancelImageRequest()
             self.updateAccountImage()
 
@@ -90,6 +92,7 @@ class Account(QtWidgets.QWidget):
         self._ui.buttonArea.setCurrentIndex(1)
         self._ui.importFromChromeButton.setEnabled(False)
         self._ui.importFromEdgeButton.setEnabled(False)
+        self._ui.importFromFirefoxButton.setEnabled(False)
         self.startLoginRequested.emit()
 
     def processAccountData(self, accountData: AccountData) -> None:
@@ -105,6 +108,7 @@ class Account(QtWidgets.QWidget):
         self._ui.loginButton.setEnabled(True)
         self._ui.importFromChromeButton.setEnabled(True)
         self._ui.importFromEdgeButton.setEnabled(True)
+        self._ui.importFromFirefoxButton.setEnabled(True)
 
     def logout(self) -> None:
         if Utils.ask("log-out", "#Are you sure you want to log out?", parent=self):
@@ -119,6 +123,7 @@ class Account(QtWidgets.QWidget):
             self._ui.loginButton.setEnabled(False)
             self._ui.importFromChromeButton.setEnabled(False)
             self._ui.importFromEdgeButton.setEnabled(False)
+            self._ui.importFromFirefoxButton.setEnabled(False)
             accountImportProgressView = Ui.AccountImportProgressView(browserInfo=browserInfo, parent=self)
             accountImportProgressView.accountDetected.connect(self.processAccountData, QtCore.Qt.ConnectionType.QueuedConnection)
             accountImportProgressView.errorOccurred.connect(self._accountImportError, QtCore.Qt.ConnectionType.QueuedConnection)
@@ -131,11 +136,14 @@ class Account(QtWidgets.QWidget):
     def importAccountFromEdge(self) -> None:
         self.importAccountFromBrowser(browserInfo=AvailableBrowsers.Edge)
 
+    def importAccountFromFirefox(self) -> None:
+        self.importAccountFromBrowser(browserInfo=AvailableBrowsers.Firefox)
+
     def _accountImportError(self, browserInfo: BrowserInfo, exception: Exceptions.BrowserNotFound | Exceptions.DriverConnectionFailure | Exceptions.UnexpectedDriverError | Exceptions.AccountNotFound) -> None:
         if isinstance(exception, Exceptions.BrowserNotFound):
             Utils.info("error", T("#Unable to detect {browserName}.\nPlease make sure {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         elif isinstance(exception, Exceptions.DriverConnectionFailure):
-            Utils.info("error", T("#{browserName} is currently running.\nPlease close all {browserName} windows and try again.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            Utils.info("error", T("#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         elif isinstance(exception, Exceptions.UnexpectedDriverError):
             Utils.info("error", T("#An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         else:

@@ -2,12 +2,13 @@ from PyQt6 import QtCore
 
 
 class Segment:
-    def __init__(self, sequence: int, url: QtCore.QUrl, datetime: QtCore.QDateTime | None, totalMilliseconds: int, startsAt: int, title: str = ""):
+    def __init__(self, sequence: int, url: QtCore.QUrl, datetime: QtCore.QDateTime | None, totalMilliseconds: int, startsAt: int, mapInfo: str | None = None, title: str = ""):
         self.sequence = sequence
         self.url = url
         self.datetime = datetime
         self.totalMilliseconds = totalMilliseconds
         self.startsAt = startsAt
+        self.mapInfo = mapInfo
         self.title = title
 
     @property

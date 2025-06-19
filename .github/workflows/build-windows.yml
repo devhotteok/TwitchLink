@@ -1,0 +1,79 @@
+name: Build Windows
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      PYTHON_VERSION: '3.12'
+      APP_NAME: TwitchLink
+      OUTPUT_FILENAME: TwitchLinkSetup-${{ inputs.version }}.exe
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          /*
+          !/.github/deploy/macos
+          !/resources/dependencies/macos
+        sparse-checkout-cone-mode: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Prepare build files
+      run: cp -r .github/build/windows/* .
+
+    - name: Update build files with version
+      run: |
+        sed -i 's/{{APP_VERSION}}/${{ inputs.version }}/g' TwitchLink.spec
+        sed -i 's/{{APP_VERSION}}/${{ inputs.version }}/g' Script.iss
+        echo "✅ Updated files with version: ${{ inputs.version }}"
+
+    - name: Build executable
+      run: |
+        pyinstaller TwitchLink.spec
+        if [ $? -ne 0 ]; then
+          echo "❌ Executable build failed"
+          exit 1
+        fi
+        echo "✅ Built executable: ${{ env.APP_NAME }}.exe"
+
+    - name: Build installer
+      run: |
+        iscc "Script.iss"
+        if [ $? -ne 0 ]; then
+          echo "❌ Installer build failed"
+          exit 1
+        fi
+        echo "✅ Built: ${{ env.OUTPUT_FILENAME }}"
+
+    - name: Upload to release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: "Output/${{ env.OUTPUT_FILENAME }}"

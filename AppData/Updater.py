@@ -148,6 +148,13 @@ class Updaters:
         data["temp"]["_downloadHistory"] = []
         return data
 
+    @staticmethod
+    def Update_3_5_0(data: dict) -> dict:
+        languageCode = data.get("localization", {}).pop("_language", None)
+        if languageCode != None:
+            data["localization"]["_translationPackId"] = languageCode
+        return data
+
     @classmethod
     def getUpdaters(cls, versionFrom: str) -> list[typing.Callable[[dict], dict]] | None:
         VERSIONS = {
@@ -165,7 +172,8 @@ class Updaters:
             "3.2.0": cls.Update_3_2_0,
             "3.2.1": None,
             "3.3.0": cls.Update_3_3_0,
-            "3.4.0": None
+            "3.4.0": None,
+            "3.5.0": cls.Update_3_5_0
         }
         updaters = []
         versionFound = False

@@ -3,6 +3,7 @@ from .AccountData import AccountData
 from .BrowserCookieDetector.BrowserCookieDetector import BrowserCookieDetector, BrowserProfile, Exceptions as BrowserCookieDetectorExceptions
 from .BrowserCookieDetector.ChromeCookieDetector import ChromeCookieDetector
 from .BrowserCookieDetector.EdgeCookieDetector import EdgeCookieDetector
+from .BrowserCookieDetector.FirefoxCookieDetector import FirefoxCookieDetector
 
 from PyQt6 import QtCore
 
@@ -27,6 +28,7 @@ class BrowserInfo:
 class AvailableBrowsers:
     Chrome = BrowserInfo(cookieDetector=ChromeCookieDetector)
     Edge = BrowserInfo(cookieDetector=EdgeCookieDetector)
+    Firefox = BrowserInfo(cookieDetector=FirefoxCookieDetector)
 
 
 class BrowserAccountDetectorThread(QtCore.QThread):
@@ -89,7 +91,10 @@ class BrowserAccountDetector(QtCore.QObject):
         self._thread: BrowserAccountDetectorThread | None = None
 
     def getProfiles(self, browserInfo: BrowserInfo) -> list[BrowserProfile]:
-        return browserInfo.getCookieDetector().getProfiles()
+        try:
+            return browserInfo.getCookieDetector().getProfiles()
+        except:
+            return []
 
     def importAccount(self, browserInfo: BrowserInfo, profile: BrowserProfile | None = None) -> None:
         if self.isRunning():

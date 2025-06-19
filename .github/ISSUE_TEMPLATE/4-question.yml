@@ -1,0 +1,54 @@
+name: ❓ Question / Support
+description: Ask a question or get help with TwitchLink
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the form below if you need help with TwitchLink.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📋 Question
+      description: Describe your question or goal in detail.
+      placeholder: |
+        Please describe:
+        1. Your question clearly and concisely
+        2. What you're trying to accomplish
+        3. Any relevant context that might help us understand your situation
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: 💻 Operating System
+      description: What operating system are you using? Leave blank if not relevant.
+      options:
+        - Windows 10
+        - Windows 11
+        - macOS (Apple Silicon)
+        - Other
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots/Videos
+      description: If applicable, add screenshots or videos to help explain your question
+      placeholder: Drag and drop images or videos here, or paste them directly
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: ✔️ Confirmation
+      description: Please confirm the following before submitting
+      options:
+        - label: I have checked existing issues and discussions to avoid duplicates
+          required: true
+        - label: I have checked the TwitchLink Homepage (https://twitchlink.github.io)
+          required: true
+        - label: I have read the README documentation
+          required: true
+        - label: I have provided clear context and sufficient information to understand the question
+          required: true

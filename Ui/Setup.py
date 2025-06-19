@@ -10,9 +10,10 @@ class Setup(QtWidgets.QDialog):
         self._ui.appName.setText(Config.APP_NAME)
         self._ui.continueButton.clicked.connect(self.proceed)
         self._ui.launchButton.clicked.connect(self.launch)
-        self._ui.language.addItems(App.Translator.getLanguageList())
-        self._ui.language.setCurrentIndex(App.Translator.getLanguageKeyList().index(App.Translator.getLanguage()))
-        self._ui.language.currentIndexChanged.connect(self.setLanguage)
+        for translationPack in App.Translator.getTranslationPacks():
+            self._ui.language.addItem(translationPack.getDisplayName(), userData=translationPack.getId())
+        self._ui.language.setCurrentIndex(self._ui.language.findData(App.Translator.getCurrentTranslationPackId()))
+        self._ui.language.currentIndexChanged.connect(self.updateLanguage)
         self._ui.timezone.addItems(App.Preferences.localization.getTimezoneNameList())
         self._ui.timezone.setCurrentText(App.Preferences.localization.getTimezone().name())
         self._ui.timezone.currentTextChanged.connect(self.setTimezone)
@@ -22,8 +23,8 @@ class Setup(QtWidgets.QDialog):
         self.timer.timeout.connect(self.showTimezoneTime)
         self.timer.start()
 
-    def setLanguage(self, index: int) -> None:
-        App.Translator.setLanguage(App.Translator.getLanguageCode(index))
+    def updateLanguage(self) -> None:
+        App.Translator.setTranslationPack(self._ui.language.currentData())
 
     def setTimezone(self, timezone: str) -> None:
         App.Preferences.localization.setTimezone(bytes(timezone, encoding="utf-8"))

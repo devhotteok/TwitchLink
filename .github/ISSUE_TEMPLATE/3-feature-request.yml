@@ -1,0 +1,51 @@
+name: ✨ Feature Request / Enhancement
+description: Request a new feature or enhancement for TwitchLink
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature or improvement! Please fill out the form below to help us understand your request.
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: 🏷️ Request Type
+      description: |
+        Type of request
+        - ✨ New Feature: Add something new
+        - 🔧 Feature Enhancement: Improve existing functionality
+      options:
+        - ✨ New Feature
+        - 🔧 Feature Enhancement
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📋 Detailed Description
+      description: |
+        Provide a clear and detailed description of your request.
+        - **For New Features**: Explain what functionality should be added and how it would work.
+        - **For Enhancements**: Describe the current functionality, what's missing, and how it can be improved.
+      placeholder: |
+        Please provide:
+        - Clearly describe what you are proposing, including any relevant details.
+        - Explain the problem it solves, the use case it supports, or the value it would bring to users.
+        - Describe how the feature should behave, any expected interactions, and possible integration points.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: ✔️ Confirmation
+      description: Please confirm the following before submitting
+      options:
+        - label: I have checked existing issues to avoid duplicates
+          required: true
+        - label: I have clearly described my proposed solution and its benefits
+          required: true
+        - label: I have provided clear context and sufficient information to understand the request
+          required: true

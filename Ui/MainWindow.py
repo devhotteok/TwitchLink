@@ -96,7 +96,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
             file = QtCore.QFile(Config.TRACEBACK_FILE, self)
             if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
                 fileName = file.readAll().data().decode(errors="ignore")
-                url = Utils.joinUrl(Config.HOMEPAGE_URL, "report", params={"lang": App.Translator.getLanguage()})
+                url = Utils.joinUrl(Config.HOMEPAGE_URL, "report", params={"lang": App.Translator.getCurrentLanguageCode()})
                 self.information.showAppInfo(
                     DocumentData(
                         contentId="CRASH_REPORT",
@@ -237,7 +237,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
 
     def showContributeInfo(self, totalFiles: int, totalByteSize: int) -> None:
         if Utils.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=totalFiles, totalSize=Utils.formatByteSize(totalByteSize), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self):
-            Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getLanguage()}))
+            Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getCurrentLanguageCode()}))
 
     def confirmShutdown(self) -> None:
         if App.GlobalDownloadManager.isDownloaderRunning() and not App.GlobalDownloadManager.isShuttingDown():
@@ -250,7 +250,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         if App.GlobalDownloadManager.isDownloaderRunning() and not App.GlobalDownloadManager.isShuttingDown():
             if not Utils.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS, parent=self):
                 return
-        Utils.openUrl(Utils.joinUrl(App.Updater.status.versionInfo.updateUrl, params={"lang": App.Translator.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(App.Updater.status.versionInfo.updateUrl, params={"lang": App.Translator.getCurrentLanguageCode()}))
         self.shutdown()
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
@@ -262,7 +262,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
             self.confirmShutdown()
 
     def gettingStarted(self) -> None:
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": App.Translator.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "help", params={"lang": App.Translator.getCurrentLanguageCode()}))
 
     def openAbout(self) -> None:
         self.information.openAbout()
@@ -271,7 +271,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         self.information.openTermsOfService()
 
     def sponsor(self) -> None:
-        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getLanguage()}))
+        Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getCurrentLanguageCode()}))
 
     def waitForCleanup(self) -> None:
         if App.GlobalDownloadManager.isDownloaderRunning():

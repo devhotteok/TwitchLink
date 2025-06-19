@@ -1,0 +1,86 @@
+name: 🚨 Bug Report
+description: Report a bug to help us improve TwitchLink
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Use this template only if you have confirmed that TwitchLink is affected by any of the following:**
+        - Program crashes or freezes
+        - Unexpected behavior or malfunctions
+        - Features not working as intended
+        - Error messages or exceptions
+
+        For questions, feature requests, or general discussions, please use other appropriate templates instead.
+
+        Thank you for taking the time to report a bug! Please fill out the form below to help us understand and resolve the issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📋 Bug Description
+      description: Describe the bug clearly and concisely
+      placeholder: Provide a clear and detailed description of the bug.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: 💻 Operating System
+      description: What operating system are you using?
+      options:
+        - Windows 10
+        - Windows 11
+        - macOS (Apple Silicon)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: 🔄 Steps to Reproduce
+      description: How to reproduce the issue
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots/Videos
+      description: If applicable, add screenshots or videos to help explain your problem
+      placeholder: Drag and drop images or videos here, or paste them directly
+
+  - type: textarea
+    id: error-logs
+    attributes:
+      label: 📁 Log Files / Error Messages
+      description: Upload log files by dragging and dropping them here (multiple files supported), or paste error messages as text.
+      placeholder: Drag and drop multiple log files here (recommended), or paste error messages as text.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📋 Additional Context
+      description: Include any other relevant details about the issue
+      placeholder: |
+        - Any workarounds you've found
+        - When did this issue start occurring?
+        - Does it happen consistently or randomly?
+        - Any recent changes to your system?
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: ✔️ Confirmation
+      description: Please confirm the following before submitting
+      options:
+        - label: I have checked existing issues to avoid duplicates
+          required: true
+        - label: I have tested with the latest version of TwitchLink
+          required: true
+        - label: I have provided clear context and sufficient information to understand the issue
+          required: true

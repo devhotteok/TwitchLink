@@ -15,7 +15,7 @@ class NotificationManager(QtCore.QObject):
 
     def updateNotifications(self, data: dict) -> None:
         updatedNotifications = []
-        for notification in data.get(App.Translator.getLanguage(), []):
+        for notification in data.get(App.Translator.getCurrentLanguageCode(), []):
             targetPlatforms = [item.lower() for item in notification.get("targetPlatforms", [OSUtils.getOSType()])]
             targetVersions = notification.get("targetVersions", [Config.APP_VERSION])
             if OSUtils.getOSType().lower() in targetPlatforms and Config.APP_VERSION in targetVersions:

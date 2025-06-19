@@ -1,0 +1,95 @@
+name: Build macOS
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+
+    runs-on: macos-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      PYTHON_VERSION: '3.12'
+      APP_NAME: TwitchLink
+      VOLUME_NAME: TwitchLinkSetup-${{ inputs.version }}
+      OUTPUT_FILENAME: TwitchLinkSetup-${{ inputs.version }}.dmg
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          /*
+          !/.github/deploy/windows
+          !/resources/dependencies/windows
+        sparse-checkout-cone-mode: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Prepare build files
+      run: cp -r .github/build/macos/* .
+
+    - name: Update build files with version
+      run: |
+        sed -i '' 's/{{APP_VERSION}}/${{ inputs.version }}/g' TwitchLink.spec
+        echo "✅ Updated files with version: ${{ inputs.version }}"
+
+    - name: Build app bundle
+      run: |
+        pyinstaller TwitchLink.spec
+        if [ $? -ne 0 ]; then
+          echo "❌ App bundle build failed"
+          exit 1
+        fi
+        echo "✅ Built app bundle: ${{ env.APP_NAME }}.app"
+
+    - name: Install create-dmg
+      run: |
+        brew install create-dmg
+
+    - name: Create DMG
+      run: |
+        create-dmg \
+          --volname "${{ env.VOLUME_NAME }}" \
+          --volicon "icon.icns" \
+          --background "background.png" \
+          --window-size 800 400 \
+          --text-size 14 \
+          --icon-size 100 \
+          --icon "${{ env.APP_NAME }}.app" 264 180 \
+          --hide-extension "${{ env.APP_NAME }}.app" \
+          --app-drop-link 536 180 \
+          "${{ env.OUTPUT_FILENAME }}" \
+          "dist/${{ env.APP_NAME }}.app"
+
+        if [ $? -ne 0 ]; then
+          echo "❌ DMG creation failed"
+          exit 1
+        fi
+        echo "✅ Built: ${{ env.OUTPUT_FILENAME }}"
+
+    - name: Upload to release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: "${{ env.OUTPUT_FILENAME }}"

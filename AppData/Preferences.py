@@ -123,15 +123,15 @@ class Advanced(Serializable):
 
 class Localization(Serializable):
     def __init__(self):
-        self._language = App.Translator.getDefaultLanguage()
+        self._translationPackId = App.Translator.getPreferredTranslationPackId()
         self._timezone = SystemUtils.getLocalTimezone()
 
     def __setup__(self):
-        App.Translator.setLanguage(self._language)
-        del self._language
+        App.Translator.setTranslationPack(self._translationPackId)
+        del self._translationPackId
 
     def __save__(self):
-        self._language = App.Translator.getLanguage()
+        self._translationPackId = App.Translator.getCurrentTranslationPackId()
         return super().__save__()
 
     def setTimezone(self, timezone: bytes) -> None:

@@ -57,9 +57,10 @@ class Settings(QtWidgets.QWidget):
         self._ui.searchExternalContent.toggled.connect(App.Preferences.advanced.setSearchExternalContentEnabled)
         self._ui.searchExternalContentInfo.clicked.connect(self.showSearchExternalContentInfo)
         Utils.setIconViewer(self._ui.searchExternalContentInfo, Icons.HELP)
-        self._ui.language.addItems(App.Translator.getLanguageList())
-        self._ui.language.setCurrentIndex(App.Translator.getLanguageKeyList().index(App.Translator.getLanguage()))
-        self._ui.language.currentIndexChanged.connect(self.setLanguage)
+        for translationPack in App.Translator.getTranslationPacks():
+            self._ui.language.addItem(translationPack.getDisplayName(), userData=translationPack.getId())
+        self._ui.language.setCurrentIndex(self._ui.language.findData(App.Translator.getCurrentTranslationPackId()))
+        self._ui.language.currentIndexChanged.connect(self.updateLanguage)
         self._ui.languageInfoIcon = Utils.setSvgIcon(self._ui.languageInfoIcon, Icons.ALERT_RED)
         self._ui.timezone.addItems(App.Preferences.localization.getTimezoneNameList())
         self._ui.timezone.setCurrentText(App.Preferences.localization.getTimezone().name())
@@ -141,8 +142,8 @@ class Settings(QtWidgets.QWidget):
     def showSearchExternalContentInfo(self) -> None:
         Utils.info("information", "#Allow URL Search to retrieve external content.\nYou can download content outside of Twitch.", parent=self)
 
-    def setLanguage(self, index: int) -> None:
-        App.Translator.setLanguage(App.Translator.getLanguageCode(index))
+    def updateLanguage(self) -> None:
+        App.Translator.setTranslationPack(self._ui.language.currentData())
         self.requestRestart()
 
     def setTimezone(self, timezone: str) -> None:

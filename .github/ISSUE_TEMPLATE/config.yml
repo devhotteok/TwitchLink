@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "🌐 TwitchLink Homepage"
+    url: "https://twitchlink.github.io"
+    about: "Visit our homepage for documentation and guides"
+  - name: "💬 GitHub Discussions"
+    url: "https://github.com/devhotteok/TwitchLink/discussions"
+    about: "Join our community discussions, share tips, and ask questions"

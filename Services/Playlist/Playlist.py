@@ -60,6 +60,7 @@ class Playlist:
             version = 3
             targetDuration = 0
             mediaSequence = 0
+            mapInfo = None
             endList = False
             segments = []
             expectSegment = []
@@ -74,6 +75,8 @@ class Playlist:
                         targetDuration = int(tag.data[0])
                     elif tag.name == "EXT-X-MEDIA-SEQUENCE":
                         mediaSequence = int(tag.data[0])
+                    elif tag.name == "EXT-X-MAP":
+                        mapInfo = tag.data.get("URI") or None
                     elif tag.name == "EXT-X-ENDLIST":
                         endList = True
                     elif tag.name == "EXT-X-PROGRAM-DATE-TIME":
@@ -92,7 +95,7 @@ class Playlist:
                             durationMilliseconds = int(float(tag.data[0]) * 1000)
                     if durationMilliseconds == None:
                         continue
-                    segments.append(Segment(mediaSequence + len(segments), QtCore.QUrl(line) if baseUrl == None else baseUrl.resolved(QtCore.QUrl(line)), programDateTime, durationMilliseconds, elapsedMilliseconds, tag.data[1]))
+                    segments.append(Segment(mediaSequence + len(segments), QtCore.QUrl(line) if baseUrl == None else baseUrl.resolved(QtCore.QUrl(line)), programDateTime, durationMilliseconds, elapsedMilliseconds, mapInfo, tag.data[1]))
                     elapsedMilliseconds += durationMilliseconds
                     expectSegment.clear()
         except:
