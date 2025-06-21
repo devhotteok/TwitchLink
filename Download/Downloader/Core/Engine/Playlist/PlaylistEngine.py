@@ -96,7 +96,7 @@ class PlaylistEngine(BaseEngine):
                         segmentsToDownload.append(segment)
                 self._downloadSegments(segmentsToDownload)
                 self._syncProgress()
-            if self._playlistManager.playlist.isEndList() or self.downloadInfo.type.isVideo():
+            if self._playlistManager.playlist.isEndList() or (self.downloadInfo.type.isVideo() and not self.downloadInfo.isUpdateTrackEnabled()):
                 self._checkDone()
             else:
                 self._refreshTimer.start()
@@ -142,7 +142,7 @@ class PlaylistEngine(BaseEngine):
 
     def _checkDone(self) -> None:
         if len(self._segmentDownloaders) == 0 and not self.status.isDone():
-            if self.status.terminateState.isProcessing() or self._playlistManager.playlist.isEndList() or self.downloadInfo.type.isVideo():
+            if self.status.terminateState.isProcessing() or self._playlistManager.playlist.isEndList() or (self.downloadInfo.type.isVideo() and not self.downloadInfo.isUpdateTrackEnabled()):
                 if self._FFmpeg == None:
                     self._finish()
                 elif self.status.terminateState.isProcessing():
