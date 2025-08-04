@@ -2,6 +2,8 @@ from Core.Ui import *
 from Services.Script import Script
 from Services.Document import DocumentData, DocumentButtonData
 
+from PyQt6 import QtWebEngineCore
+
 
 class DocumentViewButton(QtWidgets.QPushButton):
     def __init__(self, documentButtonData: DocumentButtonData, parent: QtWidgets.QWidget | None = None):
@@ -46,9 +48,11 @@ class DocumentView(QtWidgets.QWidget):
         if contentType == "html":
             self._ui.contentBrowser = Utils.setPlaceholder(self._ui.contentBrowser, QtWebEngineWidgets.QWebEngineView(parent=self))
             self._ui.contentBrowser.setHtml(content)
+            self._ui.contentBrowser.page().newWindowRequested.connect(self._browserWindowRequestHandler)
         elif contentType == "url":
             self._ui.contentBrowser = Utils.setPlaceholder(self._ui.contentBrowser, QtWebEngineWidgets.QWebEngineView(parent=self))
             self._ui.contentBrowser.load(QtCore.QUrl(content))
+            self._ui.contentBrowser.page().newWindowRequested.connect(self._browserWindowRequestHandler)
         else:
             self._ui.contentBrowser.setText(content)
 
@@ -89,3 +93,6 @@ class DocumentView(QtWidgets.QWidget):
     def _checkContentBlock(self) -> None:
         if self._ui.checkBox.isChecked():
             App.Notifications.block(self.documentData)
+
+    def _browserWindowRequestHandler(self, request: QtWebEngineCore.QWebEngineNewWindowRequest) -> None:
+        Utils.openUrl(request.requestedUrl())

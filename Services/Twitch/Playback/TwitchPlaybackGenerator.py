@@ -109,7 +109,7 @@ class TwitchStreamPlaybackGenerator(QtCore.QObject):
             raise Exceptions.GeoBlock(self.token.getGeoBlockReason())
 
     def _getStreamPlayback(self) -> None:
-        params = {"allow_source": True, "allow_audio_only": True, "sig": self.token.signature, "token": self.token.value, "fast_bread": True}
+        params = {"allow_source": True, "allow_audio_only": True, "sig": self.token.signature, "token": self.token.value, "fast_bread": True, "supported_codecs": "av1,h265,h264"}
         url = QtCore.QUrl(f"{Config.HLS_SERVER}{self.login}.m3u8")
         query = QtCore.QUrlQuery()
         for key, value in params.items():

@@ -17,7 +17,6 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         self._ui = UiLoader.load("mainWindow", self)
         self._webViewEnabled = False
         App.Instance.appStarted.connect(self.start, QtCore.Qt.ConnectionType.QueuedConnection)
-        App.Instance.newInstanceStarted.connect(self.activate)
 
     def start(self) -> None:
         if App.Preferences.setup.needSetup():
@@ -92,6 +91,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
             App.Updater.statusUpdated.connect(self.statusUpdated)
             App.Updater.startAutoUpdate()
             App.GlobalDownloadManager.statsUpdated.connect(self.showContributeInfo, QtCore.Qt.ConnectionType.QueuedConnection)
+        App.Instance.newInstanceStarted.connect(self.activate)
         if Utils.isFile(Config.TRACEBACK_FILE):
             file = QtCore.QFile(Config.TRACEBACK_FILE, self)
             if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
