@@ -1,4 +1,5 @@
 from Core.GlobalExceptions import Exceptions
+from Services.Logging.Logger import Logger
 from Services.Playlist import Playlist
 from Services.Playlist.Segment import Segment
 
@@ -11,16 +12,17 @@ class PlaylistManager(QtCore.QObject):
     playlistUpdated = QtCore.pyqtSignal()
     errorOccurred = QtCore.pyqtSignal(Exception)
 
-    def __init__(self, networkAccessManager: QtNetwork.QNetworkAccessManager, url: QtCore.QUrl, timeout: int = 10000, maxRetryCount: int = 2, retryInterval: int = 1000, parent: QtCore.QObject | None = None):
+    def __init__(self, networkAccessManager: QtNetwork.QNetworkAccessManager, url: QtCore.QUrl, logger: Logger, timeout: int = 10000, maxRetryCount: int = 2, retryInterval: int = 1000,  parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
         self.url = url
+        self.logger = logger
         self.playlist = Playlist.Playlist()
         self._range = (None, None)
         self._networkAccessManager = networkAccessManager
         self._request = QtNetwork.QNetworkRequest(self.url)
         self._request.setTransferTimeout(timeout)
         self._reply: QtNetwork.QNetworkReply | None = None
-        self._error: Exceptions.AbortRequested | Exceptions.NetworkError | Playlist.Exceptions.InvalidPlaylist | None = None
+        self._error: Exceptions.AbortRequested | Exceptions.NetworkError | Playlist.Exceptions.InvalidPlaylist | Exceptions.UnexpectedError | None = None
         self._retryTimer = QtCore.QTimer(parent=self)
         self._retryTimer.setSingleShot(True)
         self._retryTimer.timeout.connect(self._retryTimerTimeout)
@@ -59,21 +61,28 @@ class PlaylistManager(QtCore.QObject):
             self._currentNetworkError = None
             try:
                 self.playlist.loads(reply.readAll().data().decode(errors="ignore"), baseUrl=self.url)
-            except Exception as e:
+            except Playlist.Exceptions.InvalidPlaylist as e:
                 self._raiseException(e)
+            except Exception as e:
+                self._raiseException(Exceptions.UnexpectedError(e))
             else:
                 self._running = False
                 self.playlistUpdated.emit()
         elif self._currentNetworkError == QtNetwork.QNetworkReply.NetworkError.ContentAccessDenied and self._retryCount != 0:
             self._raiseException(Exceptions.NetworkError(reply))
         elif self._retryCount < self._maxRetryCount:
+            self.logger.warning(f"Unable to load playlist.")
+            self.logger.exception(Exceptions.NetworkError(reply))
             self._currentNetworkError = reply.error()
             self._retryCount += 1
+            self.logger.warning(f"Pending Retry: {self._retryCount}/{self._maxRetryCount}")
             self._retryTimer.start(self._retryInterval)
         else:
             self._raiseException(Exceptions.NetworkError(reply))
 
-    def _raiseException(self, exception: Exceptions.AbortRequested | Exceptions.NetworkError | Playlist.Exceptions.InvalidPlaylist) -> None:
+    def _raiseException(self, exception: Exceptions.AbortRequested | Exceptions.NetworkError | Playlist.Exceptions.InvalidPlaylist | Exceptions.UnexpectedError) -> None:
+        self.logger.warning("The following exception occurred.")
+        self.logger.exception(exception)
         if self._error != None:
             return
         self._error = exception

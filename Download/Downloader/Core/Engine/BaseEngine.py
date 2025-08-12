@@ -47,12 +47,12 @@ class BaseEngine(QtCore.QObject):
 
     def abort(self, exception: Exception) -> None:
         self.logger.warning("Abort requested with the following exception.")
-        self.logger.warning(exception)
+        self.logger.exception(exception)
         self._raiseException(exception)
 
     def _raiseException(self, exception: Exception) -> None:
         self.logger.warning("The following exception occurred.")
-        self.logger.warning(exception)
+        self.logger.exception(exception)
         self.status.raiseError(exception)
         self._syncStatus()
 
