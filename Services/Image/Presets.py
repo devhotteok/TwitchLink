@@ -67,7 +67,7 @@ class Icons:
     LAUNCH = I("launch.svg")
     LIST = I("list.svg")
     LOADING = I("loading.svg")
-    LOGIN = I("login.svg")
+    SIGN_IN = I("sign_in.svg")
     MOVE = I("move.svg")
     NOTICE = I("notice.svg")
     PLUS = I("plus.svg")

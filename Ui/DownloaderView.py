@@ -154,7 +154,7 @@ class DownloaderView(QtWidgets.QWidget):
             elif isinstance(self._exception, Exceptions.ProcessError):
                 Utils.info("process-error", "#Process exited unexpectedly.\n\nPossible Causes\n\n* Corruption of the original file\n* Invalid crop range\n* Too long or invalid filename or path\n* Out of memory\n* Out of storage capacity\n* Lack of device performance\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.", parent=self)
             elif isinstance(self._exception, TwitchGQLAPI.Exceptions.AuthorizationError):
-                if App.Account.isLoggedIn():
+                if App.Account.isSignedIn():
                     Utils.info(*Messages.INFO.AUTHENTICATION_ERROR, parent=self)
                 else:
                     Utils.info(*Messages.INFO.TEMPORARY_ERROR, parent=self)
@@ -181,7 +181,7 @@ class DownloaderView(QtWidgets.QWidget):
 
     def _getErrorDescription(self) -> str | None:
         if isinstance(self._exception, TwitchPlaybackGenerator.Exceptions.Forbidden):
-            if App.Account.isLoggedIn():
+            if App.Account.isSignedIn():
                 return f"{T('#Authentication of your account has been denied.')}\n\n{T('reason')}: {self._exception.reason}"
             else:
                 return f"{T('#Authentication denied.')}\n\n{T('reason')}: {self._exception.reason}"

@@ -208,7 +208,7 @@ border-radius: 10px;</string>
         </property>
         <property name="toolTip">
          <string>This stream may contain ads.
-To block ads, you must log in with a subscribed account.</string>
+To block ads, you must sign in with a subscribed account.</string>
         </property>
         <property name="icon">
          <iconset>

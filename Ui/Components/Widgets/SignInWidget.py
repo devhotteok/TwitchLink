@@ -6,8 +6,8 @@ from Ui.WebViewWidget import WebViewWidget
 from PyQt6 import QtWebEngineCore, QtNetwork
 
 
-class LoginWidget(WebViewWidget):
-    loginComplete = QtCore.pyqtSignal(AccountData)
+class SignInWidget(WebViewWidget):
+    signInComplete = QtCore.pyqtSignal(AccountData)
 
     def __init__(self, profile: QtWebEngineCore.QWebEngineProfile, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent=parent)
@@ -15,17 +15,17 @@ class LoginWidget(WebViewWidget):
         self.profile = profile
         self.profile.cookieStore().cookieAdded.connect(self._getOAuthToken)
         self.setProfile(self.profile)
-        self.showLoginPage()
+        self.showSignInPage()
 
-    def showLoginPage(self) -> None:
-        self._ui.webView.load(QtCore.QUrl(Config.LOGIN_PAGE))
+    def showSignInPage(self) -> None:
+        self._ui.webView.load(QtCore.QUrl(Config.SIGN_IN_PAGE_URL))
 
     def urlChangeHandler(self, url: QtCore.QUrl) -> None:
         super().urlChangeHandler(url)
-        if url.toString() != Config.LOGIN_PAGE:
-            self.showInfo(T("#You left the login page."), icon=Icons.ALERT_RED, buttonIcon=Icons.LOGIN, buttonText=T("#Return to login page"), buttonHandler=self.showLoginPage)
+        if url.toString() != Config.SIGN_IN_PAGE_URL:
+            self.showInfo(T("#You left the sign-in page."), icon=Icons.ALERT_RED, buttonIcon=Icons.SIGN_IN, buttonText=T("#Return to sign-in page"), buttonHandler=self.showSignInPage)
         else:
-            self.showInfo(T("#Please follow the login procedure."), icon=Icons.INFO)
+            self.showInfo(T("#Please follow the sign-in procedure."), icon=Icons.INFO)
 
     def hasAccountData(self) -> bool:
         return self.accountData.username != None and self.accountData.token != None
@@ -49,4 +49,4 @@ class LoginWidget(WebViewWidget):
     def _checkToken(self) -> None:
         if self.hasAccountData():
             self.profile.cookieStore().cookieAdded.disconnect(self._getOAuthToken)
-            self.loginComplete.emit(self.accountData)
+            self.signInComplete.emit(self.accountData)

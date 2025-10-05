@@ -6,8 +6,8 @@ class Info:
     NETWORK_ERROR = ("network-error", "#A network error has occurred.")
     TEMPORARY_ERROR = ("error", "#A temporary error has occurred.\nPlease try again later.")
 
-    AUTHENTICATION_ERROR = ("authentication-error", "#An authentication error has occurred.\nIf the error persists, try logging in again.")
-    LOGIN_EXPIRED = ("login-expired", "#Your login has expired.\nIf you do not log in again, the downloader will operate in a logged out state.")
+    AUTHENTICATION_ERROR = ("authentication-error", "#An authentication error has occurred.\nIf the error persists, try signing in again.")
+    SESSION_EXPIRED = ("session-expired", "#Your session has expired.\nPlease sign in again.")
 
 
 class Ask:

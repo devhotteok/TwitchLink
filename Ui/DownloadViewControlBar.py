@@ -125,6 +125,6 @@ class DownloadViewControlBar(QtWidgets.QWidget):
         self._ui.contentType.setText(f"{T('external-content')} / {T(contentType)}" if isinstance(downloadInfo.playback, ExternalPlaybackGenerator.ExternalPlayback) else T(contentType))
 
     def _showAdsInfo(self) -> None:
-        adsInfo = T("#This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to log in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.")
+        adsInfo = T("#This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to sign in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.")
         changesInfo = T("#Changes will take effect from the next download.")
         Utils.info("warning", f"{adsInfo}\n\n{changesInfo}", contentTranslate=False, parent=self)

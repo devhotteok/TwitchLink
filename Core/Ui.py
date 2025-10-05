@@ -75,6 +75,7 @@ class Ui:
     Settings = None
     PropertyView = None
     Account = None
+    ExternalBrowserLauncher = None
     AccountImportProgressView = None
     About = None
     DocumentView = None
@@ -98,7 +99,7 @@ class Ui:
     WebViewWidget = None
 
 
-from Ui import MainWindow, Loading, Setup, Settings, PropertyView, Account, AccountImportProgressView, About, DocumentView, Home, Search, VideoWidget, VideoDownloadWidget, SearchResult, DownloadMenu, DownloadViewControlBar, DownloadInfoView, DownloaderView, Downloads, DownloadPreview, Download, ScheduledDownloads, ScheduledDownloadPreview, ScheduledDownloadSettings, DownloadHistories, DownloadHistoryView, WebViewWidget
+from Ui import MainWindow, Loading, Setup, Settings, PropertyView, Account, ExternalBrowserLauncher, AccountImportProgressView, About, DocumentView, Home, Search, VideoWidget, VideoDownloadWidget, SearchResult, DownloadMenu, DownloadViewControlBar, DownloadInfoView, DownloaderView, Downloads, DownloadPreview, Download, ScheduledDownloads, ScheduledDownloadPreview, ScheduledDownloadSettings, DownloadHistories, DownloadHistoryView, WebViewWidget
 
 
 Ui.MainWindow = MainWindow.MainWindow
@@ -107,6 +108,7 @@ Ui.Setup = Setup.Setup
 Ui.Settings = Settings.Settings
 Ui.PropertyView = PropertyView.PropertyView
 Ui.Account = Account.Account
+Ui.ExternalBrowserLauncher = ExternalBrowserLauncher.ExternalBrowserLauncher
 Ui.AccountImportProgressView = AccountImportProgressView.AccountImportProgressView
 Ui.About = About.About
 Ui.DocumentView = DocumentView.DocumentView

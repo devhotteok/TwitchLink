@@ -45,7 +45,7 @@ class AccountImportProgressView(QtWidgets.QDialog):
         )
 
     def _showInfoText(self, browserName: str) -> None:
-        self._ui.info.setText(T("#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, logging out of your Twitch account in the browser will also log you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are logged in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.", browserName=browserName, appName=Config.APP_NAME))
+        self._ui.info.setText(T("#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, signing out of your Twitch account in the browser will also sign you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are signed in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.", browserName=browserName, appName=Config.APP_NAME))
 
     def _browserProfileUpdated(self, browserProfile: BrowserProfile) -> None:
         if not self._cancelRequested:

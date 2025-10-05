@@ -1,5 +1,4 @@
 import abc
-import json
 import selenium.webdriver.remote.webdriver
 
 
@@ -59,20 +58,9 @@ class BrowserCookieDetector:
         pass
 
     @classmethod
+    @abc.abstractmethod
     def getProfiles(cls) -> list[BrowserProfile]:
-        try:
-            with open(cls._getLocalStatePath(), "r", encoding="utf-8") as f:
-                data = json.load(f)
-            profileData = data.get("profile", {})
-            profilesOrder = profileData.get("profiles_order", [])
-            lastUsed = profileData.get("last_used", "")
-            if lastUsed in profilesOrder:
-                profilesOrder.remove(lastUsed)
-                profilesOrder.insert(0, lastUsed)
-            profileInfo = profileData.get("info_cache", {})
-            return [BrowserProfile(browserName=cls.getDisplayName(), key=profileKey, displayName=profileInfo.get(profileKey, {}).get("name") or "") for profileKey in profilesOrder]
-        except:
-            raise Exceptions.BrowserNotFound()
+        pass
 
     @classmethod
     def getProfileCookies(cls, url: str, domain: str, profile: BrowserProfile, names: list[str] | None = None) -> dict[str, BrowserCookie]:

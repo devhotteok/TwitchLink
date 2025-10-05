@@ -57,7 +57,7 @@ class DownloadButton(QtCore.QObject):
                     return
             self.askDownload(self.generateDownloadInfo(streamPlayback))
         elif isinstance(generator.getError(), TwitchPlaybackGenerator.Exceptions.Forbidden):
-            if App.Account.isLoggedIn():
+            if App.Account.isSignedIn():
                 self.info("unable-to-download", f"{T('#Authentication of your account has been denied.')}\n\n{T('reason')}: {generator.getError().reason}", contentTranslate=False)
             else:
                 self.info("unable-to-download", f"{T('#Authentication denied.')}\n\n{T('reason')}: {generator.getError().reason}", contentTranslate=False)
@@ -85,12 +85,12 @@ class DownloadButton(QtCore.QObject):
             videoPlayback = generator.getData()
             self.askDownload(self.generateDownloadInfo(videoPlayback))
         elif isinstance(generator.getError(), TwitchPlaybackGenerator.Exceptions.VideoRestricted):
-            if App.Account.isLoggedIn():
-                advice = T("#Unable to find subscription in your account.\nSubscribe to this streamer or log in with another account.")
+            if App.Account.isSignedIn():
+                advice = T("#Unable to find subscription in your account.\nSubscribe to this streamer or sign in with another account.")
                 okText = T("change-account")
             else:
-                advice = T("#You need to log in to download subscriber-only videos.")
-                okText = T("log-in")
+                advice = T("#You need to sign in to download subscriber-only videos.")
+                okText = T("sign-in")
             if self.ask("unable-to-download", T("#This video is for subscribers only.\n{advice}", advice=advice), contentTranslate=False, okText=okText, cancelText=T("ok")):
                 self.accountPageShowRequested.emit()
         elif isinstance(generator.getError(), TwitchPlaybackGenerator.Exceptions.VideoNotFound):
@@ -119,7 +119,7 @@ class DownloadButton(QtCore.QObject):
 
     def handleExceptions(self, exception: Exception) -> None:
         if isinstance(exception, TwitchGQLAPI.Exceptions.AuthorizationError):
-            if App.Account.isLoggedIn():
+            if App.Account.isSignedIn():
                 self.info(*Messages.INFO.AUTHENTICATION_ERROR)
             else:
                 self.info(*Messages.INFO.TEMPORARY_ERROR)
@@ -143,11 +143,11 @@ class DownloadButton(QtCore.QObject):
         return DownloadInfo(self.content, playback)
 
     def showStreamAdWarning(self) -> bool:
-        adsInfo = T("#This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to log in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.")
-        if App.Account.isLoggedIn():
+        adsInfo = T("#This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to sign in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.")
+        if App.Account.isSignedIn():
             adBlockFailReason = T("#Your account does not have a subscription to this channel.")
         else:
-            adBlockFailReason = T("#You are not currently logged in.")
+            adBlockFailReason = T("#You are not currently signed in.")
         proceedInfo = T("#Would you like to proceed?")
         return self.ask("warning", f"{adsInfo}\n\n{adBlockFailReason}\n\n{proceedInfo}", contentTranslate=False, defaultOk=True)
 

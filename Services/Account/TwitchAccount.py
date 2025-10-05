@@ -19,21 +19,21 @@ class TwitchAccount(QtCore.QObject, Serializable):
         super().__init__(parent=parent)
         self.clearData()
 
-    def login(self, user: TwitchGQLModels.User, token: str, expiration: int | None = None) -> None:
-        if self.isLoggedIn():
-            self.logout()
+    def signIn(self, user: TwitchGQLModels.User, token: str, expiration: int | None = None) -> None:
+        if self.isSignedIn():
+            self.signOut()
         self.user = user
         self.oAuthToken = OAuthToken(token, expiration)
         self.updateIntegrityToken()
         self.accountUpdated.emit()
 
-    def logout(self) -> None:
+    def signOut(self) -> None:
         self.clearData()
         self.updateIntegrityToken()
         self.accountUpdated.emit()
 
     def invalidate(self) -> None:
-        self.logout()
+        self.signOut()
         self.authorizationExpired.emit()
 
     def setData(self, user: TwitchGQLModels.User | None, oAuthToken: OAuthToken | None) -> None:
@@ -47,11 +47,11 @@ class TwitchAccount(QtCore.QObject, Serializable):
         self.user = None
         self.oAuthToken = None
 
-    def isLoggedIn(self) -> bool:
+    def isSignedIn(self) -> bool:
         return self.user != None
 
     def validateOAuthToken(self) -> None:
-        if self.isLoggedIn():
+        if self.isSignedIn():
             try:
                 self.oAuthToken.validate()
             except:

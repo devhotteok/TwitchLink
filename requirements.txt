@@ -2,4 +2,5 @@ PyQt6==6.9.1
 PyQt6-Qt6==6.9.1
 PyQt6-WebEngine==6.9.0
 PyQt6-WebEngine-Qt6==6.9.1
-selenium==4.33.0
+selenium==4.36.0
+patchright==1.55.2

@@ -34,7 +34,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Log In with Twitch</string>
+      <string>Sign In with Twitch</string>
      </property>
     </widget>
    </item>
@@ -60,14 +60,14 @@
           <string>Loading...</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="loginPage">
-      <layout class="QVBoxLayout" name="loginPageLayout">
+     <widget class="QWidget" name="signInPage">
+      <layout class="QVBoxLayout" name="signInPageLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -92,7 +92,7 @@
           <string>Account Info</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -123,7 +123,7 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item alignment="Qt::AlignHCenter">
+          <item alignment="Qt::AlignmentFlag::AlignHCenter">
            <widget class="QWidget" name="infoArea" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -159,12 +159,12 @@
                 <bool>true</bool>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="loginInfo">
+              <widget class="QLabel" name="signInInfo">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -175,10 +175,10 @@
                 <string notr="true">color: rgb(255, 0, 0);</string>
                </property>
                <property name="text">
-                <string>Your login is in progress.</string>
+                <string>Sign-in is in progress...</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -186,105 +186,8 @@
            </widget>
           </item>
           <item>
-           <widget class="QStackedWidget" name="buttonArea">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <widget class="QWidget" name="loginButtonArea">
-             <layout class="QHBoxLayout" name="loginButtonAreaLayout">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QPushButton" name="loginButton">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>40</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Log in</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="cancelButtonArea">
-             <layout class="QHBoxLayout" name="cancelButtonAreaLayout">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QPushButton" name="continueButton">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>40</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Continue</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="cancelButton">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>40</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Cancel</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_1">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QWidget" name="importAccountArea" native="true">
-            <layout class="QVBoxLayout" name="importAccountAreaLayout">
+           <widget class="QWidget" name="signInOptionsArea" native="true">
+            <layout class="QVBoxLayout" name="signInOptionsAreaLayout">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -298,7 +201,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QPushButton" name="importFromChromeButton">
+              <widget class="QPushButton" name="signInWithChromeButton">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -306,12 +209,12 @@
                 </size>
                </property>
                <property name="text">
-                <string>Import from Chrome</string>
+                <string>Sign in with Chrome</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="importFromEdgeButton">
+              <widget class="QPushButton" name="signInWithEdgeButton">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -319,7 +222,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Import from Edge</string>
+                <string>Sign in with Edge</string>
                </property>
               </widget>
              </item>
@@ -336,6 +239,100 @@
                </property>
               </widget>
              </item>
+             <item>
+              <spacer name="verticalSpacer_1">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QStackedWidget" name="buttonArea">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <widget class="QWidget" name="signInButtonArea">
+                <layout class="QHBoxLayout" name="signInButtonAreaLayout">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="signInButton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Sign in with Internal Browser</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="cancelButtonArea">
+                <layout class="QHBoxLayout" name="cancelButtonAreaLayout">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="continueButton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Continue</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="cancelButton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Cancel</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -344,8 +341,8 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="logoutPage">
-      <layout class="QVBoxLayout" name="logoutPageLayout">
+     <widget class="QWidget" name="signOutPage">
+      <layout class="QVBoxLayout" name="signOutPageLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -358,7 +355,7 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item alignment="Qt::AlignRight">
+       <item alignment="Qt::AlignmentFlag::AlignRight">
         <widget class="QToolButton" name="refreshAccountButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -423,7 +420,7 @@
                 <bool>true</bool>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -441,7 +438,7 @@
              <string>Account</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignmentFlag::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -449,7 +446,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="logoutButton">
+        <widget class="QPushButton" name="signOutButton">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -457,7 +454,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Log out</string>
+          <string>Sign out</string>
          </property>
         </widget>
        </item>

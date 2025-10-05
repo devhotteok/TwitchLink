@@ -67,16 +67,16 @@
     "en": "Developer Tools",
     "ko": "개발자 도구"
   },
-  "log-in": {
-    "en": "Log In",
+  "sign-in": {
+    "en": "Sign In",
     "ko": "로그인"
   },
-  "cancel-login": {
-    "en": "Cancel Login",
+  "cancel-sign-in": {
+    "en": "Cancel Sign-In",
     "ko": "로그인 취소"
   },
-  "log-out": {
-    "en": "Log Out",
+  "sign-out": {
+    "en": "Sign Out",
     "ko": "로그아웃"
   },
   "detect-automatically": {
@@ -90,10 +90,6 @@
   "version": {
     "en": "Version",
     "ko": "버전"
-  },
-  "login-expired": {
-    "en": "Login Expired",
-    "ko": "로그인 만료"
   },
   "authentication-error": {
     "en": "Authentication Error",

@@ -155,32 +155,40 @@
     "en": "Close the window by pressing [{key}].",
     "ko": "[{key}]키를 이용해 닫을 수 있습니다."
   },
-  "#Log in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)": {
-    "en": "Log in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)",
+  "#Sign in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)": {
+    "en": "Sign in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)",
     "ko": "로그인하여 Twitch 계정의 혜택을 {appName} 앱과 연동하세요.\n(생방송 광고 제거, 구독자 전용 생방송 다운로드, 구독자 전용 비디오 다운로드, Twitch Prime 또는 Twitch Turbo의 혜택 등)"
   },
-  "#Are you sure you want to cancel the login operation in progress?": {
-    "en": "Are you sure you want to cancel the login operation in progress?",
+  "#Are you sure you want to cancel the sign-in operation in progress?": {
+    "en": "Are you sure you want to cancel the sign-in operation in progress?",
     "ko": "진행 중인 로그인 작업을 취소하시겠습니까?"
   },
-  "#Are you sure you want to log out?": {
-    "en": "Are you sure you want to log out?",
+  "#Are you sure you want to sign out?": {
+    "en": "Are you sure you want to sign out?",
     "ko": "정말 로그아웃하시겠습니까?"
   },
-  "#You left the login page.": {
-    "en": "You left the login page.",
+  "#You left the sign-in page.": {
+    "en": "You left the sign-in page.",
     "ko": "로그인 페이지를 벗어났습니다."
   },
-  "#Return to login page": {
-    "en": "Return to login page",
+  "#Return to sign-in page": {
+    "en": "Return to sign-in page",
     "ko": "로그인 페이지로 돌아가기"
   },
-  "#Please follow the login procedure.": {
-    "en": "Please follow the login procedure.",
+  "#Please follow the sign-in procedure.": {
+    "en": "Please follow the sign-in procedure.",
     "ko": "로그인 절차를 따라주세요."
   },
-  "#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, logging out of your Twitch account in the browser will also log you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are logged in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.": {
-    "en": "The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, logging out of your Twitch account in the browser will also log you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are logged in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.",
+  "#{browserName} has been launched. Please proceed with the sign-in process.": {
+    "en": "{browserName} has been launched. Please proceed with the sign-in process.",
+    "ko": "{browserName}이(가) 실행되었습니다. 로그인 절차를 진행해 주세요."
+  },
+  "#An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed.": {
+    "en": "An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed.",
+    "ko": "{browserName}을(를) 실행하는 도중 알 수 없는 오류가 발생하였습니다. 최신 버전의 {browserName}이(가) 올바르게 설치되어 있는지 확인해 주세요."
+  },
+  "#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, signing out of your Twitch account in the browser will also sign you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are signed in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.": {
+    "en": "The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, signing out of your Twitch account in the browser will also sign you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are signed in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.",
     "ko": "사용자의 {browserName} 브라우저에 저장된 Twitch 계정을 감지하여 연동합니다.\n{appName}이(가) 브라우저와 동일한 계정 정보를 가지게 되며 브라우저에서 Twitch 계정 로그아웃을 수행할 경우, {appName} 앱도 함께 로그아웃됩니다.\n\n\n이 작업을 수행하기 전, {browserName}이(가) 설치되어 있고, Twitch에 로그인되어 있음을 확인하세요.\n\n또한, 모든 {browserName} 창을 닫고 {browserName} 프로세스를 종료하세요."
   },
   "#Importing Twitch account from {browserName}": {
@@ -199,8 +207,8 @@
     "en": "An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.",
     "ko": "알 수 없는 오류가 발생했습니다. 최신 버전의 {browserName}이(가) 올바르게 설치되어 있고, 모든 {browserName} 창이 닫혀 있는지 확인해 주세요."
   },
-  "#Unable to find a Twitch account. Please make sure that {browserName} is logged in to Twitch.": {
-    "en": "Unable to find a Twitch account. Please make sure that {browserName} is logged in to Twitch.",
+  "#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch.": {
+    "en": "Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch.",
     "ko": "Twitch 계정을 찾을 수 없습니다.\n{browserName}이(가) Twitch에 로그인되어 있음을 확인하세요."
   },
   "#Twitch Stream / Video / Clip Downloader": {
@@ -247,13 +255,13 @@
     "en": "A network error occurred while loading your account data.",
     "ko": "계정 정보를 불러오는 중 네트워크 오류가 발생하였습니다."
   },
-  "#An authentication error has occurred.\nIf the error persists, try logging in again.": {
-    "en": "An authentication error has occurred.\nIf the error persists, try logging in again.",
+  "#An authentication error has occurred.\nIf the error persists, try signing in again.": {
+    "en": "An authentication error has occurred.\nIf the error persists, try signing in again.",
     "ko": "사용자 계정 인증 오류가 발생하였습니다.\n해당 오류가 지속된다면 다시 로그인하시기 바랍니다."
   },
-  "#Your login has expired.\nIf you do not log in again, the downloader will operate in a logged out state.": {
-    "en": "Your login has expired.\nIf you do not log in again, the downloader will operate in a logged out state.",
-    "ko": "사용자 계정의 로그인이 만료되었습니다.\n재로그인하지 않으면 다운로더가 비로그인 상태로 작동합니다."
+  "#Your session has expired.\nPlease sign in again.": {
+    "en": "Your session has expired.\nPlease sign in again.",
+    "ko": "사용자 계정의 세션이 만료되었습니다.\n다시 로그인해 주세요."
   },
   "#A network error has occurred.": {
     "en": "A network error has occurred.",
@@ -263,12 +271,12 @@
     "en": "Video not found. Deleted or temporary error.",
     "ko": "비디오 정보를 찾을 수 없습니다. 삭제되었거나 일시적인 오류입니다."
   },
-  "#Unable to find subscription in your account.\nSubscribe to this streamer or log in with another account.": {
-    "en": "Unable to find subscription in your account.\nSubscribe to this streamer or log in with another account.",
+  "#Unable to find subscription in your account.\nSubscribe to this streamer or sign in with another account.": {
+    "en": "Unable to find subscription in your account.\nSubscribe to this streamer or sign in with another account.",
     "ko": "로그인한 계정에서 구독 정보를 찾을 수 없습니다.\n해당 스트리머를 구독하거나 다른 계정을 사용하여 로그인하세요."
   },
-  "#You need to log in to download subscriber-only videos.": {
-    "en": "You need to log in to download subscriber-only videos.",
+  "#You need to sign in to download subscriber-only videos.": {
+    "en": "You need to sign in to download subscriber-only videos.",
     "ko": "구독자 전용 비디오는 로그인을 통해 다운로드할 수 있습니다."
   },
   "#This video is for subscribers only.\n{advice}": {
@@ -307,12 +315,12 @@
     "en": "Your account does not have a subscription to this channel.",
     "ko": "로그인한 계정에 해당 채널에 대한 구독이 없습니다."
   },
-  "#You are not currently logged in.": {
-    "en": "You are not currently logged in.",
+  "#You are not currently signed in.": {
+    "en": "You are not currently signed in.",
     "ko": "현재 로그인하지 않았습니다."
   },
-  "#This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to log in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.": {
-    "en": "This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to log in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.",
+  "#This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to sign in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.": {
+    "en": "This stream may contain ads.\nIf commercials are broadcast, the portion of the stream during the commercials may not be available for download, and it may appear as though the stream is interrupted.\nTo prevent ads, you need to sign in with an account that has ad-free benefits, such as Twitch Turbo, or an account that subscribes to the channel.",
     "ko": "이 생방송에서 광고가 송출될 수 있습니다.\n광고가 송출되면 그 시간 동안의 생방송은 다운로드할 수 없으며, 생방송이 중간에 끊어진 것처럼 보일 수 있습니다.\n광고 송출을 방지하려면 Twitch Turbo, 채널을 구독한 계정 등의 광고 방지 혜택이 있는 계정으로의 로그인이 필요합니다."
   },
   "#Would you like to proceed?": {
