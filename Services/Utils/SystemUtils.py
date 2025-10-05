@@ -27,10 +27,13 @@ class SystemUtils:
     def getUserAgent() -> str:
         appInfo = f"{Config.APP_NAME}/{Config.APP_VERSION}"
         if OSUtils.isWindows():
-            version = ".".join(platform.win32_ver()[1].split(".")[:2])
-            info1 = "Win64" if platform.architecture()[0] == "64bit" else "Win32"
-            info2 = "x64" if platform.architecture()[0] == "64bit" else "x86"
-            systemInfo = f"Windows NT {version}; {info1}; {info2}"
+            try:
+                version = ".".join(platform.win32_ver()[1].split(".")[:2])
+                info1 = "Win64" if platform.architecture()[0] == "64bit" else "Win32"
+                info2 = "x64" if platform.architecture()[0] == "64bit" else "x86"
+                systemInfo = f"Windows NT {version}; {info1}; {info2}"
+            except:
+                systemInfo = "Windows NT 10.0; Win64; x64"
         else:
             systemInfo = f"Macintosh; Intel Mac OS X 10_15_7"
         userAgent = Config.USER_AGENT_TEMPLATE or "{appInfo} ({systemInfo})"
