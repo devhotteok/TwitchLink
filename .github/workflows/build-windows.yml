@@ -14,7 +14,7 @@ jobs:
   build:
     name: Build
 
-    runs-on: windows-latest
+    runs-on: windows-2025
 
     defaults:
       run:
@@ -63,6 +63,10 @@ jobs:
           exit 1
         fi
         echo "✅ Built executable: ${{ env.APP_NAME }}.exe"
+
+    - name: Install Inno Setup
+      run: |
+        choco install innosetup -y
 
     - name: Build installer
       run: |

@@ -1,3 +1,7 @@
+import os
+import patchright
+
+
 APP_NAME = "TwitchLink"
 
 
@@ -5,7 +9,10 @@ a = Analysis(
     ["TwitchLink.py"],
     pathex=[],
     binaries=[],
-    datas=[("resources", "resources")],
+    datas=[
+        ("resources", "resources"),
+        (os.path.join(os.path.dirname(patchright.__file__), "driver"), "patchright/driver")
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
