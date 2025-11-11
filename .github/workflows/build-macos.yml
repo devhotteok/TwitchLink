@@ -32,7 +32,7 @@ jobs:
       with:
         sparse-checkout: |
           /*
-          !/.github/deploy/windows
+          !/.github/build/windows
           !/resources/dependencies/windows
         sparse-checkout-cone-mode: false
 

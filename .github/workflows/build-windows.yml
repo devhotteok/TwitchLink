@@ -31,7 +31,7 @@ jobs:
       with:
         sparse-checkout: |
           /*
-          !/.github/deploy/macos
+          !/.github/build/macos
           !/resources/dependencies/macos
         sparse-checkout-cone-mode: false
 
