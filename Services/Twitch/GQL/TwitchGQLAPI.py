@@ -249,11 +249,12 @@ class TwitchGQL(QtCore.QObject):
                         }
                     },
                     "variables": {
-                        "isLive": True,
                         "login": login,
-                        "isVod": False,
+                        "isLive": True,
                         "vodID": "",
-                        "playerType": "embed"
+                        "isVod": False,
+                        "playerType": "embed",
+                        "platform": ""
                     }
                 },
                 {
@@ -265,10 +266,10 @@ class TwitchGQL(QtCore.QObject):
                         }
                     },
                     "variables": {
-                        "isLive": True,
                         "login": login,
-                        "isVOD": False,
+                        "isLive": True,
                         "vodID": "",
+                        "isVOD": False,
                         "isCollection": False,
                         "collectionID": ""
                     }
@@ -296,11 +297,12 @@ class TwitchGQL(QtCore.QObject):
                     }
                 },
                 "variables": {
-                    "isLive": False,
                     "login": "",
-                    "isVod": True,
+                    "isLive": False,
                     "vodID": id,
-                    "playerType": "embed"
+                    "isVod": True,
+                    "playerType": "embed",
+                    "platform": ""
                 }
             },
             parser=self._videoPlaybackAccessTokenParser,
