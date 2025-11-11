@@ -17,7 +17,7 @@ class SearchResult(QtWidgets.QWidget):
         ("highlights", "HIGHLIGHT"),
         ("clips", None),
         ("uploads", "UPLOAD"),
-        ("past-premiers", "PAST_PREMIERE"),
+        ("past-premieres", "PAST_PREMIERE"),
         ("all-videos", None)
     ]
 
