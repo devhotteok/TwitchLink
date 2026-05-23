@@ -19,7 +19,7 @@ class Account(QtWidgets.QWidget):
         self._ui.alertIcon = Utils.setSvgIcon(self._ui.alertIcon, Icons.ALERT_RED)
         self._ui.signInWithChromeButton.clicked.connect(self.signInWithChrome)
         self._ui.signInWithEdgeButton.clicked.connect(self.signInWithEdge)
-        if Utils.isWindows():
+        if Utils.isWindows() or Utils.isLinux():
             self._ui.importFromFirefoxButton.clicked.connect(self.importAccountFromFirefox)
         else:
             self._ui.importFromFirefoxButton.hide()
