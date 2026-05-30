@@ -128,9 +128,14 @@ class Account(QtWidgets.QWidget):
         self._signInProcessComplete()
 
     def _externalBrowserError(self, browserInfo: BrowserDriverBrowserInfo) -> None:
-        Utils.info("error", T("#An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), parent=self)
+        if Utils.isLinux():
+            Utils.info("error", T("#An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed. \n\nIf {browserName} is installed using Flatpak or Snap, please reinstall it using the native package for your distribution.", browserName=browserInfo.getDisplayName()), parent=self)
+        else:
+            Utils.info("error", T("#An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), parent=self)
 
     def _confirmBrowserSignIn(self, browserName: str) -> bool:
+        if Utils.isLinux():
+            return Utils.ask("information", T("#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, signing out of your Twitch account in the browser will also sign you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed using the native package for your distribution and that you are signed in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.", browserName=browserName, appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self)
         return Utils.ask("information", T("#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, signing out of your Twitch account in the browser will also sign you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are signed in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.", browserName=browserName, appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self)
 
     def importAccountFromBrowser(self, browserInfo: BrowserAccountDetectorBrowserInfo) -> None:
@@ -159,7 +164,10 @@ class Account(QtWidgets.QWidget):
         if isinstance(exception, Exceptions.BrowserNotFound):
             Utils.info("error", T("#Unable to detect {browserName}.\nPlease make sure {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         elif isinstance(exception, Exceptions.DriverConnectionFailure):
-            Utils.info("error", T("#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            if Utils.isLinux():
+                Utils.info("error", T("#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings or Flatpak/Snap sandboxing blocking external connections.\nConsider trying a different browser or reinstalling {browserName} using the native package for your distribution.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            else:
+                Utils.info("error", T("#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         elif isinstance(exception, Exceptions.UnexpectedDriverError):
             Utils.info("error", T("#An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         else:
