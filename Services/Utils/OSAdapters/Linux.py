@@ -69,7 +69,7 @@ class LinuxUtils(BaseAdapter):
     @staticmethod
     def openFolder(path: str) -> bool:
         try:
-            result = subprocess.run(["open", path], check=True, timeout=1)
+            result = subprocess.run(["xdg-open", path], check=True, timeout=2)
             return result.returncode == 0
         except:
             pass
@@ -78,7 +78,7 @@ class LinuxUtils(BaseAdapter):
     @staticmethod
     def openFile(path: str) -> bool:
         try:
-            result = subprocess.run(["open", path], check=True, timeout=1)
+            result = subprocess.run(["xdg-open", path], check=True, timeout=2)
             return result.returncode == 0
         except:
             pass
