@@ -19,8 +19,7 @@ class FirefoxCookieDetector(BrowserCookieDetector):
         elif OSUtils.isMacOS():
             return os.path.expanduser("~/Library/Application Support/Firefox/profiles.ini")
         else:
-            return os.path.expanduser("~/.var/app/org.mozilla.firefox/.mozilla/firefox/profiles.ini")
-            # multiple different paths possible, will fix
+            return os.path.expanduser("~/.config/mozilla/firefox/profiles.ini")
 
     @staticmethod
     def _getUserDataPath() -> str:
@@ -29,7 +28,7 @@ class FirefoxCookieDetector(BrowserCookieDetector):
         elif OSUtils.isMacOS():
             return os.path.expanduser("~/Library/Application Support/Firefox")
         else:
-            return os.path.expanduser("~/.var/app/org.mozilla.firefox/.mozilla/firefox")
+            return os.path.expanduser("~/.config/mozilla/firefox")
 
     @staticmethod
     def _createDriver(userDataPath: str, profileKey: str) -> selenium.webdriver.Firefox:
