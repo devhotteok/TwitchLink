@@ -211,10 +211,6 @@
     "en": "Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.",
     "ko": "{browserName}에 연결하지 못했습니다.\n\n{browserName}이 현재 실행 중이라면, 모든 창을 닫은 후 다시 시도하세요.\n\n실행 중이 아니라면, {browserName}의 보안 설정으로 인해 외부 연결이 차단되었을 수 있습니다.\n다른 브라우저를 사용해 보세요."
   },
-  "#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings or Flatpak/Snap sandboxing blocking external connections.\nConsider trying a different browser or reinstalling {browserName} using the native package for your distribution.": {
-    "en": "Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings or Flatpak/Snap sandboxing blocking external connections.\nConsider trying a different browser or reinstalling {browserName} using the native package for your distribution.",
-    "ko": "{browserName}에 연결하지 못했습니다.\n\n{browserName}이 현재 실행 중이라면, 모든 창을 닫은 후 다시 시도하세요.\n\n실행 중이 아니라면, {browserName}의 보안 설정으로 인해 외부 연결이 차단되었을 수 있습니다.\n다른 브라우저를 사용해 보세요."
-  },
   "#An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.": {
     "en": "An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.",
     "ko": "알 수 없는 오류가 발생했습니다. 최신 버전의 {browserName}이(가) 올바르게 설치되어 있고, 모든 {browserName} 창이 닫혀 있는지 확인해 주세요."
@@ -223,6 +219,10 @@
     "en": "Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch.",
     "ko": "Twitch 계정을 찾을 수 없습니다.\n{browserName}이(가) Twitch에 로그인되어 있음을 확인하세요."
   },
+  "#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch. \n\nTwitch accounts on browsers installed using Flatpak or Snap cannot be detected. If this is the case, please reinstall {browserName} using the native package for your distribution.": {
+    "en": "Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch. \n\nTwitch accounts on browsers installed using Flatpak or Snap cannot be detected. If this is the case, please reinstall {browserName} using the native package for your distribution.",
+    "ko": "Twitch 계정을 찾을 수 없습니다.\n{browserName}이(가) Twitch에 로그인되어 있음을 확인하세요."
+  }
   "#Twitch Stream / Video / Clip Downloader": {
     "en": "Twitch Stream / Video / Clip Downloader",
     "ko": "트위치 생방송 / 비디오 / 클립 다운로더"

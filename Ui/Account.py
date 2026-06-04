@@ -164,11 +164,11 @@ class Account(QtWidgets.QWidget):
         if isinstance(exception, Exceptions.BrowserNotFound):
             Utils.info("error", T("#Unable to detect {browserName}.\nPlease make sure {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         elif isinstance(exception, Exceptions.DriverConnectionFailure):
-            if Utils.isLinux():
-                Utils.info("error", T("#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings or Flatpak/Snap sandboxing blocking external connections.\nConsider trying a different browser or reinstalling {browserName} using the native package for your distribution.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
-            else:
-                Utils.info("error", T("#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            Utils.info("error", T("#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         elif isinstance(exception, Exceptions.UnexpectedDriverError):
             Utils.info("error", T("#An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         else:
-            Utils.info("error", T("#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            if Utils.isLinux():
+                Utils.info("error", T("#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch. \n\nTwitch accounts on browsers installed using Flatpak or Snap cannot be detected. If this is the case, please reinstall {browserName} using the native package for your distribution.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            else:
+                Utils.info("error", T("#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
