@@ -222,7 +222,7 @@
   "#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch. \n\nTwitch accounts on browsers installed using Flatpak or Snap cannot be detected. If this is the case, please reinstall {browserName} using the native package for your distribution.": {
     "en": "Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch. \n\nTwitch accounts on browsers installed using Flatpak or Snap cannot be detected. If this is the case, please reinstall {browserName} using the native package for your distribution.",
     "ko": "Twitch 계정을 찾을 수 없습니다.\n{browserName}이(가) Twitch에 로그인되어 있음을 확인하세요."
-  }
+  },
   "#Twitch Stream / Video / Clip Downloader": {
     "en": "Twitch Stream / Video / Clip Downloader",
     "ko": "트위치 생방송 / 비디오 / 클립 다운로더"
