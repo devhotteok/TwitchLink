@@ -165,8 +165,11 @@ class LinuxUtils(BaseAdapter):
 
     @staticmethod
     def isSystemShutdownSupported() -> bool:
-        return False
+        return True
 
     @staticmethod
     def shutdownSystem(message: str, time: int = 10) -> None:
-        pass
+        try:
+            subprocess.run(["shutdown", "now"], check=True, timeout=time)
+        except:
+            pass
