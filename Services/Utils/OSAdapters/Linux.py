@@ -24,7 +24,7 @@ class LinuxUtils(BaseAdapter):
 
     @staticmethod
     def getSystemAppDataPath() -> str:
-        return os.path.expanduser("~/Library/Application Support")
+        return os.path.expanduser("~")
 
     @staticmethod
     def getSystemTempPath() -> str:
