@@ -1,5 +1,5 @@
 from Core.Meta import Meta
-from Services.Utils.OSUtils import OSUtils, BaseAdapter
+from Services.Utils.OSUtils import OSUtils
 
 
 _P = OSUtils.joinPath
@@ -16,7 +16,7 @@ class Config(Meta):
     DEPENDENCIES_ROOT = _P(RESOURCE_ROOT, "dependencies", OSUtils.getOSType().lower())
     DOCS_ROOT = _P(RESOURCE_ROOT, "docs")
 
-    APPDATA_PATH = _P(OSUtils.getSystemAppDataPath(), ".twitchlink") if BaseAdapter.isLinux() else _P(OSUtils.getSystemAppDataPath(), Meta.APP_NAME)
+    APPDATA_PATH = _P(OSUtils.getSystemAppDataPath(), Meta.APP_NAME)
     APPDATA_FILE = _P(APPDATA_PATH, "settings.json")
     TRACEBACK_FILE = _P(APPDATA_PATH, "traceback")
 

@@ -24,7 +24,7 @@ class LinuxUtils(BaseAdapter):
 
     @staticmethod
     def getSystemAppDataPath() -> str:
-        return os.path.expanduser("~")
+        return os.path.expanduser("~/.config")
 
     @staticmethod
     def getSystemTempPath() -> str:
