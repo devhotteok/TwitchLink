@@ -327,7 +327,8 @@ class TwitchGQL(QtCore.QObject):
                     }
                 },
                 "variables": {
-                    "slug": slug
+                    "slug": slug,
+                    "platform": ""
                 }
             },
             parser=self._clipPlaybackAccessTokenParser,

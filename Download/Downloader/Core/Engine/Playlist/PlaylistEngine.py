@@ -86,7 +86,7 @@ class PlaylistEngine(BaseEngine):
                         if segment.mapInfo != self._segmentMapInfo:
                             self._segmentMapInfo = segment.mapInfo
                             self.progress.totalFiles += 1
-                            segmentsToDownload.append(Segment(-segment.sequence, segment.url.resolved(QtCore.QUrl(segment.mapInfo)), segment.datetime, 0, segment.startsAt))
+                            segmentsToDownload.append(Segment(-segment.sequence - 1, segment.url.resolved(QtCore.QUrl(segment.mapInfo)), segment.datetime, 0, segment.startsAt))
                     self.progress.totalFiles += 1
                     self.progress.totalMilliseconds += segment.totalMilliseconds
                     if self.downloadInfo.type.isStream() and self.downloadInfo.isSkipAdsEnabled() and any(re.match(filter, segment.title) for filter in Config.STREAM_SEGMENT_TITLE_FILTER_REGEX):

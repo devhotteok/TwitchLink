@@ -13,7 +13,7 @@ class Exceptions:
         def __init__(self, target: QtCore.QFile | QtCore.QTemporaryFile | QtCore.QDir):
             if isinstance(target, QtCore.QFile) or isinstance(target, QtCore.QTemporaryFile):
                 self.exceptionType = target.error()
-                self.reasonText = target.errorString()
+                self.reasonText = f"{target.errorString()}: {target.fileName()}"
             else:
                 self.exceptionType = "Directory Error"
                 reasonText = f"Unable to create directory '{target.path()}'."
