@@ -107,6 +107,8 @@ class ScheduledDownload(QtCore.QObject):
         self._autoUpdateTimer.timeout.connect(self.updateChannelData)
         self.downloader: StreamDownloader | None = None
         self.status = ScheduledDownloadStatus(parent=self)
+        self._sessionDisabled = False
+        self._paused = False
         self.updateChannelData()
 
     def getId(self) -> uuid.UUID:
@@ -133,8 +135,26 @@ class ScheduledDownload(QtCore.QObject):
     def isEnabled(self) -> bool:
         return self.preset.isEnabled()
 
+    def setSessionDisabled(self, disabled: bool) -> None:
+        if disabled != self._sessionDisabled:
+            self._sessionDisabled = disabled
+            self._syncEnabledState()
+            self.activeChanged.emit()
+
+    def isSessionDisabled(self) -> bool:
+        return self._sessionDisabled
+
+    def setPaused(self, paused: bool) -> None:
+        if paused != self._paused:
+            self._paused = paused
+            self._syncEnabledState()
+            self.activeChanged.emit()
+
+    def isPaused(self) -> bool:
+        return self._paused
+
     def isActive(self) -> bool:
-        return not self.isBlocked() and self.isEnabled()
+        return not self.isBlocked() and not self.isSessionDisabled() and not self.isPaused() and self.isEnabled()
 
     def _syncEnabledState(self) -> None:
         if self.isChannelRetrieved():

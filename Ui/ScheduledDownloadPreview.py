@@ -38,6 +38,7 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         self._ui.finishButton.clicked.connect(self.finishEarly)
         Utils.setIconViewer(self._ui.finishButton, Icons.VERIFIED)
         self._ui.finishButton.hide()
+        self._ui.pauseButton.clicked.connect(self.pauseResume)
         self.scheduledDownload.activeChanged.connect(self._activeChanged)
         self._activeChanged()
         self.scheduledDownload.channelDataUpdateStarted.connect(self._channelDataUpdateStarted)
@@ -58,15 +59,25 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         super().showEvent(event)
 
     def _activeChanged(self) -> None:
-        self._ui.downloaderArea.setEnabled(self.scheduledDownload.isActive())
-        self._enableButtonIconViewer.setIcon(Icons.TOGGLE_ON if self.scheduledDownload.isEnabled() else Icons.TOGGLE_OFF)
+        active = self.scheduledDownload.isActive()
+        self._ui.downloadViewControlBar.setEnabled(active)
+        self._ui.downloaderView.setEnabled(active)
+        self._ui.networkStatusArea.setEnabled(active)
+        self._enableButtonIconViewer.setIcon(Icons.TOGGLE_ON if (self.scheduledDownload.isEnabled() and not self.scheduledDownload.isSessionDisabled()) else Icons.TOGGLE_OFF)
+        self._ui.pauseButton.setText(T("resume") if self.scheduledDownload.isPaused() else T("pause"))
 
     def _enableButtonClicked(self) -> None:
-        if self.scheduledDownload.isActive():
-            if self.scheduledDownload.status.isDownloading():
-                if not Utils.ask(*Messages.ASK.STOP_DOWNLOAD, parent=self):
-                    return
-        self.scheduledDownload.setEnabled(not self.scheduledDownload.isEnabled())
+        if self.scheduledDownload.isSessionDisabled():
+            self.scheduledDownload.setSessionDisabled(False)
+        else:
+            if self.scheduledDownload.isActive():
+                if self.scheduledDownload.status.isDownloading():
+                    if not Utils.ask(*Messages.ASK.STOP_DOWNLOAD, parent=self):
+                        return
+            self.scheduledDownload.setEnabled(not self.scheduledDownload.isEnabled())
+
+    def pauseResume(self) -> None:
+        self.scheduledDownload.setPaused(not self.scheduledDownload.isPaused())
 
     def _statusUpdated(self) -> None:
         if self.scheduledDownload.status.isNone():
@@ -134,6 +145,7 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         if self._downloader != None:
             if hasattr(self._downloader, "finishEarly"):
                 self._downloader.finishEarly()
+        self.scheduledDownload.setSessionDisabled(True)
 
     def _channelDataUpdateStarted(self) -> None:
         self._ui.refreshButton.setEnabled(False)
