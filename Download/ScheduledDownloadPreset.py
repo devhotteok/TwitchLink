@@ -67,7 +67,10 @@ class ScheduledDownloadPreset(Serializable):
         self.createSubfolderForDownloads = enabled
 
     def isCreateSubfolderForDownloadsEnabled(self) -> bool:
-        return getattr(self, "createSubfolderForDownloads", False)
+        val = getattr(self, "createSubfolderForDownloads", None)
+        if val is not None:
+            return val
+        return self.optionHistory.isCreateSubfolderForDownloadsEnabled()
 
     @property
     def optionHistory(self) -> DownloadOptionHistory.ScheduledDownloadHistory:

@@ -275,9 +275,11 @@ class ScheduledDownload(QtCore.QObject):
 
     def generateStreamPlayback(self) -> None:
         try:
+            from Core import App
             App.ContentManager.checkRestriction(self.channel.stream)
         except Exception as e:
             self.status.setError(e)
+            return
         else:
             self.status.setGeneratingPlayback()
             TwitchPlaybackGenerator.TwitchStreamPlaybackGenerator(self.channel.stream.broadcaster.login, parent=self).finished.connect(self._processStreamPlaybackResult)
@@ -302,26 +304,37 @@ class ScheduledDownload(QtCore.QObject):
                 self.status.setNone()
 
     def createDownloader(self, playback: TwitchPlaybackModels.TwitchStreamPlayback) -> None:
-        downloadInfo = DownloadInfo(self.channel.stream, playback)
-        downloadInfo.setDirectory(self.preset.directory)
-        downloadInfo.setCreateSubfolderForDownloadsEnabled(self.preset.isCreateSubfolderForDownloadsEnabled())
         try:
-            from Services.Utils.OSUtils import OSUtils
-            OSUtils.createDirectory(downloadInfo.directory)
-        except:
-            pass
-        selectedResolution = self.preset.selectResolution(playback.getResolutions())
-        downloadInfo.setResolution(playback.getResolutions().index(selectedResolution))
-        downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate), self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles()))
-        if not playback.token.hideAds:
-            downloadInfo.setSkipAdsEnabled(self.preset.isSkipAdsEnabled())
-        downloadInfo.setRemuxEnabled(self.preset.isRemuxEnabled())
-        downloadInfo.setDownloadChat(self.preset.isDownloadChatEnabled())
-        self.downloader = TwitchDownloader.create(downloadInfo, parent=self)
-        self.downloader.finished.connect(self.downloadResultHandler)
-        self.downloaderCreated.emit(self, self.downloader)
-        self.status.setDownloading()
-        self.downloader.start()
+            downloadInfo = DownloadInfo(self.channel.stream, playback)
+            downloadInfo.setDirectory(self.preset.directory)
+            downloadInfo.setCreateSubfolderForDownloadsEnabled(self.preset.isCreateSubfolderForDownloadsEnabled())
+            try:
+                from Services.Utils.OSUtils import OSUtils
+                OSUtils.createDirectory(downloadInfo.directory)
+            except:
+                pass
+            selectedResolution = self.preset.selectResolution(playback.getResolutions())
+            downloadInfo.setResolution(playback.getResolutions().index(selectedResolution))
+            absoluteFileName = Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate), self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles())
+            downloadInfo.setAbsoluteFileName(absoluteFileName)
+            if downloadInfo.isCreateSubfolderForDownloadsEnabled():
+                import os
+                if os.path.exists(absoluteFileName) and os.path.getsize(absoluteFileName) == 0:
+                    os.remove(absoluteFileName)
+            if not playback.token.hideAds:
+                downloadInfo.setSkipAdsEnabled(self.preset.isSkipAdsEnabled())
+            downloadInfo.setRemuxEnabled(self.preset.isRemuxEnabled())
+            downloadInfo.setDownloadChatEnabled(self.preset.isDownloadChatEnabled())
+            self.downloader = TwitchDownloader.create(downloadInfo, parent=self)
+            self.downloader.finished.connect(self.downloadResultHandler)
+            self.downloaderCreated.emit(self, self.downloader)
+            self.status.setDownloading()
+            self.downloader.start()
+        except Exception as e:
+            import logging
+            import traceback
+            logging.getLogger("root").error(f"ScheduledDownloadManager createDownloader Exception:\n{traceback.format_exc()}")
+            self.status.setError(e)
 
     def downloadResultHandler(self, downloader: StreamDownloader) -> None:
         error = downloader.status.getError()

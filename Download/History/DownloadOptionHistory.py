@@ -20,7 +20,7 @@ class FileHistory:
         super().__init__()
         self.setDirectory(Config.DEFAULT_DIRECTORY)
         self.setFormat(self.getAvailableFormats()[0])
-        self.createSubfolderForDownloads = False
+        self.createSubfolderForDownloads = None
 
     def setAbsoluteFileName(self, absoluteFileName: str) -> None:
         self.setDirectory(os.path.dirname(absoluteFileName))
@@ -66,7 +66,10 @@ class FileHistory:
 
     def isCreateSubfolderForDownloadsEnabled(self) -> bool:
         from Core import App
-        return getattr(self, "createSubfolderForDownloads", App.Preferences.download.isCreateSubfolderForDownloadsEnabled())
+        val = getattr(self, "createSubfolderForDownloads", None)
+        if val is not None:
+            return val
+        return App.Preferences.download.isCreateSubfolderForDownloadsEnabled()
 
 
 class AudioFormatHistory:

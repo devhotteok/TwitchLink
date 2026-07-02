@@ -149,6 +149,9 @@ class DownloadInfo(Serializable):
     def setSkipAdsEnabled(self, enabled: bool) -> None:
         self.skipAds = enabled
 
+    def setDownloadChatEnabled(self, enabled: bool) -> None:
+        self.downloadChat = enabled
+
 
 
     def setRemuxEnabled(self, enabled: bool) -> None:

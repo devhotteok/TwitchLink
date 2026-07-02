@@ -14,7 +14,12 @@ class InstantDownloadButton(DownloadButton):
 
     def askDownload(self, downloadInfo: DownloadInfo) -> None:
         try:
-            downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, downloadInfo.fileName, downloadInfo.fileFormat, exclude=FileNameLocker.getLockedFiles()))
+            absoluteFileName = Utils.createUniqueFile(downloadInfo.directory, downloadInfo.fileName, downloadInfo.fileFormat, exclude=FileNameLocker.getLockedFiles())
+            downloadInfo.setAbsoluteFileName(absoluteFileName)
+            if downloadInfo.isCreateSubfolderForDownloadsEnabled():
+                import os
+                if os.path.exists(absoluteFileName) and os.path.getsize(absoluteFileName) == 0:
+                    os.remove(absoluteFileName)
         except:
             self.info("error", "errors.#an_error_occurred_while_generating_file")
             super().askDownload(downloadInfo)
