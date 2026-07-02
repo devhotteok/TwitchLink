@@ -20,6 +20,7 @@ class FileHistory:
         super().__init__()
         self.setDirectory(Config.DEFAULT_DIRECTORY)
         self.setFormat(self.getAvailableFormats()[0])
+        self.createSubfolderForDownloads = False
 
     def setAbsoluteFileName(self, absoluteFileName: str) -> None:
         self.setDirectory(os.path.dirname(absoluteFileName))

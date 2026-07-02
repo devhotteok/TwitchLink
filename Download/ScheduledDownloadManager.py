@@ -305,6 +305,11 @@ class ScheduledDownload(QtCore.QObject):
         downloadInfo = DownloadInfo(self.channel.stream, playback)
         downloadInfo.setDirectory(self.preset.directory)
         downloadInfo.setCreateSubfolderForDownloadsEnabled(self.preset.isCreateSubfolderForDownloadsEnabled())
+        try:
+            from Services.Utils.OSUtils import OSUtils
+            OSUtils.createDirectory(downloadInfo.directory)
+        except:
+            pass
         selectedResolution = self.preset.selectResolution(playback.getResolutions())
         downloadInfo.setResolution(playback.getResolutions().index(selectedResolution))
         downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate), self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles()))
