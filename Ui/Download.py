@@ -105,7 +105,7 @@ class Download(QtWidgets.QWidget):
         if self._downloader.status.pauseState.isFalse():
             self._ui.pauseButton.setText(T("pause"))
         if self._downloader.status.terminateState.isInProgress():
-            self.showStatus(T("stopping" if getattr(self._downloader.status, "terminateState", None) and self._downloader.status.terminateState.isProcessing() and getattr(self._downloader, "isFinishingEarly", False) else "canceling", ellipsis=True))
+            self.showStatus(T("stopping" if getattr(self._downloader, "isFinishingEarly", False) else "canceling", ellipsis=True))
             self._ui.pauseButton.setEnabled(False)
             self._ui.cancelButton.setEnabled(False)
             self._ui.finishButton.setEnabled(False)
