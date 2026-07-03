@@ -158,7 +158,10 @@ class Download(QtWidgets.QWidget):
         if self._downloader.status.isPreparing():
             self.showProgress(0)
         elif isinstance(self._downloader, StreamDownloader):
-            self.showProgress(None)
+            if self._downloader.status.isDone():
+                pass  # progress already handled by _updateStatus / _downloadFinishHandler
+            else:
+                self.showProgress(None)
         elif isinstance(self._downloader, VideoDownloader):
             if self._downloader.status.isDownloading() and not self._downloader.status.pauseState.isTrue():
                 if self._downloader.downloadInfo.isUpdateTrackEnabled() and self._downloader.status.getWaitingCount() != -1:
@@ -207,7 +210,10 @@ class Download(QtWidgets.QWidget):
     def _downloadFinishHandler(self) -> None:
         if self._downloader.status.terminateState.isTrue():
             if isinstance(self._downloader.status.getError(), Exceptions.AbortRequested):
-                if isinstance(self._downloader, StreamDownloader):
+                if getattr(self._downloader, "isFinishingEarly", False):
+                    self.showStatus(T("download-stopped"))
+                    self.showProgress(100)
+                elif isinstance(self._downloader, StreamDownloader):
                     self.showStatus(T("download-stopped"))
                     self.showProgress(100)
                 else:
@@ -217,13 +223,14 @@ class Download(QtWidgets.QWidget):
                 self.showError(self._downloader.status.getError(), downloadAborted=True)
                 self._ui.retryButton.show()
         else:
-            self.showStatus(T("download-complete"))
+            self.showStatus(T("download-completed"))
             self.showProgress(100)
         if not self._downloader.status.isFileRemoved():
             self._ui.openFileButton.show()
         self._ui.downloadViewControlBar.openLogsButton.setVisible()
         self._ui.pauseButton.hide()
         self._ui.cancelButton.hide()
+        self._ui.finishButton.hide()
 
     def showStatus(self, status: str) -> None:
         self._ui.alertIcon.hide()
