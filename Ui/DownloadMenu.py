@@ -239,6 +239,7 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         initialFilter = self.downloadInfo.fileFormat
         newDirectory = Utils.askSaveAs(directory, filters, initialFilter, parent=self)
         if newDirectory != None:
+            self._ui.createSubfolderForDownloadsCheckBox.setChecked(False)
             self.downloadInfo.setAbsoluteFileName(newDirectory)
             self.reloadFileDirectory()
 

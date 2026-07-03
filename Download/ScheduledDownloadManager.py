@@ -164,7 +164,10 @@ class ScheduledDownload(QtCore.QObject):
             else:
                 self.disconnectPubSub()
                 if self.status.isDownloading():
-                    self.downloader.cancel()
+                    if getattr(self.downloader, "finishEarly", None) != None:
+                        self.downloader.finishEarly()
+                    else:
+                        self.downloader.cancel()
                 elif self.status.isError() or self.status.isDownloaderError():
                     self.status.setNone()
             self._syncAutoUpdate()
@@ -328,19 +331,23 @@ class ScheduledDownload(QtCore.QObject):
             downloadInfo = DownloadInfo(self.channel.stream, playback)
             downloadInfo.setDirectory(self.preset.directory)
             downloadInfo.setCreateSubfolderForDownloadsEnabled(self.preset.isCreateSubfolderForDownloadsEnabled())
-            try:
-                from Services.Utils.OSUtils import OSUtils
-                OSUtils.createDirectory(downloadInfo.directory)
-            except:
-                pass
             selectedResolution = self.preset.selectResolution(playback.getResolutions())
             downloadInfo.setResolution(playback.getResolutions().index(selectedResolution))
-            absoluteFileName = Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate), self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles())
-            downloadInfo.setAbsoluteFileName(absoluteFileName)
+            
+            fileName = FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate)
+            directory = downloadInfo.directory
+            
             if downloadInfo.isCreateSubfolderForDownloadsEnabled():
-                import os
-                if os.path.exists(absoluteFileName) and os.path.getsize(absoluteFileName) == 0:
-                    os.remove(absoluteFileName)
+                directory = Utils.joinPath(directory, fileName)
+            try:
+                from Services.Utils.OSUtils import OSUtils
+                OSUtils.createDirectory(directory)
+            except:
+                pass
+                
+            absoluteFileName = Utils.createUniqueFile(directory, fileName, self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles())
+            downloadInfo.setAbsoluteFileName(absoluteFileName)
+            downloadInfo.setCreateSubfolderForDownloadsEnabled(False)
             if not playback.token.hideAds:
                 downloadInfo.setSkipAdsEnabled(self.preset.isSkipAdsEnabled())
             downloadInfo.setRemuxEnabled(self.preset.isRemuxEnabled())
@@ -359,7 +366,8 @@ class ScheduledDownload(QtCore.QObject):
     def downloadResultHandler(self, downloader: StreamDownloader) -> None:
         error = downloader.status.getError()
         if error == None:
-            self.setOffline()
+            if not getattr(downloader, "isFinishingEarly", False):
+                self.setOffline()
             self.status.setNone()
         elif self.isActive():
             self.status.setDownloaderError(error)

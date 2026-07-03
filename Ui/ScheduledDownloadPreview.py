@@ -35,9 +35,6 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         Utils.setIconViewer(self._ui.settingsButton, Icons.SETTINGS)
         self._ui.deleteButton.clicked.connect(self.tryRemoveScheduledDownload)
         Utils.setIconViewer(self._ui.deleteButton, Icons.TRASH)
-        self._ui.finishButton.clicked.connect(self.finishEarly)
-        Utils.setIconViewer(self._ui.finishButton, Icons.VERIFIED)
-        self._ui.finishButton.hide()
         self._ui.pauseButton.clicked.connect(self.pauseResume)
         self.scheduledDownload.activeChanged.connect(self._activeChanged)
         self._activeChanged()
@@ -82,19 +79,14 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
     def _statusUpdated(self) -> None:
         if self.scheduledDownload.status.isNone():
             self._ui.downloaderView.setStatusVisible(False)
-            self._ui.finishButton.hide()
         elif self.scheduledDownload.status.isGeneratingPlayback():
             self._ui.downloaderView.showAlert(T("preparing", ellipsis=True))
             self._ui.downloaderView.setStatusVisible(True)
-            self._ui.finishButton.hide()
         elif self.scheduledDownload.status.isDownloading():
             self.connectDownloader(self.scheduledDownload.downloader)
-            self._ui.finishButton.show()
-            self._ui.finishButton.setEnabled(True)
         elif self.scheduledDownload.status.isError():
             self._ui.downloaderView.showError(self.scheduledDownload.status.getError())
             self._ui.downloaderView.setStatusVisible(True)
-            self._ui.finishButton.hide()
             if isinstance(self.scheduledDownload.status.getError(), ScheduledDownloadPreset.Exceptions.PreferredResolutionNotFound) and App.Preferences.general.isNotifyEnabled():
                 App.Instance.notification.toastMessage(
                     title=T("preferred-resolution-not-found"),
@@ -104,7 +96,6 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         elif self.scheduledDownload.status.isDownloaderError():
             self._ui.downloaderView.showError(self.scheduledDownload.status.getError(), downloadAborted=True)
             self._ui.downloaderView.setStatusVisible(True)
-            self._ui.finishButton.hide()
 
     def connectDownloader(self, downloader: StreamDownloader) -> None:
         self.disconnectDownloader()
@@ -126,26 +117,16 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
             self._showChannel()
             self._ui.downloadViewControlBar.openFileButton.setDisabled()
             self._widgetRemoveController.setRemoveEnabled(True)
-            self._ui.finishButton.hide()
-
     def _handleDownloadStatus(self) -> None:
         if self._downloader.status.terminateState.isInProgress():
             self._ui.enableButton.setEnabled(False)
             self._ui.refreshButton.setEnabled(False)
-            self._ui.finishButton.setEnabled(False)
 
     def _handleDownloadResult(self) -> None:
         if self._downloader.status.terminateState.isTrue():
             self._ui.enableButton.setEnabled(True)
             self._ui.refreshButton.setEnabled(True)
-            self._ui.finishButton.setEnabled(True)
         self.disconnectDownloader()
-
-    def finishEarly(self) -> None:
-        if self._downloader != None:
-            if hasattr(self._downloader, "finishEarly"):
-                self._downloader.finishEarly()
-        self.scheduledDownload.setSessionDisabled(True)
 
     def _channelDataUpdateStarted(self) -> None:
         self._ui.refreshButton.setEnabled(False)
