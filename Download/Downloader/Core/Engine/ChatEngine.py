@@ -109,7 +109,6 @@ class ChatEngine(QtCore.QObject):
             with open(chatFilePath, "r", encoding="utf-8") as f:
                 content = f.read().strip()
                 
-            # If chat-downloader was aborted, the JSON might be broken (e.g. trailing comma or missing closing bracket).
             if not content.endswith("]"):
                 if content.endswith(","):
                     content = content[:-1]
@@ -151,7 +150,6 @@ class ChatEngine(QtCore.QObject):
             last_original_end_us = None
             
             for segment in mergedTimeline:
-                # 1. Process any skipped gap before this segment
                 if isLivestream and segment.get("original_timestamp") is not None:
                     if last_original_end_us is not None and segment["original_timestamp"] > last_original_end_us:
                         gapMessages = []
@@ -183,7 +181,6 @@ class ChatEngine(QtCore.QObject):
                             })
                     last_original_end_s = segment["original_start"] + segment["original_duration"]
 
-                # 2. Process the merged video segment
                 segmentMessages = []
                 for msg in messages:
                     if isLivestream and segment.get("original_timestamp") is not None:
@@ -206,10 +203,8 @@ class ChatEngine(QtCore.QObject):
                     "messages": segmentMessages
                 })
                 
-            # Optimize data structure to compress JSON
             optimizedChat = ChatEngine.optimizeChatData(segmentedChat)
             
-            # 3. Save chunked JSON with ensure_ascii=False for unicode text
             with open(chatFilePath, "w", encoding="utf-8") as f:
                 json.dump(optimizedChat, f, ensure_ascii=False, indent=2)
                 
@@ -235,10 +230,8 @@ class ChatEngine(QtCore.QObject):
                 "original_timestamp": seg.get("original_timestamp"),
                 "messages": []
             }
-            # Remove None values
             out_seg = {k: v for k, v in out_seg.items() if v is not None}
 
-            # Process messages
             for msg in seg.get("messages", []):
                 v_start = seg.get("video_start", 0.0)
                 t = None

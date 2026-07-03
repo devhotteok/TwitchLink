@@ -33,7 +33,6 @@ class BaseEngine(QtCore.QObject):
             self.status.setFileRemoved()
 
             import os
-            # Cleanup chat file
             if getattr(self.downloadInfo, "downloadChat", False):
                 chatFilePath = os.path.splitext(self.downloadInfo.getAbsoluteFileName())[0] + ".json"
                 if os.path.exists(chatFilePath):
@@ -43,7 +42,6 @@ class BaseEngine(QtCore.QObject):
                     except Exception as e:
                         self.logger.warning(f"Failed to clean up chat file: {e}")
             
-            # Cleanup subfolder
             if self.downloadInfo.isCreateSubfolderForDownloadsEnabled():
                 directory = os.path.dirname(self.downloadInfo.getAbsoluteFileName())
                 if os.path.exists(directory) and not os.listdir(directory):

@@ -2,16 +2,13 @@ import sys
 from chat_downloader.sites.twitch import TwitchChatDownloader
 from chat_downloader.cli import main
 
-# Patch the Twitch Client-ID
 TwitchChatDownloader._CLIENT_ID = 'kimne78kx3ncx6brgo4mv6wki5h1ko'
 
-# Update the hashes to the latest known ones (StreamMetadata and VideoMetadata changed)
 TwitchChatDownloader._OPERATION_HASHES.update({
     'StreamMetadata': 'b57f9b910f8cd1a4659d894fe7550ccc81ec9052c01e438b290fd66a040b9b93',
     'VideoMetadata': '45111672eea2e507f8ba44d101a61862f9c56b11dee09a15634cb75cb9b9084d',
 })
 
-# Monkey-patch _download_gql to add new required variables like includeIsDJ
 original_download_gql = TwitchChatDownloader._download_gql
 
 def patched_download_gql(self, ops):
@@ -25,7 +22,6 @@ def patched_download_gql(self, ops):
 
 TwitchChatDownloader._download_gql = patched_download_gql
 
-# Monkey-patch json.dump and json.dumps to default ensure_ascii to False for human-readable intermediate files
 import json
 original_json_dump = json.dump
 original_json_dumps = json.dumps
@@ -49,7 +45,6 @@ def patched_json_dumps(obj, *, skipkeys=False, ensure_ascii=False, check_circula
 json.dump = patched_json_dump
 json.dumps = patched_json_dumps
 
-# Original method uses `cursor` which fails integrity check now. We must use contentOffsetSeconds.
 from chat_downloader.utils.core import multi_get, ensure_seconds, attempts
 from requests.exceptions import RequestException
 from json.decoder import JSONDecodeError
@@ -143,7 +138,6 @@ def patched_get_chat_messages_by_vod_id(self, vod_id, params, max_duration, offs
             
         if last_offset is not None:
             if new_messages_yielded == 0 and last_offset == content_offset_seconds:
-                # Force advance if we are stuck on the same second with >100 messages
                 content_offset_seconds += 1
             else:
                 content_offset_seconds = last_offset
