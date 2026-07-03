@@ -206,11 +206,137 @@ class ChatEngine(QtCore.QObject):
                     "messages": segmentMessages
                 })
                 
+            # Optimize data structure to compress JSON
+            optimizedChat = ChatEngine.optimizeChatData(segmentedChat)
+            
             # 3. Save chunked JSON with ensure_ascii=False for unicode text
             with open(chatFilePath, "w", encoding="utf-8") as f:
-                json.dump(segmentedChat, f, ensure_ascii=False, indent=2)
+                json.dump(optimizedChat, f, ensure_ascii=False, indent=2)
                 
             logger.info("Chat post-processing completed.")
         except Exception as e:
             logger.exception(e)
             logger.warning("Failed to post-process chat file.")
+
+    @staticmethod
+    def optimizeChatData(segmented_chat: list[dict]) -> dict:
+        import re
+        out_badges = {}
+        out_users = {}
+        out_segments = []
+
+        for seg in segmented_chat:
+            out_seg = {
+                "type": seg["type"],
+                "video_start": seg.get("video_start"),
+                "video_duration": seg.get("video_duration"),
+                "original_start": seg.get("original_start"),
+                "original_duration": seg.get("original_duration"),
+                "original_timestamp": seg.get("original_timestamp"),
+                "messages": []
+            }
+            # Remove None values
+            out_seg = {k: v for k, v in out_seg.items() if v is not None}
+
+            # Process messages
+            for msg in seg.get("messages", []):
+                v_start = seg.get("video_start", 0.0)
+                t = None
+                if "timestamp" in msg and seg.get("original_timestamp") is not None:
+                    t = int(v_start * 1000) + int((msg["timestamp"] - seg["original_timestamp"]) / 1000)
+                elif "time_in_seconds" in msg and seg.get("original_start") is not None:
+                    t = int(v_start * 1000) + int((msg["time_in_seconds"] - seg["original_start"]) * 1000)
+                
+                if t is None:
+                    continue
+
+                action_type = msg.get("action_type") or msg.get("message_type")
+                author = msg.get("author", {})
+
+                if action_type in ("text_message", "highlighted_message"):
+                    badges = author.get("badges", [])
+                    user_badge_keys = []
+                    for b in badges:
+                        b_name = b.get("name")
+                        b_version = b.get("version")
+                        if b_name is None or b_version is None:
+                            continue
+                        b_key = f"{b_name}:{b_version}"
+                        user_badge_keys.append(b_key)
+                        if b_key not in out_badges:
+                            icons = b.get("icons", [])
+                            if icons:
+                                url = icons[0].get("url", "")
+                                match = re.search(r'/v1/([^/]+)', url)
+                                if match:
+                                    out_badges[b_key] = match.group(1)
+                                else:
+                                    out_badges[b_key] = ""
+
+                    uid = author.get("id")
+                    if uid and uid not in out_users:
+                        display_name = author.get("display_name")
+                        if not display_name:
+                            display_name = author.get("name")
+                        color = author.get("colour") or msg.get("colour") or ""
+                        out_users[uid] = {
+                            "name": display_name,
+                            "color": color,
+                            "badges": user_badge_keys
+                        }
+
+                    out_msg = {
+                        "t": t,
+                        "uid": uid,
+                        "mid": msg.get("message_id"),
+                        "msg": msg.get("message")
+                    }
+                    
+                    if msg.get("is_first_message") is True:
+                        out_msg["first"] = True
+                    
+                    in_reply_to = msg.get("in_reply_to")
+                    if in_reply_to and in_reply_to.get("message_id"):
+                        out_msg["rep"] = in_reply_to["message_id"]
+
+                    emotes = msg.get("emotes", [])
+                    if emotes:
+                        em_dict = {}
+                        for em in emotes:
+                            em_id = em.get("id")
+                            locations = em.get("locations")
+                            if em_id and locations:
+                                if isinstance(locations, str):
+                                    loc_list = locations.split(",")
+                                else:
+                                    loc_list = locations
+                                em_dict[em_id] = loc_list
+                        if em_dict:
+                            out_msg["em"] = em_dict
+                    
+                    out_seg["messages"].append(out_msg)
+
+                elif action_type == "delete_message":
+                    out_msg = {
+                        "t": t,
+                        "act": "del",
+                        "tid": msg.get("target_message_id") or msg.get("target_id")
+                    }
+                    out_seg["messages"].append(out_msg)
+
+                elif action_type == "clear_chat" or action_type == "ban_user":
+                    tid = author.get("target_id") or author.get("id") or msg.get("banned_user")
+                    if tid:
+                        out_seg["messages"].append({
+                            "t": t,
+                            "act": "ban",
+                            "tid": tid
+                        })
+
+            out_segments.append(out_seg)
+
+        return {
+            "badges": out_badges,
+            "users": out_users,
+            "segments": out_segments
+        }
