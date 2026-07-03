@@ -43,10 +43,10 @@ class ChatEngine(QtCore.QObject):
 
         executable = sys.executable
         if getattr(sys, 'frozen', False):
-            args = ["RunChatDownloader", url, "--output", chatFilePath, "--quiet"]
+            args = ["RunChatDownloader", url, "--output", chatFilePath, "--quiet", "--message_groups", "all"]
         else:
             scriptPath = os.path.join(os.path.dirname(__file__), "RunChatDownloader.py")
-            args = [scriptPath, url, "--output", chatFilePath, "--quiet"]
+            args = [scriptPath, url, "--output", chatFilePath, "--quiet", "--message_groups", "all"]
 
         if self.downloadInfo.type.isVideo() or self.downloadInfo.type.isClip():
             start_ms, end_ms = self.downloadInfo.getCropRangeMilliseconds()
