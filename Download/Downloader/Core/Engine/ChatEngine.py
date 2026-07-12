@@ -218,6 +218,7 @@ class ChatEngine(QtCore.QObject):
         import re
         out_badges = {}
         out_users = {}
+        user_states = {}
         out_segments = []
 
         for seg in segmented_chat:
@@ -267,16 +268,7 @@ class ChatEngine(QtCore.QObject):
                                     out_badges[b_key] = ""
 
                     uid = author.get("id")
-                    if uid and uid not in out_users:
-                        display_name = author.get("display_name")
-                        if not display_name:
-                            display_name = author.get("name")
-                        color = author.get("colour") or msg.get("colour") or ""
-                        out_users[uid] = {
-                            "name": display_name,
-                            "color": color,
-                            "badges": user_badge_keys
-                        }
+                    current_color = author.get("colour") or msg.get("colour") or ""
 
                     out_msg = {
                         "t": t,
@@ -284,6 +276,34 @@ class ChatEngine(QtCore.QObject):
                         "mid": msg.get("message_id"),
                         "msg": msg.get("message")
                     }
+
+                    if uid:
+                        if uid not in user_states:
+                            display_name = author.get("display_name")
+                            if not display_name:
+                                display_name = author.get("name")
+                            
+                            user_states[uid] = {
+                                "color": current_color,
+                                "badges": user_badge_keys
+                            }
+                            out_users[uid] = {
+                                "name": display_name,
+                                "color": current_color,
+                                "badges": user_badge_keys
+                            }
+                        else:
+                            state = user_states[uid]
+                            color_changed = current_color != state["color"]
+                            badges_changed = user_badge_keys != state["badges"]
+                            
+                            if color_changed:
+                                out_msg["c"] = current_color
+                                state["color"] = current_color
+                                
+                            if badges_changed:
+                                out_msg["b"] = user_badge_keys
+                                state["badges"] = user_badge_keys
                     
                     if msg.get("is_first_message") is True:
                         out_msg["first"] = True
