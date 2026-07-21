@@ -161,16 +161,16 @@ class DownloadInfo(Serializable):
         self.createSubfolderForDownloads = enabled
 
     def isUnmuteVideoEnabled(self) -> bool:
-        return self.unmuteVideo
+        return getattr(self, "unmuteVideo", False)
 
     def isUpdateTrackEnabled(self) -> bool:
-        return self.updateTrack
+        return getattr(self, "updateTrack", False)
 
     def isPrioritizeEnabled(self) -> bool:
-        return self.prioritize
+        return getattr(self, "prioritize", False)
 
     def isSkipAdsEnabled(self) -> bool:
-        return self.skipAds
+        return getattr(self, "skipAds", False)
 
 
 
