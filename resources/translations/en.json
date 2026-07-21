@@ -488,5 +488,6 @@
     "ui.include_counted": "Include ads (count)",
     "ui.download_segments_data": "Download segments data",
     "ui.#create_subfolder_for_downloads": "Create subfolder for each download",
-    "ui.finish": "Finish"
+    "ui.finish": "Finish",
+    "messages.update_track_interval_ms": "Update Track Interval (ms)"
 }
