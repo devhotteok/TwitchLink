@@ -134,7 +134,13 @@ def patched_get_chat_messages_by_vod_id(self, vod_id, params, max_duration, offs
             yield data
 
         if not comments['pageInfo']['hasNextPage']:
-            break
+            import os
+            import time
+            if os.environ.get("TWITCHLINK_UPDATE_TRACK") == "1":
+                interval = int(os.environ.get("TWITCHLINK_UPDATE_TRACK_INTERVAL", "15000")) / 1000.0
+                time.sleep(interval)
+            else:
+                break
             
         if last_offset is not None:
             if new_messages_yielded == 0 and last_offset == content_offset_seconds:

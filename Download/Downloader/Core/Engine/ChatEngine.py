@@ -54,6 +54,12 @@ class ChatEngine(QtCore.QObject):
                 args.extend(["--start_time", str(int(start_ms / 1000))])
             if end_ms is not None:
                 args.extend(["--end_time", str(int(end_ms / 1000))])
+                
+        if self.downloadInfo.isUpdateTrackEnabled():
+            env = QtCore.QProcessEnvironment.systemEnvironment()
+            env.insert("TWITCHLINK_UPDATE_TRACK", "1")
+            env.insert("TWITCHLINK_UPDATE_TRACK_INTERVAL", str(App.Preferences.download.getUpdateTrackInterval()))
+            self.process.setProcessEnvironment(env)
 
         self.process.start(executable, args)
 
