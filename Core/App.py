@@ -30,7 +30,8 @@ class App(SingleApplicationLauncher):
     def restart(self) -> None:
         self.exit(self.EXIT_CODE.RESTART)
 
-Instance = App(Config.APP_NAME, sys.argv)
+import os
+Instance = App(Config.APP_NAME + os.environ.get("TWITCHLINK_SUFFIX", ""), sys.argv)
 
 
 from Services.NetworkAccessManager import NetworkAccessManager as _NetworkAccessManager
