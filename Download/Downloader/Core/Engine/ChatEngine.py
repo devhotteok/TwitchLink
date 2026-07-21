@@ -236,10 +236,10 @@ class ChatEngine(QtCore.QObject):
             for msg in seg.get("messages", []):
                 v_start = seg.get("video_start", 0.0)
                 t = None
-                if "timestamp" in msg and seg.get("original_timestamp") is not None:
-                    t = int(v_start * 1000) + int((msg["timestamp"] - seg["original_timestamp"]) / 1000)
-                elif "time_in_seconds" in msg and seg.get("original_start") is not None:
+                if "time_in_seconds" in msg and seg.get("original_start") is not None:
                     t = int(v_start * 1000) + int((msg["time_in_seconds"] - seg["original_start"]) * 1000)
+                elif "timestamp" in msg and seg.get("original_timestamp") is not None:
+                    t = int(v_start * 1000) + int((msg["timestamp"] - seg["original_timestamp"]) / 1000)
                 
                 if t is None:
                     continue
