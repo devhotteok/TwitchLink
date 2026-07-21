@@ -220,6 +220,7 @@ class Download(Serializable):
         self._reconnectAttempts = 10
         self._reconnectInterval = 3000
         self._createSubfolderForDownloads = True
+        self._updateTrackInterval = Config.UPDATE_TRACK_INTERVAL
 
     def setCreateSubfolderForDownloadsEnabled(self, enabled: bool) -> None:
         self._createSubfolderForDownloads = enabled
@@ -252,6 +253,12 @@ class Download(Serializable):
 
     def setReconnectInterval(self, interval: int) -> None:
         self._reconnectInterval = interval
+
+    def getUpdateTrackInterval(self) -> int:
+        return getattr(self, "_updateTrackInterval", Config.UPDATE_TRACK_INTERVAL)
+
+    def setUpdateTrackInterval(self, interval: int) -> None:
+        self._updateTrackInterval = interval
 
 
 class ScheduledDownloads(Serializable):

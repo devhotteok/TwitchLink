@@ -85,6 +85,9 @@ class Settings(QtWidgets.QWidget):
         self._ui.reconnectIntervalSlider.valueChanged.connect(self.setReconnectInterval)
         self._ui.reconnectIntervalSpinBox.valueChanged.connect(self.setReconnectInterval)
         self.setReconnectInterval(App.Preferences.download.getReconnectInterval())
+        self._ui.updateTrackIntervalSlider.valueChanged.connect(self.setUpdateTrackInterval)
+        self._ui.updateTrackIntervalSpinBox.valueChanged.connect(self.setUpdateTrackInterval)
+        self.setUpdateTrackInterval(App.Preferences.download.getUpdateTrackInterval())
         self._ui.resetButton.clicked.connect(self.resetSettings)
         self.reloadBookmarkArea()
         App.GlobalDownloadManager.runningCountChangedSignal.connect(self.reload)
@@ -179,6 +182,11 @@ class Settings(QtWidgets.QWidget):
         self._ui.reconnectIntervalSlider.setValueSilent(interval)
         self._ui.reconnectIntervalSpinBox.setValueSilent(interval)
 
+    def setUpdateTrackInterval(self, interval: int) -> None:
+        App.Preferences.download.setUpdateTrackInterval(interval)
+        self._ui.updateTrackIntervalSlider.setValueSilent(interval)
+        self._ui.updateTrackIntervalSpinBox.setValueSilent(interval)
+
     def resetSettings(self) -> None:
         if Utils.ask("warning", "prompts.#this_will_reset_all_settings_proceed", parent=self):
             App.Preferences.reset()
@@ -212,3 +220,4 @@ class Settings(QtWidgets.QWidget):
         self._ui.reconnectEnabled.setText(T("messages.enable_reconnect"))
         self._ui.reconnectAttemptsLabel.setText(T("messages.reconnect_attempts"))
         self._ui.reconnectIntervalLabel.setText(T("messages.retry_interval_ms"))
+        self._ui.updateTrackIntervalLabel.setText(T("messages.update_track_interval_ms"))
