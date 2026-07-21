@@ -99,7 +99,7 @@ class BaseDownloader(QtCore.QThread):
         if self.status.terminateState.isFalse() and not self.status.isDone():
             self.logger.warning("[ACTION] Finish Early")
             self.isFinishingEarly = True
-            self.status.terminateState.setPreparing()
+            self.status.raiseError(Exceptions.AbortRequested())
             self.status.sync()
             self._finishEarlyRequested.emit()
 

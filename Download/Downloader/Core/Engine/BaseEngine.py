@@ -54,7 +54,10 @@ class BaseEngine(QtCore.QObject):
         if self.status.terminateState.isProcessing():
             self.status.terminateState.setTrue()
             if isinstance(self.status.getError(), Exceptions.AbortRequested):
-                self.logger.info("Download Abort Requested")
+                if getattr(self, "_isFinishingEarly", False):
+                    self.logger.info("Download Stopped Early")
+                else:
+                    self.logger.info("Download Abort Requested")
             else:
                 self.logger.info("Download Failed")
                 self.logger.warning("Download failed for the following reason.")

@@ -99,4 +99,4 @@ class VideoEngine(PlaylistEngine):
             self._updatePlaylist()
 
     def _isFileRemoveRequired(self) -> bool:
-        return super()._isFileRemoveRequired() or (not self.status.terminateState.isFalse() and isinstance(self.status.getError(), Exceptions.AbortRequested))
+        return super()._isFileRemoveRequired() or (not self.status.terminateState.isFalse() and isinstance(self.status.getError(), Exceptions.AbortRequested) and not getattr(self, "_isFinishingEarly", False))
