@@ -146,7 +146,7 @@ class PlaylistEngine(BaseEngine):
     def _segmentDownloadFinished(self, segmentDownloader: SegmentDownloader) -> None:
         while len(self._segmentDownloaders) > 0 and self._segmentDownloaders[0].isFinished():
             nextSegmentDownloader = self._segmentDownloaders.pop(0)
-            if nextSegmentDownloader.getError() == None and not self.status.terminateState.isProcessing():
+            if nextSegmentDownloader.getError() == None and (not self.status.terminateState.isProcessing() or getattr(self, "_isFinishingEarly", False)):
                 self._mergeSegment(nextSegmentDownloader)
             nextSegmentDownloader.file.remove()
             nextSegmentDownloader.setParent(None)
@@ -157,7 +157,7 @@ class PlaylistEngine(BaseEngine):
             if self.status.terminateState.isProcessing() or self._playlistManager.playlist.isEndList() or (self.downloadInfo.type.isVideo() and not self.downloadInfo.isUpdateTrackEnabled()) or getattr(self, "_isFinishingEarly", False):
                 if self._FFmpeg == None:
                     self._finish()
-                elif self.status.terminateState.isProcessing():
+                elif self.status.terminateState.isProcessing() and not getattr(self, "_isFinishingEarly", False):
                     self._FFmpeg.terminate()
                 else:
                     self._FFmpeg.closeStream()
@@ -217,4 +217,5 @@ class PlaylistEngine(BaseEngine):
         if len(self._segmentDownloaders) == 0:
             self._checkDone()
         else:
-            App.FileDownloadManager.cancelDownloads(self._segmentDownloaders)
+            unstarted = [d for d in self._segmentDownloaders if d.bytesTotal == 0]
+            App.FileDownloadManager.cancelDownloads(unstarted)
