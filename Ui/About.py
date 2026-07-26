@@ -21,7 +21,7 @@ class About(QtWidgets.QWidget):
         self.retranslateDynamicUi()
 
     def showVersionInfo(self) -> None:
-        self._ui.versionInfoLabel.setText(f"{T('version')} {Config.APP_VERSION}")
+        self._ui.versionInfoLabel.setText(f"{T('ui.version')} {Config.APP_VERSION}")
         if App.Updater.status.versionInfo.hasUpdate():
             self._ui.updateInfoLabel.setText(T("messages.#_has_been_released", appName=Config.APP_NAME, version=App.Updater.status.versionInfo.latestVersion))
             self._ui.updateInfoLabel.setStyleSheet("color: rgb(255, 0, 0);")

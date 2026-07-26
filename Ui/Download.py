@@ -136,7 +136,7 @@ class Download(QtWidgets.QWidget):
             elif self._downloader.status.getError() != None:
                 self.showAlert(T("download-aborted"))
             else:
-                self.showStatus(T("download-completed"))
+                self.showStatus(T("download-complete"))
                 self.showProgress(100)
 
         if self._downloader.status.isFileRemoved():
@@ -223,7 +223,7 @@ class Download(QtWidgets.QWidget):
                 self.showError(self._downloader.status.getError(), downloadAborted=True)
                 self._ui.retryButton.show()
         else:
-            self.showStatus(T("download-completed"))
+            self.showStatus(T("download-complete"))
             self.showProgress(100)
         if not self._downloader.status.isFileRemoved():
             self._ui.openFileButton.show()
