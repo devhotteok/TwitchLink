@@ -485,6 +485,9 @@
     "ui.download_chat": "채팅 다운로드",
     "messages.#the_chat_will_be_downloaded_in_json": "채팅은 비디오와 함께 JSON 형식으로 다운로드됩니다.",
     "ui.copyright": "저작권",
+    "ui.include_counted": "광고 포함 (카운트)",
+    "ui.download_segments_data": "구간 데이터 다운로드",
     "ui.#create_subfolder_for_downloads": "각 다운로드마다 개별 하위 폴더 생성",
+    "ui.finish": "완료",
     "messages.update_track_interval_ms": "트랙 업데이트 간격 (ms)"
 }
