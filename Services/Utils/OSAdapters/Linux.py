@@ -24,11 +24,11 @@ class LinuxUtils(BaseAdapter):
 
     @staticmethod
     def getSystemAppDataPath() -> str:
-        return os.path.expanduser("~/.config")
+        return os.path.expanduser(QtCore.QStandardPaths.writableLocation(QtCore.QStandardPaths.StandardLocation.ConfigLocation)) 
 
     @staticmethod
     def getSystemTempPath() -> str:
-        return "/tmp"
+        return QtCore.QStandardPaths.writableLocation(QtCore.QStandardPaths.StandardLocation.TempLocation)
 
     @classmethod
     def getExecutableType(cls) -> str:
