@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=TwitchLink
+Type=Application
+Comment=Twitch Stream / Video / Clip Downloader
+Comment[ko]=트위치 생방송 / 비디오 / 클립 다운로더
+Icon=io.github.devhotteok.TwitchLink
+Exec=twitchlink.sh %u
+Terminal=false
+Categories=AudioVideo;Video;
+Keywords=Stream;Clip;Download;
