@@ -19,3 +19,9 @@ jobs:
     uses: ./.github/workflows/build-macos.yml
     with:
       version: ${{ github.event.release.tag_name }}
+
+  build-linux:
+    name: Linux
+    uses: ./.github/workflows/build-linux.yml
+    with:
+      version: ${{ github.event.release.tag_name }}

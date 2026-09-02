@@ -1,0 +1,118 @@
+# INCOMPLETE
+name: Build Linux
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+
+    runs-on: ubuntu-22.04
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      PYTHON_VERSION: '3.12'
+      APP_NAME: twitchlink
+      DIRECTORY_NAME: twitchlink_${{ inputs.version }}-1_amd64
+      OUTPUT_DEB: twitchlink_${{ inputs.version }}-1_amd64.deb
+      OUTPUT_FLATPAK: twitchlink-${{ inputs.version }}-x86_64.flatpak
+      FFMPEG_SOURCE: 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-07-31-14-10/ffmpeg-N-125875-g5d4d3bdc61-linux64-gpl.tar.xz'
+
+    steps:
+    - name: Download FFmpeg
+      run: |
+        curl -L -o ffmpeg_download.tar.xz ${{ env.FFMPEG_SOURCE }}
+        mkdir ffmpeg_download
+        tar -xf ffmpeg_download.tar.xz --strip-components 1 -C ffmpeg_download
+        mv ffmpeg_download/bin/ffmpeg resources/dependencies/linux
+        rm -r ffmpeg_download.tar.xz ffmpeg_download
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          /*
+          !/.github/build/windows
+          !/resources/dependencies/windows
+          !/.github/build/macos
+          !/resources/dependencies/macos
+        sparse-checkout-cone-mode: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Prepare build files
+      run: cp -r .github/build/linux/* .
+
+    - name: Update build files with version
+      run: |
+        sed -i 's/{{APP_VERSION}}/${{ inputs.version }}/g' DEBIAN/control
+        sed -i 's/{{APP_VERSION}}/${{ inputs.version }}/g' DEBIAN/control
+        echo "✅ Updated files with version: ${{ inputs.version }}"
+
+    - name: Build executible
+      run: |
+        pyinstaller TwitchLink.spec
+        if [ $? -ne 0 ]; then
+          echo "❌ Executible build failed"
+          exit 1
+        fi
+        echo "✅ Built executible: ${{ env.APP_NAME }}"
+
+    - name: Build .deb package
+      run: |
+        mv dist/${{ env.APP_NAME }} usr/share
+        mkdir ${{ env.DIRECTORY_NAME }}
+        mv DEBIAN usr ${{ env.DIRECTORY_NAME }}
+        dpkg-deb --build ${{ env.DIRECTORY_NAME }}
+
+        if [ $? -ne 0 ]; then
+          echo "❌ Failed to package .deb"
+          exit 1
+        fi
+        echo "✅ Built: ${{ env.OUTPUT_DEB }}"
+
+    - name: Install flatpak-builder
+      run: sudo apt install flatpak-builder
+
+    - name: Prepare .deb for flatpak building
+      run: |
+        mkdir flatpak
+        cp ${{ env.OUTPUT_DEB }} flatpak
+
+    - name: Build flatpak
+      run: |
+        flatpak-builder --force-clean --user --install-deps-from=flathub --repo=repo --install builddir io.github.devhotteok.TwitchLink.yml
+        flatpak build-bundle repo ${{ env.OUTPUT_FLATPAK }} io.github.devhotteok.TwitchLink
+
+        if [ $? -ne 0 ]; then
+          echo "❌ Failed to build flatpak"
+          exit 1
+        fi
+        echo "✅ Built: ${{ env.OUTPUT_FLATPAK }}"
+
+    - name: Upload to release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          "${{ env.OUTPUT_DEB }}"
+          "${{ env.OUTPUT_FLATPAK }}"

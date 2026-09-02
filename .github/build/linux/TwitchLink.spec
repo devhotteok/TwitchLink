@@ -2,7 +2,7 @@ import os
 import patchright
 
 
-APP_NAME = "TwitchLink"
+APP_NAME = "twitchlink"
 
 
 a = Analysis(
