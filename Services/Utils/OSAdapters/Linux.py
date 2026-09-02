@@ -20,11 +20,11 @@ class LinuxUtils(BaseAdapter):
 
     @staticmethod
     def getSystemHomeRoot() -> str:
-        return os.path.expanduser("~")
+        return QtCore.QStandardPaths.writableLocation(QtCore.QStandardPaths.StandardLocation.HomeLocation)
 
     @staticmethod
     def getSystemAppDataPath() -> str:
-        return os.path.expanduser(QtCore.QStandardPaths.writableLocation(QtCore.QStandardPaths.StandardLocation.ConfigLocation)) 
+        return QtCore.QStandardPaths.writableLocation(QtCore.QStandardPaths.StandardLocation.ConfigLocation)
 
     @staticmethod
     def getSystemTempPath() -> str:
