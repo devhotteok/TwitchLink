@@ -27,7 +27,7 @@ jobs:
       DIRECTORY_NAME: twitchlink_${{ inputs.version }}-1_amd64
       OUTPUT_DEB: twitchlink_${{ inputs.version }}-1_amd64.deb
       OUTPUT_FLATPAK: twitchlink-${{ inputs.version }}-x86_64.flatpak
-      FFMPEG_SOURCE: 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-07-31-14-10/ffmpeg-N-125875-g5d4d3bdc61-linux64-gpl.tar.xz'
+      FFMPEG_SOURCE: 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-08-31-13-27/ffmpeg-N-126342-gf88b741dbf-linux64-gpl.tar.xz'
 
     steps:
     - name: Download FFmpeg
@@ -91,8 +91,8 @@ jobs:
         fi
         echo "✅ Built: ${{ env.OUTPUT_DEB }}"
 
-    - name: Install flatpak-builder
-      run: sudo apt install flatpak-builder
+    - name: Install flatpak utilities
+      run: sudo apt install flatpak flatpak-builder
 
     - name: Prepare .deb for flatpak building
       run: |
