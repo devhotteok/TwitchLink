@@ -67,6 +67,7 @@ jobs:
       run: |
         sed -i 's/{{APP_VERSION}}/${{ inputs.version }}/g' DEBIAN/control
         sed -i 's/{{APP_VERSION}}/${{ inputs.version }}/g' DEBIAN/control
+        sed -i 's/{{APP_VERSION}}/${{ inputs.version }}/g' io.github.devhotteok.TwitchLink.yml
         echo "✅ Updated files with version: ${{ inputs.version }}"
 
     - name: Build executible
