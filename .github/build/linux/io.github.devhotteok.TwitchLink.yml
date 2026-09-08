@@ -1,0 +1,48 @@
+id: io.github.devhotteok.TwitchLink
+runtime: org.freedesktop.Platform
+runtime-version: '26.08'
+sdk: org.freedesktop.Sdk
+command: /app/share/twitchlink/twitchlink
+
+finish-args:
+- --share=ipc
+- --socket=fallback-x11
+- --socket=wayland
+- --device=all
+- --share=network
+- --filesystem=host:ro
+- --filesystem=home:create
+- --filesystem=/media:create
+- --filesystem=/run/media:create
+- --filesystem=/mnt:create
+
+modules:
+  - name: twitchlink
+    buildsystem: simple
+    build-commands:
+      # Unpack .deb
+      - ar -x twitchlink_{{APP_VERSION}}-1_amd64.deb
+      - tar -xf data.tar.zst
+
+      # Change desktop file to flatpak format
+      - sed -i 's/usr/app/g' usr/share/applications/twitchlink.desktop
+      - sed -i 's/Icon=twitchlink/Icon=io.github.devhotteok.TwitchLink/g' usr/share/applications/twitchlink.desktop
+      - sed -i '/^Path/d' usr/share/applications/twitchlink.desktop
+
+      # Install program
+      - install -Dm755 usr/share/twitchlink/twitchlink /app/share/twitchlink/twitchlink
+      - cp -rp usr/share/twitchlink/_internal /app/share/twitchlink
+      - install -Dm755 usr/share/applications/twitchlink.desktop /app/share/applications/io.github.devhotteok.TwitchLink.desktop
+      - install -Dm644 usr/share/metainfo/io.github.devhotteok.TwitchLink.metainfo.xml /app/share/metainfo/io.github.devhotteok.TwitchLink.metainfo.xml
+      - install -Dm644 usr/share/doc/twitchlink/copyright /app/share/doc/twitchlink/copyright
+      - install -Dm644 usr/share/icons/hicolor/16x16/apps/twitchlink.png /app/share/icons/hicolor/16x16/apps/io.github.devhotteok.TwitchLink.png
+      - install -Dm644 usr/share/icons/hicolor/24x24/apps/twitchlink.png /app/share/icons/hicolor/24x24/apps/io.github.devhotteok.TwitchLink.png
+      - install -Dm644 usr/share/icons/hicolor/32x32/apps/twitchlink.png /app/share/icons/hicolor/32x32/apps/io.github.devhotteok.TwitchLink.png
+      - install -Dm644 usr/share/icons/hicolor/48x48/apps/twitchlink.png /app/share/icons/hicolor/48x48/apps/io.github.devhotteok.TwitchLink.png
+      - install -Dm644 usr/share/icons/hicolor/64x64/apps/twitchlink.png /app/share/icons/hicolor/64x64/apps/io.github.devhotteok.TwitchLink.png
+      - install -Dm644 usr/share/icons/hicolor/128x128/apps/twitchlink.png /app/share/icons/hicolor/128x128/apps/io.github.devhotteok.TwitchLink.png
+      - install -Dm644 usr/share/icons/hicolor/256x256/apps/twitchlink.png /app/share/icons/hicolor/256x256/apps/io.github.devhotteok.TwitchLink.png
+      - install -Dm644 usr/share/icons/hicolor/scalable/apps/twitchlink.svg /app/share/icons/hicolor/scalable/apps/io.github.devhotteok.TwitchLink.svg
+    sources:
+      - type: dir
+        path: flatpak
