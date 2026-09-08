@@ -178,7 +178,8 @@ class Updaters:
             "3.5.2": None,
             "3.5.3": None,
             "3.5.4": None,
-            "3.5.5": None
+            "3.5.5": None,
+            "3.5.6": None
         }
         updaters = []
         versionFound = False
