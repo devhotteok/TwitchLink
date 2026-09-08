@@ -49,6 +49,7 @@ class General(Serializable):
         self._openProgressWindow = True
         self._notify = True
         self._useSystemTray = False
+        self._startHiddenInTray = False
         self._bookmarks = []
 
     def setOpenProgressWindowEnabled(self, enabled: bool) -> None:
@@ -59,6 +60,9 @@ class General(Serializable):
 
     def setSystemTrayEnabled(self, enabled: bool) -> None:
         self._useSystemTray = enabled
+
+    def setStartHiddenInTrayEnabled(self, enabled: bool) -> None:
+        self._startHiddenInTray = enabled
 
     def setBookmarks(self, bookmarks: list[str]) -> None:
         self._bookmarks = bookmarks
@@ -71,6 +75,9 @@ class General(Serializable):
 
     def isSystemTrayEnabled(self) -> bool:
         return self._useSystemTray
+
+    def isStartHiddenInTrayEnabled(self) -> bool:
+        return self._startHiddenInTray
 
     def getBookmarks(self) -> list[str]:
         return self._bookmarks

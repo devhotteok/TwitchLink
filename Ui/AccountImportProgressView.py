@@ -50,7 +50,7 @@ class AccountImportProgressView(QtWidgets.QDialog):
     def _browserProfileUpdated(self, browserProfile: BrowserProfile) -> None:
         if not self._cancelRequested:
             importInfoText = T("#Importing Twitch account from {browserName}", ellipsis=True, browserName=browserProfile.browserName)
-            profileInfoText = f"{T("profile")}: {browserProfile.displayName}({browserProfile.key})"
+            profileInfoText = f"{T('profile')}: {browserProfile.displayName}({browserProfile.key})"
             if len(self._profiles) > 1:
                 self._ui.progressInfo.setText(f"{importInfoText}\n{profileInfoText}")
             else:
