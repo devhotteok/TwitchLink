@@ -76,7 +76,7 @@
 }</string>
         </property>
         <property name="text">
-         <string>App Name</string>
+         <string>ui.app_name</string>
         </property>
        </widget>
       </item>
@@ -102,7 +102,7 @@
 }</string>
      </property>
      <property name="text">
-      <string>Starting...</string>
+      <string>ui.starting</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -144,7 +144,7 @@
 }</string>
         </property>
         <property name="text">
-         <string>version</string>
+         <string>ui.version</string>
         </property>
        </widget>
       </item>
@@ -162,7 +162,7 @@
 }</string>
         </property>
         <property name="text">
-         <string>copyright</string>
+         <string>ui.copyright</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

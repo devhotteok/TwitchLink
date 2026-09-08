@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Download History</string>
+   <string>ui.download_history</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -31,7 +31,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Download History</string>
+      <string>ui.download_history</string>
      </property>
     </widget>
    </item>
@@ -106,7 +106,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Your download history will be displayed here.</string>
+             <string>ui.#your_download_history_will_be_displayed</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

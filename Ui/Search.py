@@ -9,11 +9,11 @@ class Search(QtWidgets.QDialog):
     searchCompleted = QtCore.pyqtSignal(object)
 
     SEARCH_MESSAGE = {
-        SearchMode.Types.CHANNEL: "#Checking channel info",
-        SearchMode.Types.VIDEO: "#Checking video info",
-        SearchMode.Types.CLIP: "#Checking clip info",
-        SearchMode.Types.URL: "#Checking URL",
-        SearchMode.Types.UNKNOWN: "#Searching"
+        SearchMode.Types.CHANNEL: "messages.#checking_channel_info",
+        SearchMode.Types.VIDEO: "messages.#checking_video_info",
+        SearchMode.Types.CLIP: "messages.#checking_clip_info",
+        SearchMode.Types.URL: "messages.#checking_url",
+        SearchMode.Types.UNKNOWN: "messages.#searching"
     }
 
     def __init__(self, mode: SearchMode, parent: QtWidgets.QWidget | None = None):
@@ -24,23 +24,23 @@ class Search(QtWidgets.QDialog):
 
     def setup(self) -> None:
         if self.mode.isChannel():
-            self._ui.windowTitleLabel.setText(T("#Search by Channel ID"))
+            self._ui.windowTitleLabel.setText(T("messages.#search_channel_id"))
             self.showSearchExamples(
                 SearchHelper.getChannelIdExamples()
             )
         elif self.mode.isVideo():
-            self._ui.windowTitleLabel.setText(T("#Search by Video / Clip ID"))
+            self._ui.windowTitleLabel.setText(T("messages.#search_video_clip_id"))
             self.showSearchExamples(
                 SearchHelper.getVideoIdExamples(),
                 SearchHelper.getClipIdExamples()
             )
         elif self.mode.isUrl():
-            self._ui.windowTitleLabel.setText(T("#Search by Channel / Video / Clip URL"))
+            self._ui.windowTitleLabel.setText(T("messages.#search_channel_video_clip_url"))
             self.showSearchExamples(
                 SearchHelper.getUrlExamples()
             )
         else:
-            self._ui.windowTitleLabel.setText(T("#Enter your search term."))
+            self._ui.windowTitleLabel.setText(T("messages.#enter_your_search_term"))
             self.showSearchExamples(
                 SearchHelper.getChannelIdExamples(),
                 SearchHelper.getVideoIdExamples(),
@@ -97,14 +97,23 @@ class Search(QtWidgets.QDialog):
             self._ui.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True)
             self.showInputPage()
             if isinstance(searchEngine.getError(), Engine.Exceptions.ChannelNotFound):
-                Utils.info("no-results-found", "#Channel not found.", parent=self)
+                Utils.info("no-results-found", "errors.#channel_not_found", parent=self)
             elif isinstance(searchEngine.getError(), Engine.Exceptions.VideoNotFound):
-                Utils.info("no-results-found", "#Video not found.", parent=self)
+                Utils.info("no-results-found", "errors.#video_not_found", parent=self)
             elif isinstance(searchEngine.getError(), Engine.Exceptions.ClipNotFound):
-                Utils.info("no-results-found", "#Clip not found.", parent=self)
+                Utils.info("no-results-found", "errors.#clip_not_found", parent=self)
             elif isinstance(searchEngine.getError(), Engine.Exceptions.InvalidURL):
-                Utils.info("no-results-found", "#This URL is invalid.", parent=self)
+                Utils.info("no-results-found", "errors.#this_url_is_invalid", parent=self)
             elif isinstance(searchEngine.getError(), Engine.Exceptions.NoResultsFound):
-                Utils.info("no-results-found", "#No Results Found.", parent=self)
+                Utils.info("no-results-found", "messages.#no_results_found", parent=self)
             else:
                 Utils.info(*Messages.INFO.NETWORK_ERROR, parent=self)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

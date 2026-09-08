@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Download Menu</string>
+   <string>ui.download_menu</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -40,7 +40,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Download</string>
+      <string>ui.download</string>
      </property>
     </widget>
    </item>
@@ -104,7 +104,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="directoryLabel">
               <property name="text">
-               <string>Directory</string>
+               <string>ui.directory</string>
               </property>
              </widget>
             </item>
@@ -118,12 +118,19 @@
             <item row="1" column="0">
              <widget class="QLabel" name="formatLabel">
               <property name="text">
-               <string>Format</string>
+               <string>ui.format</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
              <widget class="QComboBox" name="fileFormat"/>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QCheckBox" name="createSubfolderForDownloadsCheckBox">
+              <property name="text">
+               <string>ui.#create_subfolder_for_downloads</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -137,7 +144,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Browse</string>
+            <string>ui.browse</string>
            </property>
           </widget>
          </item>
@@ -168,7 +175,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Resolution</string>
+            <string>ui.resolution</string>
            </property>
           </widget>
          </item>
@@ -188,7 +195,7 @@
       <item>
        <widget class="QGroupBox" name="cropArea">
         <property name="title">
-         <string>Crop</string>
+         <string>ui.crop</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
@@ -212,7 +219,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="cropFromLabel">
               <property name="text">
-               <string>From</string>
+               <string>ui.from</string>
               </property>
              </widget>
             </item>
@@ -234,7 +241,7 @@
                <item>
                 <widget class="QRadioButton" name="cropFromStartRadioButton">
                  <property name="text">
-                  <string>Start</string>
+                  <string>ui.start</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -365,7 +372,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="cropToLabel">
               <property name="text">
-               <string>To</string>
+               <string>ui.to</string>
               </property>
              </widget>
             </item>
@@ -387,7 +394,7 @@
                <item>
                 <widget class="QRadioButton" name="cropToEndRadioButton">
                  <property name="text">
-                  <string>End</string>
+                  <string>ui.end</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -571,14 +578,14 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>The actual cut may vary a few seconds from the specified range.</string>
+                <string>ui.#the_actual_cut_may_vary_a</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QToolButton" name="cropSettingsInfoButton">
                <property name="toolTip">
-                <string>Help</string>
+                <string>ui.help</string>
                </property>
                <property name="icon">
                 <iconset>
@@ -636,7 +643,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>Please specify a valid range.</string>
+                <string>ui.#please_specify_a_valid_range</string>
                </property>
               </widget>
              </item>
@@ -650,27 +657,55 @@
       <item>
        <widget class="QGroupBox" name="adBlockArea">
         <property name="title">
-         <string>Ad Block (This stream may contain ads.)</string>
+         <string>ui.#ad_block_this_stream_may_contain</string>
         </property>
         <layout class="QHBoxLayout" name="adBlockAreaLayout">
          <item>
           <widget class="QRadioButton" name="adBlockSkipSegmentsRadioButton">
            <property name="text">
-            <string>Skip Segments (Recommended)</string>
+            <string>ui.skip_segments_recommended</string>
            </property>
           </widget>
          </item>
+
          <item>
           <widget class="QRadioButton" name="adBlockAlternativeScreenRadioButton">
            <property name="text">
-            <string>Alternative Screen</string>
+            <string>ui.alternative_screen</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QToolButton" name="adBlockInfo">
            <property name="toolTip">
-            <string>Help</string>
+            <string>ui.help</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../icons/light/help.svg</normaloff>../icons/light/help.svg</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="chatArea">
+        <property name="title">
+         <string>ui.chat</string>
+        </property>
+        <layout class="QHBoxLayout" name="chatAreaLayout">
+         <item>
+          <widget class="QCheckBox" name="downloadChatCheckBox">
+           <property name="text">
+            <string>ui.download_chat</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="downloadChatInfo">
+           <property name="toolTip">
+            <string>ui.help</string>
            </property>
            <property name="icon">
             <iconset>
@@ -684,27 +719,27 @@
       <item>
        <widget class="QGroupBox" name="encoderArea">
         <property name="title">
-         <string>Encoder</string>
+         <string>ui.encoder</string>
         </property>
         <layout class="QHBoxLayout" name="encoderAreaLayout">
          <item>
           <widget class="QRadioButton" name="remuxRadioButton">
            <property name="text">
-            <string>Remux (Recommended)</string>
+            <string>ui.remux_recommended</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QRadioButton" name="concatRadioButton">
            <property name="text">
-            <string>Concat</string>
+            <string>ui.concat</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QToolButton" name="encoderInfo">
            <property name="toolTip">
-            <string>Help</string>
+            <string>ui.help</string>
            </property>
            <property name="icon">
             <iconset>
@@ -724,7 +759,7 @@
          </sizepolicy>
         </property>
         <property name="title">
-         <string>Advanced</string>
+         <string>ui.advanced</string>
         </property>
         <layout class="QVBoxLayout" name="advancedAreaLayout">
          <item>
@@ -745,14 +780,14 @@
             <item>
              <widget class="QCheckBox" name="unmuteVideoCheckBox">
               <property name="text">
-               <string>Unmute Video</string>
+               <string>ui.unmute_video</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QToolButton" name="unmuteVideoInfo">
               <property name="toolTip">
-               <string>Help</string>
+               <string>ui.help</string>
               </property>
               <property name="icon">
                <iconset>
@@ -781,14 +816,14 @@
             <item>
              <widget class="QCheckBox" name="updateTrackCheckBox">
               <property name="text">
-               <string>Update Track</string>
+               <string>ui.update_track</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QToolButton" name="updateTrackInfo">
               <property name="toolTip">
-               <string>Help</string>
+               <string>ui.help</string>
               </property>
               <property name="icon">
                <iconset>
@@ -817,14 +852,14 @@
             <item>
              <widget class="QCheckBox" name="prioritizeCheckBox">
               <property name="text">
-               <string>Prioritize</string>
+               <string>ui.prioritize</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QToolButton" name="prioritizeInfo">
               <property name="toolTip">
-               <string>Help</string>
+               <string>ui.help</string>
               </property>
               <property name="icon">
                <iconset>

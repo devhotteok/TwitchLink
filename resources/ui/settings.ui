@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <ui version="4.0">
  <class>Form</class>
  <widget class="QWidget" name="Form">
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="locale">
-   <locale language="English" country="UnitedStates"/>
+   <locale language="English" country="UnitedStates" />
   </property>
   <layout class="QVBoxLayout" name="FormLayout">
    <item>
@@ -28,7 +28,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Settings</string>
+      <string>ui.settings</string>
      </property>
     </widget>
    </item>
@@ -43,7 +43,7 @@
     <widget class="QTabWidget" name="tabWidget">
      <widget class="QWidget" name="generalSettings">
       <attribute name="title">
-       <string>General</string>
+       <string>ui.general</string>
       </attribute>
       <layout class="QVBoxLayout" name="generalSettingsLayout">
        <item>
@@ -55,23 +55,24 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>General</string>
+          <string>ui.general</string>
          </property>
          <layout class="QVBoxLayout" name="generalAreaLayout">
           <item>
            <widget class="QCheckBox" name="openProgressWindow">
             <property name="text">
-             <string>Automatically open progress window when download starts</string>
+             <string>ui.#automatically_open_progress_window_when_download</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="notify">
             <property name="text">
-             <string>Notify on download start/end</string>
+             <string>ui.#notify_on_download_startend</string>
             </property>
            </widget>
           </item>
+
           <item>
            <widget class="QWidget" name="windowCloseArea" native="true">
             <layout class="QHBoxLayout" name="windowCloseAreaLayout">
@@ -96,7 +97,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>When closing window</string>
+                <string>ui.when_closing_window</string>
                </property>
               </widget>
              </item>
@@ -110,14 +111,59 @@
                </property>
                <item>
                 <property name="text">
-                 <string>Exit completely</string>
+                 <string>ui.exit_completely</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Minimize to system tray</string>
+                 <string>ui.#minimize_to_system_tray</string>
                 </property>
                </item>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="defaultDirectoryArea" native="true">
+            <layout class="QHBoxLayout" name="defaultDirectoryAreaLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="defaultDirectoryLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>ui.default_directory</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="defaultDirectory" />
+             </item>
+             <item>
+              <widget class="QToolButton" name="searchDefaultDirectory">
+               <property name="toolTip">
+                <string>ui.browse</string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>../icons/light/folder.svg</normaloff>../icons/light/folder.svg</iconset>
+               </property>
               </widget>
              </item>
             </layout>
@@ -135,27 +181,27 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Filename Template</string>
+          <string>ui.filename_template</string>
          </property>
          <layout class="QFormLayout" name="templateAreaLayout">
           <item row="0" column="0">
            <widget class="QLabel" name="streamLabel">
             <property name="text">
-             <string>Stream</string>
+             <string>ui.stream</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="videoLabel">
             <property name="text">
-             <string>Video</string>
+             <string>ui.video</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="clipLabel">
             <property name="text">
-             <string>Clip</string>
+             <string>ui.clip</string>
             </property>
            </widget>
           </item>
@@ -175,12 +221,12 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QLineEdit" name="streamFilename"/>
+              <widget class="QLineEdit" name="streamFilename" />
              </item>
              <item>
               <widget class="QToolButton" name="streamTemplateInfo">
                <property name="toolTip">
-                <string>Help</string>
+                <string>ui.help</string>
                </property>
                <property name="icon">
                 <iconset>
@@ -207,12 +253,12 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QLineEdit" name="videoFilename"/>
+              <widget class="QLineEdit" name="videoFilename" />
              </item>
              <item>
               <widget class="QToolButton" name="videoTemplateInfo">
                <property name="toolTip">
-                <string>Help</string>
+                <string>ui.help</string>
                </property>
                <property name="icon">
                 <iconset>
@@ -239,12 +285,12 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QLineEdit" name="clipFilename"/>
+              <widget class="QLineEdit" name="clipFilename" />
              </item>
              <item>
               <widget class="QToolButton" name="clipTemplateInfo">
                <property name="toolTip">
-                <string>Help</string>
+                <string>ui.help</string>
                </property>
                <property name="icon">
                 <iconset>
@@ -267,7 +313,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Channel Bookmarks</string>
+          <string>ui.channel_bookmarks</string>
          </property>
          <layout class="QVBoxLayout" name="bookmarkAreaLayout">
           <item>
@@ -358,7 +404,7 @@
      </widget>
      <widget class="QWidget" name="advancedSettings">
       <attribute name="title">
-       <string>Advanced</string>
+       <string>ui.advanced</string>
       </attribute>
       <layout class="QVBoxLayout" name="advancedSettingsLayout">
        <item>
@@ -370,7 +416,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Appearance</string>
+          <string>ui.appearance</string>
          </property>
          <layout class="QHBoxLayout" name="themeAreaLayout">
           <item>
@@ -409,7 +455,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Automatic (Follow System Settings)</string>
+               <string>ui.#automatic_follow_system_settings</string>
               </property>
              </widget>
             </item>
@@ -451,7 +497,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Light</string>
+               <string>ui.light</string>
               </property>
              </widget>
             </item>
@@ -493,7 +539,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Dark</string>
+               <string>ui.dark</string>
               </property>
              </widget>
             </item>
@@ -511,7 +557,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Search</string>
+          <string>ui.search</string>
          </property>
          <layout class="QVBoxLayout" name="searchAreaLayout">
           <item>
@@ -532,14 +578,14 @@
              <item>
               <widget class="QCheckBox" name="searchExternalContent">
                <property name="text">
-                <string>Allow searching external content</string>
+                <string>ui.#allow_searching_external_content</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QToolButton" name="searchExternalContentInfo">
                <property name="toolTip">
-                <string>Help</string>
+                <string>ui.help</string>
                </property>
                <property name="icon">
                 <iconset>
@@ -562,70 +608,11 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Language</string>
+          <string>ui.language</string>
          </property>
          <layout class="QVBoxLayout" name="languageAreaLayout">
           <item>
-           <widget class="QComboBox" name="language"/>
-          </item>
-          <item>
-           <widget class="QWidget" name="languageInfoArea" native="true">
-            <layout class="QHBoxLayout" name="languageInfoAreaLayout">
-             <property name="spacing">
-              <number>5</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="languageInfoIcon">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>18</width>
-                 <height>18</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>18</width>
-                 <height>18</height>
-                </size>
-               </property>
-               <property name="pixmap">
-                <pixmap>../icons/light/alert_red.svg</pixmap>
-               </property>
-               <property name="scaledContents">
-                <bool>true</bool>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="languageInfo">
-               <property name="text">
-                <string>Changing this setting will restart the application.</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
+           <widget class="QComboBox" name="language" />
           </item>
          </layout>
         </widget>
@@ -639,11 +626,11 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Time Zone</string>
+          <string>ui.time_zone</string>
          </property>
          <layout class="QVBoxLayout" name="timezoneAreaLayout">
           <item>
-           <widget class="QComboBox" name="timezone"/>
+           <widget class="QComboBox" name="timezone" />
           </item>
           <item>
            <widget class="QWidget" name="timezoneInfoArea" native="true">
@@ -697,7 +684,7 @@
              <item>
               <widget class="QLabel" name="timezoneInfo">
                <property name="text">
-                <string>Changing this setting will restart the application.</string>
+                <string>ui.#changing_this_setting_will_restart_the</string>
                </property>
               </widget>
              </item>
@@ -710,7 +697,7 @@
        <item>
         <widget class="QGroupBox" name="resetArea">
          <property name="title">
-          <string>Reset</string>
+          <string>ui.reset</string>
          </property>
          <layout class="QVBoxLayout" name="resetAreaLayout">
           <item>
@@ -728,7 +715,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Reset</string>
+             <string>ui.reset</string>
             </property>
            </widget>
           </item>
@@ -746,7 +733,7 @@
           <string notr="true">color: rgb(255, 0, 0);</string>
          </property>
          <property name="text">
-          <string>Some settings are restricted during download progress.</string>
+          <string>ui.#some_settings_are_restricted_during_download</string>
          </property>
         </widget>
        </item>
@@ -767,9 +754,25 @@
      </widget>
      <widget class="QWidget" name="downloadSettings">
       <attribute name="title">
-       <string>Download</string>
+       <string>ui.download</string>
       </attribute>
       <layout class="QVBoxLayout" name="downloadSettingsLayout">
+       <item>
+        <widget class="QGroupBox" name="generalDownloadArea">
+         <property name="title">
+          <string>ui.general</string>
+         </property>
+         <layout class="QVBoxLayout" name="generalDownloadAreaLayout">
+          <item>
+           <widget class="QCheckBox" name="createSubfolderForDownloads">
+            <property name="text">
+             <string>ui.#create_subfolder_for_downloads</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <widget class="QGroupBox" name="downloadSpeedArea">
          <property name="sizePolicy">
@@ -779,7 +782,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Download Speed</string>
+          <string>ui.download_speed</string>
          </property>
          <layout class="QVBoxLayout" name="downloadSpeedAreaLayout">
           <item>
@@ -791,9 +794,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Increasing speed boosts downloads, but can slow down other network activities like watching Twitch or YouTube.
-Please maintain a balanced speed.
-Keep in mind, beyond a certain level, boosting speed might not necessarily improve performance, depending on your hardware and network capabilities.</string>
+             <string>ui.#increasing_speed_boosts_downloads_but_can</string>
             </property>
            </widget>
           </item>
@@ -826,7 +827,227 @@ Keep in mind, beyond a certain level, boosting speed might not necessarily impro
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="speedSpinBox"/>
+              <widget class="QSpinBox" name="speedSpinBox" />
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="reconnectArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>ui.#network_reconnection_network_error</string>
+         </property>
+         <layout class="QVBoxLayout" name="reconnectAreaLayout">
+          <item>
+           <widget class="QCheckBox" name="reconnectEnabled">
+            <property name="text">
+             <string>ui.#enable_reconnect_on_network_error</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="reconnectAttemptsArea" native="true">
+            <layout class="QHBoxLayout" name="reconnectAttemptsAreaLayout">
+             <property name="spacing">
+              <number>15</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="reconnectAttemptsLabel">
+               <property name="text">
+                <string>ui.reconnect_attempts</string>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="reconnectAttemptsSlider">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>20</number>
+               </property>
+               <property name="pageStep">
+                <number>1</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksBelow</enum>
+               </property>
+               <property name="tickInterval">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="reconnectAttemptsSpinBox">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>9999999</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="reconnectIntervalArea" native="true">
+            <layout class="QHBoxLayout" name="reconnectIntervalAreaLayout">
+             <property name="spacing">
+              <number>15</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="reconnectIntervalLabel">
+               <property name="text">
+                <string>ui.retry_interval_ms</string>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="reconnectIntervalSlider">
+               <property name="minimum">
+                <number>100</number>
+               </property>
+               <property name="maximum">
+                <number>5000</number>
+               </property>
+               <property name="pageStep">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksBelow</enum>
+               </property>
+               <property name="tickInterval">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="reconnectIntervalSpinBox">
+               <property name="minimum">
+                <number>100</number>
+               </property>
+               <property name="maximum">
+                <number>9999999</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         <item>
+           <widget class="QWidget" name="updateTrackIntervalArea" native="true">
+            <layout class="QHBoxLayout" name="updateTrackIntervalAreaLayout">
+             <property name="spacing">
+              <number>15</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="updateTrackIntervalLabel">
+               <property name="text">
+                <string>ui.update_track_interval_ms</string>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="updateTrackIntervalSlider">
+               <property name="minimum">
+                <number>5000</number>
+               </property>
+               <property name="maximum">
+                <number>300000</number>
+               </property>
+               <property name="pageStep">
+                <number>1000</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksBelow</enum>
+               </property>
+               <property name="tickInterval">
+                <number>10000</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="updateTrackIntervalSpinBox">
+               <property name="minimum">
+                <number>5000</number>
+               </property>
+               <property name="maximum">
+                <number>300000</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -853,6 +1074,6 @@ Keep in mind, beyond a certain level, boosting speed might not necessarily impro
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

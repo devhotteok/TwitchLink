@@ -31,10 +31,33 @@ class BaseEngine(QtCore.QObject):
         if self._isFileRemoveRequired():
             self.file.remove()
             self.status.setFileRemoved()
+
+            import os
+            if getattr(self.downloadInfo, "downloadChat", False):
+                chatFilePath = os.path.splitext(self.downloadInfo.getAbsoluteFileName())[0] + ".json"
+                if os.path.exists(chatFilePath):
+                    try:
+                        os.remove(chatFilePath)
+                        self.logger.info("Removed aborted chat file.")
+                    except Exception as e:
+                        self.logger.warning(f"Failed to clean up chat file: {e}")
+            
+            if self.downloadInfo.isCreateSubfolderForDownloadsEnabled():
+                directory = os.path.dirname(self.downloadInfo.getAbsoluteFileName())
+                if os.path.exists(directory) and not os.listdir(directory):
+                    try:
+                        os.rmdir(directory)
+                        self.logger.info("Removed empty download subfolder.")
+                    except Exception as e:
+                        self.logger.warning(f"Failed to clean up subfolder: {e}")
+
         if self.status.terminateState.isProcessing():
             self.status.terminateState.setTrue()
             if isinstance(self.status.getError(), Exceptions.AbortRequested):
-                self.logger.info("Download Abort Requested")
+                if getattr(self, "_isFinishingEarly", False):
+                    self.logger.info("Download Stopped Early")
+                else:
+                    self.logger.info("Download Abort Requested")
             else:
                 self.logger.info("Download Failed")
                 self.logger.warning("Download failed for the following reason.")
@@ -49,6 +72,11 @@ class BaseEngine(QtCore.QObject):
         self.logger.warning("Abort requested with the following exception.")
         self.logger.exception(exception)
         self._raiseException(exception)
+
+    def finishEarly(self) -> None:
+        self.logger.warning("Finish early requested.")
+        if self.status.terminateState.isPreparing():
+            self.status.terminateState.setProcessing()
 
     def _raiseException(self, exception: Exception) -> None:
         self.logger.warning("The following exception occurred.")

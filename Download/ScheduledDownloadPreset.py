@@ -14,68 +14,40 @@ class Quality(Serializable):
     SERIALIZABLE_INIT_MODEL = False
     SERIALIZABLE_STRICT_MODE = False
 
-    def __init__(self, key: int | str):
+    def __init__(self, key: str, res: int = 0, fps: int = 0):
         self.key = key
-
-    def isValid(self) -> bool:
-        return type(self.key) == int
+        self.res = res
+        self.fps = fps
 
     def toString(self) -> str:
-        return f"{self.key}p" if self.isValid() else str(self.key)
-
-    def checkMatch(self, quality: int | str) -> bool:
-        return self.key == quality if self.isValid() else False
-
-
-class FrameRate(Serializable):
-    SERIALIZABLE_INIT_MODEL = False
-    SERIALIZABLE_STRICT_MODE = False
-
-    def __init__(self, key: int | str):
-        self.key = key
-
-    def isValid(self) -> bool:
-        return type(self.key) == int
-
-    def toString(self) -> str:
-        return str(self.key)
-
-    def checkMatch(self, frameRate: int | str) -> bool:
-        return self.key == frameRate if self.isValid() else False
+        return self.key
 
 
 class ScheduledDownloadPreset(Serializable):
     class AVAILABLE_QUALITY:
-        BEST = Quality("best")
-        RESOLUTION_1080P = Quality(1080)
-        RESOLUTION_720P = Quality(720)
-        RESOLUTION_480P = Quality(480)
-        RESOLUTION_360P = Quality(360)
-        RESOLUTION_160P = Quality(160)
-        WORST = Quality("worst")
-        AUDIO_ONLY = Quality("audio-only")
+        SOURCE = Quality("Source (maximum)")
+        RES_1440P60 = Quality("1440p60", 1440, 60)
+        RES_1080P60 = Quality("1080p60", 1080, 60)
+        RES_720P60 = Quality("720p60", 720, 60)
+        RES_480P30 = Quality("480p30", 480, 30)
+        RES_360P30 = Quality("360p30", 360, 30)
+        RES_160P30 = Quality("160p30", 160, 30)
+        AUDIO_ONLY = Quality("Audio Only")
 
         @classmethod
         def getList(cls) -> tuple[Quality, ...]:
-            return cls.BEST, cls.RESOLUTION_1080P, cls.RESOLUTION_720P, cls.RESOLUTION_480P, cls.RESOLUTION_360P, cls.RESOLUTION_160P, cls.WORST, cls.AUDIO_ONLY
-
-    class AVAILABLE_FRAMERATE:
-        HIGH = FrameRate("high")
-        LOW = FrameRate("low")
-
-        @classmethod
-        def getList(cls) -> tuple[FrameRate, ...]:
-            return cls.HIGH, cls.LOW
+            return cls.SOURCE, cls.RES_1440P60, cls.RES_1080P60, cls.RES_720P60, cls.RES_480P30, cls.RES_360P30, cls.RES_160P30, cls.AUDIO_ONLY
 
     def __init__(self):
         self.channel = ""
         self.filenameTemplate = self.optionHistory.getFilenameTemplate()
         self.directory = self.optionHistory.getUpdatedDirectory()
         self.preferredQualityIndex = 0
-        self.preferredFrameRateIndex = 0
         self.fileFormat = self.getAvailableFormat()
         self.skipAds = self.optionHistory.isSkipAdsEnabled()
         self.remux = self.optionHistory.isRemuxEnabled()
+        self.downloadChat = self.optionHistory.isDownloadChatEnabled()
+        self.createSubfolderForDownloads = self.optionHistory.isCreateSubfolderForDownloadsEnabled()
         self.preferredResolutionOnly = False
         self.enabled = True
 
@@ -84,6 +56,21 @@ class ScheduledDownloadPreset(Serializable):
 
     def isEnabled(self) -> bool:
         return self.enabled
+        
+    def setDownloadChatEnabled(self, enabled: bool) -> None:
+        self.downloadChat = enabled
+        
+    def isDownloadChatEnabled(self) -> bool:
+        return self.downloadChat
+
+    def setCreateSubfolderForDownloadsEnabled(self, enabled: bool) -> None:
+        self.createSubfolderForDownloads = enabled
+
+    def isCreateSubfolderForDownloadsEnabled(self) -> bool:
+        val = getattr(self, "createSubfolderForDownloads", None)
+        if val is not None:
+            return val
+        return self.optionHistory.isCreateSubfolderForDownloadsEnabled()
 
     @property
     def optionHistory(self) -> DownloadOptionHistory.ScheduledDownloadHistory:
@@ -128,22 +115,13 @@ class ScheduledDownloadPreset(Serializable):
     def isAudioOnlyPreferred(self) -> bool:
         return self.preferredQuality == self.AVAILABLE_QUALITY.AUDIO_ONLY
 
-    def setPreferredFrameRate(self, index: int) -> None:
-        self.preferredFrameRateIndex = index
-        self.setFileFormat(self.getAvailableFormat(self.fileFormat))
-
-    @property
-    def preferredFrameRate(self) -> FrameRate:
-        return self.getFrameRateList()[self.preferredFrameRateIndex]
-
-    def getFrameRateList(self) -> tuple[FrameRate, ...]:
-        return self.AVAILABLE_FRAMERATE.getList()
-
     def setSkipAdsEnabled(self, enabled: bool) -> None:
         self.skipAds = enabled
 
     def isSkipAdsEnabled(self) -> bool:
         return self.skipAds
+
+
 
     def setRemuxEnabled(self, enabled: bool) -> None:
         self.remux = enabled
@@ -158,28 +136,39 @@ class ScheduledDownloadPreset(Serializable):
         return self.preferredResolutionOnly
 
     def selectResolution(self, resolutions: list[Resolution]) -> Resolution:
-        if self.preferredQuality == self.AVAILABLE_QUALITY.BEST:
+        if self.preferredQuality == self.AVAILABLE_QUALITY.SOURCE:
             return resolutions[0]
-        elif self.preferredQuality == self.AVAILABLE_QUALITY.WORST:
-            for resolution in reversed(resolutions):
-                if not resolution.isAudioOnly():
-                    return resolution
-        elif self.preferredQuality == self.AVAILABLE_QUALITY.AUDIO_ONLY:
+            
+        if self.preferredQuality == self.AVAILABLE_QUALITY.AUDIO_ONLY:
             for resolution in reversed(resolutions):
                 if resolution.isAudioOnly():
                     return resolution
-        else:
-            matchingResolutions = []
-            for resolution in resolutions:
-                if self.preferredQuality.checkMatch(resolution.quality):
-                    matchingResolutions.append(resolution)
-            if len(matchingResolutions) != 0:
-                if self.preferredFrameRate == self.AVAILABLE_FRAMERATE.HIGH:
-                    return matchingResolutions[0]
-                else:
-                    return matchingResolutions[-1]
-        if self.isPreferredResolutionOnlyEnabled():
-            raise Exceptions.PreferredResolutionNotFound
+            for resolution in reversed(resolutions):
+                if not resolution.isAudioOnly():
+                    return resolution
+                    
+        req_res = self.preferredQuality.res
+        req_fps = self.preferredQuality.fps
+        
+        for resolution in resolutions:
+            res_fps = resolution.frameRate if resolution.frameRate != None else 30
+            if resolution.quality == req_res and res_fps == req_fps:
+                return resolution
+                
+        filtered = []
+        for res in resolutions:
+            if res.isAudioOnly():
+                continue
+            if res.quality != None and res.quality <= req_res:
+                filtered.append(res)
+                
+        if len(filtered) > 0:
+            return max(filtered, key=lambda r: (r.quality or 0, r.frameRate or 0))
+            
+        videos = [r for r in resolutions if not r.isAudioOnly() and r.quality != None]
+        if len(videos) > 0:
+            return videos[-1]
+            
         return resolutions[0]
 
     def saveOptionHistory(self) -> None:
@@ -191,3 +180,5 @@ class ScheduledDownloadPreset(Serializable):
             self.optionHistory.setFormat(self.fileFormat)
         self.optionHistory.setSkipAdsEnabled(self.skipAds)
         self.optionHistory.setRemuxEnabled(self.remux)
+        self.optionHistory.setDownloadChatEnabled(self.downloadChat)
+        self.optionHistory.setCreateSubfolderForDownloadsEnabled(getattr(self, "createSubfolderForDownloads", False))

@@ -43,7 +43,10 @@ class Utils(OSUtils, SystemUtils, UiUtils):
     @staticmethod
     def getDocument(file: str, language: str) -> str:
         try:
-            with open(Utils.joinPath(Config.DOCS_ROOT, language, file), "r", encoding="utf-8") as file:
-                return file.read()
+            path = Utils.joinPath(Config.DOCS_ROOT, language, file)
+            if not Utils.isFile(path):
+                path = Utils.joinPath(Config.DOCS_ROOT, "en", file)
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
         except:
             return ""

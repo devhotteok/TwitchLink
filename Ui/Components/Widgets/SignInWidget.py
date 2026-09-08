@@ -23,9 +23,9 @@ class SignInWidget(WebViewWidget):
     def urlChangeHandler(self, url: QtCore.QUrl) -> None:
         super().urlChangeHandler(url)
         if url.toString() != Config.SIGN_IN_PAGE_URL:
-            self.showInfo(T("#You left the sign-in page."), icon=Icons.ALERT_RED, buttonIcon=Icons.SIGN_IN, buttonText=T("#Return to sign-in page"), buttonHandler=self.showSignInPage)
+            self.showInfo(T("messages.#you_left_sign_page"), icon=Icons.ALERT_RED, buttonIcon=Icons.SIGN_IN, buttonText=T("messages.#return_sign_page"), buttonHandler=self.showSignInPage)
         else:
-            self.showInfo(T("#Please follow the sign-in procedure."), icon=Icons.INFO)
+            self.showInfo(T("messages.#please_follow_sign_procedure"), icon=Icons.INFO)
 
     def hasAccountData(self) -> bool:
         return self.accountData.username != None and self.accountData.token != None

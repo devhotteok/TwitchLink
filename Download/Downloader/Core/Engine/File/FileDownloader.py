@@ -4,6 +4,8 @@ from Core.GlobalExceptions import Exceptions
 
 from PyQt6 import QtCore, QtNetwork
 
+from Services.Utils.SystemUtils import SystemUtils
+
 
 class FileDownloader(QtCore.QObject):
     progressChanged = QtCore.pyqtSignal(object, object)
@@ -24,6 +26,7 @@ class FileDownloader(QtCore.QObject):
         self.bytesTotal = 0
         self._networkAccessManager = networkAccessManager
         self._request = QtNetwork.QNetworkRequest(self.url)
+        self._request.setRawHeader(b"User-Agent", SystemUtils.getUserAgent().encode())
         self._request.setTransferTimeout(Config.FILE_REQUEST_TIMEOUT)
         self._reply: QtNetwork.QNetworkReply | None = None
         self._error: Exceptions.AbortRequested | Exceptions.FileSystemError | Exceptions.NetworkError | None = None

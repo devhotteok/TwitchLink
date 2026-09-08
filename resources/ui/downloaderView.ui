@@ -73,21 +73,21 @@
       <item>
        <widget class="QLabel" name="status">
         <property name="text">
-         <string>Status</string>
+         <string>ui.status</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="updateTrackInfo">
         <property name="text">
-         <string>Update Track Info</string>
+         <string>ui.update_track_info</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="statusInfoButton">
         <property name="toolTip">
-         <string>Information</string>
+         <string>ui.information</string>
         </property>
         <property name="icon">
          <iconset>
@@ -105,7 +105,7 @@
       <item>
        <widget class="QLabel" name="fileSize">
         <property name="text">
-         <string>0.0B</string>
+         <string>ui.00b</string>
         </property>
        </widget>
       </item>

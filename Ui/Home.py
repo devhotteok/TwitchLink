@@ -54,3 +54,12 @@ class Home(QtWidgets.QWidget):
             App.DownloadManager.create(downloadInfo)
         except:
             Utils.info(*Messages.INFO.ACTION_PERFORM_ERROR, parent=self)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

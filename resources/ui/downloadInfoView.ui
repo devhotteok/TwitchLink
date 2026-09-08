@@ -119,7 +119,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Title:</string>
+           <string>ui.title_1</string>
           </property>
          </widget>
         </item>
@@ -132,7 +132,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Title</string>
+           <string>ui.title</string>
           </property>
          </widget>
         </item>
@@ -145,7 +145,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Date:</string>
+           <string>ui.date_1</string>
           </property>
          </widget>
         </item>
@@ -158,7 +158,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Date</string>
+           <string>ui.date</string>
           </property>
          </widget>
         </item>
@@ -171,7 +171,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Duration:</string>
+           <string>ui.duration_1</string>
           </property>
          </widget>
         </item>
@@ -184,7 +184,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Resolution:</string>
+           <string>ui.resolution_1</string>
           </property>
          </widget>
         </item>
@@ -197,7 +197,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Resolution</string>
+           <string>ui.resolution</string>
           </property>
          </widget>
         </item>
@@ -210,7 +210,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>File:</string>
+           <string>ui.file_1</string>
           </property>
          </widget>
         </item>
@@ -223,7 +223,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>File</string>
+           <string>ui.file</string>
           </property>
          </widget>
         </item>
@@ -254,7 +254,7 @@
            <item>
             <widget class="QLabel" name="duration">
              <property name="text">
-              <string>Duration</string>
+              <string>ui.duration</string>
              </property>
             </widget>
            </item>
@@ -282,7 +282,7 @@
                  <string notr="true">color: rgb(31, 71, 136);</string>
                 </property>
                 <property name="text">
-                 <string>Failed to unmute 0 segments (00:00:00)</string>
+                 <string>ui.#failed_to_unmute_0_segments_000000</string>
                 </property>
                </widget>
               </item>
@@ -292,7 +292,7 @@
                  <string notr="true">color: rgb(255, 0, 0);</string>
                 </property>
                 <property name="text">
-                 <string>Skipped 0 commercial segments (00:00:00)</string>
+                 <string>ui.#skipped_0_commercial_segments_000000</string>
                 </property>
                </widget>
               </item>
@@ -302,7 +302,7 @@
                  <string notr="true">color: rgb(255, 0, 0);</string>
                 </property>
                 <property name="text">
-                 <string>Missing 0 segments (00:00:00)</string>
+                 <string>ui.#missing_0_segments_000000</string>
                 </property>
                </widget>
               </item>
@@ -363,7 +363,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Category</string>
+           <string>ui.category</string>
           </property>
          </widget>
         </item>
@@ -431,7 +431,7 @@ border-radius: 10px;</string>
                </font>
               </property>
               <property name="text">
-               <string>Unmute Video</string>
+               <string>ui.unmute_video</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -482,7 +482,7 @@ border-radius: 10px;</string>
                </font>
               </property>
               <property name="text">
-               <string>Update Track</string>
+               <string>ui.update_track</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -533,7 +533,7 @@ border-radius: 10px;</string>
                </font>
               </property>
               <property name="text">
-               <string>Prioritize</string>
+               <string>ui.prioritize</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -584,7 +584,7 @@ border-radius: 10px;</string>
                </font>
               </property>
               <property name="text">
-               <string>Ad Block</string>
+               <string>ui.ad_block</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -635,7 +635,7 @@ border-radius: 10px;</string>
                </font>
               </property>
               <property name="text">
-               <string>Encoder: Concat</string>
+               <string>ui.encoder_concat</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>

@@ -55,7 +55,7 @@ class UpdateTrackInfoDisplay(QtWidgets.QWidget):
         elif self._downloader.status.getNextUpdateDateTime() == None:
             extraStatus = f"{T('tracking-updates', ellipsis=True)}"
         elif self._downloader.status.getWaitingCount() == 0:
-            extraStatus = f"{T('next-update')}: {QtCore.QDateTime.currentDateTimeUtc().secsTo(self._downloader.status.getNextUpdateDateTime())}"
+            extraStatus = f"{T('next-update')}: {max(0, QtCore.QDateTime.currentDateTimeUtc().secsTo(self._downloader.status.getNextUpdateDateTime()))}"
         else:
-            extraStatus = f"{T('next-update')}: {QtCore.QDateTime.currentDateTimeUtc().secsTo(self._downloader.status.getNextUpdateDateTime())} / {T('no-changes-found')}: {self._downloader.status.getWaitingCount()}/{self._downloader.status.getMaxWaitingCount()}"
+            extraStatus = f"{T('next-update')}: {max(0, QtCore.QDateTime.currentDateTimeUtc().secsTo(self._downloader.status.getNextUpdateDateTime()))} / {T('no-changes-found')}: {self._downloader.status.getWaitingCount()}/{self._downloader.status.getMaxWaitingCount()}"
         self._target.setText(f"({extraStatus})")

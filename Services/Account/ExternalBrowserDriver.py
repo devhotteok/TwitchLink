@@ -54,7 +54,9 @@ class ExternalBrowserDriverThread(QtCore.QThread):
                     channel=self._browserInfo.getChannel(),
                     headless=False,
                     no_viewport=True,
-                    args=["--start-maximized"]
+                    args=["--start-maximized"],
+                    ignore_default_args=["--enable-automation"],
+                    chromium_sandbox=True
                 )
                 page = context.new_page() if len(context.pages) == 0 else context.pages[0]
                 page.bring_to_front()

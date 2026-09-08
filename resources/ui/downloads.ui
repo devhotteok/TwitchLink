@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Downloads</string>
+   <string>ui.downloads</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -64,7 +64,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Total:</string>
+            <string>ui.total</string>
            </property>
           </widget>
          </item>
@@ -91,7 +91,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Filtered:</string>
+            <string>ui.filtered</string>
            </property>
           </widget>
          </item>
@@ -135,7 +135,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Type:</string>
+         <string>ui.type_1</string>
         </property>
        </widget>
       </item>
@@ -155,22 +155,22 @@
         </property>
         <item>
          <property name="text">
-          <string>All</string>
+          <string>ui.all</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Stream</string>
+          <string>ui.stream</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Video</string>
+          <string>ui.video</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Clip</string>
+          <string>ui.clip</string>
          </property>
         </item>
        </widget>
@@ -184,7 +184,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Status:</string>
+         <string>ui.status_1</string>
         </property>
        </widget>
       </item>
@@ -204,32 +204,32 @@
         </property>
         <item>
          <property name="text">
-          <string>All</string>
+          <string>ui.all</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>In Progress</string>
+          <string>ui.in_progress</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Completed</string>
+          <string>ui.completed</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Completed(Succeed)</string>
+          <string>ui.completedsucceed</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Completed(Failed)</string>
+          <string>ui.completedfailed</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Completed(Stopped/Canceled)</string>
+          <string>ui.completedstoppedcanceled</string>
          </property>
         </item>
        </widget>
@@ -301,7 +301,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Info</string>
+             <string>ui.info</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -383,7 +383,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Download History</string>
+         <string>ui.download_history</string>
         </property>
         <property name="icon">
          <iconset>
@@ -490,7 +490,7 @@
             <item>
              <widget class="QLabel" name="scheduledShutdownLabel">
               <property name="text">
-               <string>Scheduled Shutdown:</string>
+               <string>ui.scheduled_shutdown</string>
               </property>
              </widget>
             </item>
@@ -498,17 +498,17 @@
              <widget class="QComboBox" name="scheduledShutdown">
               <item>
                <property name="text">
-                <string>None</string>
+                <string>ui.none</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>Shutdown App</string>
+                <string>ui.shutdown_app</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>Shutdown System</string>
+                <string>ui.shutdown_system</string>
                </property>
               </item>
              </widget>
@@ -516,7 +516,7 @@
             <item>
              <widget class="QToolButton" name="scheduledShutdownInfo">
               <property name="toolTip">
-               <string>Help</string>
+               <string>ui.help</string>
               </property>
               <property name="icon">
                <iconset>
@@ -544,7 +544,7 @@
             <string notr="true">color: rgb(255, 0, 0);</string>
            </property>
            <property name="text">
-            <string>Unavailable when Scheduled Downloads are enabled.</string>
+            <string>ui.#unavailable_when_scheduled_downloads_are_enabled</string>
            </property>
           </widget>
          </item>

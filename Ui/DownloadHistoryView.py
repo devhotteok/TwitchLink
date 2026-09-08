@@ -67,7 +67,7 @@ class DownloadHistoryView(QtWidgets.QWidget):
         elif self.downloadInfo.type.isClip():
             return
         self._ui.downloadInfoView.showMutedInfo(self.downloadHistory.progressDetails.mutedFiles, self.downloadHistory.progressDetails.mutedMilliseconds)
-        self._ui.downloadInfoView.showSkippedInfo(self.downloadHistory.progressDetails.skippedFiles, self.downloadHistory.progressDetails.skippedMilliseconds)
+        self._ui.downloadInfoView.showSkippedInfo(self.downloadHistory.progressDetails.skippedFiles + getattr(self.downloadHistory.progressDetails, 'adFiles', 0), self.downloadHistory.progressDetails.skippedMilliseconds + getattr(self.downloadHistory.progressDetails, 'adMilliseconds', 0))
         self._ui.downloadInfoView.showMissingInfo(self.downloadHistory.progressDetails.missingFiles, self.downloadHistory.progressDetails.missingMilliseconds)
 
     def deleteHistory(self) -> None:
@@ -78,7 +78,7 @@ class DownloadHistoryView(QtWidgets.QWidget):
             self.openFile()
 
     def openFolder(self) -> None:
-        if not Utils.openFolder(self.downloadInfo.directory):
+        if not Utils.openFolder(self.downloadInfo.getAbsoluteDirectory()):
             Utils.info(*Messages.INFO.FOLDER_NOT_FOUND, parent=self)
 
     def openFile(self) -> None:
@@ -88,3 +88,12 @@ class DownloadHistoryView(QtWidgets.QWidget):
     def openLogs(self) -> None:
         if not Utils.openFile(self.downloadHistory.logFile):
             Utils.info(*Messages.INFO.FILE_NOT_FOUND, parent=self)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

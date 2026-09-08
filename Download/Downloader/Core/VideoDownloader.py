@@ -17,6 +17,7 @@ class VideoDownloader(BaseDownloader):
             parent=None
         )
         self._abortRequested.connect(engine.abort)
+        self._finishEarlyRequested.connect(engine.finishEarly)
         self._pauseRequested.connect(engine.pause)
         self._resumeRequested.connect(engine.resume, QtCore.Qt.ConnectionType.BlockingQueuedConnection)
         return engine

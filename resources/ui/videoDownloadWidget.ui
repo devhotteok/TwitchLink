@@ -74,7 +74,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Download</string>
+         <string>ui.download</string>
         </property>
         <property name="icon">
          <iconset>
@@ -97,7 +97,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Instant Download (Downloads immediately with options previously used for this type.)</string>
+         <string>ui.#instant_download_downloads_immediately_with_options</string>
         </property>
         <property name="icon">
          <iconset>

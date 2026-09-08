@@ -155,3 +155,12 @@ class VideoWidget(QtWidgets.QWidget):
             parent=self
         )
         propertyView.exec()
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

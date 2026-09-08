@@ -18,6 +18,7 @@ class Translator(QtCore.QObject):
         super().__init__(parent=parent)
         self._translationPacks: dict[str, TranslationPack] = {}
         self._currentTranslationPack: TranslationPack | None = None
+        self._activeTranslators: list[QtCore.QTranslator] = []
         self._translationsCache: dict[str, str] = {}
         self._loadTranslations()
         self.setTranslationPack(self.getPreferredTranslationPackId())
@@ -37,13 +38,20 @@ class Translator(QtCore.QObject):
     def setTranslationPack(self, translationPackId: str) -> None:
         if translationPackId not in self._translationPacks:
             raise Exceptions.LanguageNotFound
-        if self._currentTranslationPack != None:
-            for translator in self._currentTranslationPack.getStaticTranslators():
-                App.Instance.removeTranslator(translator)
-        self._currentTranslationPack = self._translationPacks[translationPackId]
+            
+        newPack = self._translationPacks[translationPackId]
+        newTranslationsCache = newPack.getDynamicTranslations()
+        
+        self._currentTranslationPack = newPack
+        self._translationsCache = newTranslationsCache
+        
+        for translator in self._activeTranslators:
+            App.Instance.removeTranslator(translator)
+        self._activeTranslators.clear()
+        
         for translator in self._currentTranslationPack.getStaticTranslators():
+            self._activeTranslators.append(translator)
             App.Instance.installTranslator(translator)
-        self._translationsCache = self._currentTranslationPack.getDynamicTranslations()
 
     def getTranslationPacks(self) -> list[TranslationPack]:
         return list(self._translationPacks.values())

@@ -28,7 +28,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Title</string>
+      <string>ui.title</string>
      </property>
     </widget>
    </item>
@@ -60,7 +60,7 @@
       <item>
        <widget class="QCheckBox" name="checkBox">
         <property name="text">
-         <string>Do not show this again.</string>
+         <string>ui.#do_not_show_this_again</string>
         </property>
        </widget>
       </item>

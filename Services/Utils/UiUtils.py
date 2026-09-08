@@ -33,8 +33,7 @@ class UiUtils:
         msg.setWindowTitle(T(title) if titleTranslate else title)
         msg.setText(T(content) if contentTranslate else content)
         msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-        if buttonText != None:
-            msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(buttonText)
+        msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(T(buttonText or "ok"))
         msg.exec()
 
     @staticmethod
@@ -43,10 +42,8 @@ class UiUtils:
         msg.setWindowTitle(T(title) if titleTranslate else title)
         msg.setText(T(content) if contentTranslate else content)
         msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel)
-        if okText != None:
-            msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(T(okText))
-        if cancelText != None:
-            msg.button(QtWidgets.QMessageBox.StandardButton.Cancel).setText(T(cancelText))
+        msg.button(QtWidgets.QMessageBox.StandardButton.Ok).setText(T(okText or "ok"))
+        msg.button(QtWidgets.QMessageBox.StandardButton.Cancel).setText(T(cancelText or "cancel"))
         msg.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Ok if defaultOk else QtWidgets.QMessageBox.StandardButton.Cancel)
         return msg.exec() == QtWidgets.QMessageBox.StandardButton.Ok
 
@@ -63,7 +60,7 @@ class UiUtils:
 
     @staticmethod
     def askSaveAs(directory: str, filters: list[str], initialFilter: str | None = None, parent: QtWidgets.QWidget | None = None) -> str | None:
-        mappedFilters = dict((T("#{fileFormat} file (*.{fileFormat})", fileFormat=key), key) for key in filters)
+        mappedFilters = dict((T("messages.#_file_*", fileFormat=key), key) for key in filters)
         fileDialog = QtWidgets.QFileDialog(parent=parent)
         fileDialog.setWindowIcon(Icons.APP_LOGO.icon)
         result = fileDialog.getSaveFileName(

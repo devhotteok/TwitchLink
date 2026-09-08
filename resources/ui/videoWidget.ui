@@ -121,7 +121,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Title</string>
+            <string>ui.title</string>
            </property>
           </widget>
          </item>
@@ -134,7 +134,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Info 1</string>
+            <string>ui.info_1</string>
            </property>
           </widget>
          </item>
@@ -147,7 +147,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Info 2</string>
+            <string>ui.info_2</string>
            </property>
           </widget>
          </item>
@@ -169,7 +169,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>More</string>
+         <string>ui.more</string>
         </property>
         <property name="icon">
          <iconset>

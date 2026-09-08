@@ -5,6 +5,8 @@ from Services.Playlist.Segment import Segment
 
 from PyQt6 import QtCore, QtNetwork
 
+from Services.Utils.SystemUtils import SystemUtils
+
 import typing
 
 
@@ -20,6 +22,7 @@ class PlaylistManager(QtCore.QObject):
         self._range = (None, None)
         self._networkAccessManager = networkAccessManager
         self._request = QtNetwork.QNetworkRequest(self.url)
+        self._request.setRawHeader(b"User-Agent", SystemUtils.getUserAgent().encode())
         self._request.setTransferTimeout(timeout)
         self._reply: QtNetwork.QNetworkReply | None = None
         self._error: Exceptions.AbortRequested | Exceptions.NetworkError | Playlist.Exceptions.InvalidPlaylist | Exceptions.UnexpectedError | None = None

@@ -14,7 +14,7 @@ class Config(Meta):
     RESOURCE_ROOT = _P(APP_ROOT, "resources")
     UI_ROOT = _P(RESOURCE_ROOT, "ui")
     DEPENDENCIES_ROOT = _P(RESOURCE_ROOT, "dependencies", OSUtils.getOSType().lower())
-    DOCS_ROOT = _P(RESOURCE_ROOT, "docs")
+    DOCS_ROOT = _P(RESOURCE_ROOT, "translations", "docs")
 
     APPDATA_PATH = _P(OSUtils.getSystemAppDataPath(), Meta.APP_NAME)
     APPDATA_FILE = _P(APPDATA_PATH, "settings.json")
@@ -32,7 +32,7 @@ class Config(Meta):
     STATUS_UPDATE_NETWORK_ERROR_MAX_IGNORE_COUNT = 1440
     STATUS_UPDATE_MAX_REDIRECT_COUNT = 10
 
-    USER_AGENT_TEMPLATE = None
+    USER_AGENT_TEMPLATE = "Mozilla/5.0 ({systemInfo}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
 
     SHOW_STATS = [50, [10, 30]]
 

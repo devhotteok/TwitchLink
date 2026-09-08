@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Import Account</string>
+   <string>ui.import_account</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -40,7 +40,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Import Account</string>
+      <string>ui.import_account</string>
      </property>
     </widget>
    </item>
@@ -78,7 +78,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Info</string>
+         <string>ui.info</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -101,7 +101,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="profileLabel">
             <property name="text">
-             <string>Profile:</string>
+             <string>ui.profile</string>
             </property>
            </widget>
           </item>
@@ -164,7 +164,7 @@
                 <string notr="true">color: rgb(255, 0, 0);</string>
                </property>
                <property name="text">
-                <string>Progress Info</string>
+                <string>ui.progress_info</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignCenter</set>

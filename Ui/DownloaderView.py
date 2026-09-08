@@ -94,7 +94,7 @@ class DownloaderView(QtWidgets.QWidget):
         elif isinstance(self._downloader, ClipDownloader):
             return
         self._ui.downloadInfoView.showMutedInfo(self._downloader.progress.mutedFiles, self._downloader.progress.mutedMilliseconds)
-        self._ui.downloadInfoView.showSkippedInfo(self._downloader.progress.skippedFiles, self._downloader.progress.skippedMilliseconds)
+        self._ui.downloadInfoView.showSkippedInfo(self._downloader.progress.skippedFiles + getattr(self._downloader.progress, 'adFiles', 0), self._downloader.progress.skippedMilliseconds + getattr(self._downloader.progress, 'adMilliseconds', 0))
         self._ui.downloadInfoView.showMissingInfo(self._downloader.progress.missingFiles, self._downloader.progress.missingMilliseconds)
 
     def _downloadFinishHandler(self) -> None:
@@ -152,14 +152,14 @@ class DownloaderView(QtWidgets.QWidget):
             elif isinstance(self._exception, Exceptions.NetworkError):
                 Utils.info(*Messages.INFO.NETWORK_ERROR, parent=self)
             elif isinstance(self._exception, Exceptions.ProcessError):
-                Utils.info("process-error", "#Process exited unexpectedly.\n\nPossible Causes\n\n* Corruption of the original file\n* Invalid crop range\n* Too long or invalid filename or path\n* Out of memory\n* Out of storage capacity\n* Lack of device performance\n* Needs permission to perform this action\n\nIf the error persists, try Run as administrator.", parent=self)
+                Utils.info("process-error", "errors.#process_exited_unexpectedly_possible_ca", parent=self)
             elif isinstance(self._exception, TwitchGQLAPI.Exceptions.AuthorizationError):
                 if App.Account.isSignedIn():
                     Utils.info(*Messages.INFO.AUTHENTICATION_ERROR, parent=self)
                 else:
                     Utils.info(*Messages.INFO.TEMPORARY_ERROR, parent=self)
             else:
-                Utils.info("error", "#An error occurred while downloading.", parent=self)
+                Utils.info("error", "errors.#an_error_occurred_while_downloading", parent=self)
         else:
             Utils.info("unable-to-download", description, contentTranslate=False, parent=self)
 
@@ -182,27 +182,27 @@ class DownloaderView(QtWidgets.QWidget):
     def _getErrorDescription(self) -> str | None:
         if isinstance(self._exception, TwitchPlaybackGenerator.Exceptions.Forbidden):
             if App.Account.isSignedIn():
-                return f"{T('#Authentication of your account has been denied.')}\n\n{T('reason')}: {self._exception.reason}"
+                return f"{T("errors.#authentication_your_account_has_been_de")}\n\n{T('reason')}: {self._exception.reason}"
             else:
-                return f"{T('#Authentication denied.')}\n\n{T('reason')}: {self._exception.reason}"
+                return f"{T("errors.#authentication_denied")}\n\n{T('reason')}: {self._exception.reason}"
         elif isinstance(self._exception, TwitchPlaybackGenerator.Exceptions.GeoBlock):
-            return f"{T('#This content is not available in your region.')}\n\n{T('reason')}: {self._exception.reason}"
+            return f"{T("info.#this_content_is_not_available_your_regi")}\n\n{T('reason')}: {self._exception.reason}"
         elif isinstance(self._exception, TwitchPlaybackGenerator.Exceptions.ChannelNotFound):
-            return T("#Channel not found. Deleted or temporary error.")
+            return T("errors.#channel_not_found_deleted_or_temporary")
         elif isinstance(self._exception, ContentManager.Exceptions.RestrictedContent):
             if self._exception.restrictionType == ContentManager.RestrictionType.CONTENT_TYPE:
-                restrictionType = T("#Downloading {contentType} from this channel has been restricted by the streamer({channel})'s request or by the administrator.", channel=self._exception.channel.displayName, contentType=T(self._exception.contentType))
+                restrictionType = T("errors.#downloading_this_channel_has_been_restr", channel=self._exception.channel.displayName, contentType=T(self._exception.contentType))
             else:
-                restrictionType = T("#This content has been restricted by the streamer({channel})'s request or by the administrator.", channel=self._exception.channel.displayName)
-            restrictionInfo = T("#To protect the rights of streamers, {appName} restricts downloads when a content restriction request is received.", appName=Config.APP_NAME)
+                restrictionType = T("errors.#this_content_has_been_restricted_stream", channel=self._exception.channel.displayName)
+            restrictionInfo = T("messages.#to_protect_rights_streamers_restricts_d", appName=Config.APP_NAME)
             message = f"{restrictionType}\n\n{restrictionInfo}"
             if self._exception.reason != None:
                 message = f"{message}\n\n[{T('reason')}]\n{self._exception.reason}"
             return message
         elif isinstance(self._exception, ScheduledDownloadPreset.Exceptions.PreferredResolutionNotFound):
-            return T("#The preferred resolution was not found.\nYou have disabled the download until a matching resolution is found.")
+            return T("errors.#the_preferred_resolution_was_not_found")
         elif isinstance(self._exception, TwitchDownloader.Exceptions.DownloaderCreationDisabled):
-            return T("#Unable to start a new download.\nThis feature has been disabled.")
+            return T("errors.#unable_start_new_download_this_feature")
         else:
             return None
 
@@ -213,3 +213,12 @@ class DownloaderView(QtWidgets.QWidget):
             self._ui.downloadInfoView.showContentInfo(content, immediateRefresh=immediateRefresh)
         if self._downloader != None:
             self._updateDurationInfo()
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

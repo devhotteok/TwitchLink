@@ -15,7 +15,7 @@ class Account(QtWidgets.QWidget):
         super().__init__(parent=parent)
         self._ui = UiLoader.load("account", self)
         self._ui.profileImage.setImageSizePolicy(QtCore.QSize(50, 50), QtCore.QSize(300, 300))
-        self._ui.accountInfo.setText(T("#Sign in and link the benefits of your Twitch account with {appName}.\n(Stream Ad-Free benefits, Subscriber-Only Stream access, Subscriber-Only Video access, Twitch Prime or Twitch Turbo benefits, etc.)", appName=CoreConfig.APP_NAME))
+
         self._ui.alertIcon = Utils.setSvgIcon(self._ui.alertIcon, Icons.ALERT_RED)
         self._ui.signInWithChromeButton.clicked.connect(self.signInWithChrome)
         self._ui.signInWithEdgeButton.clicked.connect(self.signInWithEdge)
@@ -33,6 +33,7 @@ class Account(QtWidgets.QWidget):
         self._tempAccountData: AccountData | None = None
         App.Account.accountUpdated.connect(self.showAccount)
         App.Account.authorizationExpired.connect(self.authorizationExpired, QtCore.Qt.ConnectionType.QueuedConnection)
+        self.retranslateDynamicUi()
 
     def showLoading(self) -> None:
         self._ui.accountMenu.setCurrentIndex(0)
@@ -65,7 +66,7 @@ class Account(QtWidgets.QWidget):
         self.showAccount()
         if response.getError() != None:
             if not isinstance(response.getError(), TwitchGQLAPI.Exceptions.DataNotFound):
-                Utils.info("network-error", "#A network error occurred while loading your account data.", parent=self)
+                Utils.info("network-error", "errors.#a_network_error_occurred_while_loading", parent=self)
 
     def showAccount(self) -> None:
         if App.Account.isSignedIn():
@@ -112,7 +113,7 @@ class Account(QtWidgets.QWidget):
         self._ui.importFromFirefoxButton.setEnabled(True)
 
     def signOut(self) -> None:
-        if Utils.ask("sign-out", "#Are you sure you want to sign out?", parent=self):
+        if Utils.ask("sign-out", "prompts.#are_you_sure_you_want_sign_out", parent=self):
             App.Account.signOut()
 
     def _openExternalBrowser(self, browserInfo: BrowserDriverBrowserInfo) -> None:
@@ -128,10 +129,10 @@ class Account(QtWidgets.QWidget):
         self._signInProcessComplete()
 
     def _externalBrowserError(self, browserInfo: BrowserDriverBrowserInfo) -> None:
-        Utils.info("error", T("#An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), parent=self)
+        Utils.info("error", T("errors.#an_unexpected_error_occurred_while_laun", browserName=browserInfo.getDisplayName()), parent=self)
 
     def _confirmBrowserSignIn(self, browserName: str) -> bool:
-        return Utils.ask("information", T("#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, signing out of your Twitch account in the browser will also sign you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are signed in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.", browserName=browserName, appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self)
+        return Utils.ask("information", T("prompts.#the_twitch_account_saved_your_browser_w", browserName=browserName, appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self)
 
     def importAccountFromBrowser(self, browserInfo: BrowserAccountDetectorBrowserInfo) -> None:
         if self._confirmBrowserSignIn(browserName=browserInfo.getDisplayName()):
@@ -157,10 +158,19 @@ class Account(QtWidgets.QWidget):
 
     def _accountImportError(self, browserInfo: BrowserAccountDetectorBrowserInfo, exception: Exceptions.BrowserNotFound | Exceptions.DriverConnectionFailure | Exceptions.UnexpectedDriverError | Exceptions.AccountNotFound) -> None:
         if isinstance(exception, Exceptions.BrowserNotFound):
-            Utils.info("error", T("#Unable to detect {browserName}.\nPlease make sure {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            Utils.info("error", T("errors.#unable_detect_please_make_sure_is_prope", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         elif isinstance(exception, Exceptions.DriverConnectionFailure):
-            Utils.info("error", T("#Failed to connect to the {browserName}.\n\nIf {browserName} is currently running, please close all windows and try again.\n\nIf it's not running, the issue may be caused by {browserName}'s security settings blocking external connections.\nConsider trying a different browser.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            Utils.info("error", T("errors.#failed_connect_if_is_currently_running", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         elif isinstance(exception, Exceptions.UnexpectedDriverError):
-            Utils.info("error", T("#An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            Utils.info("error", T("errors.#an_unexpected_error_occurred_please_ens", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         else:
-            Utils.info("error", T("#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            Utils.info("error", T("errors.#unable_find_twitch_account_please_make", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        self._ui.accountInfo.setText(T("messages.#sign_and_link_benefits_your_twitch_acco", appName=CoreConfig.APP_NAME))

@@ -20,5 +20,10 @@ class Config:
             "languageId": "Korean",
             "languageCode": "ko",
             "displayName": "한국어"
+        },
+        "ru": {
+            "languageId": "Russian",
+            "languageCode": "ru",
+            "displayName": "Русский"
         }
     }

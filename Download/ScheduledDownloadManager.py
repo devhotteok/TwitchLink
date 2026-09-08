@@ -107,6 +107,8 @@ class ScheduledDownload(QtCore.QObject):
         self._autoUpdateTimer.timeout.connect(self.updateChannelData)
         self.downloader: StreamDownloader | None = None
         self.status = ScheduledDownloadStatus(parent=self)
+        self._sessionDisabled = False
+        self._paused = False
         self.updateChannelData()
 
     def getId(self) -> uuid.UUID:
@@ -133,8 +135,26 @@ class ScheduledDownload(QtCore.QObject):
     def isEnabled(self) -> bool:
         return self.preset.isEnabled()
 
+    def setSessionDisabled(self, disabled: bool) -> None:
+        if disabled != self._sessionDisabled:
+            self._sessionDisabled = disabled
+            self._syncEnabledState()
+            self.activeChanged.emit()
+
+    def isSessionDisabled(self) -> bool:
+        return self._sessionDisabled
+
+    def setPaused(self, paused: bool) -> None:
+        if paused != self._paused:
+            self._paused = paused
+            self._syncEnabledState()
+            self.activeChanged.emit()
+
+    def isPaused(self) -> bool:
+        return self._paused
+
     def isActive(self) -> bool:
-        return not self.isBlocked() and self.isEnabled()
+        return not self.isBlocked() and not self.isSessionDisabled() and not self.isPaused() and self.isEnabled()
 
     def _syncEnabledState(self) -> None:
         if self.isChannelRetrieved():
@@ -144,7 +164,10 @@ class ScheduledDownload(QtCore.QObject):
             else:
                 self.disconnectPubSub()
                 if self.status.isDownloading():
-                    self.downloader.cancel()
+                    if getattr(self.downloader, "finishEarly", None) != None:
+                        self.downloader.finishEarly()
+                    else:
+                        self.downloader.cancel()
                 elif self.status.isError() or self.status.isDownloaderError():
                     self.status.setNone()
             self._syncAutoUpdate()
@@ -275,9 +298,11 @@ class ScheduledDownload(QtCore.QObject):
 
     def generateStreamPlayback(self) -> None:
         try:
+            from Core import App
             App.ContentManager.checkRestriction(self.channel.stream)
         except Exception as e:
             self.status.setError(e)
+            return
         else:
             self.status.setGeneratingPlayback()
             TwitchPlaybackGenerator.TwitchStreamPlaybackGenerator(self.channel.stream.broadcaster.login, parent=self).finished.connect(self._processStreamPlaybackResult)
@@ -302,24 +327,47 @@ class ScheduledDownload(QtCore.QObject):
                 self.status.setNone()
 
     def createDownloader(self, playback: TwitchPlaybackModels.TwitchStreamPlayback) -> None:
-        downloadInfo = DownloadInfo(self.channel.stream, playback)
-        downloadInfo.setDirectory(self.preset.directory)
-        selectedResolution = self.preset.selectResolution(playback.getResolutions())
-        downloadInfo.setResolution(playback.getResolutions().index(selectedResolution))
-        downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate), self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles()))
-        if not playback.token.hideAds:
-            downloadInfo.setSkipAdsEnabled(self.preset.isSkipAdsEnabled())
-        downloadInfo.setRemuxEnabled(self.preset.isRemuxEnabled())
-        self.downloader = TwitchDownloader.create(downloadInfo, parent=self)
-        self.downloader.finished.connect(self.downloadResultHandler)
-        self.downloaderCreated.emit(self, self.downloader)
-        self.status.setDownloading()
-        self.downloader.start()
+        try:
+            downloadInfo = DownloadInfo(self.channel.stream, playback)
+            downloadInfo.setDirectory(self.preset.directory)
+            downloadInfo.setCreateSubfolderForDownloadsEnabled(self.preset.isCreateSubfolderForDownloadsEnabled())
+            selectedResolution = self.preset.selectResolution(playback.getResolutions())
+            downloadInfo.setResolution(playback.getResolutions().index(selectedResolution))
+            
+            fileName = FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate)
+            directory = downloadInfo.directory
+            
+            if downloadInfo.isCreateSubfolderForDownloadsEnabled():
+                directory = Utils.joinPath(directory, fileName)
+            try:
+                from Services.Utils.OSUtils import OSUtils
+                OSUtils.createDirectory(directory)
+            except:
+                pass
+                
+            absoluteFileName = Utils.createUniqueFile(directory, fileName, self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles())
+            downloadInfo.setAbsoluteFileName(absoluteFileName)
+            downloadInfo.setCreateSubfolderForDownloadsEnabled(False)
+            if not playback.token.hideAds:
+                downloadInfo.setSkipAdsEnabled(self.preset.isSkipAdsEnabled())
+            downloadInfo.setRemuxEnabled(self.preset.isRemuxEnabled())
+            downloadInfo.setDownloadChatEnabled(self.preset.isDownloadChatEnabled())
+            self.downloader = TwitchDownloader.create(downloadInfo, parent=self)
+            self.downloader.finished.connect(self.downloadResultHandler)
+            self.downloaderCreated.emit(self, self.downloader)
+            self.status.setDownloading()
+            self.downloader.start()
+        except Exception as e:
+            import logging
+            import traceback
+            logging.getLogger("root").error(f"ScheduledDownloadManager createDownloader Exception:\n{traceback.format_exc()}")
+            self.status.setError(e)
 
     def downloadResultHandler(self, downloader: StreamDownloader) -> None:
         error = downloader.status.getError()
         if error == None:
-            self.setOffline()
+            if not getattr(downloader, "isFinishingEarly", False):
+                self.setOffline()
             self.status.setNone()
         elif self.isActive():
             self.status.setDownloaderError(error)

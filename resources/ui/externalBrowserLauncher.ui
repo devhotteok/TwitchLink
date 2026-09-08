@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Sign In</string>
+   <string>ui.sign_in</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -40,7 +40,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Sign In</string>
+      <string>ui.sign_in</string>
      </property>
     </widget>
    </item>
@@ -63,7 +63,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Info</string>
+         <string>ui.info</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -125,7 +125,7 @@
             <string notr="true">color: rgb(255, 0, 0);</string>
            </property>
            <property name="text">
-            <string>Sign-in is in progress...</string>
+            <string>ui.#sign_in_is_in_progress</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>

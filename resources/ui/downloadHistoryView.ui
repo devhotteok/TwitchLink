@@ -60,7 +60,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Started At:</string>
+           <string>ui.started_at_1</string>
           </property>
          </widget>
         </item>
@@ -73,7 +73,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Started At</string>
+           <string>ui.started_at</string>
           </property>
          </widget>
         </item>
@@ -86,7 +86,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Completed At:</string>
+           <string>ui.completed_at_1</string>
           </property>
          </widget>
         </item>
@@ -99,7 +99,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Completed At</string>
+           <string>ui.completed_at</string>
           </property>
          </widget>
         </item>
@@ -112,7 +112,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Result:</string>
+           <string>ui.result_1</string>
           </property>
          </widget>
         </item>
@@ -125,7 +125,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Result</string>
+           <string>ui.result</string>
           </property>
          </widget>
         </item>

@@ -22,7 +22,9 @@ import re
 class PlaylistEngine(BaseEngine):
     def __init__(self, downloadInfo: DownloadInfo, status: Modules.Status, progress: Modules.Progress, logger: Logger, parent: QtCore.QObject | None = None):
         super().__init__(downloadInfo, status, progress, logger, parent=parent)
-        self._playlistManager = PlaylistManager(self._networkAccessManager, self.downloadInfo.getUrl(), logger=self.logger, timeout=Config.PLAYLIST_REQUEST_TIMEOUT, maxRetryCount=Config.PLAYLIST_UPDATE_MAX_RETRY_COUNT, retryInterval=Config.PLAYLIST_UPDATE_RETRY_INTERVAL, parent=self)
+        maxRetryCount = App.Preferences.download.getReconnectAttempts() if App.Preferences.download.isReconnectEnabled() else 0
+        retryInterval = App.Preferences.download.getReconnectInterval() if App.Preferences.download.isReconnectEnabled() else Config.PLAYLIST_UPDATE_RETRY_INTERVAL
+        self._playlistManager = PlaylistManager(self._networkAccessManager, self.downloadInfo.getUrl(), logger=self.logger, timeout=Config.PLAYLIST_REQUEST_TIMEOUT, maxRetryCount=maxRetryCount, retryInterval=retryInterval, parent=self)
         self._playlistManager.errorOccurred.connect(self._playlistManagerErrorOccurred)
         self._playlistManager.playlistUpdated.connect(self._playlistUpdated)
         self._safeTempDirectory: SafeTempDirectory | None = None
@@ -50,6 +52,7 @@ class PlaylistEngine(BaseEngine):
     def _finish(self) -> None:
         if self._safeTempDirectory.getError() == None:
             self._safeTempDirectory.clear()
+            
         super()._finish()
 
     def _startFFmpegProcess(self) -> None:
@@ -87,9 +90,17 @@ class PlaylistEngine(BaseEngine):
                             self._segmentMapInfo = segment.mapInfo
                             self.progress.totalFiles += 1
                             segmentsToDownload.append(Segment(-segment.sequence - 1, segment.url.resolved(QtCore.QUrl(segment.mapInfo)), segment.datetime, 0, segment.startsAt))
+                    
+                    is_ad = False
+                    if self.downloadInfo.type.isStream() and any(re.match(filter, segment.title) for filter in Config.STREAM_SEGMENT_TITLE_FILTER_REGEX):
+                        is_ad = True
+                        
+
+
                     self.progress.totalFiles += 1
                     self.progress.totalMilliseconds += segment.totalMilliseconds
-                    if self.downloadInfo.type.isStream() and self.downloadInfo.isSkipAdsEnabled() and any(re.match(filter, segment.title) for filter in Config.STREAM_SEGMENT_TITLE_FILTER_REGEX):
+                    
+                    if is_ad and self.downloadInfo.isSkipAdsEnabled():
                         self.progress.skippedFiles += 1
                         self.progress.skippedMilliseconds += segment.totalMilliseconds
                         self.logger.info(f"Skipping Segment: <Sequence: {segment.sequence} / Length: {segment.totalMilliseconds}>\n{segment.url.toString()}")
@@ -97,7 +108,7 @@ class PlaylistEngine(BaseEngine):
                         segmentsToDownload.append(segment)
                 self._downloadSegments(segmentsToDownload)
                 self._syncProgress()
-            if self._playlistManager.playlist.isEndList() or (self.downloadInfo.type.isVideo() and not self.downloadInfo.isUpdateTrackEnabled()):
+            if self._playlistManager.playlist.isEndList() or (self.downloadInfo.type.isVideo() and not self.downloadInfo.isUpdateTrackEnabled()) or getattr(self, "_isFinishingEarly", False):
                 self._checkDone()
             else:
                 self._refreshTimer.start()
@@ -135,7 +146,7 @@ class PlaylistEngine(BaseEngine):
     def _segmentDownloadFinished(self, segmentDownloader: SegmentDownloader) -> None:
         while len(self._segmentDownloaders) > 0 and self._segmentDownloaders[0].isFinished():
             nextSegmentDownloader = self._segmentDownloaders.pop(0)
-            if nextSegmentDownloader.getError() == None and not self.status.terminateState.isProcessing():
+            if nextSegmentDownloader.getError() == None and (not self.status.terminateState.isProcessing() or getattr(self, "_isFinishingEarly", False)):
                 self._mergeSegment(nextSegmentDownloader)
             nextSegmentDownloader.file.remove()
             nextSegmentDownloader.setParent(None)
@@ -143,10 +154,10 @@ class PlaylistEngine(BaseEngine):
 
     def _checkDone(self) -> None:
         if len(self._segmentDownloaders) == 0 and not self.status.isDone():
-            if self.status.terminateState.isProcessing() or self._playlistManager.playlist.isEndList() or (self.downloadInfo.type.isVideo() and not self.downloadInfo.isUpdateTrackEnabled()):
+            if self.status.terminateState.isProcessing() or self._playlistManager.playlist.isEndList() or (self.downloadInfo.type.isVideo() and not self.downloadInfo.isUpdateTrackEnabled()) or getattr(self, "_isFinishingEarly", False):
                 if self._FFmpeg == None:
                     self._finish()
-                elif self.status.terminateState.isProcessing():
+                elif self.status.terminateState.isProcessing() and not getattr(self, "_isFinishingEarly", False):
                     self._FFmpeg.terminate()
                 else:
                     self._FFmpeg.closeStream()
@@ -171,6 +182,13 @@ class PlaylistEngine(BaseEngine):
                         break
             segmentDownloader.file.close()
             self.progress.files += 1
+            self.progress.downloadedTimeline.append({
+                "video_start": self.progress.milliseconds / 1000.0,
+                "video_duration": segmentDownloader.segment.totalMilliseconds / 1000.0,
+                "original_start": segmentDownloader.segment.startsAt / 1000.0,
+                "original_duration": segmentDownloader.segment.totalMilliseconds / 1000.0,
+                "original_timestamp": segmentDownloader.segment.datetime.toMSecsSinceEpoch() * 1000 if segmentDownloader.segment.datetime else None
+            })
             self.progress.milliseconds += segmentDownloader.segment.totalMilliseconds
             self.progress.byteSize = self.file.size()
             self.progress.totalByteSize = self.progress.byteSize
@@ -188,3 +206,16 @@ class PlaylistEngine(BaseEngine):
             self._checkDone()
         else:
             App.FileDownloadManager.cancelDownloads(self._segmentDownloaders)
+
+    def finishEarly(self) -> None:
+        super().finishEarly()
+        self._isFinishingEarly = True
+        if self._refreshTimer.isActive():
+            self._refreshTimer.stop()
+        if self._playlistManager.isRunning():
+            self._playlistManager.abort()
+        if len(self._segmentDownloaders) == 0:
+            self._checkDone()
+        else:
+            unstarted = [d for d in self._segmentDownloaders if d.bytesTotal == 0]
+            App.FileDownloadManager.cancelDownloads(unstarted)

@@ -121,13 +121,16 @@ class Progress(QtCore.QObject):
         self.mutedFiles = 0
         self.skippedFiles = 0
         self.missingFiles = 0
+        self.adFiles = 0
         self.milliseconds = 0
         self.totalMilliseconds = 0
         self.mutedMilliseconds = 0
         self.skippedMilliseconds = 0
         self.missingMilliseconds = 0
+        self.adMilliseconds = 0
         self.byteSize = 0
         self.totalByteSize = 0
+        self.downloadedTimeline: list[dict] = []
 
     @staticmethod
     def _getPercentage(part: float, whole: float) -> int:

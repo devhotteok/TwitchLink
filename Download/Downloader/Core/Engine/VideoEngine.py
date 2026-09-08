@@ -18,7 +18,7 @@ class VideoEngine(PlaylistEngine):
     def __init__(self, downloadInfo: DownloadInfo, status: Modules.Status, progress: Modules.Progress, logger: Logger, parent: QtCore.QObject | None = None):
         super().__init__(downloadInfo, status, progress, logger, parent=parent)
         self._playlistManager.setRange(*self.downloadInfo.getCropRangeMilliseconds())
-        self._refreshTimer.setInterval(Config.UPDATE_TRACK_INTERVAL)
+        self._refreshTimer.setInterval(App.Preferences.download.getUpdateTrackInterval())
         self._pausedSegments: list[Segment] = []
 
     def _updatePlaylist(self) -> None:
@@ -32,7 +32,7 @@ class VideoEngine(PlaylistEngine):
             self.downloadInfo.setCropRangeMilliseconds(*self._playlistManager.getSegmentRange())
             if self.downloadInfo.isUpdateTrackEnabled():
                 if self._playlistManager.hasNewSegments() or self.status.getWaitingCount() < self.status.getMaxWaitingCount():
-                    self.status.setNextUpdateDateTime(QtCore.QDateTime.currentDateTimeUtc().addMSecs(Config.UPDATE_TRACK_INTERVAL))
+                    self.status.setNextUpdateDateTime(QtCore.QDateTime.currentDateTimeUtc().addMSecs(App.Preferences.download.getUpdateTrackInterval()))
                     if self._playlistManager.hasNewSegments():
                         self.status.setWaitingCount(0)
                     else:
@@ -99,4 +99,4 @@ class VideoEngine(PlaylistEngine):
             self._updatePlaylist()
 
     def _isFileRemoveRequired(self) -> bool:
-        return super()._isFileRemoveRequired() or (not self.status.terminateState.isFalse() and isinstance(self.status.getError(), Exceptions.AbortRequested))
+        return super()._isFileRemoveRequired() or (not self.status.terminateState.isFalse() and isinstance(self.status.getError(), Exceptions.AbortRequested) and not getattr(self, "_isFinishingEarly", False))

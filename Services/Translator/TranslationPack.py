@@ -6,6 +6,17 @@ import os
 import json
 
 
+class JsonTranslator(QtCore.QTranslator):
+    def __init__(self, translations: dict[str, str], parent: QtCore.QObject | None = None):
+        super().__init__(parent=parent)
+        self._translations = translations
+
+    def translate(self, context: str, sourceText: str, disambiguation: str | None = None, n: int = -1) -> str:
+        if sourceText in self._translations:
+            return self._translations[sourceText]
+        return None
+
+
 class TranslationPack(QtCore.QObject):
     def __init__(self, id: str, languageCode: str, displayName: str, staticTranslatorsPath: str, dynamicTranslationsPath: str, parent: QtCore.QObject | None = None):
         super().__init__(parent=parent)
@@ -36,18 +47,15 @@ class TranslationPack(QtCore.QObject):
             if os.path.isfile(os.path.join(directory, fileName)):
                 if fileName.endswith(f"_{self._languageCode}.qm"):
                     translators.append(self._loadStaticTranslator(fileName, directory))
-        directory = OSUtils.joinPath(self._staticTranslatorsPath, self._languageCode)
-        if OSUtils.isDirectory(directory):
-            for fileName in (data for data in OSUtils.listDirectory(directory) if OSUtils.isFile(OSUtils.joinPath(directory, data))):
-                translators.append(self._loadStaticTranslator(fileName, directory))
+        translators.append(JsonTranslator(self.getDynamicTranslations(), parent=self))
         return translators
 
     def getDynamicTranslations(self) -> dict[str, str]:
         translations: dict[str, str] = {}
-        for fileName in ["KeywordTranslations.json", "Translations.json"]:
-            try:
-                with open(OSUtils.joinPath(self._dynamicTranslationsPath, fileName), encoding="utf-8") as file:
-                    translations.update({key: value.get(self._languageCode, key) for key, value in json.load(file).items()})
-            except:
-                pass
+        fileName = f"{self._languageCode}.json"
+        try:
+            with open(OSUtils.joinPath(self._dynamicTranslationsPath, fileName), encoding="utf-8") as file:
+                translations.update(json.load(file))
+        except:
+            pass
         return translations

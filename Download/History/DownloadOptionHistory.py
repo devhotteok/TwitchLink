@@ -20,6 +20,7 @@ class FileHistory:
         super().__init__()
         self.setDirectory(Config.DEFAULT_DIRECTORY)
         self.setFormat(self.getAvailableFormats()[0])
+        self.createSubfolderForDownloads = None
 
     def setAbsoluteFileName(self, absoluteFileName: str) -> None:
         self.setDirectory(os.path.dirname(absoluteFileName))
@@ -35,7 +36,18 @@ class FileHistory:
         return self._directory
 
     def getUpdatedDirectory(self) -> str:
-        for directory in [self.getDirectory(), Config.DEFAULT_DIRECTORY, Config.APPDATA_PATH]:
+        from Core import App
+        try:
+            default_dir = App.Preferences.general.getDefaultDirectory()
+        except Exception:
+            default_dir = ""
+            
+        directories = []
+        if default_dir:
+            directories.append(default_dir)
+        directories.extend([self.getDirectory(), Config.DEFAULT_DIRECTORY, Config.APPDATA_PATH])
+
+        for directory in directories:
             try:
                 OSUtils.createDirectory(directory)
                 return directory
@@ -48,6 +60,16 @@ class FileHistory:
 
     def getAvailableFormats(self) -> list[str]:
         return self.SUPPORTED_FORMATS
+
+    def setCreateSubfolderForDownloadsEnabled(self, enabled: bool) -> None:
+        self.createSubfolderForDownloads = enabled
+
+    def isCreateSubfolderForDownloadsEnabled(self) -> bool:
+        from Core import App
+        val = getattr(self, "createSubfolderForDownloads", None)
+        if val is not None:
+            return val
+        return App.Preferences.download.isCreateSubfolderForDownloadsEnabled()
 
 
 class AudioFormatHistory:
@@ -70,10 +92,23 @@ class AudioFormatHistory:
         return self.SUPPORTED_AUDIO_FORMATS
 
 
-class StreamHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, Serializable):
+class ChatHistory:
+    def __init__(self):
+        super().__init__()
+        self.setDownloadChatEnabled(False)
+
+    def setDownloadChatEnabled(self, enabled: bool) -> None:
+        self.downloadChat = enabled
+
+    def isDownloadChatEnabled(self) -> bool:
+        return getattr(self, "downloadChat", False)
+
+
+class StreamHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, ChatHistory, Serializable):
     SUPPORTED_FORMATS = [
         "ts",
-        "mp4"
+        "mp4",
+        "mkv"
     ]
 
     def __init__(self):
@@ -87,6 +122,8 @@ class StreamHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, Serializ
     def isSkipAdsEnabled(self) -> bool:
         return self.skipAds
 
+
+
     def setRemuxEnabled(self, enabled: bool) -> None:
         self.remux = enabled
 
@@ -94,10 +131,11 @@ class StreamHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, Serializ
         return self.remux
 
 
-class VideoHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, Serializable):
+class VideoHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, ChatHistory, Serializable):
     SUPPORTED_FORMATS = [
         "ts",
-        "mp4"
+        "mp4",
+        "mkv"
     ]
 
     def __init__(self):
@@ -125,9 +163,10 @@ class VideoHistory(BaseOptionHistory, FileHistory, AudioFormatHistory, Serializa
         return self.remux
 
 
-class ClipHistory(BaseOptionHistory, FileHistory, Serializable):
+class ClipHistory(BaseOptionHistory, FileHistory, ChatHistory, Serializable):
     SUPPORTED_FORMATS = [
-        "mp4"
+        "mp4",
+        "mkv"
     ]
 
 

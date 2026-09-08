@@ -63,9 +63,9 @@ class DocumentView(QtWidgets.QWidget):
         self.blockExpiration = blockExpiration
         if self.isBlockable():
             if self.blockExpiration == None:
-                self._ui.checkBox.setText(T("#Do not show this again."))
+                self._ui.checkBox.setText(T("messages.#do_not_show_this_again"))
             else:
-                self._ui.checkBox.setText(T("#Do not show this again for {blockExpiration} days.", blockExpiration=blockExpiration))
+                self._ui.checkBox.setText(T("messages.#do_not_show_this_again_days", blockExpiration=blockExpiration))
             self._ui.checkBox.show()
         else:
             self._ui.checkBox.hide()
@@ -96,3 +96,12 @@ class DocumentView(QtWidgets.QWidget):
 
     def _browserWindowRequestHandler(self, request: QtWebEngineCore.QWebEngineNewWindowRequest) -> None:
         Utils.openUrl(request.requestedUrl())
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

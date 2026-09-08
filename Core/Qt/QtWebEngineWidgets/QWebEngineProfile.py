@@ -9,7 +9,14 @@ class _QWebEngineProfile(QtWebEngineCore.QWebEngineProfile):
         self._setupProfile()
 
     def _setupProfile(self) -> None:
-        self.setHttpUserAgent(SystemUtils.getUserAgent())
+        import re
+        self.setHttpUserAgent(re.sub(r"QtWebEngine/[\d\.]+\s*", "", self.httpUserAgent()))
+        self.setHttpAcceptLanguage("en-US,en;q=0.9")
+        script = QtWebEngineCore.QWebEngineScript()
+        script.setSourceCode("Object.defineProperty(navigator, 'webdriver', { get: () => undefined }); window.chrome = { runtime: {} };")
+        script.setWorldId(QtWebEngineCore.QWebEngineScript.ScriptWorldId.MainWorld)
+        script.setInjectionPoint(QtWebEngineCore.QWebEngineScript.InjectionPoint.DocumentCreation)
+        self.scripts().insert(script)
 
     @classmethod
     def setup(cls) -> None:

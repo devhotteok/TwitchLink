@@ -89,7 +89,7 @@ class DownloadsPage(TabManager):
         if self.downloads._ui.scheduledShutdown.currentIndex() == ScheduledShutdownTypes.SHUTDOWN_APP.value:
             if TimedMessageBox(
                 T("warning"),
-                T("#{appName} will shut down soon.", appName=Config.APP_NAME),
+                T("messages.#_will_shut_down_soon", appName=Config.APP_NAME),
                 defaultButton=TimedMessageBox.StandardButton.Cancel,
                 autoClickButton=TimedMessageBox.StandardButton.Ok,
                 time=Config.APP_SHUTDOWN_TIMEOUT,
@@ -99,7 +99,7 @@ class DownloadsPage(TabManager):
         elif self.downloads._ui.scheduledShutdown.currentIndex() == ScheduledShutdownTypes.SHUTDOWN_SYSTEM.value:
             if TimedMessageBox(
                 T("warning"),
-                T("#System will shut down soon."),
+                T("messages.#system_will_shut_down_soon"),
                 defaultButton=TimedMessageBox.StandardButton.Cancel,
                 autoClickButton=TimedMessageBox.StandardButton.Ok,
                 time=Config.SYSTEM_SHUTDOWN_TIMEOUT,

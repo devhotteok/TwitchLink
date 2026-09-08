@@ -129,7 +129,7 @@ class FileNameGenerator:
 
     @staticmethod
     def getInfoTitle(contentType: str) -> str:
-        return f"{T(contentType)} {T('#Filename Template Variables')}"
+        return f"{T(contentType)} {T("info.#filename_template_variables")}"
 
     @staticmethod
     def getBaseInfo(contentType: str) -> dict[str, str]:
@@ -147,7 +147,7 @@ class FileNameGenerator:
         return {
             f"{{{nameType}}}": f"{translated} {T('username')}",
             f"{{{nameType}_name}}": f"{translated} {T('displayname')}",
-            f"{{{nameType}_formatted_name}}": T("#'displayname' if {nameType} Displayname is English, otherwise 'displayname(username)'", nameType=translated)
+            f"{{{nameType}_formatted_name}}": T("messages.#'displayname'_if_displayname_is_english", nameType=translated)
         }
 
     @staticmethod

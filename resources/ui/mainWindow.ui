@@ -68,7 +68,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Search</string>
+          <string>ui.search</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QToolButton {
@@ -123,7 +123,7 @@ QToolButton:checked {
           </size>
          </property>
          <property name="toolTip">
-          <string>Downloads</string>
+          <string>ui.downloads</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QToolButton {
@@ -175,7 +175,7 @@ QToolButton:checked {
           </size>
          </property>
          <property name="toolTip">
-          <string>Scheduled Downloads</string>
+          <string>ui.scheduled_downloads</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QToolButton {
@@ -240,7 +240,7 @@ QToolButton:checked {
           </size>
          </property>
          <property name="toolTip">
-          <string>Account</string>
+          <string>ui.account</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QToolButton {
@@ -292,7 +292,7 @@ QToolButton:checked {
           </size>
          </property>
          <property name="toolTip">
-          <string>Settings</string>
+          <string>ui.settings</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QToolButton {
@@ -344,7 +344,7 @@ QToolButton:checked {
           </size>
          </property>
          <property name="toolTip">
-          <string>Information</string>
+          <string>ui.information</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QToolButton {
@@ -497,7 +497,7 @@ QToolButton:checked {
    </property>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>ui.help</string>
     </property>
     <addaction name="actionGettingStarted"/>
     <addaction name="actionAbout"/>
@@ -505,7 +505,7 @@ QToolButton:checked {
    </widget>
    <widget class="QMenu" name="menuContribute">
     <property name="title">
-     <string>Contribute</string>
+     <string>ui.contribute</string>
     </property>
     <addaction name="actionSponsor"/>
    </widget>
@@ -514,22 +514,22 @@ QToolButton:checked {
   </widget>
   <action name="actionGettingStarted">
    <property name="text">
-    <string>Getting Started</string>
+    <string>ui.getting_started</string>
    </property>
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>ui.about</string>
    </property>
   </action>
   <action name="actionTermsOfService">
    <property name="text">
-    <string>Terms of Service</string>
+    <string>ui.terms_of_service</string>
    </property>
   </action>
   <action name="actionSponsor">
    <property name="text">
-    <string>Become a Sponsor</string>
+    <string>ui.become_a_sponsor</string>
    </property>
   </action>
  </widget>

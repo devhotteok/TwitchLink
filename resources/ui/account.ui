@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Account</string>
+   <string>ui.account</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -34,7 +34,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Sign In with Twitch</string>
+      <string>ui.#sign_in_with_twitch</string>
      </property>
     </widget>
    </item>
@@ -57,7 +57,7 @@
        <item>
         <widget class="QLabel" name="loadingLabel">
          <property name="text">
-          <string>Loading...</string>
+          <string>ui.loading</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -89,7 +89,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Account Info</string>
+          <string>ui.account_info</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -175,7 +175,7 @@
                 <string notr="true">color: rgb(255, 0, 0);</string>
                </property>
                <property name="text">
-                <string>Sign-in is in progress...</string>
+                <string>ui.#sign_in_is_in_progress</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -209,7 +209,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Sign in with Chrome</string>
+                <string>ui.#sign_in_with_chrome</string>
                </property>
               </widget>
              </item>
@@ -222,7 +222,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Sign in with Edge</string>
+                <string>ui.#sign_in_with_edge</string>
                </property>
               </widget>
              </item>
@@ -235,7 +235,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Import from Firefox</string>
+                <string>ui.import_from_firefox</string>
                </property>
               </widget>
              </item>
@@ -283,7 +283,7 @@
                     </size>
                    </property>
                    <property name="text">
-                    <string>Sign in with Internal Browser</string>
+                    <string>ui.#sign_in_with_internal_browser</string>
                    </property>
                   </widget>
                  </item>
@@ -312,7 +312,7 @@
                     </size>
                    </property>
                    <property name="text">
-                    <string>Continue</string>
+                    <string>ui.continue</string>
                    </property>
                   </widget>
                  </item>
@@ -325,7 +325,7 @@
                     </size>
                    </property>
                    <property name="text">
-                    <string>Cancel</string>
+                    <string>ui.cancel</string>
                    </property>
                   </widget>
                  </item>
@@ -364,7 +364,7 @@
           </sizepolicy>
          </property>
          <property name="toolTip">
-          <string>Refresh</string>
+          <string>ui.refresh</string>
          </property>
          <property name="icon">
           <iconset>
@@ -435,7 +435,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Account</string>
+             <string>ui.account</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -454,7 +454,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Sign out</string>
+          <string>ui.sign_out</string>
          </property>
         </widget>
        </item>

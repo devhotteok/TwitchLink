@@ -5,6 +5,7 @@ from .TwitchGQLConfig import Config
 from Core import App
 from Core import GlobalExceptions
 from Services.Twitch.Authentication.Integrity.IntegrityToken import IntegrityToken
+from Services.Utils.SystemUtils import SystemUtils
 
 from PyQt6 import QtCore, QtNetwork
 
@@ -56,6 +57,7 @@ class TwitchGQLResponse(QtCore.QObject):
     def _startRequest(self, headers: dict | None = None) -> None:
         if headers == None:
             headers = {"Client-ID": Config.CLIENT_ID}
+        headers["User-Agent"] = SystemUtils.getUserAgent()
         if self._useAuth:
             headers.update({"Authorization": f"OAuth {App.Account.getOAuthToken()}"})
         request = QtNetwork.QNetworkRequest(QtCore.QUrl(Config.SERVER))
@@ -253,8 +255,8 @@ class TwitchGQL(QtCore.QObject):
                         "isLive": True,
                         "vodID": "",
                         "isVod": False,
-                        "playerType": "embed",
-                        "platform": ""
+                        "playerType": "site",
+                        "platform": "web"
                     }
                 },
                 {
@@ -301,8 +303,8 @@ class TwitchGQL(QtCore.QObject):
                     "isLive": False,
                     "vodID": id,
                     "isVod": True,
-                    "playerType": "embed",
-                    "platform": ""
+                    "playerType": "site",
+                    "platform": "web"
                 }
             },
             parser=self._videoPlaybackAccessTokenParser,
@@ -328,7 +330,7 @@ class TwitchGQL(QtCore.QObject):
                 },
                 "variables": {
                     "slug": slug,
-                    "platform": ""
+                    "platform": "web"
                 }
             },
             parser=self._clipPlaybackAccessTokenParser,

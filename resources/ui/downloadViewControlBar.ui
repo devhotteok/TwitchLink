@@ -69,7 +69,7 @@ border-radius: 10px;</string>
          <string notr="true">color: rgb(255, 255, 255);</string>
         </property>
         <property name="text">
-         <string>Type</string>
+         <string>ui.type</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -99,7 +99,7 @@ border-radius: 10px;</string>
       </font>
      </property>
      <property name="text">
-      <string>Channel</string>
+      <string>ui.channel</string>
      </property>
     </widget>
    </item>
@@ -207,8 +207,7 @@ border-radius: 10px;</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>This stream may contain ads.
-To block ads, you must sign in with a subscribed account.</string>
+         <string>ui.#this_stream_may_contain_ads_to</string>
         </property>
         <property name="icon">
          <iconset>
@@ -231,7 +230,7 @@ To block ads, you must sign in with a subscribed account.</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Retry Download</string>
+         <string>ui.retry_download</string>
         </property>
         <property name="icon">
          <iconset>
@@ -254,7 +253,7 @@ To block ads, you must sign in with a subscribed account.</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Open Folder</string>
+         <string>ui.open_folder</string>
         </property>
         <property name="icon">
          <iconset>
@@ -277,7 +276,7 @@ To block ads, you must sign in with a subscribed account.</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Open File</string>
+         <string>ui.open_file</string>
         </property>
         <property name="icon">
          <iconset>
@@ -300,7 +299,7 @@ To block ads, you must sign in with a subscribed account.</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>View Logs</string>
+         <string>ui.view_logs</string>
         </property>
         <property name="icon">
          <iconset>
@@ -323,7 +322,7 @@ To block ads, you must sign in with a subscribed account.</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Delete</string>
+         <string>ui.delete</string>
         </property>
         <property name="icon">
          <iconset>
@@ -346,7 +345,7 @@ To block ads, you must sign in with a subscribed account.</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Close</string>
+         <string>ui.close</string>
         </property>
         <property name="icon">
          <iconset>

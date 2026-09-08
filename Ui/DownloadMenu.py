@@ -27,14 +27,18 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
             super().keyPressEvent(event)
 
     def loadOptions(self) -> None:
-        self._ui.windowTitleLabel.setText(T("#Download {type}", type=T(self.downloadInfo.type.toString())))
+        self._ui.windowTitleLabel.setText(T("messages.#download", type=T(self.downloadInfo.type.toString())))
         self.reloadFileDirectory()
+        self._ui.createSubfolderForDownloadsCheckBox.setChecked(self.downloadInfo.isCreateSubfolderForDownloadsEnabled())
+        self._ui.createSubfolderForDownloadsCheckBox.toggled.connect(self.downloadInfo.setCreateSubfolderForDownloadsEnabled)
+        self._ui.createSubfolderForDownloadsCheckBox.toggled.connect(lambda: self.reloadFileDirectory())
         self._ui.fileFormat.currentTextChanged.connect(self.setFormat)
         self._ui.searchDirectory.clicked.connect(self.askSaveAs)
         for resolution in self.downloadInfo.playback.getResolutions():
             self._ui.resolution.addItem(FileNameGenerator.generateResolutionName(resolution))
         self._ui.resolution.setCurrentIndex(self.downloadInfo.selectedResolutionIndex)
         self._ui.resolution.currentIndexChanged.connect(self.setResolution)
+        self.setupChatArea()
         if self.downloadInfo.type.isStream():
             self._ui.cropArea.hide()
             if self.downloadInfo.playback.token.hideAds:
@@ -88,7 +92,7 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         self.downloadInfo.setResolution(index)
         self.reloadFileDirectory()
         if self.hasResolutionInFileNameTemplate():
-            if Utils.ask("filename-change", "#The filename template contains a 'resolution' variable. Do you want to create a new filename based on the changed resolution?", defaultOk=True, parent=self):
+            if Utils.ask("filename-change", "prompts.#the_filename_template_contains_'resolut", defaultOk=True, parent=self):
                 self.downloadInfo.setFileName(self.downloadInfo.generateFileName())
                 self.reloadFileDirectory()
 
@@ -102,7 +106,7 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         return "{resolution}" in fileNameTemplate
 
     def setupCropArea(self) -> None:
-        self._ui.cropArea.setTitle(f"{T('crop')} / {T('#Total Length: {duration}', duration=self.downloadInfo.content.durationString)}")
+        self._ui.cropArea.setTitle(f"{T('crop')} / {T("messages.#total_length", duration=self.downloadInfo.content.durationString)}")
         self._ui.cropFromStartRadioButton.toggled.connect(self.reloadCropArea)
         self._ui.cropToEndRadioButton.toggled.connect(self.checkUpdateTrack)
         self._ui.fromSpinH.valueChanged.connect(self.startRangeChanged)
@@ -134,6 +138,22 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         self._ui.remuxRadioButton.toggled.connect(self.downloadInfo.setRemuxEnabled)
         self._ui.encoderInfo.clicked.connect(self.showEncoderInfo)
         Utils.setIconViewer(self._ui.encoderInfo, Icons.HELP)
+
+    def setupChatArea(self) -> None:
+        self._ui.downloadChatCheckBox.setChecked(self.downloadInfo.downloadChat)
+        self._ui.downloadChatCheckBox.toggled.connect(self.downloadInfo.optionHistory.setDownloadChatEnabled)
+        self._ui.downloadChatCheckBox.toggled.connect(lambda enabled: setattr(self.downloadInfo, 'downloadChat', enabled))
+        self._ui.downloadChatCheckBox.toggled.connect(self.onDownloadChatToggled)
+        self._ui.downloadChatInfo.clicked.connect(self.showDownloadChatInfo)
+        Utils.setIconViewer(self._ui.downloadChatInfo, Icons.HELP)
+
+    def onDownloadChatToggled(self, enabled: bool) -> None:
+        from Core import App
+        if enabled:
+            if App.Preferences.download.isCreateSubfolderForDownloadsEnabled():
+                self._ui.createSubfolderForDownloadsCheckBox.setChecked(True)
+        else:
+            self._ui.createSubfolderForDownloadsCheckBox.setChecked(False)
 
     def startRangeChanged(self) -> None:
         self.setFromSeconds(self.checkCropRange(self.getFromSeconds(), maximum=int(self.downloadInfo.content.lengthSeconds) - 1))
@@ -200,7 +220,7 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
     def checkUpdateTrack(self) -> None:
         self.reloadCropArea()
         if self._ui.updateTrackCheckBox.isChecked() and not self._ui.cropToEndRadioButton.isChecked():
-            if Utils.ask("warning", "#Update track mode is currently enabled.\nSetting the end of the crop range will not track updates.\nProceed?", defaultOk=True, parent=self):
+            if Utils.ask("warning", "prompts.#update_track_mode_is_currently_enabled", defaultOk=True, parent=self):
                 self._ui.updateTrackCheckBox.setCheckState(QtCore.Qt.CheckState.Unchecked)
             else:
                 self._ui.cropToEndRadioButton.setChecked(True)
@@ -208,7 +228,7 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
     def showCropInfo(self) -> None:
         Utils.info(
             "information",
-            T("#For precise range handling, it is necessary to re-encode the video from the beginning, a process which can be very time-consuming.\nTo speed up this process, {appName} performs the cutting operation using computationally inexpensive points near the specified range, without re-encoding.\nThere is no loss during this process, but a few additional seconds may be saved before and after the specified range.\nIf precise range handling is required, please process the downloaded video using a professional video editor.", appName=Config.APP_NAME),
+            T("messages.#for_precise_range_handling_it_is_necess", appName=Config.APP_NAME),
             contentTranslate=False,
             parent=self
         )
@@ -219,32 +239,36 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         initialFilter = self.downloadInfo.fileFormat
         newDirectory = Utils.askSaveAs(directory, filters, initialFilter, parent=self)
         if newDirectory != None:
+            self._ui.createSubfolderForDownloadsCheckBox.setChecked(False)
             self.downloadInfo.setAbsoluteFileName(newDirectory)
             self.reloadFileDirectory()
 
     def showAdBlockInfo(self) -> None:
-        skipSegmentsInfo = T("#[Skip Segments]\n\nAds are skipped, but the stream during that time cannot be downloaded.\nIn this case, no alternative screen is shown, and it will directly connect to the scene after the ad, making the stream appear as if it's interrupted in the middle.")
-        alternativeScreenInfo = T("#[Alternative Screen]\n\nDisplays an alternate screen instead of skipping ads.\nIn this case, the entire length of the stream is maintained, but some players might not play the video correctly.")
-        Utils.info("information", f"{T('#If commercials are broadcast during this stream, they will be handled according to the following rules.')}\n\n{skipSegmentsInfo}\n\n\n{alternativeScreenInfo}", contentTranslate=False, parent=self)
+        skipSegmentsInfo = T("info.#_skip_segments_ads_are_skipped_but_stre")
+        alternativeScreenInfo = T("info.#_alternative_screen_displays_alternate")
+        Utils.info("information", f"{T("info.#if_commercials_are_broadcast_during_thi")}\n\n{skipSegmentsInfo}\n\n\n{alternativeScreenInfo}", contentTranslate=False, parent=self)
 
     def showEncoderInfo(self) -> None:
-        remuxInfo = T("#[Remux]\n\nThe file will be saved as a standard video file.\nThis involves a minor conversion process of the Transport Stream file to ensure its compatibility with standard players.\nThe quality of the video is retained, with only additional information about the video being modified for compatibility with standard players.")
-        concatInfo = T("#[Concat]\n\nThis feature enables you to store Transport Stream file in its original form, without any conversion to ensure its compatibility with standard players.\nSince these files are typically designed for streaming, they may not play correctly on certain players.\nAdditionally, if commercials are broadcast during a live stream or parts are missing due to network issues, some players might not play the video correctly.")
+        remuxInfo = T("prompts.#_remux_file_will_be_saved_as_standard_v")
+        concatInfo = T("errors.#_concat_this_feature_enables_you_store")
         Utils.info("information", f"{remuxInfo}\n\n\n{concatInfo}", contentTranslate=False, parent=self)
 
     def showUnmuteVideoInfo(self) -> None:
-        Utils.info("information", "#If there are no problems with the sound source used, or if there are parts that have been muted in error despite having permission to use them, you can use this function to unmute them.\nIn some cases, unmute may not be successful.", parent=self)
+        Utils.info("information", "errors.#if_there_are_no_problems_sound_source_u", parent=self)
+
+    def showDownloadChatInfo(self) -> None:
+        Utils.info("information", "messages.#the_chat_will_be_downloaded_in_json", parent=self)
 
     def showUpdateTrackInfo(self) -> None:
-        Utils.info("information", "#Downloads the live replay continuously until the broadcast ends.\nThe download ends if there are no changes in the video for a certain amount of time.", parent=self)
+        Utils.info("information", "messages.#downloads_live_replay_continuously_unti", parent=self)
 
     def showPrioritizeInfo(self) -> None:
-        Utils.info("information", "#This download will be prioritized. Downloads with this option take precedence over those without.", parent=self)
+        Utils.info("information", "messages.#this_download_will_be_prioritized_downl", parent=self)
 
     def setUpdateTrackEnabled(self, enabled: bool) -> None:
         self.downloadInfo.setUpdateTrackEnabled(enabled)
         if self._ui.updateTrackCheckBox.isChecked() and not self._ui.cropToEndRadioButton.isChecked():
-            if Utils.ask("warning", "#The end of the crop range is currently set.\nEnabling update track mode will ignore the end of the crop range and continue downloading.\nProceed?", defaultOk=True, parent=self):
+            if Utils.ask("warning", "prompts.#the_end_crop_range_is_currently_set_ena", defaultOk=True, parent=self):
                 self._ui.cropToEndRadioButton.setChecked(True)
             else:
                 self._ui.updateTrackCheckBox.setCheckState(QtCore.Qt.CheckState.Unchecked)
@@ -257,13 +281,13 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
 
     def checkDownloadAvailable(self) -> bool:
         if not FileNameLocker.isAvailable(self.downloadInfo.getAbsoluteFileName()):
-            Utils.info("error", "#There is another download in progress with the same file name.", parent=self)
+            Utils.info("error", "messages.#there_is_another_download_progress_same", parent=self)
             return False
         elif Utils.isFile(self.downloadInfo.getAbsoluteFileName()):
-            if not Utils.ask("overwrite", "#A file with the same name already exists.\nOverwrite?", parent=self):
+            if not Utils.ask("overwrite", "prompts.#a_file_same_name_already_exists_overwri", parent=self):
                 return False
         elif not Utils.isDirectory(self.downloadInfo.directory) or Utils.isDirectory(self.downloadInfo.getAbsoluteFileName()):
-            Utils.info("error", "#The target directory or filename is unavailable.", parent=self)
+            Utils.info("error", "errors.#the_target_directory_or_filename_is_una", parent=self)
             return False
         return True
 
@@ -276,3 +300,12 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
             super().accept()
         else:
             self.askSaveAs()
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

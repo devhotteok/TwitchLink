@@ -32,9 +32,9 @@ class Loading(QtWidgets.QDialog):
 
     def updateProgress(self, progress: int) -> None:
         if progress == 0:
-            self.setStatus(T("#Checking for updates", ellipsis=True))
+            self.setStatus(T("messages.#checking_updates", ellipsis=True))
         else:
-            self.setStatus(f"{T('#Loading Data', ellipsis=True)} {progress}/3")
+            self.setStatus(f"{T("messages.#loading_data", ellipsis=True)} {progress}/3")
 
     def setStatus(self, status: str) -> None:
         self._ui.status.setText(status)
@@ -60,3 +60,12 @@ class Loading(QtWidgets.QDialog):
             super().closeEvent(event)
         else:
             event.ignore()
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

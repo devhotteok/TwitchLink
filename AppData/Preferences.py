@@ -50,6 +50,8 @@ class General(Serializable):
         self._notify = True
         self._useSystemTray = False
         self._bookmarks = []
+        self._defaultDirectory = ""
+
 
     def setOpenProgressWindowEnabled(self, enabled: bool) -> None:
         self._openProgressWindow = enabled
@@ -74,6 +76,12 @@ class General(Serializable):
 
     def getBookmarks(self) -> list[str]:
         return self._bookmarks
+
+    def setDefaultDirectory(self, directory: str) -> None:
+        self._defaultDirectory = directory
+
+    def getDefaultDirectory(self) -> str:
+        return getattr(self, "_defaultDirectory", "") or Config.DEFAULT_DIRECTORY
 
 
 class Templates(Serializable):
@@ -208,6 +216,17 @@ class Temp(Serializable):
 class Download(Serializable):
     def __init__(self):
         self._downloadSpeed = 20
+        self._reconnectEnabled = True
+        self._reconnectAttempts = 10
+        self._reconnectInterval = 3000
+        self._createSubfolderForDownloads = True
+        self._updateTrackInterval = 120000
+
+    def setCreateSubfolderForDownloadsEnabled(self, enabled: bool) -> None:
+        self._createSubfolderForDownloads = enabled
+
+    def isCreateSubfolderForDownloadsEnabled(self) -> bool:
+        return getattr(self, "_createSubfolderForDownloads", False)
 
     def __setup__(self):
         App.FileDownloadManager.setPoolSize(self._downloadSpeed)
@@ -216,6 +235,30 @@ class Download(Serializable):
     def __save__(self):
         self._downloadSpeed = App.FileDownloadManager.getPoolSize()
         return super().__save__()
+
+    def isReconnectEnabled(self) -> bool:
+        return self._reconnectEnabled
+
+    def setReconnectEnabled(self, enabled: bool) -> None:
+        self._reconnectEnabled = enabled
+
+    def getReconnectAttempts(self) -> int:
+        return self._reconnectAttempts
+
+    def setReconnectAttempts(self, attempts: int) -> None:
+        self._reconnectAttempts = attempts
+
+    def getReconnectInterval(self) -> int:
+        return self._reconnectInterval
+
+    def setReconnectInterval(self, interval: int) -> None:
+        self._reconnectInterval = interval
+
+    def getUpdateTrackInterval(self) -> int:
+        return getattr(self, "_updateTrackInterval", 120000)
+
+    def setUpdateTrackInterval(self, interval: int) -> None:
+        self._updateTrackInterval = interval
 
 
 class ScheduledDownloads(Serializable):

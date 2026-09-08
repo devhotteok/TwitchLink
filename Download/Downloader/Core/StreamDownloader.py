@@ -12,4 +12,5 @@ class StreamDownloader(BaseDownloader):
             parent=None
         )
         self._abortRequested.connect(engine.abort)
+        self._finishEarlyRequested.connect(engine.finishEarly)
         return engine

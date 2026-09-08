@@ -13,10 +13,17 @@ class Settings(QtWidgets.QWidget):
         self._ui.openProgressWindow.toggled.connect(App.Preferences.general.setOpenProgressWindowEnabled)
         self._ui.notify.setChecked(App.Preferences.general.isNotifyEnabled())
         self._ui.notify.toggled.connect(App.Preferences.general.setNotifyEnabled)
+        self._ui.createSubfolderForDownloads.setChecked(App.Preferences.download.isCreateSubfolderForDownloadsEnabled())
+        self._ui.createSubfolderForDownloads.toggled.connect(App.Preferences.download.setCreateSubfolderForDownloadsEnabled)
         self._ui.windowClose.setCurrentIndex(1 if App.Preferences.general.isSystemTrayEnabled() else 0)
         self._ui.windowClose.currentIndexChanged.connect(self.windowCloseChanged)
         if not Utils.isMinimizeToSystemTraySupported():
             self._ui.windowCloseArea.hide()
+            
+        self._ui.defaultDirectory.setText(App.Preferences.general.getDefaultDirectory())
+        self._ui.defaultDirectory.editingFinished.connect(self.setDefaultDirectoryFromLineEdit)
+        self._ui.searchDefaultDirectory.clicked.connect(self.askDefaultDirectory)
+        
         self.streamTemplateInfoWindow = FileNameTemplateInfo(FileNameTemplateInfo.TYPE.STREAM, parent=self)
         self._ui.streamFilename.setText(App.Preferences.templates.getStreamFilename())
         self._ui.streamFilename.editingFinished.connect(self.setStreamFilename)
@@ -61,7 +68,6 @@ class Settings(QtWidgets.QWidget):
             self._ui.language.addItem(translationPack.getDisplayName(), userData=translationPack.getId())
         self._ui.language.setCurrentIndex(self._ui.language.findData(App.Translator.getCurrentTranslationPackId()))
         self._ui.language.currentIndexChanged.connect(self.updateLanguage)
-        self._ui.languageInfoIcon = Utils.setSvgIcon(self._ui.languageInfoIcon, Icons.ALERT_RED)
         self._ui.timezone.addItems(App.Preferences.localization.getTimezoneNameList())
         self._ui.timezone.setCurrentText(App.Preferences.localization.getTimezone().name())
         self._ui.timezone.currentTextChanged.connect(self.setTimezone)
@@ -71,11 +77,23 @@ class Settings(QtWidgets.QWidget):
         self._ui.speedSpinBox.setRange(DownloadEngineConfig.FILE_DOWNLOAD_MANAGER_MIN_POOL_SIZE, DownloadEngineConfig.FILE_DOWNLOAD_MANAGER_MAX_POOL_SIZE)
         self._ui.speedSpinBox.valueChanged.connect(self.setDownloadSpeed)
         self.setDownloadSpeed(App.FileDownloadManager.getPoolSize())
+        self._ui.reconnectEnabled.setChecked(App.Preferences.download.isReconnectEnabled())
+        self._ui.reconnectEnabled.toggled.connect(App.Preferences.download.setReconnectEnabled)
+        self._ui.reconnectAttemptsSlider.valueChanged.connect(self.setReconnectAttempts)
+        self._ui.reconnectAttemptsSpinBox.valueChanged.connect(self.setReconnectAttempts)
+        self.setReconnectAttempts(App.Preferences.download.getReconnectAttempts())
+        self._ui.reconnectIntervalSlider.valueChanged.connect(self.setReconnectInterval)
+        self._ui.reconnectIntervalSpinBox.valueChanged.connect(self.setReconnectInterval)
+        self.setReconnectInterval(App.Preferences.download.getReconnectInterval())
+        self._ui.updateTrackIntervalSlider.valueChanged.connect(self.setUpdateTrackInterval)
+        self._ui.updateTrackIntervalSpinBox.valueChanged.connect(self.setUpdateTrackInterval)
+        self.setUpdateTrackInterval(App.Preferences.download.getUpdateTrackInterval())
         self._ui.resetButton.clicked.connect(self.resetSettings)
         self.reloadBookmarkArea()
         App.GlobalDownloadManager.runningCountChangedSignal.connect(self.reload)
         self.reload()
         App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+        self.retranslateDynamicUi()
 
     def _setupThemeStyle(self) -> None:
         for index in range(self._ui.bookmarkList.count()):
@@ -120,7 +138,7 @@ class Settings(QtWidgets.QWidget):
     def addBookmark(self, bookmark: str) -> None:
         item = QtWidgets.QListWidgetItem(bookmark)
         item.setIcon(Icons.MOVE.icon)
-        item.setToolTip(T("#Drag to change order."))
+        item.setToolTip(T("messages.#drag_change_order"))
         self._ui.bookmarkList.addItem(item)
         self._ui.newBookmark.clear()
 
@@ -140,11 +158,10 @@ class Settings(QtWidgets.QWidget):
             App.ThemeManager.setThemeMode(App.ThemeManager.Modes.DARK)
 
     def showSearchExternalContentInfo(self) -> None:
-        Utils.info("information", "#Allow URL Search to retrieve external content.\nYou can download content outside of Twitch.", parent=self)
+        Utils.info("information", "messages.#allow_url_search_retrieve_external_cont", parent=self)
 
     def updateLanguage(self) -> None:
         App.Translator.setTranslationPack(self._ui.language.currentData())
-        self.requestRestart()
 
     def setTimezone(self, timezone: str) -> None:
         App.Preferences.localization.setTimezone(bytes(timezone, encoding="utf-8"))
@@ -155,10 +172,52 @@ class Settings(QtWidgets.QWidget):
         self._ui.downloadSpeed.setValueSilent(speed)
         self._ui.speedSpinBox.setValueSilent(speed)
 
+    def setReconnectAttempts(self, attempts: int) -> None:
+        App.Preferences.download.setReconnectAttempts(attempts)
+        self._ui.reconnectAttemptsSlider.setValueSilent(attempts)
+        self._ui.reconnectAttemptsSpinBox.setValueSilent(attempts)
+
+    def setReconnectInterval(self, interval: int) -> None:
+        App.Preferences.download.setReconnectInterval(interval)
+        self._ui.reconnectIntervalSlider.setValueSilent(interval)
+        self._ui.reconnectIntervalSpinBox.setValueSilent(interval)
+
+    def setUpdateTrackInterval(self, interval: int) -> None:
+        App.Preferences.download.setUpdateTrackInterval(interval)
+        self._ui.updateTrackIntervalSlider.setValueSilent(interval)
+        self._ui.updateTrackIntervalSpinBox.setValueSilent(interval)
+
     def resetSettings(self) -> None:
-        if Utils.ask("warning", "#This will reset all settings.\nProceed?", parent=self):
+        if Utils.ask("warning", "prompts.#this_will_reset_all_settings_proceed", parent=self):
             App.Preferences.reset()
             self.requestRestart()
 
+    def askDefaultDirectory(self) -> None:
+        directory = Utils.askDirectory(self._ui.defaultDirectory.text() or Config.DEFAULT_DIRECTORY, parent=self)
+        if directory != "":
+            App.Preferences.general.setDefaultDirectory(directory)
+            self._ui.defaultDirectory.setText(directory)
+
+    def setDefaultDirectoryFromLineEdit(self) -> None:
+        directory = self._ui.defaultDirectory.text().strip()
+        directory = directory.strip("\"'")
+        App.Preferences.general.setDefaultDirectory(directory)
+        self._ui.defaultDirectory.setText(directory)
+
     def requestRestart(self) -> None:
         self.restartRequired.emit()
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        self._ui.defaultDirectoryLabel.setText(T("messages.default_directory"))
+        self._ui.searchDefaultDirectory.setToolTip(T("messages.browse"))
+        self._ui.reconnectArea.setTitle(T("messages.network_reconnection"))
+        self._ui.reconnectEnabled.setText(T("messages.enable_reconnect"))
+        self._ui.reconnectAttemptsLabel.setText(T("messages.reconnect_attempts"))
+        self._ui.reconnectIntervalLabel.setText(T("messages.retry_interval_ms"))
+        self._ui.updateTrackIntervalLabel.setText(T("messages.update_track_interval_ms"))

@@ -88,7 +88,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Pause</string>
+         <string>ui.pause</string>
         </property>
        </widget>
       </item>
@@ -101,7 +101,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Cancel</string>
+         <string>ui.cancel</string>
         </property>
        </widget>
       </item>

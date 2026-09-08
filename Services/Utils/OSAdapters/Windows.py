@@ -100,7 +100,7 @@ class WindowsUtils(BaseAdapter):
             if not cls.isDirectory(directory):
                 os.makedirs(directory)
         except:
-            raise Exceptions.FileSystemError
+            raise Exceptions.FileSystemError(QtCore.QDir(directory))
 
     @staticmethod
     def getValidFileName(name: str) -> str:
@@ -139,7 +139,7 @@ class WindowsUtils(BaseAdapter):
                         return absoluteFileName
                 except:
                     pass
-        raise Exceptions.FileSystemError
+        raise Exceptions.FileSystemError(QtCore.QFile(absoluteFileName))
 
     @staticmethod
     def hideFileOrDirectory(target: str) -> None:

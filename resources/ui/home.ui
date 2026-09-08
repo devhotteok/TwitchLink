@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Home</string>
+   <string>ui.home</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -77,7 +77,7 @@
          </font>
         </property>
         <property name="text">
-         <string>App Name</string>
+         <string>ui.app_name</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -113,7 +113,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Search By</string>
+         <string>ui.search_by</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -129,7 +129,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Smart Search</string>
+         <string>ui.smart_search</string>
         </property>
        </widget>
       </item>
@@ -169,7 +169,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Channel ID</string>
+            <string>ui.channel_id</string>
            </property>
           </widget>
          </item>
@@ -182,7 +182,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Video / Clip ID</string>
+            <string>ui.video_clip_id</string>
            </property>
           </widget>
          </item>
@@ -195,7 +195,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>URL</string>
+            <string>ui.url</string>
            </property>
           </widget>
          </item>
@@ -220,7 +220,7 @@
       </size>
      </property>
      <property name="text">
-      <string>copyright</string>
+      <string>ui.copyright</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

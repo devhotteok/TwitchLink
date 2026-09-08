@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Scheduled Downloads</string>
+   <string>ui.scheduled_downloads</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -64,7 +64,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Total:</string>
+            <string>ui.total</string>
            </property>
           </widget>
          </item>
@@ -91,7 +91,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Downloading:</string>
+            <string>ui.downloading</string>
            </property>
           </widget>
          </item>
@@ -237,7 +237,7 @@ QPushButton:pressed {
              </font>
             </property>
             <property name="text">
-             <string>Scheduled downloads will be displayed here.</string>
+             <string>ui.#scheduled_downloads_will_be_displayed_here</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -367,7 +367,7 @@ QPushButton:pressed {
          </size>
         </property>
         <property name="text">
-         <string>Add New Scheduled Download</string>
+         <string>ui.#add_new_scheduled_download</string>
         </property>
         <property name="icon">
          <iconset>

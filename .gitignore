@@ -7,3 +7,10 @@ venv/
 .vscode/
 
 .DS_Store
+
+# Build and Packaging artifacts
+build/
+dist/
+*.spec
+Script.iss
+setup.ico

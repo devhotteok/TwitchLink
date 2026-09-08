@@ -150,7 +150,7 @@ class DownloadInfoView(QtWidgets.QWidget):
         else:
             startMilliseconds, endMilliseconds = cropRangeMilliseconds
             cropInfoString = T(
-                "#[Original: {totalDuration} / Crop: {startTime}~{endTime}]",
+                "messages.#_original_crop_~",
                 totalDuration=Utils.formatMilliseconds(totalMilliseconds),
                 startTime="" if startMilliseconds == None else Utils.formatMilliseconds(startMilliseconds),
                 endTime="" if endMilliseconds == None else Utils.formatMilliseconds(endMilliseconds)
@@ -164,21 +164,21 @@ class DownloadInfoView(QtWidgets.QWidget):
         if mutedFiles == 0:
             self._ui.mutedInfo.hide()
         else:
-            self._ui.mutedInfo.setText(T("#Failed to unmute {fileCount} segments ({time})", fileCount=mutedFiles, time=Utils.formatMilliseconds(mutedMilliseconds)))
+            self._ui.mutedInfo.setText(T("errors.#failed_unmute_segments", fileCount=mutedFiles, time=Utils.formatMilliseconds(mutedMilliseconds)))
             self._ui.mutedInfo.show()
 
     def showSkippedInfo(self, skippedFiles: int, skippedMilliseconds: int) -> None:
         if skippedFiles == 0:
             self._ui.skippedInfo.hide()
         else:
-            self._ui.skippedInfo.setText(T("#Skipped {fileCount} commercial segments ({time})", fileCount=skippedFiles, time=Utils.formatMilliseconds(skippedMilliseconds)))
+            self._ui.skippedInfo.setText(T("messages.#skipped_commercial_segments", fileCount=skippedFiles, time=Utils.formatMilliseconds(skippedMilliseconds)))
             self._ui.skippedInfo.show()
 
     def showMissingInfo(self, missingFiles: int, missingMilliseconds: int) -> None:
         if missingFiles == 0:
             self._ui.missingInfo.hide()
         else:
-            self._ui.missingInfo.setText(T("#Missing {fileCount} segments ({time})", fileCount=missingFiles, time=Utils.formatMilliseconds(missingMilliseconds)))
+            self._ui.missingInfo.setText(T("errors.#missing_segments", fileCount=missingFiles, time=Utils.formatMilliseconds(missingMilliseconds)))
             self._ui.missingInfo.show()
 
     def setThumbnailImageSizePolicy(self, minimum: QtCore.QSize, maximum: QtCore.QSize) -> None:
@@ -188,3 +188,12 @@ class DownloadInfoView(QtWidgets.QWidget):
 
     def setCategoryImageSize(self, size: QtCore.QSize) -> None:
         self._ui.categoryImage.setImageSizePolicy(size, size)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

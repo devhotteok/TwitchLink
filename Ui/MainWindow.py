@@ -100,8 +100,8 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
                 self.information.showAppInfo(
                     DocumentData(
                         contentId="CRASH_REPORT",
-                        title=T("#{appName} has crashed.", appName=Config.APP_NAME),
-                        content=T("#{appName} has crashed due to an unexpected error.\nIf you see this message, please attach the following log file and report it to us.\n\nFile: {fileName}", appName=Config.APP_NAME, fileName=fileName),
+                        title=T("errors.#_has_crashed", appName=Config.APP_NAME),
+                        content=T("errors.#_has_crashed_due_unexpected_error_if_yo", appName=Config.APP_NAME, fileName=fileName),
                         contentType="text",
                         modal=True,
                         buttons=[
@@ -148,18 +148,18 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         status = App.Updater.status.getStatus()
         if status == App.Updater.status.Types.CONNECTION_FAILURE:
             if isInSetup:
-                content = T("#Please try again later.")
+                content = T("messages.#please_try_again_later")
                 buttons = [
                     DocumentButtonData(text=T("ok"), action=self.shutdown, role="action", default=True)
                 ]
             else:
-                content = T("#Some features will be temporarily disabled.\nPlease wait.\nWhen the connection is restored, those features will be activated.")
+                content = T("info.#some_features_will_be_temporarily_disab")
                 buttons = []
             self.information.showAppInfo(
                 DocumentData(
                     contentId=contentId,
                     title=T("network-error"),
-                    content=f"{T('#A network error occurred while connecting to the server.')}\n{content}",
+                    content=f"{T("errors.#a_network_error_occurred_while_connecti")}\n{content}",
                     contentType="text",
                     modal=True,
                     buttons=buttons
@@ -168,18 +168,18 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         elif status == App.Updater.status.Types.UNEXPECTED_ERROR:
             App.Updater.stopAutoUpdate()
             if isInSetup:
-                content = T("#Please try again later.")
+                content = T("messages.#please_try_again_later")
                 buttons = [
                     DocumentButtonData(text=T("ok"), action=self.shutdown, role="action", default=True)
                 ]
             else:
-                content = f"{T('#Some features will be disabled.')}\n{T('#Please restart the app.')}"
+                content = f"{T("messages.#some_features_will_be_disabled")}\n{T("messages.#please_restart_app")}"
                 buttons = []
             self.information.showAppInfo(
                 DocumentData(
                     contentId=contentId,
                     title=T("error"),
-                    content=f"{T('#An unexpected error occurred while connecting to the server.')}\n{content}",
+                    content=f"{T("errors.#an_unexpected_error_occurred_while_conn")}\n{content}",
                     contentType="text",
                     modal=True,
                     buttons=buttons
@@ -191,7 +191,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
                 DocumentData(
                     contentId=contentId,
                     title=T("session-expired"),
-                    content=f"{T('#Your session has expired.')}\n{T('#Some features will be disabled.')}\n{T('#Please restart the app.')}",
+                    content=f"{T("messages.#your_session_has_expired")}\n{T("messages.#some_features_will_be_disabled")}\n{T("messages.#please_restart_app")}",
                     contentType="text",
                     modal=True,
                     buttons=[]
@@ -202,7 +202,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
                 DocumentData(
                     contentId=contentId,
                     title=T("service-unavailable"),
-                    content=App.Updater.status.operationalInfo or T("#{appName} is currently unavailable.", appName=Config.APP_NAME),
+                    content=App.Updater.status.operationalInfo or T("errors.#_is_currently_unavailable", appName=Config.APP_NAME),
                     contentType=App.Updater.status.operationalInfoType or "text",
                     modal=True,
                     buttons=[DocumentButtonData(text=T("ok"), action=self.shutdown, role="action", default=True)] if isInSetup else []
@@ -217,7 +217,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
                 DocumentData(
                     contentId=contentId,
                     title=T("recommended-update" if status == App.Updater.status.Types.UPDATE_FOUND else "required-update"),
-                    content=App.Updater.status.versionInfo.updateNote or f"{T('#A new version of {appName} has been released!', appName=Config.APP_NAME)}\n\n[{Config.APP_NAME} {App.Updater.status.versionInfo.latestVersion if App.Updater.status.versionInfo.hasUpdate() else T('unknown')}]",
+                    content=App.Updater.status.versionInfo.updateNote or f"{T("messages.#a_new_version_has_been_released", appName=Config.APP_NAME)}\n\n[{Config.APP_NAME} {App.Updater.status.versionInfo.latestVersion if App.Updater.status.versionInfo.hasUpdate() else T('unknown')}]",
                     contentType=App.Updater.status.versionInfo.updateNoteType if App.Updater.status.versionInfo.updateNote else "text",
                     modal=status == App.Updater.status.Types.UPDATE_REQUIRED,
                     buttons=[
@@ -236,7 +236,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
             self.activate()
 
     def showContributeInfo(self, totalFiles: int, totalByteSize: int) -> None:
-        if Utils.ask("contribute", T("#You have downloaded a total of {totalFiles}({totalSize}) videos so far.\nPlease become a patron of {appName} for better functionality and service.", totalFiles=totalFiles, totalSize=Utils.formatByteSize(totalByteSize), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self):
+        if Utils.ask("contribute", T("messages.#you_have_downloaded_total_videos_so_far", totalFiles=totalFiles, totalSize=Utils.formatByteSize(totalByteSize), appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self):
             Utils.openUrl(Utils.joinUrl(Config.HOMEPAGE_URL, "donate", params={"lang": App.Translator.getCurrentLanguageCode()}))
 
     def confirmShutdown(self) -> None:
@@ -277,7 +277,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         if App.GlobalDownloadManager.isDownloaderRunning():
             msg = QtWidgets.QProgressDialog(parent=self)
             msg.setWindowTitle(T("shutting-down"))
-            msg.setLabelText(T("#Shutting down all downloads" if App.GlobalDownloadManager.isDownloaderRunning() else "shutting-down", ellipsis=True))
+            msg.setLabelText(T("messages.#shutting_down_all_downloads" if App.GlobalDownloadManager.isDownloaderRunning() else "shutting-down", ellipsis=True))
             msg.setRange(0, 0)
             msg.setCancelButton(None)
             App.GlobalDownloadManager.cancelAll()
@@ -303,14 +303,14 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
 
     def shutdownSystem(self) -> None:
         self.shutdown()
-        Utils.shutdownSystem(message=T("#Shutdown by {appName}'s scheduled task.", appName=Config.APP_NAME))
+        Utils.shutdownSystem(message=T("messages.#shutdown_'s_scheduled_task", appName=Config.APP_NAME))
 
     def moveToSystemTray(self) -> None:
         if not self.isHidden():
             self.hide()
             App.Instance.notification.toastMessage(
-                title=T("#Minimized to system tray"),
-                message=T("#{appName} is running in the background.", appName=Config.APP_NAME),
+                title=T("messages.#minimized_system_tray"),
+                message=T("messages.#_is_running_background", appName=Config.APP_NAME),
                 icon=App.Instance.notification.Icons.Information
             )
 
@@ -320,3 +320,12 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         self.setWindowState((self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized) | QtCore.Qt.WindowState.WindowActive)
         self.raise_()
         self.activateWindow()
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

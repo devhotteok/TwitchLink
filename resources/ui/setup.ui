@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Setup</string>
+   <string>ui.setup</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -107,7 +107,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>App Name</string>
+                <string>ui.app_name</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -128,7 +128,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Twitch Stream / Video / Clip Downloader</string>
+                <string>ui.#twitch_stream_video_clip_downloader</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -156,7 +156,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Continue</string>
+          <string>ui.continue</string>
          </property>
         </widget>
        </item>
@@ -178,7 +178,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Preferences</string>
+          <string>ui.preferences</string>
          </property>
         </widget>
        </item>
@@ -204,7 +204,7 @@
           </size>
          </property>
          <property name="title">
-          <string>Language</string>
+          <string>ui.language</string>
          </property>
          <layout class="QVBoxLayout" name="languageAreaLayout">
           <item>
@@ -228,7 +228,7 @@
           </size>
          </property>
          <property name="title">
-          <string>Time Zone</string>
+          <string>ui.time_zone</string>
          </property>
          <layout class="QVBoxLayout" name="timezoneAreaLayout">
           <item>
@@ -247,7 +247,7 @@
        <item>
         <widget class="QLabel" name="infoLabel">
          <property name="text">
-          <string>You can change it later in settings.</string>
+          <string>ui.#you_can_change_it_later_in</string>
          </property>
         </widget>
        </item>
@@ -279,7 +279,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Launch</string>
+          <string>ui.launch</string>
          </property>
         </widget>
        </item>

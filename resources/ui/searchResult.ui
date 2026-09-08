@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Search Result</string>
+   <string>ui.search_result</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -31,7 +31,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Search Result</string>
+      <string>ui.search_result</string>
      </property>
     </widget>
    </item>
@@ -46,7 +46,7 @@
     <widget class="QTabWidget" name="tabWidget">
      <widget class="QWidget" name="stream">
       <attribute name="title">
-       <string>Stream</string>
+       <string>ui.stream</string>
       </attribute>
       <layout class="QVBoxLayout" name="streamLayout">
        <item>
@@ -111,7 +111,7 @@ border-radius: 10px;</string>
                 </font>
                </property>
                <property name="text">
-                <string>Offline</string>
+                <string>ui.offline</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -169,7 +169,7 @@ border-radius: 10px;</string>
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>Refresh</string>
+             <string>ui.refresh</string>
             </property>
             <property name="icon">
              <iconset>
@@ -313,7 +313,7 @@ border-radius: 10px;</string>
                       </font>
                      </property>
                      <property name="text">
-                      <string>Channel</string>
+                      <string>ui.channel</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignCenter</set>
@@ -357,7 +357,7 @@ border-radius: 10px;</string>
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Description</string>
+                   <string>ui.description</string>
                   </property>
                  </widget>
                 </item>
@@ -370,7 +370,7 @@ border-radius: 10px;</string>
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Followers</string>
+                   <string>ui.followers</string>
                   </property>
                  </widget>
                 </item>
@@ -409,7 +409,7 @@ border-radius: 10px;</string>
                       </font>
                      </property>
                      <property name="text">
-                      <string>Broadcaster Type</string>
+                      <string>ui.broadcaster_type</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignCenter</set>
@@ -440,7 +440,7 @@ border-radius: 10px;</string>
              </size>
             </property>
             <property name="toolTip">
-             <string>Open in Web Browser</string>
+             <string>ui.#open_in_web_browser</string>
             </property>
             <property name="icon">
              <iconset>
@@ -455,7 +455,7 @@ border-radius: 10px;</string>
      </widget>
      <widget class="QWidget" name="video">
       <attribute name="title">
-       <string>Video / Clip</string>
+       <string>ui.video_clip</string>
       </attribute>
       <layout class="QVBoxLayout" name="videoLayout">
        <item>
@@ -487,7 +487,7 @@ border-radius: 10px;</string>
              </font>
             </property>
             <property name="text">
-             <string>Channel Videos</string>
+             <string>ui.channel_videos</string>
             </property>
            </widget>
           </item>
@@ -532,7 +532,7 @@ border-radius: 10px;</string>
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>Refresh</string>
+             <string>ui.refresh</string>
             </property>
             <property name="icon">
              <iconset>
@@ -607,7 +607,7 @@ border-radius: 10px;</string>
                  </font>
                 </property>
                 <property name="text">
-                 <string>Status</string>
+                 <string>ui.status</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -720,7 +720,7 @@ border-radius: 10px;</string>
              </size>
             </property>
             <property name="text">
-             <string>Loading...</string>
+             <string>ui.loading</string>
             </property>
            </widget>
           </item>

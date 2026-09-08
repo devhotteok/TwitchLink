@@ -118,7 +118,7 @@
                </sizepolicy>
               </property>
               <property name="toolTip">
-               <string>Back</string>
+               <string>ui.back</string>
               </property>
               <property name="icon">
                <iconset>
@@ -141,7 +141,7 @@
                </sizepolicy>
               </property>
               <property name="toolTip">
-               <string>Forward</string>
+               <string>ui.forward</string>
               </property>
               <property name="icon">
                <iconset>
@@ -164,7 +164,7 @@
                </sizepolicy>
               </property>
               <property name="toolTip">
-               <string>Reload</string>
+               <string>ui.reload</string>
               </property>
               <property name="icon">
                <iconset>
@@ -187,7 +187,7 @@
                </sizepolicy>
               </property>
               <property name="toolTip">
-               <string>Stop Loading</string>
+               <string>ui.stop_loading</string>
               </property>
               <property name="icon">
                <iconset>
@@ -220,7 +220,7 @@ padding-right: 10px;</string>
             <bool>false</bool>
            </property>
            <property name="placeholderText">
-            <string>Type a URL</string>
+            <string>ui.type_a_url</string>
            </property>
            <property name="clearButtonEnabled">
             <bool>true</bool>
@@ -306,7 +306,7 @@ padding-right: 10px;</string>
                </size>
               </property>
               <property name="text">
-               <string>Info</string>
+               <string>ui.info</string>
               </property>
              </widget>
             </item>
@@ -322,7 +322,7 @@ padding-right: 10px;</string>
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Info Button</string>
+            <string>ui.info_button</string>
            </property>
           </widget>
          </item>

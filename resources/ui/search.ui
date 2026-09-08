@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Search</string>
+   <string>ui.search</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -37,7 +37,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Search</string>
+      <string>ui.search</string>
      </property>
     </widget>
    </item>
@@ -57,7 +57,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="searchExampleLabel">
         <property name="text">
-         <string>Example</string>
+         <string>ui.example</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -119,7 +119,7 @@
        <item>
         <widget class="QLabel" name="searchProgress">
          <property name="text">
-          <string>Search Progress</string>
+          <string>ui.search_progress</string>
          </property>
         </widget>
        </item>

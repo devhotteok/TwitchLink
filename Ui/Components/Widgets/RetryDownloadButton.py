@@ -17,7 +17,7 @@ class RetryDownloadButton(DownloadButton):
             self.button.clicked.connect(self.retryExternalContentDownload)
 
     def askDownloadThroughHistory(self, contentType: str, properties: tuple[str, ...]) -> bool:
-        return self.ask("warning", T("#Attempting to start a new download based on your download history.\nFile data and download settings are generated based on this history and may differ from the current {contentType}. ({properties}, etc.)", contentType=contentType, properties=", ".join(properties)), contentTranslate=False)
+        return self.ask("warning", T("info.#attempting_start_new_download_based_you", contentType=contentType, properties=", ".join(properties)), contentTranslate=False)
 
     def downloadStream(self) -> None:
         if self.askDownloadThroughHistory(T("stream"), (f"{T('file-type')}[{T('stream')}, {T('rerun')}]", T("id"), T("title"), T("started-at"), T("available-resolutions"))):

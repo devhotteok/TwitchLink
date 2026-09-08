@@ -30,7 +30,8 @@ class App(SingleApplicationLauncher):
     def restart(self) -> None:
         self.exit(self.EXIT_CODE.RESTART)
 
-Instance = App(Config.APP_NAME, sys.argv)
+import os
+Instance = App(Config.APP_NAME + os.environ.get("TWITCHLINK_SUFFIX", ""), sys.argv)
 
 
 from Services.NetworkAccessManager import NetworkAccessManager as _NetworkAccessManager
@@ -91,3 +92,8 @@ Updater = _Updater(parent=Instance)
 from AppData.Preferences import Preferences as _Preferences
 Preferences = _Preferences(logger=Instance.logger, parent=Instance)
 Preferences.load()
+
+from Download.Downloader.Core.ChatRecoveryManager import ChatRecoveryManager as _ChatRecoveryManager
+import threading
+ChatRecovery = _ChatRecoveryManager(logger=Instance.logger)
+threading.Thread(target=ChatRecovery.recoverAll, daemon=True).start()

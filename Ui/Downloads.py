@@ -63,7 +63,7 @@ class Downloads(QtWidgets.QWidget):
         previewCount = self.getFilteredPreviewCount()
         self._ui.filteredCount.setText(previewCount)
         if previewCount == 0:
-            self._ui.infoLabel.setText(T("#Your downloads will be displayed here." if self.downloaderType == 0 and self.downloaderStatus == 0 else "#There are no matches for this filter."))
+            self._ui.infoLabel.setText(T("messages.#your_downloads_will_be_displayed_here" if self.downloaderType == 0 and self.downloaderStatus == 0 else "messages.#there_are_no_matches_this_filter"))
             self._ui.stackedWidget.setCurrentIndex(0)
         else:
             self._ui.stackedWidget.setCurrentIndex(1)
@@ -111,4 +111,13 @@ class Downloads(QtWidgets.QWidget):
             self.progressWindowRequested.emit(widget.downloaderId)
 
     def showScheduledShutdownInfo(self) -> None:
-        Utils.info("information", "#When all downloads are complete, it will perform the selected action.\nA warning notification will be displayed for a period of time so that the operation can be canceled.\nWhen the time expires, the action will be performed.", parent=self)
+        Utils.info("information", "messages.#when_all_downloads_are_complete_it_will", parent=self)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

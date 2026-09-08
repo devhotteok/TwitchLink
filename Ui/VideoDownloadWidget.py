@@ -18,9 +18,9 @@ class VideoDownloadWidget(QtWidgets.QWidget):
         self.instantDownloadButtonManager = InstantDownloadButton(self.content, self._ui.instantDownloadButton, buttonIcon=Icons.INSTANT_DOWNLOAD, parent=self)
         self.instantDownloadButtonManager.accountPageShowRequested.connect(self.accountPageShowRequested)
         self._contextMenu = QtWidgets.QMenu(parent=self)
-        self._filePropertyAction = QtGui.QAction(Icons.FILE.icon, T("view-file-properties"), parent=self._contextMenu)
-        self._imagePropertyAction = QtGui.QAction(Icons.IMAGE.icon, T("view-image-properties"), parent=self._contextMenu)
-        self._saveImageAction = QtGui.QAction(Icons.SAVE.icon, T("save-image"), parent=self._contextMenu)
+        self._filePropertyAction = QtGui.QAction(Icons.FILE.icon, "", parent=self._contextMenu)
+        self._imagePropertyAction = QtGui.QAction(Icons.IMAGE.icon, "", parent=self._contextMenu)
+        self._saveImageAction = QtGui.QAction(Icons.SAVE.icon, "", parent=self._contextMenu)
         self._filePropertyAction.triggered.connect(self.showFileProperty)
         self._imagePropertyAction.triggered.connect(self.showImageProperty)
         self._saveImageAction.triggered.connect(self.saveImage)
@@ -32,6 +32,7 @@ class VideoDownloadWidget(QtWidgets.QWidget):
         self.customContextMenuRequested.connect(self.contextMenuRequested)
         self._ui.videoWidget.thumbnailImage.customContextMenuRequested.connect(self.thumbnailImageContextMenuRequested)
         App.ThemeManager.themeUpdated.connect(self._setupThemeStyle)
+        self.retranslateDynamicUi()
 
     def _setupThemeStyle(self) -> None:
         self._filePropertyAction.setIcon(Icons.FILE.icon)
@@ -59,3 +60,15 @@ class VideoDownloadWidget(QtWidgets.QWidget):
 
     def saveImage(self) -> None:
         VideoWidgetImageSaver.saveImage(self.content, self._ui.videoWidget.thumbnailImage.pixmap(), parent=self)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        self.downloadButtonManager.buttonText = T("live-download" if isinstance(self.content, Channel) or isinstance(self.content, Stream) else "download")
+        self._filePropertyAction.setText(T("view-file-properties"))
+        self._imagePropertyAction.setText(T("view-image-properties"))
+        self._saveImageAction.setText(T("save-image"))

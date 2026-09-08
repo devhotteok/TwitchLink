@@ -63,7 +63,7 @@ class SearchResult(QtWidgets.QWidget):
             self._ui.searchType.setEnabled(True)
             self._ui.sortOrFilter.setEnabled(True)
             self._ui.refreshVideoListButton.setEnabled(True)
-            self._ui.statusLabel.setText(T("#A temporary error has occurred.\nPlease try again later." if showErrorMessage else "no-results-found"))
+            self._ui.statusLabel.setText(T("errors.#a_temporary_error_has_occurred_please_t" if showErrorMessage else "no-results-found"))
             self._ui.loadingInfoArea.hide()
         if self._widgetListViewer.count() == 0:
             self._ui.stackedWidget.setCurrentIndex(0)
@@ -111,7 +111,7 @@ class SearchResult(QtWidgets.QWidget):
             self.showChannel(response.getData())
         else:
             if isinstance(response.getError(), TwitchGQLAPI.Exceptions.DataNotFound):
-                Utils.info("error", "#Channel not found. Deleted or temporary error.", parent=self)
+                Utils.info("error", "errors.#channel_not_found_deleted_or_temporary", parent=self)
             else:
                 Utils.info(*Messages.INFO.NETWORK_ERROR, parent=self)
         self._ui.refreshChannelButton.setEnabled(True)
@@ -119,7 +119,7 @@ class SearchResult(QtWidgets.QWidget):
     def showChannel(self, channel: TwitchGQLModels.Channel) -> None:
         self.channel = channel
         self.setWindowTitle(self.channel.displayName)
-        self._ui.windowTitleLabel.setText(T("#{channel}'s channel", channel=self.channel.displayName))
+        self._ui.windowTitleLabel.setText(T("messages.#'s_channel", channel=self.channel.displayName))
         if self.channel.stream == None:
             self._ui.liveLabel.setText(T("offline"))
             self._ui.viewIcon.hide()
@@ -144,7 +144,7 @@ class SearchResult(QtWidgets.QWidget):
         self._ui.verifiedIcon.setSizePolicy(sizePolicy)
         self._ui.verifiedIcon.setVisible(self.channel.isVerified)
         self._ui.description.setText(self.channel.description)
-        self._ui.followers.setText(T("#{followers} followers", followers=self.channel.followers))
+        self._ui.followers.setText(T("messages.#_followers", followers=self.channel.followers))
         if self.channel.isPartner:
             broadcasterType = "partner-streamer"
             themeColor = "#9147ff"
@@ -168,7 +168,7 @@ class SearchResult(QtWidgets.QWidget):
     def setSearchOptions(self, index: int) -> None:
         if index == -1:
             return
-        self._ui.channelVideosLabel.setText(T("#{channel}'s {searchType}", channel=self.channel.displayName, searchType=T(self.SEARCH_TYPES[self._ui.searchType.currentIndex()][0])))
+        self._ui.channelVideosLabel.setText(T("messages.#'s", channel=self.channel.displayName, searchType=T(self.SEARCH_TYPES[self._ui.searchType.currentIndex()][0])))
         self.searchVideos()
 
     def refreshVideoList(self) -> None:
@@ -194,7 +194,7 @@ class SearchResult(QtWidgets.QWidget):
         else:
             self.setLoading(False, showErrorMessage=True)
             if isinstance(response.getError(), TwitchGQLAPI.Exceptions.DataNotFound):
-                Utils.info("error", "#Channel not found. Deleted or temporary error.", parent=self)
+                Utils.info("error", "errors.#channel_not_found_deleted_or_temporary", parent=self)
             elif isinstance(response.getError(), TwitchGQLAPI.Exceptions.IntegrityError):
                 pass
             else:
@@ -219,3 +219,53 @@ class SearchResult(QtWidgets.QWidget):
 
     def clearVideoList(self) -> None:
         self._widgetListViewer.clear()
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        if type(self.data) == TwitchGQLModels.Channel:
+            self.setWindowTitle(self.channel.displayName)
+            self._ui.windowTitleLabel.setText(T("messages.#'s_channel", channel=self.channel.displayName))
+            if self.channel.stream == None:
+                self._ui.liveLabel.setText(T("offline"))
+            else:
+                self._ui.liveLabel.setText(T("live" if self.channel.stream.isLive() else "rerun"))
+            self._ui.followers.setText(T("messages.#_followers", followers=self.channel.followers))
+            
+            if self.channel.isPartner:
+                broadcasterType = "partner-streamer"
+            elif self.channel.isAffiliate:
+                broadcasterType = "affiliate-streamer"
+            else:
+                broadcasterType = "streamer"
+            self._ui.broadcasterType.setText(T(broadcasterType))
+            
+            searchTypeIndex = self._ui.searchType.currentIndex()
+            self._ui.searchType.blockSignals(True)
+            self._ui.searchType.clear()
+            self._ui.searchType.addItems([T(item[0]) for item in self.SEARCH_TYPES])
+            self._ui.searchType.setCurrentIndex(searchTypeIndex)
+            self._ui.searchType.blockSignals(False)
+            
+            sortOrFilterIndex = self._ui.sortOrFilter.currentIndex()
+            self._ui.sortOrFilter.blockSignals(True)
+            self._ui.sortOrFilter.clear()
+            self._ui.sortOrFilter.addItems([T(item[0]) for item in (self.FILTER_LIST if self.SEARCH_TYPES[searchTypeIndex][0] == "clips" else self.SORT_LIST)])
+            self._ui.sortOrFilter.setCurrentIndex(sortOrFilterIndex)
+            self._ui.sortOrFilter.blockSignals(False)
+            
+            if sortOrFilterIndex != -1:
+                self._ui.channelVideosLabel.setText(T("messages.#'s", channel=self.channel.displayName, searchType=T(self.SEARCH_TYPES[searchTypeIndex][0])))
+        else:
+            if type(self.data) == TwitchGQLModels.Video:
+                videoType = T("video")
+                videoId = self.data.id
+            else:
+                videoType = T("clip")
+                videoId = self.data.slug
+            self.setWindowTitle(f"{videoType}: {videoId}")
+            self._ui.windowTitleLabel.setText(f"{videoType} {T('id')}: {videoId}")

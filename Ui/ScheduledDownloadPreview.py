@@ -35,6 +35,7 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         Utils.setIconViewer(self._ui.settingsButton, Icons.SETTINGS)
         self._ui.deleteButton.clicked.connect(self.tryRemoveScheduledDownload)
         Utils.setIconViewer(self._ui.deleteButton, Icons.TRASH)
+        self._ui.pauseButton.clicked.connect(self.pauseResume)
         self.scheduledDownload.activeChanged.connect(self._activeChanged)
         self._activeChanged()
         self.scheduledDownload.channelDataUpdateStarted.connect(self._channelDataUpdateStarted)
@@ -55,15 +56,25 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
         super().showEvent(event)
 
     def _activeChanged(self) -> None:
-        self._ui.downloaderArea.setEnabled(self.scheduledDownload.isActive())
-        self._enableButtonIconViewer.setIcon(Icons.TOGGLE_ON if self.scheduledDownload.isEnabled() else Icons.TOGGLE_OFF)
+        active = self.scheduledDownload.isActive()
+        self._ui.downloadViewControlBar.setEnabled(active)
+        self._ui.downloaderView.setEnabled(active)
+        self._ui.networkStatusArea.setEnabled(active)
+        self._enableButtonIconViewer.setIcon(Icons.TOGGLE_ON if (self.scheduledDownload.isEnabled() and not self.scheduledDownload.isSessionDisabled()) else Icons.TOGGLE_OFF)
+        self._ui.pauseButton.setText(T("resume") if self.scheduledDownload.isPaused() else T("pause"))
 
     def _enableButtonClicked(self) -> None:
-        if self.scheduledDownload.isActive():
-            if self.scheduledDownload.status.isDownloading():
-                if not Utils.ask(*Messages.ASK.STOP_DOWNLOAD, parent=self):
-                    return
-        self.scheduledDownload.setEnabled(not self.scheduledDownload.isEnabled())
+        if self.scheduledDownload.isSessionDisabled():
+            self.scheduledDownload.setSessionDisabled(False)
+        else:
+            if self.scheduledDownload.isActive():
+                if self.scheduledDownload.status.isDownloading():
+                    if not Utils.ask(*Messages.ASK.STOP_DOWNLOAD, parent=self):
+                        return
+            self.scheduledDownload.setEnabled(not self.scheduledDownload.isEnabled())
+
+    def pauseResume(self) -> None:
+        self.scheduledDownload.setPaused(not self.scheduledDownload.isPaused())
 
     def _statusUpdated(self) -> None:
         if self.scheduledDownload.status.isNone():
@@ -79,7 +90,7 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
             if isinstance(self.scheduledDownload.status.getError(), ScheduledDownloadPreset.Exceptions.PreferredResolutionNotFound) and App.Preferences.general.isNotifyEnabled():
                 App.Instance.notification.toastMessage(
                     title=T("preferred-resolution-not-found"),
-                    message=f"{T('#Unable to start scheduled download for channel {channel}.', channel=self.scheduledDownload.channel.formattedName)}\n{T('started-at')}: {self.scheduledDownload.channel.stream.createdAt.toTimeZone(App.Preferences.localization.getTimezone()).toString('yyyy-MM-dd HH:mm:ss')}",
+                    message=f"{T("errors.#unable_start_scheduled_download_channel", channel=self.scheduledDownload.channel.formattedName)}\n{T('started-at')}: {self.scheduledDownload.channel.stream.createdAt.toTimeZone(App.Preferences.localization.getTimezone()).toString('yyyy-MM-dd HH:mm:ss')}",
                     icon=App.Instance.notification.Icons.Warning
                 )
         elif self.scheduledDownload.status.isDownloaderError():
@@ -106,7 +117,6 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
             self._showChannel()
             self._ui.downloadViewControlBar.openFileButton.setDisabled()
             self._widgetRemoveController.setRemoveEnabled(True)
-
     def _handleDownloadStatus(self) -> None:
         if self._downloader.status.terminateState.isInProgress():
             self._ui.enableButton.setEnabled(False)
@@ -186,3 +196,12 @@ class ScheduledDownloadPreview(QtWidgets.QWidget):
 
     def removeScheduledDownload(self) -> None:
         App.ScheduledDownloadManager.remove(self.scheduledDownloadId)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

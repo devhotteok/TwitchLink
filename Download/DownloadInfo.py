@@ -42,18 +42,22 @@ class DownloadInfo(Serializable):
     def __init__(self, content: Stream | Video | Clip, playback: TwitchStreamPlayback | TwitchVideoPlayback | TwitchClipPlayback):
         self.content = content
         self.playback = playback
+        self.downloadChat = self.optionHistory.isDownloadChatEnabled()
+        self.range = (None, None)
         if self.type.isStream():
             self.skipAds = False if self.playback.token.hideAds else self.optionHistory.isSkipAdsEnabled()
             self.remux = self.optionHistory.isRemuxEnabled()
         elif self.type.isVideo():
-            self.range = (None, None)
             self.unmuteVideo = self.optionHistory.isUnmuteVideoEnabled()
             self.updateTrack = self.optionHistory.isUpdateTrackEnabled()
             self.prioritize = False
             self.remux = self.optionHistory.isRemuxEnabled()
         elif self.type.isClip():
             self.prioritize = False
-        self.directory = self.optionHistory.getUpdatedDirectory()
+            self.remux = getattr(self.optionHistory, "remux", True)
+        self.createSubfolderForDownloads = self.optionHistory.isCreateSubfolderForDownloadsEnabled()
+
+        self.setDirectory(self.optionHistory.getUpdatedDirectory())
         self.selectedResolutionIndex = 0
         self.fileName = self.generateFileName()
         self.fileFormat = self.getAvailableFormat()
@@ -145,20 +149,33 @@ class DownloadInfo(Serializable):
     def setSkipAdsEnabled(self, enabled: bool) -> None:
         self.skipAds = enabled
 
+    def setDownloadChatEnabled(self, enabled: bool) -> None:
+        self.downloadChat = enabled
+
+
+
     def setRemuxEnabled(self, enabled: bool) -> None:
         self.remux = enabled
 
+    def setCreateSubfolderForDownloadsEnabled(self, enabled: bool) -> None:
+        self.createSubfolderForDownloads = enabled
+
     def isUnmuteVideoEnabled(self) -> bool:
-        return self.unmuteVideo
+        return getattr(self, "unmuteVideo", False)
 
     def isUpdateTrackEnabled(self) -> bool:
-        return self.updateTrack
+        return getattr(self, "updateTrack", False)
 
     def isPrioritizeEnabled(self) -> bool:
-        return self.prioritize
+        return getattr(self, "prioritize", False)
 
     def isSkipAdsEnabled(self) -> bool:
-        return self.skipAds
+        return getattr(self, "skipAds", False)
+
+
+
+    def isCreateSubfolderForDownloadsEnabled(self) -> bool:
+        return getattr(self, "createSubfolderForDownloads", False)
 
     def isRemuxEnabled(self) -> bool:
         return self.remux
@@ -177,9 +194,15 @@ class DownloadInfo(Serializable):
             self.optionHistory.setUnmuteVideoEnabled(self.unmuteVideo)
             self.optionHistory.setUpdateTrackEnabled(self.updateTrack)
             self.optionHistory.setRemuxEnabled(self.remux)
+        self.optionHistory.setCreateSubfolderForDownloadsEnabled(self.createSubfolderForDownloads)
 
     def getUrl(self) -> QtCore.QUrl:
         return self.resolution.url
 
     def getAbsoluteFileName(self) -> str:
-        return Utils.joinPath(self.directory, f"{self.fileName}.{self.fileFormat}")
+        return Utils.joinPath(self.getAbsoluteDirectory(), f"{self.fileName}.{self.fileFormat}")
+
+    def getAbsoluteDirectory(self) -> str:
+        if self.isCreateSubfolderForDownloadsEnabled():
+            return Utils.joinPath(self.directory, self.fileName)
+        return self.directory

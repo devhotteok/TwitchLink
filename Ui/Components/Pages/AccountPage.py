@@ -38,7 +38,7 @@ class AccountPage(WebViewTabManager):
         self.setCurrentIndex(tabIndex)
 
     def _cancelSignInRequested(self) -> None:
-        if Utils.ask("cancel-sign-in", "#Are you sure you want to cancel the sign-in operation in progress?", parent=self):
+        if Utils.ask("cancel-sign-in", "prompts.#are_you_sure_you_want_cancel_sign_opera", parent=self):
             self.closeSignIn()
 
     def _signInCompleteHandler(self, accountData: AccountData) -> None:

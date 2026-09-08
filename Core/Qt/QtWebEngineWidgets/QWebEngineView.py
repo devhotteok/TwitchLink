@@ -3,7 +3,7 @@ from PyQt6 import QtCore, QtGui, QtWebEngineCore, QtWebEngineWidgets
 import os
 
 
-os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-gpu --enable-experimental-web-platform-features"
+os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-gpu"
 
 
 class _QWebEngineView(QtWebEngineWidgets.QWebEngineView):

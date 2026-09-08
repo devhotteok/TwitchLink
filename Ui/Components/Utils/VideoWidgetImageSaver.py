@@ -22,7 +22,7 @@ class VideoWidgetImageSaver:
                 history.setAbsoluteFileName(fileName)
                 if Utils.ask(
                     "save-complete",
-                    f"{T('#Save completed.')}\n\n{fileName}",
+                    f"{T("messages.#save_completed")}\n\n{fileName}",
                     contentTranslate=False,
                     okText=T("open"),
                     cancelText=T("ok"),

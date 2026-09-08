@@ -16,11 +16,13 @@ class ProgressDetails(Serializable):
         self.mutedFiles = 0
         self.skippedFiles = 0
         self.missingFiles = 0
+        self.adFiles = 0
         self.milliseconds = 0
         self.totalMilliseconds = 0
         self.mutedMilliseconds = 0
         self.skippedMilliseconds = 0
         self.missingMilliseconds = 0
+        self.adMilliseconds = 0
         self.byteSize = 0
         self.totalByteSize = 0
 
@@ -30,11 +32,13 @@ class ProgressDetails(Serializable):
         self.mutedFiles = progress.mutedFiles
         self.skippedFiles = progress.skippedFiles
         self.missingFiles = progress.missingFiles
+        self.adFiles = getattr(progress, "adFiles", 0)
         self.milliseconds = progress.milliseconds
         self.totalMilliseconds = progress.totalMilliseconds
         self.mutedMilliseconds = progress.mutedMilliseconds
         self.skippedMilliseconds = progress.skippedMilliseconds
         self.missingMilliseconds = progress.missingMilliseconds
+        self.adMilliseconds = getattr(progress, "adMilliseconds", 0)
         self.byteSize = progress.byteSize
         self.totalByteSize = progress.totalByteSize
 

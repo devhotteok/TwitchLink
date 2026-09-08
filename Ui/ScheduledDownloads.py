@@ -45,7 +45,7 @@ class ScheduledDownloads(QtWidgets.QWidget):
     def enableButtonClicked(self) -> None:
         if App.ScheduledDownloadManager.isEnabled():
             if len(App.ScheduledDownloadManager.getScheduledDownloads()) != 0:
-                if not Utils.ask("warning", "#This disables all scheduled downloads and disconnects from the channel.\nProceed?", parent=self):
+                if not Utils.ask("warning", "prompts.#this_disables_all_scheduled_downloads_a", parent=self):
                     return
                 if App.ScheduledDownloadManager.isDownloaderRunning():
                     if not Utils.ask(*Messages.ASK.STOP_CANCEL_ALL_DOWNLOADS, parent=self):
@@ -72,3 +72,12 @@ class ScheduledDownloads(QtWidgets.QWidget):
         self._ui.totalCount.setText(scheduledDownloadsCount)
         self._ui.downloadingCount.setText(len(App.ScheduledDownloadManager.getRunningScheduledDownloads()))
         self._ui.stackedWidget.setCurrentIndex(0 if scheduledDownloadsCount == 0 else 1)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass

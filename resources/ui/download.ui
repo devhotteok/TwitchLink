@@ -34,7 +34,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Title</string>
+      <string>ui.title</string>
      </property>
     </widget>
    </item>
@@ -123,7 +123,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="statusLabel">
         <property name="text">
-         <string>Status</string>
+         <string>ui.status</string>
         </property>
        </widget>
       </item>
@@ -164,21 +164,21 @@
          <item>
           <widget class="QLabel" name="status">
            <property name="text">
-            <string>Status</string>
+            <string>ui.status</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="updateTrackInfo">
            <property name="text">
-            <string>Update Track Info</string>
+            <string>ui.update_track_info</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QToolButton" name="statusInfoButton">
            <property name="toolTip">
-            <string>Information</string>
+            <string>ui.information</string>
            </property>
            <property name="icon">
             <iconset>
@@ -205,7 +205,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="downloadLabel">
         <property name="text">
-         <string>Download</string>
+         <string>ui.download</string>
         </property>
        </widget>
       </item>
@@ -219,7 +219,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="durationLabel">
         <property name="text">
-         <string>Duration</string>
+         <string>ui.duration</string>
         </property>
        </widget>
       </item>
@@ -254,7 +254,7 @@
             <string notr="true">color: rgb(31, 71, 136);</string>
            </property>
            <property name="text">
-            <string>Failed to unmute 0 segments (00:00:00)</string>
+            <string>ui.#failed_to_unmute_0_segments_000000</string>
            </property>
           </widget>
          </item>
@@ -264,7 +264,7 @@
             <string notr="true">color: rgb(255, 0, 0);</string>
            </property>
            <property name="text">
-            <string>Skipped 0 commercial segments (00:00:00)</string>
+            <string>ui.#skipped_0_commercial_segments_000000</string>
            </property>
           </widget>
          </item>
@@ -274,7 +274,7 @@
             <string notr="true">color: rgb(255, 0, 0);</string>
            </property>
            <property name="text">
-            <string>Missing 0 segments (00:00:00)</string>
+            <string>ui.#missing_0_segments_000000</string>
            </property>
           </widget>
          </item>
@@ -294,7 +294,7 @@
          <item>
           <widget class="QLabel" name="fileSize">
            <property name="text">
-            <string>0.0B</string>
+            <string>ui.00b</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -350,7 +350,20 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Pause</string>
+         <string>ui.pause</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="finishButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>ui.finish</string>
         </property>
        </widget>
       </item>
@@ -363,7 +376,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Cancel</string>
+         <string>ui.cancel</string>
         </property>
        </widget>
       </item>
@@ -376,7 +389,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Retry</string>
+         <string>ui.retry</string>
         </property>
         <property name="icon">
          <iconset>
@@ -399,7 +412,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Open Folder</string>
+         <string>ui.open_folder</string>
         </property>
         <property name="icon">
          <iconset>
@@ -422,7 +435,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Open File</string>
+         <string>ui.open_file</string>
         </property>
         <property name="icon">
          <iconset>

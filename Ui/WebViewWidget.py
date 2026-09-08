@@ -55,7 +55,7 @@ class WebViewWidget(QtWidgets.QWidget):
         self.refreshShortcut.setEnabled(False)
         self.stopShortcut.setEnabled(False)
         self._ui.controlArea.hide()
-        self.showInfo(f"{T('developer-tools')} - {T('#Close the window by pressing [{key}].', key='F12')}", icon=Icons.SETTINGS, buttonIcon=Icons.CLOSE, buttonTransparent=True, buttonHandler=self.hideInfo)
+        self.showInfo(f"{T('developer-tools')} - {T("messages.#close_window_pressing", key='F12')}", icon=Icons.SETTINGS, buttonIcon=Icons.CLOSE, buttonTransparent=True, buttonHandler=self.hideInfo)
         self._ui.webView.page().setInspectedPage(page)
 
     def setProfile(self, profile: QtWebEngineCore.QWebEngineProfile) -> None:
@@ -158,3 +158,12 @@ class WebView(QtWebEngineWidgets.QWebEngineView):
         devToolsWidget.setProfile(self.page().profile())
         devToolsWidget.setInspectedMode(self.page())
         self.newTabRequested.emit(devToolsWidget)
+
+    def changeEvent(self, event: QtCore.QEvent) -> None:
+        super().changeEvent(event)
+        if event.type() == QtCore.QEvent.Type.LanguageChange:
+            self._ui.retranslateUi(self)
+            self.retranslateDynamicUi()
+
+    def retranslateDynamicUi(self) -> None:
+        pass
