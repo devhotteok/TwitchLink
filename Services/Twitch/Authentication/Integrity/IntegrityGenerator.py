@@ -1,4 +1,5 @@
 from .IntegrityToken import IntegrityToken
+from .IntegrityWebPage import IntegrityWebPage
 from .IntegrityConfig import Config
 
 from Core import App
@@ -66,7 +67,7 @@ class TwitchIntegrityGenerator(QtCore.QObject):
         self._profile.setUrlRequestInterceptor(self._requestInterceptor)
         self._webEngineView = QtWebEngineWidgets.QWebEngineView()
         self._webEngineView.setVisible(False)
-        self._webEngineView.setPage(QtWebEngineCore.QWebEnginePage(self._profile, self._webEngineView))
+        self._webEngineView.setPage(IntegrityWebPage(self._profile, self._webEngineView))
         self._webEngineView.load(QtCore.QUrl(Config.ACCOUNT_PAGE_URL))
 
     def _webEngineViewtimeoutHandler(self) -> None:
