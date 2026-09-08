@@ -30,14 +30,6 @@ jobs:
       FFMPEG_SOURCE: 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-08-31-13-27/ffmpeg-N-126342-gf88b741dbf-linux64-gpl.tar.xz'
 
     steps:
-    - name: Download FFmpeg
-      run: |
-        curl -L -o ffmpeg_download.tar.xz ${{ env.FFMPEG_SOURCE }}
-        mkdir ffmpeg_download
-        tar -xf ffmpeg_download.tar.xz --strip-components 1 -C ffmpeg_download
-        mv ffmpeg_download/bin/ffmpeg resources/dependencies/linux
-        rm -r ffmpeg_download.tar.xz ffmpeg_download
-
     - name: Checkout code
       uses: actions/checkout@v4
       with:
@@ -48,6 +40,14 @@ jobs:
           !/.github/build/macos
           !/resources/dependencies/macos
         sparse-checkout-cone-mode: false
+        
+    - name: Download FFmpeg
+      run: |
+        curl -L -o ffmpeg_download.tar.xz ${{ env.FFMPEG_SOURCE }}
+        mkdir ffmpeg_download
+        tar -xf ffmpeg_download.tar.xz --strip-components 1 -C ffmpeg_download
+        mv ffmpeg_download/bin/ffmpeg resources/dependencies/linux
+        rm -r ffmpeg_download.tar.xz ffmpeg_download
 
     - name: Set up Python
       uses: actions/setup-python@v5
