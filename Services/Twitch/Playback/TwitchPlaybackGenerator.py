@@ -173,7 +173,7 @@ class TwitchVideoPlaybackGenerator(QtCore.QObject):
             self._raiseException(response.getError())
 
     def _getVideoPlayback(self) -> None:
-        params = {"allow_source": True, "allow_audio_only": True, "sig": self.token.signature, "token": self.token.value}
+        params = {"allow_source": True, "allow_audio_only": True, "sig": self.token.signature, "token": self.token.value, "supported_codecs": "av1,h265,h264"}
         url = QtCore.QUrl(f"{Config.VOD_SERVER}{self.id}.m3u8")
         query = QtCore.QUrlQuery()
         for key, value in params.items():
