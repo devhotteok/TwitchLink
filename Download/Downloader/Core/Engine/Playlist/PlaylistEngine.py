@@ -28,7 +28,7 @@ class PlaylistEngine(BaseEngine):
         self._safeTempDirectory: SafeTempDirectory | None = None
         self._FFmpeg: FFmpeg | None = None
         self._segmentDownloaders: list[SegmentDownloader] = []
-        self._segmentMapInfo: str | None = None
+        self._lastInitializationSegment: Segment | None = None
         self._refreshTimer = QtCore.QTimer(parent=self)
         self._refreshTimer.setSingleShot(True)
         self._refreshTimer.setInterval(Config.PLAYLIST_UPDATE_INTERVAL)
@@ -82,11 +82,6 @@ class PlaylistEngine(BaseEngine):
             if self._playlistManager.hasNewSegments():
                 segmentsToDownload = []
                 for segment in self._playlistManager.getNewSegments():
-                    if self.progress.totalFiles == 0:
-                        if segment.mapInfo != self._segmentMapInfo:
-                            self._segmentMapInfo = segment.mapInfo
-                            self.progress.totalFiles += 1
-                            segmentsToDownload.append(Segment(-segment.sequence - 1, segment.url.resolved(QtCore.QUrl(segment.mapInfo)), segment.datetime, 0, segment.startsAt))
                     self.progress.totalFiles += 1
                     self.progress.totalMilliseconds += segment.totalMilliseconds
                     if self.downloadInfo.type.isStream() and self.downloadInfo.isSkipAdsEnabled() and any(re.match(filter, segment.title) for filter in Config.STREAM_SEGMENT_TITLE_FILTER_REGEX):
@@ -94,6 +89,17 @@ class PlaylistEngine(BaseEngine):
                         self.progress.skippedMilliseconds += segment.totalMilliseconds
                         self.logger.info(f"Skipping Segment: <Sequence: {segment.sequence} / Length: {segment.totalMilliseconds}>\n{segment.url.toString()}")
                     else:
+                        if segment.mapInfo != None and (self._lastInitializationSegment == None or self._lastInitializationSegment.url.toString() != segment.mapInfo):
+                            self._lastInitializationSegment = Segment(
+                                sequence=-segment.sequence - 1,
+                                url=QtCore.QUrl(segment.mapInfo),
+                                datetime=segment.datetime,
+                                totalMilliseconds=0,
+                                startsAt=segment.startsAt,
+                                initializationSegment=True
+                            )
+                            self.progress.totalFiles += 1
+                            segmentsToDownload.append(self._lastInitializationSegment)
                         segmentsToDownload.append(segment)
                 self._downloadSegments(segmentsToDownload)
                 self._syncProgress()
@@ -129,7 +135,7 @@ class PlaylistEngine(BaseEngine):
             self.progress.missingFiles += 1
             self.progress.missingMilliseconds += segmentDownloader.segment.totalMilliseconds
             self._syncProgress()
-            if isinstance(exception, Exceptions.FileSystemError):
+            if segmentDownloader.segment.isInitializationSegment() or isinstance(exception, Exceptions.FileSystemError):
                 self._raiseException(exception)
 
     def _segmentDownloadFinished(self, segmentDownloader: SegmentDownloader) -> None:

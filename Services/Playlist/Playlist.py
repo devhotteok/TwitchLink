@@ -77,6 +77,8 @@ class Playlist:
                         mediaSequence = int(tag.data[0])
                     elif tag.name == "EXT-X-MAP":
                         mapInfo = tag.data.get("URI") or None
+                        if mapInfo != None and baseUrl != None:
+                            mapInfo = baseUrl.resolved(QtCore.QUrl(mapInfo)).toString()
                     elif tag.name == "EXT-X-ENDLIST":
                         endList = True
                     elif tag.name == "EXT-X-PROGRAM-DATE-TIME":
