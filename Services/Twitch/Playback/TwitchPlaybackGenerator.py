@@ -1,11 +1,11 @@
 from . import TwitchPlaybackModels
 from .TwitchPlaybackConfig import Config
+from .TwitchPlaylistReader import TwitchPlaylistReader
 
 from Core import App
 from Core import GlobalExceptions
 from Services.Twitch.GQL import TwitchGQLAPI
 from Services.Twitch.GQL import TwitchGQLModels
-from Services.Playlist.VariantPlaylistReader import VariantPlaylistReader
 from Services.Playlist.Resolution import Resolution
 
 from PyQt6 import QtCore, QtNetwork
@@ -72,6 +72,13 @@ class Exceptions(GlobalExceptions.Exceptions):
         def __str__(self):
             return f"Clip Not Found\nClip: {self.slug}"
 
+    class NoAvailableResolutions(Exception):
+        def __init__(self, unavailableResolutions: list[TwitchPlaybackModels.TwitchUnavailableResolution]):
+            self.unavailableResolutions = unavailableResolutions
+
+        def __str__(self):
+            return "No Available Resolutions"
+
 
 class TwitchStreamPlaybackGenerator(QtCore.QObject):
     finished = QtCore.pyqtSignal(object)
@@ -109,7 +116,7 @@ class TwitchStreamPlaybackGenerator(QtCore.QObject):
             raise Exceptions.GeoBlock(self.token.getGeoBlockReason())
 
     def _getStreamPlayback(self) -> None:
-        params = {"allow_source": True, "allow_audio_only": True, "sig": self.token.signature, "token": self.token.value, "fast_bread": True, "supported_codecs": "av1,h265,h264"}
+        params = {"allow_source": True, "allow_audio_only": True, "sig": self.token.signature, "token": self.token.value, "fast_bread": True, "supported_codecs": "av1,h265,h264", "include_unavailable": True}
         url = QtCore.QUrl(f"{Config.HLS_SERVER}{self.login}.m3u8")
         query = QtCore.QUrlQuery()
         for key, value in params.items():
@@ -121,14 +128,18 @@ class TwitchStreamPlaybackGenerator(QtCore.QObject):
 
     def _replyFinished(self) -> None:
         if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
-            resolutions = VariantPlaylistReader.loads(self._reply.readAll().data().decode(errors="ignore"), baseUrl=self._reply.url())
+            resolutions, unavailableResolutions = TwitchPlaylistReader.loads(self._reply.readAll().data().decode(errors="ignore"), baseUrl=self._reply.url())
             if len(resolutions) == 0:
-                self._raiseException(Exceptions.ChannelIsOffline(self.login))
+                if len(unavailableResolutions) == 0:
+                    self._raiseException(Exceptions.ChannelIsOffline(self.login))
+                else:
+                    self._raiseException(Exceptions.NoAvailableResolutions(unavailableResolutions))
             else:
                 self._data = TwitchPlaybackModels.TwitchStreamPlayback(
                     login=self.login,
                     token=self.token,
-                    resolutions=resolutions
+                    resolutions=resolutions,
+                    unavailableResolutions=unavailableResolutions
                 )
                 self._setFinished()
         elif self._reply.error() == QtNetwork.QNetworkReply.NetworkError.ContentNotFoundError:
@@ -173,7 +184,7 @@ class TwitchVideoPlaybackGenerator(QtCore.QObject):
             self._raiseException(response.getError())
 
     def _getVideoPlayback(self) -> None:
-        params = {"allow_source": True, "allow_audio_only": True, "sig": self.token.signature, "token": self.token.value, "supported_codecs": "av1,h265,h264"}
+        params = {"allow_source": True, "allow_audio_only": True, "sig": self.token.signature, "token": self.token.value, "supported_codecs": "av1,h265,h264", "include_unavailable": True}
         url = QtCore.QUrl(f"{Config.VOD_SERVER}{self.id}.m3u8")
         query = QtCore.QUrlQuery()
         for key, value in params.items():
@@ -185,14 +196,18 @@ class TwitchVideoPlaybackGenerator(QtCore.QObject):
 
     def _replyFinished(self) -> None:
         if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
-            resolutions = VariantPlaylistReader.loads(self._reply.readAll().data().decode(errors="ignore"), baseUrl=self._reply.url())
+            resolutions, unavailableResolutions = TwitchPlaylistReader.loads(self._reply.readAll().data().decode(errors="ignore"), baseUrl=self._reply.url())
             if len(resolutions) == 0:
-                self._raiseException(Exceptions.VideoNotFound(self.id))
+                if len(unavailableResolutions) == 0:
+                    self._raiseException(Exceptions.VideoNotFound(self.id))
+                else:
+                    self._raiseException(Exceptions.NoAvailableResolutions(unavailableResolutions))
             else:
                 self._data = TwitchPlaybackModels.TwitchVideoPlayback(
                     id=self.id,
                     token=self.token,
-                    resolutions=resolutions
+                    resolutions=resolutions,
+                    unavailableResolutions=unavailableResolutions
                 )
                 self._setFinished()
         elif self._reply.error() == QtNetwork.QNetworkReply.NetworkError.ContentAccessDenied:

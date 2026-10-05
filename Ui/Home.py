@@ -8,6 +8,7 @@ from Download.DownloadInfo import DownloadInfo
 
 class Home(QtWidgets.QWidget):
     searchResultWindowRequested = QtCore.pyqtSignal(object)
+    accountPageShowRequested = QtCore.pyqtSignal()
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent=parent)
@@ -45,6 +46,7 @@ class Home(QtWidgets.QWidget):
                 data = TwitchGQLModels.Video({"title": "Unknown Video", "game": {"name": "Unknown"}, "owner": {"login": "Unknown User"}, "lengthSeconds": result.totalSeconds})
             downloadMenu = Ui.DownloadMenu(DownloadInfo(data, result), parent=self)
             downloadMenu.downloadRequested.connect(self.startDownload, QtCore.Qt.ConnectionType.QueuedConnection)
+            downloadMenu.accountPageShowRequested.connect(self.accountPageShowRequested, QtCore.Qt.ConnectionType.QueuedConnection)
             downloadMenu.exec()
         else:
             self.searchResultWindowRequested.emit(result)

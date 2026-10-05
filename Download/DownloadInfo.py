@@ -98,7 +98,7 @@ class DownloadInfo(Serializable):
 
     @property
     def resolution(self) -> Resolution:
-        return self.playback.getResolutions()[self.selectedResolutionIndex]
+        return self.playback.getAvailableResolutions()[self.selectedResolutionIndex]
 
     def getAvailableFormat(self, currentFormat: str | None = None) -> str:
         defaultFormat = self.optionHistory.getAudioFormat() if self.resolution.isAudioOnly() else self.optionHistory.getFormat()

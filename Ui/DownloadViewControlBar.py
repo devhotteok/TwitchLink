@@ -15,6 +15,7 @@ class DownloadViewControlButtonTypes(enum.Enum):
     Downloading = 4
     FileNotFound = 5
 
+
 class DownloadViewControlButton:
     def __init__(self, button: QtWidgets.QPushButton, icon: ThemedIcon | None = None):
         self.button = button

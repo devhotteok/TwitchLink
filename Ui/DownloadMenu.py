@@ -1,11 +1,41 @@
 from Core.Ui import *
 from Download.DownloadInfo import DownloadInfo
 from Services.FileNameLocker import FileNameLocker
+from Services.Playlist.Resolution import Resolution
+from Services.Twitch.Playback import TwitchPlaybackModels
 from Ui.Components.Utils.FileNameGenerator import FileNameGenerator
+
+
+class ResolutionOptions:
+    def __init__(self, resolutions: list[Resolution | TwitchPlaybackModels.TwitchUnavailableResolution]):
+        self._displayResolutions: list[Resolution | TwitchPlaybackModels.TwitchUnavailableResolution] = []
+        self._availableResolutions: list[Resolution] = []
+        for resolution in resolutions:
+            if isinstance(resolution, TwitchPlaybackModels.TwitchUnavailableResolution):
+                if not resolution.isLoginRequired():
+                    continue
+            else:
+                self._availableResolutions.append(resolution)
+            self._displayResolutions.append(resolution)
+
+    def getDisplayResolutions(self) -> list[Resolution | TwitchPlaybackModels.TwitchUnavailableResolution]:
+        return self._displayResolutions
+
+    def getDisplayResolution(self, index: int) -> Resolution | TwitchPlaybackModels.TwitchUnavailableResolution:
+        return self._displayResolutions[index]
+
+    def getDisplayResolutionIndex(self, availableResolutionIndex: int) -> int:
+        target = self._availableResolutions[availableResolutionIndex]
+        return next(index for index, resolution in enumerate(self._displayResolutions) if resolution is target)
+
+    def getAvailableResolutionIndex(self, displayResolutionIndex: int) -> int:
+        target = self._displayResolutions[displayResolutionIndex]
+        return next(index for index, resolution in enumerate(self._availableResolutions) if resolution is target)
 
 
 class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
     downloadRequested = QtCore.pyqtSignal(DownloadInfo)
+    accountPageShowRequested = QtCore.pyqtSignal()
 
     def __init__(self, downloadInfo: DownloadInfo, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent=parent)
@@ -31,9 +61,10 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         self.reloadFileDirectory()
         self._ui.fileFormat.currentTextChanged.connect(self.setFormat)
         self._ui.searchDirectory.clicked.connect(self.askSaveAs)
-        for resolution in self.downloadInfo.playback.getResolutions():
+        self._resolutionOptions = ResolutionOptions(self.downloadInfo.playback.getAllResolutions())
+        for resolution in self._resolutionOptions.getDisplayResolutions():
             self._ui.resolution.addItem(FileNameGenerator.generateResolutionName(resolution))
-        self._ui.resolution.setCurrentIndex(self.downloadInfo.selectedResolutionIndex)
+        self._ui.resolution.setCurrentIndex(self._resolutionOptions.getDisplayResolutionIndex(self.downloadInfo.selectedResolutionIndex))
         self._ui.resolution.currentIndexChanged.connect(self.setResolution)
         if self.downloadInfo.type.isStream():
             self._ui.cropArea.hide()
@@ -85,7 +116,17 @@ class DownloadMenu(QtWidgets.QDialog, WindowGeometryManager):
         self.reloadFileDirectory()
 
     def setResolution(self, index: int) -> None:
-        self.downloadInfo.setResolution(index)
+        resolution = self._resolutionOptions.getDisplayResolution(index)
+        if isinstance(resolution, TwitchPlaybackModels.TwitchUnavailableResolution):
+            self._ui.resolution.setCurrentIndexSilent(self._resolutionOptions.getDisplayResolutionIndex(self.downloadInfo.selectedResolutionIndex))
+            if resolution.isLoginRequired():
+                if Utils.ask("unable-to-download", "#Twitch requires you to log in to access this resolution. Would you like to log in?"):
+                    self.reject()
+                    self.accountPageShowRequested.emit()
+            else:
+                Utils.info("unable-to-download", "#This resolution is not available.", parent=self)
+            return
+        self.downloadInfo.setResolution(self._resolutionOptions.getAvailableResolutionIndex(index))
         self.reloadFileDirectory()
         if self.hasResolutionInFileNameTemplate():
             if Utils.ask("filename-change", "#The filename template contains a 'resolution' variable. Do you want to create a new filename based on the changed resolution?", defaultOk=True, parent=self):

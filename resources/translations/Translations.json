@@ -287,6 +287,22 @@
     "en": "Clip not found. Deleted or temporary error.",
     "ko": "클립 정보를 찾을 수 없습니다. 삭제되었거나 일시적인 오류입니다."
   },
+  "#Twitch requires you to log in to access this content. Would you like to log in?": {
+    "en": "Twitch requires you to log in to access this content. Would you like to log in?",
+    "ko": "Twitch는 이 콘텐츠를 로그인 전용 사용자들에게만 제공하고 있습니다. 로그인하시겠습니까?"
+  },
+  "#No available resolutions could be found.": {
+    "en": "No available resolutions could be found.",
+    "ko": "이용 가능한 해상도를 찾을 수 없습니다."
+  },
+  "#This resolution is not available.": {
+    "en": "This resolution is not available.",
+    "ko": "이 해상도는 이용할 수 없습니다."
+  },
+  "#Twitch requires you to log in to access this resolution. Would you like to log in?": {
+    "en": "Twitch requires you to log in to access this resolution. Would you like to log in?",
+    "ko": "Twitch는 이 해상도를 로그인 전용 사용자들에게만 제공하고 있습니다. 로그인하시겠습니까?"
+  },
   "#{channel}'s channel": {
     "en": "{channel}'s channel",
     "ko": "{channel}님의 채널"

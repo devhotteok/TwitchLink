@@ -1,6 +1,6 @@
 from Core import App
 from Core.GlobalExceptions import Exceptions
-from Services.Playlist.VariantPlaylistReader import VariantPlaylistReader
+from Services.Playlist.MultivariantPlaylistReader import MultivariantPlaylistReader
 from Services.Playlist.Resolution import Resolution
 from Services.Playlist.Playlist import Playlist
 from Services.Twitch.GQL import TwitchGQLModels
@@ -48,12 +48,12 @@ class ExternalPlaybackGenerator(QtCore.QObject):
     def _replyFinished(self) -> None:
         if self._reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
             text = self._reply.readAll().data().decode(errors="ignore")
-            self._resolutions = VariantPlaylistReader.loads(text, baseUrl=self._reply.url())
+            self._resolutions = MultivariantPlaylistReader.loads(text, baseUrl=self._reply.url()).resolutions
             if len(self._resolutions) == 0:
                 try:
                     playlist = Playlist()
                     playlist.loads(text, baseUrl=self._reply.url())
-                    resolution = VariantPlaylistReader.generateResolution({"NAME": "Unknown", "GROUP-ID": "Unknown"}, self.url)
+                    resolution = MultivariantPlaylistReader.generateResolution({"NAME": "Unknown", "GROUP-ID": "Unknown"}, {}, self.url)
                     self._resolutions[resolution.groupId] = resolution
                 except Exception as e:
                     self._raiseException(e)

@@ -304,8 +304,9 @@ class ScheduledDownload(QtCore.QObject):
     def createDownloader(self, playback: TwitchPlaybackModels.TwitchStreamPlayback) -> None:
         downloadInfo = DownloadInfo(self.channel.stream, playback)
         downloadInfo.setDirectory(self.preset.directory)
-        selectedResolution = self.preset.selectResolution(playback.getResolutions())
-        downloadInfo.setResolution(playback.getResolutions().index(selectedResolution))
+        resolutions = playback.getAvailableResolutions()
+        selectedResolution = self.preset.selectResolution(resolutions)
+        downloadInfo.setResolution(next(index for index, resolution in enumerate(resolutions) if resolution is selectedResolution))
         downloadInfo.setAbsoluteFileName(Utils.createUniqueFile(downloadInfo.directory, FileNameGenerator.generateFileName(self.channel.stream, selectedResolution, filenameTemplate=self.preset.filenameTemplate), self.preset.fileFormat, exclude=FileNameLocker.getLockedFiles()))
         if not playback.token.hideAds:
             downloadInfo.setSkipAdsEnabled(self.preset.isSkipAdsEnabled())

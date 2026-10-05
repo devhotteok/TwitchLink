@@ -12,6 +12,7 @@ class SearchPage(TabManager):
         self.pageObject = pageObject
         self.home = Ui.Home(parent=self)
         self.home.searchResultWindowRequested.connect(self.openSearchResultTab)
+        self.home.accountPageShowRequested.connect(self.accountPageShowRequested)
         self.addTab(self.home, icon=Icons.HOME, closable=False)
 
     def openSearchResultTab(self, searchResult: TwitchGQLModels.Channel | TwitchGQLModels.Video | TwitchGQLModels.Clip) -> None:

@@ -3,6 +3,7 @@ from Core.App import T
 from Services.Utils.Utils import Utils
 from Services.Playlist.Resolution import Resolution
 from Services.Twitch.GQL import TwitchGQLModels
+from Services.Twitch.Playback import TwitchPlaybackModels
 
 from PyQt6 import QtCore
 
@@ -125,7 +126,10 @@ class FileNameGenerator:
 
     @staticmethod
     def generateResolutionName(resolution: Resolution) -> str:
-        return T("audio-only") if resolution.isAudioOnly() else f"{resolution.displayName} ({T('source')})" if resolution.isSource() else resolution.displayName
+        name = T("audio-only") if resolution.isAudioOnly() else f"{resolution.displayName} ({T('source')})" if resolution.isSource() else resolution.displayName
+        if isinstance(resolution, TwitchPlaybackModels.TwitchUnavailableResolution) and resolution.isLoginRequired():
+            return f"{name} ({T("login-required")})"
+        return name
 
     @staticmethod
     def getInfoTitle(contentType: str) -> str:

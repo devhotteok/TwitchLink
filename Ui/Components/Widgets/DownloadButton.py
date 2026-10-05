@@ -118,7 +118,13 @@ class DownloadButton(QtCore.QObject):
             self.handleExceptions(generator.getError())
 
     def handleExceptions(self, exception: Exception) -> None:
-        if isinstance(exception, TwitchGQLAPI.Exceptions.AuthorizationError):
+        if isinstance(exception, TwitchPlaybackGenerator.Exceptions.NoAvailableResolutions):
+            if any(unavailableResolution.isLoginRequired() for unavailableResolution in exception.unavailableResolutions):
+                if self.ask("unable-to-download", "#Twitch requires you to log in to access this content. Would you like to log in?"):
+                    self.accountPageShowRequested.emit()
+            else:
+                self.info("unable-to-download", "#No available resolutions could be found.")
+        elif isinstance(exception, TwitchGQLAPI.Exceptions.AuthorizationError):
             if App.Account.isSignedIn():
                 self.info(*Messages.INFO.AUTHENTICATION_ERROR)
             else:
@@ -154,6 +160,7 @@ class DownloadButton(QtCore.QObject):
     def askDownload(self, downloadInfo: DownloadInfo) -> None:
         downloadMenu = Ui.DownloadMenu(downloadInfo, parent=self.button)
         downloadMenu.downloadRequested.connect(self.startDownload, QtCore.Qt.ConnectionType.QueuedConnection)
+        downloadMenu.accountPageShowRequested.connect(self.accountPageShowRequested, QtCore.Qt.ConnectionType.QueuedConnection)
         downloadMenu.exec()
 
     def startDownload(self, downloadInfo: DownloadInfo) -> None:

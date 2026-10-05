@@ -2,6 +2,8 @@ from Services.Twitch.GQL import TwitchGQLModels
 from Services.Playlist.Resolution import Resolution
 from AppData.EncoderDecoder import Serializable
 
+from PyQt6 import QtCore
+
 
 class TwitchPlaybackObject(Serializable):
     SERIALIZABLE_INIT_MODEL = False
@@ -14,11 +16,22 @@ class TwitchPlaybackObject(Serializable):
         return self.__str__()
 
 
+class TwitchUnavailableResolution(Resolution):
+    def __init__(self, name: str, groupId: str, authorizationReasons: list[str], filterReasons: list[str]):
+        super().__init__(name, groupId, QtCore.QUrl(), False, False)
+        self.authorizationReasons = authorizationReasons
+        self.filterReasons = filterReasons
+
+    def isLoginRequired(self) -> bool:
+        return "AUTHZ_NOT_LOGGED_IN" in self.authorizationReasons
+
+
 class TwitchStreamPlayback(TwitchPlaybackObject):
-    def __init__(self, login: str, token: TwitchGQLModels.StreamPlaybackAccessToken, resolutions: dict[str, Resolution]):
+    def __init__(self, login: str, token: TwitchGQLModels.StreamPlaybackAccessToken, resolutions: dict[str, Resolution], unavailableResolutions: list[TwitchUnavailableResolution] | None = None):
         self.login = login
         self.token = token
         self.resolutions = resolutions
+        self.unavailableResolutions = unavailableResolutions or []
 
     def resolution(self, id: str) -> Resolution | None:
         if id in self.resolutions:
@@ -26,15 +39,22 @@ class TwitchStreamPlayback(TwitchPlaybackObject):
         else:
             return None
 
-    def getResolutions(self) -> list[Resolution]:
-        return list(self.resolutions.values())
+    def getAvailableResolutions(self) -> list[Resolution]:
+        return sorted(self.resolutions.values(), reverse=True)
+
+    def getUnavailableResolutions(self) -> list[TwitchUnavailableResolution]:
+        return sorted(self.unavailableResolutions, reverse=True)
+
+    def getAllResolutions(self) -> list[Resolution | TwitchUnavailableResolution]:
+        return sorted([*self.resolutions.values(), *self.unavailableResolutions], reverse=True)
 
 
 class TwitchVideoPlayback(TwitchPlaybackObject):
-    def __init__(self, id: str, token: TwitchGQLModels.VideoPlaybackAccessToken, resolutions: dict[str, Resolution]):
+    def __init__(self, id: str, token: TwitchGQLModels.VideoPlaybackAccessToken, resolutions: dict[str, Resolution], unavailableResolutions: list[TwitchUnavailableResolution] | None = None):
         self.id = id
         self.token = token
         self.resolutions = resolutions
+        self.unavailableResolutions = unavailableResolutions or []
 
     def resolution(self, id: str) -> Resolution | None:
         if id in self.resolutions:
@@ -42,8 +62,14 @@ class TwitchVideoPlayback(TwitchPlaybackObject):
         else:
             return None
 
-    def getResolutions(self) -> list[Resolution]:
-        return list(self.resolutions.values())
+    def getAvailableResolutions(self) -> list[Resolution]:
+        return sorted(self.resolutions.values(), reverse=True)
+
+    def getUnavailableResolutions(self) -> list[TwitchUnavailableResolution]:
+        return sorted(self.unavailableResolutions, reverse=True)
+
+    def getAllResolutions(self) -> list[Resolution | TwitchUnavailableResolution]:
+        return sorted([*self.resolutions.values(), *self.unavailableResolutions], reverse=True)
 
 
 class TwitchClipPlayback(TwitchPlaybackObject):
@@ -58,5 +84,11 @@ class TwitchClipPlayback(TwitchPlaybackObject):
         else:
             return None
 
-    def getResolutions(self) -> list[Resolution]:
-        return list(self.resolutions.values())
+    def getAvailableResolutions(self) -> list[Resolution]:
+        return sorted(self.resolutions.values(), reverse=True)
+
+    def getUnavailableResolutions(self) -> list[TwitchUnavailableResolution]:
+        return []
+
+    def getAllResolutions(self) -> list[Resolution | TwitchUnavailableResolution]:
+        return self.getAvailableResolutions()

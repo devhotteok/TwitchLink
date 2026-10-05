@@ -155,6 +155,20 @@ class Updaters:
             data["localization"]["_translationPackId"] = languageCode
         return data
 
+    @staticmethod
+    def Update_3_5_7(data: dict) -> dict:
+        playbackTypes = (
+            "obj:Services.Twitch.Playback.TwitchPlaybackModels:TwitchStreamPlayback",
+            "obj:Services.Twitch.Playback.TwitchPlaybackModels:TwitchVideoPlayback",
+            "obj:Search.ExternalPlaybackGenerator:ExternalStreamPlayback",
+            "obj:Search.ExternalPlaybackGenerator:ExternalVideoPlayback"
+        )
+        for history in data.get("temp", {}).get("_downloadHistory", []):
+            playback = history.get("downloadInfo", {}).get("playback", {})
+            if playback.get("__type__") in playbackTypes:
+                playback.setdefault("unavailableResolutions", [])
+        return data
+
     @classmethod
     def getUpdaters(cls, versionFrom: str) -> list[typing.Callable[[dict], dict]] | None:
         VERSIONS = {
@@ -179,7 +193,8 @@ class Updaters:
             "3.5.3": None,
             "3.5.4": None,
             "3.5.5": None,
-            "3.5.6": None
+            "3.5.6": None,
+            "3.5.7": cls.Update_3_5_7
         }
         updaters = []
         versionFound = False

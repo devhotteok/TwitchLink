@@ -135,6 +135,10 @@
     "en": "Downloading",
     "ko": "다운로드 중"
   },
+  "login-required": {
+    "en": "Login Required",
+    "ko": "로그인 필요"
+  },
   "file": {
     "en": "File",
     "ko": "파일"
