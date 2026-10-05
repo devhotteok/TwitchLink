@@ -27,7 +27,6 @@ class PlaylistTag:
             return NotImplemented
 
 
-
 class PlaylistTagReader:
     TAG_WITH_DATA = re.compile("#(.*?):(.*)")
     TAG_WITHOUT_DATA = re.compile("#(.*)")
@@ -81,15 +80,20 @@ class PlaylistTagReader:
         data = {}
         for string in parsedLine:
             if quotation == None:
+                if "=" not in string:
+                    continue
                 key, value = string.split("=", 1)
+                key = key.strip()
+                value = value.strip()
+                if key == "" or value == "":
+                    continue
                 quotation = value[0] if self._startsWithQuotation(value) else None
-                data[key] = value
                 if quotation == None:
+                    data[key] = value
                     continue
             else:
-                value = string
-                data[key] = ",".join((data[key], value))
-            if value.endswith(quotation):
-                data[key] = data[key].strip("\'\"")
+                value = ",".join((value, string))
+            if len(value) >= 2 and value.endswith(quotation):
+                data[key] = value[1:-1]
                 quotation = None
         return data
