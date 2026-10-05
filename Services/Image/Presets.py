@@ -18,7 +18,7 @@ class ImageSize:
     USER_PROFILE = (600, 600)
     STREAM_PREVIEW = (1920, 1080)
     VIDEO_THUMBNAIL = (1920, 1080)
-    CLIP_THUMBNAIL = (None, None)
+    CLIP_THUMBNAIL = (1920, 1080)
     CATEGORY = (90, 120)
 
 
