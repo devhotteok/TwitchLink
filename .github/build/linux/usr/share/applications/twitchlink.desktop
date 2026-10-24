@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=TwitchLink
+Type=Application
+Comment=Twitch Stream / Video / Clip Downloader
+Comment[ko]=트위치 생방송 / 비디오 / 클립 다운로더
+Icon=twitchlink
+Exec=/usr/share/twitchlink/twitchlink %u
+Path=/usr/share/twitchlink
+Terminal=false
+Categories=AudioVideo;Video;
+Keywords=Stream;Clip;Download;

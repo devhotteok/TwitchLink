@@ -1,0 +1,10 @@
+Package: twitchlink
+Version: {{APP_VERSION}}-1
+Architecture: amd64
+Section: python
+Priority: optional
+Depends: libc6 (>= {{LIBC_VERSION}}), libgl1, zlib1g, libegl1, libwayland-server0, libxcb-cursor0, libxcb-icccm4, libxcb-keysyms1, libxcb-shape0, libxkbcommon-x11-0
+Maintainer: devhotteok <devhotteok@gmail.com>
+Homepage: https://twitchlink.github.io/
+Description: Twitch Stream / Video / Clip Downloader
+ TwitchLink is a user-friendly GUI tool for downloading Twitch streams, videos, and clips.

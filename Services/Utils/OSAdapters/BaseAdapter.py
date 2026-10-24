@@ -12,6 +12,8 @@ class BaseAdapter(abc.ABC):
             return "Windows"
         elif system == "Darwin":
             return "macOS"
+        elif system == "Linux":
+            return "Linux"
         return ""
 
     @classmethod
@@ -21,6 +23,10 @@ class BaseAdapter(abc.ABC):
     @classmethod
     def isMacOS(cls) -> bool:
         return cls.getOSType() == "macOS"
+    
+    @classmethod
+    def isLinux(cls) -> bool:
+        return cls.getOSType() == "Linux"
 
     @staticmethod
     @abc.abstractmethod

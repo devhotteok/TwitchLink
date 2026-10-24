@@ -19,7 +19,7 @@ class Account(QtWidgets.QWidget):
         self._ui.alertIcon = Utils.setSvgIcon(self._ui.alertIcon, Icons.ALERT_RED)
         self._ui.signInWithChromeButton.clicked.connect(self.signInWithChrome)
         self._ui.signInWithEdgeButton.clicked.connect(self.signInWithEdge)
-        if Utils.isWindows():
+        if Utils.isWindows() or Utils.isLinux():
             self._ui.importFromFirefoxButton.clicked.connect(self.importAccountFromFirefox)
         else:
             self._ui.importFromFirefoxButton.hide()
@@ -128,9 +128,14 @@ class Account(QtWidgets.QWidget):
         self._signInProcessComplete()
 
     def _externalBrowserError(self, browserInfo: BrowserDriverBrowserInfo) -> None:
-        Utils.info("error", T("#An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), parent=self)
+        if Utils.isLinux():
+            Utils.info("error", T("#An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed. \n\nIf {browserName} is installed using Flatpak or Snap, please reinstall it using the native package for your distribution.", browserName=browserInfo.getDisplayName()), parent=self)
+        else:
+            Utils.info("error", T("#An unexpected error occurred while launching {browserName}. Please ensure that the latest version of {browserName} is properly installed.", browserName=browserInfo.getDisplayName()), parent=self)
 
     def _confirmBrowserSignIn(self, browserName: str) -> bool:
+        if Utils.isLinux():
+            return Utils.ask("information", T("#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, signing out of your Twitch account in the browser will also sign you out of {appName}.\n\nBefore proceeding, please make sure that {browserName} is installed using the native package for your distribution and that you are signed in to Twitch.", browserName=browserName, appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self)
         return Utils.ask("information", T("#The Twitch account saved in your {browserName} browser will be detected and linked.\nSince {appName} shares the same account information as your browser, signing out of your Twitch account in the browser will also sign you out of {appName}.\n\n\nBefore proceeding, please make sure that {browserName} is installed and that you are signed in to Twitch.\n\nAlso, please close all {browserName} windows and terminate any running {browserName} processes.", browserName=browserName, appName=Config.APP_NAME), contentTranslate=False, defaultOk=True, parent=self)
 
     def importAccountFromBrowser(self, browserInfo: BrowserAccountDetectorBrowserInfo) -> None:
@@ -163,4 +168,7 @@ class Account(QtWidgets.QWidget):
         elif isinstance(exception, Exceptions.UnexpectedDriverError):
             Utils.info("error", T("#An unexpected error occurred. Please ensure that the latest version of {browserName} is properly installed and all {browserName} windows are closed.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
         else:
-            Utils.info("error", T("#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            if Utils.isLinux():
+                Utils.info("error", T("#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch. \n\nTwitch accounts on browsers installed using Flatpak or Snap cannot be detected. If this is the case, please reinstall {browserName} using the native package for your distribution.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
+            else:
+                Utils.info("error", T("#Unable to find a Twitch account. Please make sure that {browserName} is signed in to Twitch.", browserName=browserInfo.getDisplayName()), contentTranslate=False, parent=self)
