@@ -16,6 +16,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
         super().__init__(parent=parent)
         self._ui = UiLoader.load("mainWindow", self)
         self._webViewEnabled = False
+        # startup flags
         App.Instance.appStarted.connect(self.start, QtCore.Qt.ConnectionType.QueuedConnection)
 
     def start(self) -> None:
@@ -28,13 +29,25 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
             loading = Ui.Loading()
             loading.completeSignal.connect(self.onLoadingComplete)
             loading.exec()
-            self.show()
+            # If user requested start-hidden, show the window off-screen briefly to register it
+            if App.Preferences.general.isStartHiddenInTrayEnabled() and Utils.isMinimizeToSystemTraySupported():
+                try:
+                    self.move(-10000, -10000)
+                except:
+                    pass
+                self.show()
+                QtCore.QTimer.singleShot(0, self.moveToSystemTray)
+            else:
+                self.show()
 
     def onLoadingComplete(self) -> None:
         self.loadWindowGeometry()
         self.loadComponents()
         self.setupSystemTray()
         self.setup()
+        if App.Preferences.general.isStartHiddenInTrayEnabled():
+            self.moveToSystemTray()
+        
 
     def loadComponents(self) -> None:
         self.setWindowIcon(Icons.APP_LOGO.icon)
@@ -316,6 +329,11 @@ class MainWindow(QtWidgets.QMainWindow, WindowGeometryManager):
 
     def activate(self) -> None:
         if self.isHidden():
+            try:
+                # restore last saved geometry so window appears on-screen
+                self.loadWindowGeometry()
+            except:
+                pass
             self.show()
         self.setWindowState((self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized) | QtCore.Qt.WindowState.WindowActive)
         self.raise_()

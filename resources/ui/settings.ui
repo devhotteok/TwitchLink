@@ -123,6 +123,31 @@
             </layout>
            </widget>
           </item>
+          <item>
+           <widget class="QWidget" name="startHiddenInTrayArea" native="true">
+            <layout class="QHBoxLayout" name="startHiddenInTrayAreaLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="startHiddenInTray">
+               <property name="text">
+                <string>Start application hidden in system tray</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
