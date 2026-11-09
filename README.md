@@ -71,6 +71,7 @@ Make sure your system meets the following requirements to run this project.
 ### Operating System
 - **Windows**: Windows 10 or later
 - **macOS (Apple Silicon)**: macOS 14 (Sonoma) or later
+- **Linux**: glibc 2.35 or later, x86_64 CPU
 
 ### Python
 - Python 3.12
@@ -86,6 +87,7 @@ Make sure your system meets the following requirements to run this project.
 ## Installation
 - [**TwitchLink** for Windows][Releases]
 - [**TwitchLink** for macOS][Releases]
+- [**TwitchLink** for Linux][Releases]
 
 
 ## Contributing

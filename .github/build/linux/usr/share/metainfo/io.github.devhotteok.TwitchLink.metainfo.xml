@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.devhotteok.TwitchLink</id>
+  
+  <name>TwitchLink</name>
+  <summary>Twitch Stream / Video / Clip Downloader</summary>
+  
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  
+  <description>
+    <p>
+      <em>TwitchLink</em> is a user-friendly GUI tool for downloading Twitch streams, videos, and clips. Enjoy fast and reliable downloads with powerful features to save your favorite moments and archive streams.
+      </p>
+  </description>
+
+  <url type="homepage">https://twitchlink.github.io/</url>
+  <url type="bugtracker">https://github.com/devhotteok/TwitchLink/issues/</url>
+  <url type="donation">https://twitchlink.github.io/donate</url>
+    
+  <launchable type="desktop-id">io.github.devhotteok.TwitchLink.desktop</launchable>
+    <screenshots>
+      <screenshot type="default">
+        <image>https://twitchlink.github.io/resources/github/PREVIEW_1.png</image>
+      </screenshot>
+      <screenshot>
+        <image>https://twitchlink.github.io/resources/github/PREVIEW_2.png</image>
+      </screenshot>
+      <screenshot>
+        <image>https://twitchlink.github.io/resources/github/PREVIEW_3.png</image>
+      </screenshot>
+    </screenshots>
+  </component>
